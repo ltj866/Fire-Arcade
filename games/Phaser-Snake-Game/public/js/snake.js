@@ -1,4 +1,3 @@
-
 export default class Snake {
     constructor(scene){
         this.scene = scene;
@@ -18,29 +17,37 @@ export default class Snake {
             ).setOrigin(0));
         // setOrigin will show the full square at 0,0
 
-        this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0)
-        this.wall = [];
+        this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
+        this.wall = []; // define walls
         this.wall2 = [];
-        this.wall3 = [];
-        this.portal = [];
+        this.portal = []; // define a array for portals
+
+        // colors
         this.color = [];
         this.color[0] = "0x0000ff";
         this.color[1] = "0xffff00"
         this.color[2] = "0xFFA500"
         this.color[3] = "0x8300ff"
-        this.color[4] = "0xffc0cb"
-        this.color[5] = "0x40e0d0"
-        this.color[6] = "0xc90076"
-        this.color[7] = "0x800080"
-        this.map = [];
-        this.map = this.randomSequence();
-        console.log(this.map);
 
-        this.positionApple();
-        this.positionPortal();
-        this.positionWall();
+        // map out portal spawns
+        this.map1 = [];
+        this.map2 = [];
+        this.map1 = this.mapArray();
+        this.map2 = this.mapArray();
+
+        // redo second sequence until it is nothing like the first one
+        while (JSON.stringify(this.map1) === JSON.stringify(this.map2)) {
+            this.map2 = mapArray();
+        }
+        // combine two random quadrant arrays for mappinng
+        this.combinedMapping = this.map1.concat(this.map2);
+
+        // call methods
+        this.positionApple(); // drop first apple
+        this.positionPortal(); // position portals
+        this.positionWall(); // position walls
         
-
+        // define keys
         scene.input.keyboard.on('keydown', e => {
             this.keydown(e);
         })
@@ -53,39 +60,54 @@ export default class Snake {
         this.apple.y = Math.floor(
             (Math.random() * this.scene.game.config.height)/this.tileSize
             ) * this.tileSize;
-        if (this.apple.x == 320 || this.apple.x == 640 || this.apple.x == 960) {
+        if (this.apple.x == 320 || this.apple.y == 320) {
             this.apple.x += 16;
         }
     }
     positionPortal(){
-        let j = 160;
+        let c = 0;
         for (let i = 0; i < 8; i++) {
-        this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[i]).setOrigin(0)
-        this.portal[i].x = Math.floor(
-            (Math.random() * ((j-159) - j) + j)/this.tileSize
-            ) * this.tileSize;
-        this.portal[i].y = Math.floor(
-            (Math.random() * this.scene.game.config.height)/this.tileSize
-            ) * this.tileSize;
-            j +=160;
+            if (this.combinedMapping[i] == 0) { // quadrant 0
+                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
+                this.portal[i].x = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
+
+            } else if (this.combinedMapping[i] == 1) { // quadrant 1
+                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
+                this.portal[i].x = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
+
+            } else if (this.combinedMapping[i] == 2) { // quadrant 2
+                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
+                this.portal[i].x = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
+
+            } else if (this.combinedMapping[i] == 3) { // quadrant 3
+                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
+                this.portal[i].x = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
+
+            }
+            
+            if (i % 2 > 0) {
+                c++; // change color every even number
+            }
         }
     }
   
-    positionWall(){
+    positionWall() {
        for (let i = 0; i < this.scene.game.config.height; i++) {
-        this.wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-        this.wall[i].x = 320;
-        this.wall[i].y = i;
-        this.wall2[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-        this.wall2[i].x = 640;
-        this.wall2[i].y = i;
-        this.wall3[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-        this.wall3[i].x = 960;
-        this.wall3[i].y = i;
-       }
+            this.wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
+            this.wall[i].x = 320;
+            this.wall[i].y = i;
+            this.wall2[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
+            this.wall2[i].x = i;
+            this.wall2[i].y = 320;
+        
+        }
     }
 
-    keydown(event){
+    keydown(event) {
         // console.log(event);
         switch(event.keyCode){
             case 37:    //left
@@ -106,28 +128,36 @@ export default class Snake {
                 break;
         }
     }
-    randomSequence() {
-        let sequence = [4, 5, 6, 7];
-        let newArray = [];
-    
-        // Randomly arrange the sequence and add it to the new array
-        while (sequence.length > 0) {
-            let randomIndex = Math.floor(Math.random() * sequence.length);
-            newArray.push(sequence[randomIndex]);
-            sequence = sequence.filter((_, index) => index !== randomIndex);
+
+    // Randomly generates a sequence of 0-3 for choosing a portals quadrant
+    // 0 | 1
+    // __|__
+    //   | 
+    // 2 | 3
+    mapArray() {
+        let numbers = [0, 1, 2, 3, 0, 1, 2, 3];
+        let mapping = [];
+
+        while (numbers.length > 0) {
+            // Exclude numbers that are the same as the last number added
+            let options = numbers.filter(n => n !== mapping[mapping.length - 1]);
+
+            // Select a random number from the options
+            let randomIndex = Math.floor(Math.random() * options.length);
+            let number = options[randomIndex];
+
+            // Add the number to the mapping
+            mapping.push(number);
+
+            // Remove the number from the numbers array
+            numbers = numbers.filter(n => n !== number);
         }
-    
-        // Add the indices of the first half to the second half of the new array
-        for (let i = 4; i < 8; i++) {
-            newArray[i] = newArray.indexOf(i);
-        }
-    
-        return newArray;
+
+        return mapping;
     }
     
     
-    
-
+    // Game Loop
     update(time){
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
@@ -150,9 +180,16 @@ export default class Snake {
             this.positionApple();
 
         }
+
+        let j; // check even/odds
         for (let i = 0; i < 8; i++) {
             if (this.portal[i].x == x && this.portal[i].y == y) {
-                let j = this.map[i];
+                let check = i % 2; // if portal # even = 0 | if portal # odd = 1
+                if (check < 1) { // if even spawn to portal after it
+                    j = i+1;
+                } else {        // if odd spawn in portal behind it
+                    j = i-1;
+                }
                 if (this.direction.x == 1 && this.direction.y == 0) {
                     x = this.portal[j].x+8;
                     y = this.portal[j].y;
@@ -169,8 +206,6 @@ export default class Snake {
             }
         }
 
-        
-
         for (let index = this.body.length-1; index>0; index--){
             this.body[index].x = this.body[index-1].x;
             this.body[index].y = this.body[index-1].y;
@@ -186,11 +221,9 @@ export default class Snake {
             this.body[0].y < 0 || 
             this.body[0].y >= this.scene.game.config.height ||
             this.body[0].x == 320 ||
-            this.body[0].x == 640 ||
-            this.body[0].x == 960
+            this.body[0].y == 320 
         ){
             this.scene.scene.restart();
-
         }
 
         // Death by eating itself
@@ -199,8 +232,8 @@ export default class Snake {
         // if any tailpos == headpos
         if(
             tail.some(
-                section => section.x === this.body[0].x && 
-                section.y === this.body[0].y
+                quadrant => quadrant.x === this.body[0].x && 
+                quadrant.y === this.body[0].y
                 ) 
                 // arr.some() method checks whether 
                 // at least one of the elements of the array 
