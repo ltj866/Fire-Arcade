@@ -2,14 +2,15 @@ export default class Snake {
     constructor(scene){
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
-        this.moveInterval = 100;
-        this.tileSize = 8;
+        this.moveInterval = 120;
+        this.tileSize = 16;
+        this.spawnZone = this.tileSize*4
         this.direction = Phaser.Math.Vector2.DOWN;
         this.body = []; // body will be a set of boxes
 
         //head of the snake
         this.body.push(this.scene.add.rectangle(
-            this.scene.game.config.width -32, 
+            this.scene.game.config.width -this.tileSize*4, 
             this.scene.game.config.height/2, 
             this.tileSize, 
             this.tileSize, 
@@ -60,49 +61,56 @@ export default class Snake {
         this.apple.y = Math.floor(
             (Math.random() * this.scene.game.config.height)/this.tileSize
             ) * this.tileSize;
-        if (this.apple.x == 320 || this.apple.y == 320) {
-            this.apple.x += 16;
+        if (this.apple.x == this.scene.game.config.width/2 || this.apple.y == this.scene.game.config.width/2) {
+            this.apple.x += this.tileSize;
         }
     }
     positionPortal(){
+        console.log("*********************************");
         let c = 0;
         for (let i = 0; i < 8; i++) {
             if (this.combinedMapping[i] == 0) { // quadrant 0
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
+                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - (this.scene.game.config.height/2+this.spawnZone)) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
 
             } else if (this.combinedMapping[i] == 1) { // quadrant 1
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
+                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - this.scene.game.config.width/2+this.spawnZone) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - this.scene.game.config.height/2+this.spawnZone) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
 
             } else if (this.combinedMapping[i] == 2) { // quadrant 2
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
+                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * (this.scene.game.config.height/2 - this.spawnZone*2) + this.spawnZone)/this.tileSize) * this.tileSize;
 
             } else if (this.combinedMapping[i] == 3) { // quadrant 3
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * (624 - 352) + 352)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * (288 - 32) + 32)/this.tileSize) * this.tileSize;
+                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - this.scene.game.config.width/2+this.spawnZone) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
 
             }
             
             if (i % 2 > 0) {
                 c++; // change color every even number
             }
+            console.log(this.portal[i].x, this.portal[i].y);
         }
+        console.log("*********************************");
+        // let j = 0;
+        // while ( j < this.portal.length) {
+
+        // }
     }
   
     positionWall() {
        for (let i = 0; i < this.scene.game.config.height; i++) {
             this.wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-            this.wall[i].x = 320;
+            this.wall[i].x = this.scene.game.config.height/2;
             this.wall[i].y = i;
             this.wall2[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
             this.wall2[i].x = i;
-            this.wall2[i].y = 320;
+            this.wall2[i].y = this.scene.game.config.height/2;
         
         }
     }
@@ -191,17 +199,17 @@ export default class Snake {
                     j = i-1;
                 }
                 if (this.direction.x == 1 && this.direction.y == 0) {
-                    x = this.portal[j].x+8;
+                    x = this.portal[j].x+this.tileSize;
                     y = this.portal[j].y;
                 } else if (this.direction.x == -1 && this.direction.y == 0) {
-                    x = this.portal[j].x-8;
+                    x = this.portal[j].x-this.tileSize;
                     y = this.portal[j].y;
                 } else if (this.direction.x == 0 && this.direction.y == -1) {
                     x = this.portal[j].x;
-                    y = this.portal[j].y-8;
+                    y = this.portal[j].y-this.tileSize;
                 } else if (this.direction.x == 0 && this.direction.y == 1) {
                     x = this.portal[j].x;
-                    y = this.portal[j].y+8;
+                    y = this.portal[j].y+this.tileSize;
                 }
             }
         }
@@ -220,8 +228,8 @@ export default class Snake {
             this.body[0].x >= this.scene.game.config.width ||
             this.body[0].y < 0 || 
             this.body[0].y >= this.scene.game.config.height ||
-            this.body[0].x == 320 ||
-            this.body[0].y == 320 
+            this.body[0].x == this.scene.game.config.width/2 ||
+            this.body[0].y == this.scene.game.config.height/2 
         ){
             this.scene.scene.restart();
         }
