@@ -1,5 +1,5 @@
 export default class Snake {
-    constructor(scene){
+    constructor(scene) {
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
         this.moveInterval = 120;
@@ -15,7 +15,7 @@ export default class Snake {
             this.tileSize, 
             this.tileSize, 
             0xff0000
-            ).setOrigin(0));
+        ).setOrigin(0));
         // setOrigin will show the full square at 0,0
 
         this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
@@ -40,7 +40,7 @@ export default class Snake {
         while (JSON.stringify(this.map1) === JSON.stringify(this.map2)) {
             this.map2 = mapArray();
         }
-        // combine two random quadrant arrays for mappinng
+        // combine two random quadrant arrays for mapping
         this.combinedMapping = this.map1.concat(this.map2);
 
         // call methods
@@ -52,6 +52,10 @@ export default class Snake {
         scene.input.keyboard.on('keydown', e => {
             this.keydown(e);
         })
+    }
+
+    createMap() {
+
     }
 
     positionApple() {
@@ -163,7 +167,32 @@ export default class Snake {
 
         return mapping;
     }
-    
+
+    createMapQuadrant(rows, cols, leftWall = false, rightWall = false, topWall = false, bottomWall = false) {
+        let map = new Array(cols).fill(new Array(rows).fill(0))
+      
+        if (leftWall) {
+            for (let i = 0; i < rows; i++) {
+                map[i][0] = 1;
+            }
+        }
+        if (rightWall) {
+            for (let i = 0; i < rows; i++) {
+                map[i][cols - 1] = 1;
+            }
+        }
+        if (topWall) {
+            for (let i = 0; i < cols; i++) {
+                map[0][i] = 1;
+            }
+        }
+        if (bottomWall) {
+            for (let i = 0; i < cols; i++) {
+                map[rows - 1][i] = 1;
+            }
+        }
+        return map;
+      }
     
     // Game Loop
     update(time){
