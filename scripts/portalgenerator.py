@@ -1,5 +1,8 @@
 import random
-
+"""
+Input: list of possible portal areas
+Output: List of tuples where portals should be made
+"""
 #random.seed(1)
 
 areas = ["A","B","C","D","E","F","G","H"]
