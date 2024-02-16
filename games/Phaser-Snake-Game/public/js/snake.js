@@ -13,13 +13,28 @@ class Snake extends Phaser.Scene
 
     create ()
     {
+        
+        // define keys
+        this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.input.keyboard.on('keydown', e => {
+            this.updateDirection(e);
+        })
+        
         this.add.image(400, 300, 'sky');
 
         //  Create a series of sprites, with a block as the 'head'
 
-        let head;
+        
+        this.alive = true;
+        this.lastMoveTime = 0
         const snake = [];
+        const head = this.add.image(64 * 32, 128, 'blocks', 0); // 0 is head sprite and 1 is body
+        
+        snake.push(head)
 
+        
+
+        /***
         for (let i = 0; i < 12; i++)
         {
             const part = this.add.image(64 + i * 32, 128, 'blocks', 1);
@@ -35,6 +50,7 @@ class Snake extends Phaser.Scene
 
             snake.push(part);
         }
+        */
 
         //  0 = left
         //  1 = right
@@ -45,7 +61,7 @@ class Snake extends Phaser.Scene
 
         //  Create a movement timer - every 100ms we'll move the 'snake'
 
-        this.time.addEvent({ delay: 100, loop: true, callback: () => {
+        this.time.addEvent({ delay: 85, loop: true, callback: () => {
 
             let x = head.x;
             let y = head.y;
@@ -87,7 +103,36 @@ class Snake extends Phaser.Scene
 
         }});
     }
+    
+    updateDirection(event) {
+        console.log(event.key);
+        switch(event.key){
+            case a:
+                console.log(event.key);
+        }
+    }
+
+    update (time, delta) {
+    // console.log("update -- time=" + time + " delta=" + delta);
+        if (!this.alive)
+            {
+                return;
+            }
+        
+        if(time >= this.lastMoveTime + this.moveInterval){
+            this.lastMoveTime = time;
+            //this.move();
+            //console.log(this.previousDirection)
+        }
+        if (!this.spaceBar.isDown){
+            this.moveInterval = 96;} // Less is Faster
+        else{
+            this.moveInterval = 32;
+        }
+    }
 }
+
+
 
 const config = {
     type: Phaser.AUTO,
