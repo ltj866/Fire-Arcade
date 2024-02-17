@@ -12,6 +12,12 @@ var config = {
 
 var snake;
 
+//  Direction consts
+var LEFT = 0;
+var RIGHT = 1;
+var UP = 2;
+var DOWN = 3;
+
 const game = new Phaser.Game(config);
 
 function preload ()
@@ -55,7 +61,7 @@ function create ()
             this.head.setOrigin(0);
             this.body.push(this.head);
             this.moveTime = 0;
-            this.direction = 3;
+            this.direction = LEFT;
         },
         
         update: function (time)
@@ -99,9 +105,6 @@ function create ()
     snake = new Snake(this, 5, 5);
 
     //  Create a series of sprites, with a block as the 'head'
-    
-
-    self.direction = 3
 
     
 
@@ -122,9 +125,6 @@ function create ()
         snake.push(part);
     }
     */
-
-
-    let direction = 3;
 }
     
 function updateDirection(game, event) 
@@ -132,35 +132,43 @@ function updateDirection(game, event)
     // console.log(event.keyCode, this.time.now); // all keys
     switch (event.keyCode) {
         case 87: // w
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = UP;
         break;
 
         case 65: // a
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = LEFT;
         break;
 
         case 83: // s
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = DOWN;
         break;
 
         case 68: // d
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = RIGHT;
         break;
 
         case 38: // UP
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = UP;
         break;
 
         case 37: // LEFT
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = LEFT;
         break;
 
         case 40: // DOWN
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = DOWN;
         break;
 
         case 39: // RIGHT
-        console.log(event.code, game.time.now);
+        //console.log(event.code, game.time.now);
+        snake.direction = RIGHT;
         break;
 
         case 32: // SPACE
