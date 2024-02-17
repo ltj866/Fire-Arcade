@@ -12,7 +12,7 @@ var config = {
 
 var snake;
 
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
 
 function preload ()
 {
@@ -31,7 +31,7 @@ function create ()
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.input.keyboard.on('keydown', e => {
-        this.updateDirection(e);
+        updateDirection(this, e);
     })
 
     this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
@@ -91,9 +91,6 @@ function create ()
         {
             y = Phaser.Math.Wrap(y + 32, 0, 640);
         }
-        console.log(x);
-        console.log(y);
-        console.log(this.body);
         Phaser.Actions.ShiftPosition(this.body, x, y);
 
         }
@@ -130,44 +127,44 @@ function create ()
     let direction = 3;
 }
     
-function updateDirection(event) 
+function updateDirection(game, event) 
 {
     // console.log(event.keyCode, this.time.now); // all keys
     switch (event.keyCode) {
         case 87: // w
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 65: // a
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 83: // s
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 68: // d
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 38: // UP
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 37: // LEFT
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 40: // DOWN
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 39: // RIGHT
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
         break;
 
         case 32: // SPACE
-        console.log(event.code, this.time.now);
+        console.log(event.code, game.time.now);
 
     }
 
@@ -184,7 +181,6 @@ function updateDirection(event)
     if(time >= this.lastMoveTime + this.moveInterval){
         this.lastMoveTime = time;
         snake.move();
-        console.log(snake)
         //console.log(this.previousDirection)
     }
     if (!this.spaceBar.isDown){
