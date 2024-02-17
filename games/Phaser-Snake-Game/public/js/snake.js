@@ -14,13 +14,19 @@ class Snake extends Phaser.Scene
     create ()
     {
         
+        
+        this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
         // define keys
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.input.keyboard.on('keydown', e => {
             this.updateDirection(e);
         })
+
+        this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+            console.log(e.code+" unPress", this.time.now);
+        }) 
         
-        this.add.image(400, 300, 'sky');
+        this.add.image(416, 320, 'sky');
 
         //  Create a series of sprites, with a block as the 'head'
 
@@ -28,7 +34,7 @@ class Snake extends Phaser.Scene
         this.alive = true;
         this.lastMoveTime = 0
         const snake = [];
-        const head = this.add.image(64 * 32, 128, 'blocks', 0); // 0 is head sprite and 1 is body
+        const head = this.add.image(64 * 32, 128, 'blocks', 0).setOrigin(0); // 0 is head sprite and 1 is body
         
         snake.push(head)
 
@@ -57,7 +63,7 @@ class Snake extends Phaser.Scene
         //  2 = up
         //  3 = down
         let direction = 3;
-        let distance = Phaser.Math.Between(4, 8);
+        let distance = 4;
 
         //  Create a movement timer - every 100ms we'll move the 'snake'
 
@@ -98,18 +104,77 @@ class Snake extends Phaser.Scene
                     direction = Phaser.Math.Between(0, 1);
                 }
 
-                distance = Phaser.Math.Between(4, 12);
+                distance = 4;
             }
 
         }});
     }
     
+    move ()
+    {
+        let x = head.x;
+        let y = head.y;
+
+        if (direction === 0)
+            {
+                x = Phaser.Math.Wrap(x - 32, 0, 832);
+            }
+            else if (direction === 1)
+            {
+                x = Phaser.Math.Wrap(x + 32, 0, 832);
+            }
+            else if (direction === 2)
+            {
+                y = Phaser.Math.Wrap(y - 32, 0, 640);
+            }
+            else if (direction === 3)
+            {
+                y = Phaser.Math.Wrap(y + 32, 0, 640);
+            }
+
+            Phaser.Actions.ShiftPosition(snake, x, y);
+
+    }
     updateDirection(event) {
-        console.log(event.key);
-        switch(event.key){
-            case a:
-                console.log(event.key);
+        // console.log(event.keyCode, this.time.now); // all keys
+        switch (event.keyCode) {
+            case 87: // w
+            console.log(event.code, this.time.now);
+            break;
+
+            case 65: // a
+            console.log(event.code, this.time.now);
+            break;
+
+            case 83: // s
+            console.log(event.code, this.time.now);
+            break;
+
+            case 68: // d
+            console.log(event.code, this.time.now);
+            break;
+
+            case 38: // UP
+            console.log(event.code, this.time.now);
+            break;
+
+            case 37: // LEFT
+            console.log(event.code, this.time.now);
+            break;
+
+            case 40: // DOWN
+            console.log(event.code, this.time.now);
+            break;
+
+            case 39: // RIGHT
+            console.log(event.code, this.time.now);
+            break;
+
+            case 32: // SPACE
+            console.log(event.code, this.time.now);
+
         }
+    
     }
 
     update (time, delta) {
@@ -136,8 +201,8 @@ class Snake extends Phaser.Scene
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 832,
+    height: 640,
     parent: 'phaser-example',
     scene: Snake
 };
