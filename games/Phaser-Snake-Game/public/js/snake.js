@@ -47,6 +47,27 @@ function create ()
     // add background
     this.add.image(416, 320, 'sky');
 
+    var Food = new Phaser.Class({
+
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Food (scene, x, y)
+        {
+            Phaser.GameObjects.Image.call(this, scene)
+
+            this.setTexture('blocks', 1);
+            this.setPosition(x * 32, y * 32);
+            this.setOrigin(0);
+
+            this.points = 100;
+
+            scene.children.add(this);
+        },
+
+    });
+
 
     var Snake = new Phaser.Class({
         initialize:
@@ -60,6 +81,14 @@ function create ()
             this.head = scene.add.image(x * 32, y * 32, 'blocks', 0);
             this.head.setOrigin(0);
             this.body.push(this.head);
+
+            // Trying to get one body part to follow correctly. WORKING HERE
+            var part = scene.add.image((x-1) * 32, y * 32, 'blocks', 1);
+            part.setOrigin(0);
+            this.body.push(part)
+
+
+
             this.moveTime = 0;
             this.direction = LEFT;
         },
@@ -71,60 +100,40 @@ function create ()
                 return this.move(time);
             }
         },
+        
         move: function (time)
-        //  0 = left
-        //  1 = right
-        //  2 = up
-        //  3 = down
         {
 
         let x = this.head.x;
         let y = this.head.y;
 
-        if (this.direction === 0)
+        if (this.direction === LEFT)
         {
             x = Phaser.Math.Wrap(x - 32, 0, 832);
         }
-        else if (this.direction === 1)
+        else if (this.direction === RIGHT)
         {
             x = Phaser.Math.Wrap(x + 32, 0, 832);
         }
-        else if (this.direction === 2)
+        else if (this.direction === UP)
         {
             y = Phaser.Math.Wrap(y - 32, 0, 640);
         }
-        else if (this.direction === 3)
+        else if (this.direction === DOWN)
         {
             y = Phaser.Math.Wrap(y + 32, 0, 640);
         }
         Phaser.Actions.ShiftPosition(this.body, x, y);
 
-        }
+        },
     });
 
-    snake = new Snake(this, 5, 5);
+    snake = new Snake(this, 8, 4);
 
-    //  Create a series of sprites, with a block as the 'head'
+    this.apples = [];
+    var food = new Food(this, 0, 0);
+    this.apples.push(food)
 
-    
-
-    /***
-    for (let i = 0; i < 12; i++)
-    {
-        const part = this.add.image(64 + i * 32, 128, 'blocks', 1);
-
-        part.setOrigin(0, 0);
-
-        if (i === 11)
-        {
-            part.setFrame(0);
-
-            head = part;
-        }
-
-        snake.push(part);
-    }
-    */
 }
     
 function updateDirection(game, event) 
@@ -195,6 +204,18 @@ function updateDirection(game, event)
         this.moveInterval = 96;} // Less is Faster
     else{
         this.moveInterval = 32;
+    }
+    //console.log(this.apples[0]);
+   
+    if (snake.head.x === this.apples[0].x && snake.head.y === this.apples[0].y){
+        console.log("HIT");
+        snake.body.push(
+            this.add.image(
+                snake.head.x, snake.head.y, 'blocks', 1
+            ).setOrigin(0)
+        );
+        this.apples[0].x = 5 * 32;
+        this.apples[0].y = 5 * 32;
     }
 }
 
