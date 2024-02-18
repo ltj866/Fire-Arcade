@@ -33,6 +33,8 @@ function preload ()
 function create ()
 {
     
+    this.apples = [];
+    
     this.lastMoveTime = 0; // The last time we called move()
     this.moveInterval = 96;
 
@@ -67,6 +69,8 @@ function create ()
 
             this.points = 100;
 
+            scene.apples.push(this);
+
             scene.children.add(this); // make sense of this
         },
         
@@ -83,6 +87,22 @@ function create ()
         },    
 
     });
+
+    var Wall = new Phaser.Class({
+
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Wall (scene, x, y)
+        {
+            this.setTexture('blocks', 0);
+            this.setPosition(x * GRID, y * GRID);
+            this.setOrigin(0);
+
+            scene.children.add(this);
+        }
+    })
 
 
     var Snake = new Phaser.Class({
@@ -152,10 +172,6 @@ function create ()
     var food0 = new Food(this, 25, 19);
     var food1 = new Food(this, 14, 10);
     var food2 = new Food(this, 5, 13);
-
-    this.apples.push(food0);
-    this.apples.push(food1);
-    this.apples.push(food2);
 
 }
     
