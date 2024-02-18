@@ -66,7 +66,7 @@ function create ()
             Phaser.GameObjects.Image.call(this, scene)
 
             this.setTexture('blocks', 1);
-            this.move();
+            this.move(scene.walls);
             this.setOrigin(0);
 
             this.points = 100;
@@ -76,15 +76,88 @@ function create ()
             scene.children.add(this); // make sense of this
         },
         
-        move: function ()
+        move: function (walls)
         {
-            let x;
-            let y;
+            //let x;
+            //let y;
 
-            x = Phaser.Math.RND.between(0,25); //TODO Only Spawn on Safe Spaces
-            y = Phaser.Math.RND.between(0,19);
+            var safe = [];
+            var safePoints = [];
+            
+            
+            var testGrid = [];
 
-            this.setPosition(x * GRID, y * GRID);
+            for (var x = 0; x <= 25; x++)
+            {
+                testGrid[x] = [];
+        
+                for (var y = 0; y <= 19; y++)
+                {
+                    testGrid[x][y] = true;
+                }
+            }
+            console.log("GRID MADE");
+        
+            // Change every wall to unsafe
+            walls.forEach(wall => {
+                console.log(wall.x/GRID, wall.y/GRID);
+                console.log(testGrid[1][0])
+                testGrid[wall.x][wall.y] = false;
+            });
+
+            console.log("WALLS DONE");
+            
+            
+            //  Purge out false positions
+            var validLocations = [];
+        
+            for (var x = 0; x <= 25; x++)
+            {
+                for (var y = 0; y <= 19; y++)
+                {
+                    if (testGrid[x][y] === true)
+                    {
+                        //  Is this position valid for food? If so, add it here ...
+                        validLocations.push({ x: x, y: y });
+                    }
+                }
+            }
+            
+            
+            // Start with all safe points as true
+            // This is important beacuse Javascript treats non initallized values
+            // as undefined and so comparison throws an error
+/*
+            for (let x = 0; x <= 25; x++) {
+                safe[x] = [];
+                for (let y = 0; y <= 19; y++) {
+                    safe[x][y] = true;
+
+                }
+            };
+
+
+            // generate full list of safe points
+            for (let x = 0; x <= 25; x++) {
+                for (let y = 0; y <= 19; y++) {
+                    if (safe[x][y]) {
+                        console.log(safe[x][y]);
+                        safePoints.push({ x: x, y: y });
+                    }
+                    
+
+                }
+            };*/
+
+            //console.log(safeSpawn[0]);
+              
+
+            var pos = Phaser.Math.RND.pick(validLocations)
+            //x = Phaser.Math.RND.between(0,25); //TODO Only Spawn on Safe Spaces
+            //y = Phaser.Math.RND.between(0,19);
+
+            this.setPosition(pos.x * GRID, pos.y * GRID);
+            //this.setPosition(x * GRID, y * GRID);
 
         },    
 
@@ -187,8 +260,8 @@ function create ()
     var wall = new Wall(this, 10, 14);
 
     var food0 = new Food(this);
-    var food1 = new Food(this, 14, 10);
-    var food2 = new Food(this, 5, 13);
+    var food1 = new Food(this);
+    var food2 = new Food(this);
 
 }
     
@@ -268,7 +341,7 @@ function updateDirection(game, event)
     this.apples.forEach(fruit => {
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
             console.log("EAT");
-            fruit.move()
+            fruit.move(this.walls)
             return 'valid';
         }
     });
