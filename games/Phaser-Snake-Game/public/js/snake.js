@@ -10,6 +10,7 @@ var config = {
     }
 };
 
+
 var snake;
 
 //  Direction consts
@@ -18,12 +19,15 @@ var RIGHT = 1;
 var UP = 2;
 var DOWN = 3;
 
+var GRID = 32;
+
+
 const game = new Phaser.Game(config);
 
 function preload ()
 {
     this.load.image('sky', 'assets/skies/pixelsky.png');
-    this.load.spritesheet('blocks', 'assets/sprites/heartstar32.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('blocks', 'assets/sprites/heartstar32.png', { frameWidth: GRID, frameHeight: GRID });
 }
 
 function create ()
@@ -58,13 +62,25 @@ function create ()
             Phaser.GameObjects.Image.call(this, scene)
 
             this.setTexture('blocks', 1);
-            this.setPosition(x * 32, y * 32);
+            this.setPosition(x * GRID, y * GRID);
             this.setOrigin(0);
 
             this.points = 100;
 
             scene.children.add(this); // make sense of this
         },
+        
+        move: function ()
+        {
+            let x;
+            let y;
+
+            x = Phaser.Math.RND.between(0,25); //TODO Only Spawn on Safe Spaces
+            y = Phaser.Math.RND.between(0,19);
+
+            this.setPosition(x * GRID, y * GRID);
+
+        },    
 
     });
 
@@ -78,7 +94,7 @@ function create ()
             this.alive = true;
             //this.parts = scene.add.group();
             this.body = []
-            this.head = scene.add.image(x * 32, y * 32, 'blocks', 0);
+            this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
             this.head.setOrigin(0);
             this.body.push(this.head);
 
@@ -95,6 +111,7 @@ function create ()
         
         update: function (time)
         {
+            
             //if (time >= this.moveTime)
             //{
             //    return this.move(time);
@@ -109,19 +126,19 @@ function create ()
 
         if (this.direction === LEFT)
         {
-            x = Phaser.Math.Wrap(x - 32, 0, 832);
+            x = Phaser.Math.Wrap(x - GRID, 0, 832);
         }
         else if (this.direction === RIGHT)
         {
-            x = Phaser.Math.Wrap(x + 32, 0, 832);
+            x = Phaser.Math.Wrap(x + GRID, 0, 832);
         }
         else if (this.direction === UP)
         {
-            y = Phaser.Math.Wrap(y - 32, 0, 640);
+            y = Phaser.Math.Wrap(y - GRID, 0, 640);
         }
         else if (this.direction === DOWN)
         {
-            y = Phaser.Math.Wrap(y + 32, 0, 640);
+            y = Phaser.Math.Wrap(y + GRID, 0, 640);
         }
         Phaser.Actions.ShiftPosition(this.body, x, y);
 
@@ -129,11 +146,16 @@ function create ()
     });
 
     snake = new Snake(this, 8, 4);
-
+    // x = width 25 grid
+    // y width 19
     this.apples = [];
-    var food = new Food(this, 0, 0);
-    var food = new Food(this, 5, 5);
-    this.apples.push(food)
+    var food0 = new Food(this, 25, 19);
+    var food1 = new Food(this, 14, 10);
+    var food2 = new Food(this, 5, 13);
+
+    this.apples.push(food0);
+    this.apples.push(food1);
+    this.apples.push(food2);
 
 }
     
@@ -208,16 +230,15 @@ function updateDirection(game, event)
     }
     //console.log(this.apples[0]);
    
-    if (snake.head.x === this.apples[0].x && snake.head.y === this.apples[0].y){
-        console.log("HIT");
-        //snake.body.push(
-        //    this.add.image(
-        //        snake.head.x, snake.head.y, 'blocks', 1
-        //    ).setOrigin(0)
-        //);
-        this.apples[0].x = 10 * 32;
-        this.apples[0].y = 10 * 32;
-    }
+    // Check if the head hits any fruite
+    this.apples.forEach(fruit => {
+        if(snake.head.x === fruit.x && snake.head.y === fruit.y){
+            console.log("EAT");
+            fruit.move()
+            return 'valid';
+        }
+    })
+    
 }
 
 
