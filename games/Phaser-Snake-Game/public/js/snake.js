@@ -63,7 +63,7 @@ function create ()
 
             this.points = 100;
 
-            scene.children.add(this);
+            scene.children.add(this); // make sense of this
         },
 
     });
@@ -76,16 +76,16 @@ function create ()
         {
         
             this.alive = true;
-            this.parts = scene.add.group();
+            //this.parts = scene.add.group();
             this.body = []
             this.head = scene.add.image(x * 32, y * 32, 'blocks', 0);
             this.head.setOrigin(0);
             this.body.push(this.head);
 
             // Trying to get one body part to follow correctly. WORKING HERE
-            var part = scene.add.image((x-1) * 32, y * 32, 'blocks', 1);
-            part.setOrigin(0);
-            this.body.push(part)
+            //var part = scene.add.image((x-1) * 32, y * 32, 'blocks', 1);
+            //part.setOrigin(0);
+            //this.body.push(part);
 
 
 
@@ -95,10 +95,10 @@ function create ()
         
         update: function (time)
         {
-            if (time >= this.moveTime)
-            {
-                return this.move(time);
-            }
+            //if (time >= this.moveTime)
+            //{
+            //    return this.move(time);
+            //}
         },
         
         move: function (time)
@@ -132,6 +132,7 @@ function create ()
 
     this.apples = [];
     var food = new Food(this, 0, 0);
+    var food = new Food(this, 5, 5);
     this.apples.push(food)
 
 }
@@ -209,13 +210,13 @@ function updateDirection(game, event)
    
     if (snake.head.x === this.apples[0].x && snake.head.y === this.apples[0].y){
         console.log("HIT");
-        snake.body.push(
-            this.add.image(
-                snake.head.x, snake.head.y, 'blocks', 1
-            ).setOrigin(0)
-        );
-        this.apples[0].x = 5 * 32;
-        this.apples[0].y = 5 * 32;
+        //snake.body.push(
+        //    this.add.image(
+        //        snake.head.x, snake.head.y, 'blocks', 1
+        //    ).setOrigin(0)
+        //);
+        this.apples[0].x = 10 * 32;
+        this.apples[0].y = 10 * 32;
     }
 }
 
