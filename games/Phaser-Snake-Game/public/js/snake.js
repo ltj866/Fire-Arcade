@@ -34,6 +34,7 @@ function create ()
 {
     
     this.apples = [];
+    this.walls = [];
     
     this.lastMoveTime = 0; // The last time we called move()
     this.moveInterval = 96;
@@ -96,13 +97,17 @@ function create ()
 
         function Wall (scene, x, y)
         {
+            Phaser.GameObjects.Image.call(this, scene)
+
             this.setTexture('blocks', 0);
             this.setPosition(x * GRID, y * GRID);
             this.setOrigin(0);
 
+            scene.walls.push(this);
+
             scene.children.add(this);
-        }
-    })
+        },
+    });
 
 
     var Snake = new Phaser.Class({
@@ -165,10 +170,16 @@ function create ()
         },
     });
 
-    snake = new Snake(this, 8, 4);
+    snake = new Snake(this, 8, 8);
     // x = width 25 grid
     // y width 19
-    this.apples = [];
+
+    var wall = new Wall(this, 10, 10);
+    var wall = new Wall(this, 10, 11);
+    var wall = new Wall(this, 10, 12);
+    var wall = new Wall(this, 10, 13);
+    var wall = new Wall(this, 10, 14);
+
     var food0 = new Food(this, 25, 19);
     var food1 = new Food(this, 14, 10);
     var food2 = new Food(this, 5, 13);
@@ -231,6 +242,7 @@ function updateDirection(game, event)
 // console.log("update -- time=" + time + " delta=" + delta);
     if (!snake.alive)
         {
+            // game.scene.scene.restart(); // This doesn't work correctly
             return;
         }
     
@@ -246,15 +258,22 @@ function updateDirection(game, event)
     }
     //console.log(this.apples[0]);
    
-    // Check if the head hits any fruite
+    // Check collision for all Fruits
     this.apples.forEach(fruit => {
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
             console.log("EAT");
             fruit.move()
             return 'valid';
         }
-    })
-    
+    });
+
+    this.walls.forEach(wall => {
+        if(snake.head.x === wall.x && snake.head.y === wall.y){
+            console.log("DEAD");
+            snake.alive = false;
+            return 'valid';
+        }
+    });
 }
 
 
