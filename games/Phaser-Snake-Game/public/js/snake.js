@@ -19,7 +19,14 @@ var RIGHT = 1;
 var UP = 2;
 var DOWN = 3;
 
-var GRID = 32;
+// Screen Globals
+var GRID = 32; // Size of Sprites and GRID
+var SCREEN_WIDTH = 832; // In pixels needs to manually be the same in var config
+var SCREEN_HEIGHT = 640; // Same as above
+
+// Edge locations for X and Y
+var END_X = SCREEN_WIDTH/GRID -1;
+var END_Y = SCREEN_HEIGHT/GRID -1;
 
 
 const game = new Phaser.Game(config);
@@ -74,7 +81,7 @@ function create ()
 
             scene.apples.push(this);
 
-            scene.children.add(this); // make sense of this
+            scene.children.add(this);
         },
         
         move: function (walls)
@@ -88,14 +95,13 @@ function create ()
             
             var testGrid = {};
 
-            // Start with all safe points as true
-            // This is important because Javascript treats non initallized values
-            // as undefined and so any comparison or look up throws an error.
-            for (var x1 = 0; x1 <= 25; x1++)
+            // Start with all safe points as true. This is important because Javascript treats 
+            // non initallized values as undefined and so any comparison or look up throws an error.
+            for (var x1 = 0; x1 <= END_X; x1++)
             {
                 testGrid[x1] = {};
         
-                for (var y1 = 0; y1 <= 19; y1++)
+                for (var y1 = 0; y1 <= END_Y; y1++)
                 {
                     testGrid[x1][y1] = true;
                 }
@@ -109,9 +115,9 @@ function create ()
             
             var validLocations = [];
         
-            for (var x2 = 0; x2 <= 25; x2++)
+            for (var x2 = 0; x2 <= END_X; x2++)
             {
-                for (var y2 = 0; y2 <= 19; y2++)
+                for (var y2 = 0; y2 <= END_Y; y2++)
                 {
                     if (testGrid[x2][y2] === true)
                     {
@@ -191,19 +197,19 @@ function create ()
 
         if (this.direction === LEFT)
         {
-            x = Phaser.Math.Wrap(x - GRID, 0, 832);
+            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
         }
         else if (this.direction === RIGHT)
         {
-            x = Phaser.Math.Wrap(x + GRID, 0, 832);
+            x = Phaser.Math.Wrap(x + GRID, 0, SCREEN_WIDTH);
         }
         else if (this.direction === UP)
         {
-            y = Phaser.Math.Wrap(y - GRID, 0, 640);
+            y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
         }
         else if (this.direction === DOWN)
         {
-            y = Phaser.Math.Wrap(y + GRID, 0, 640);
+            y = Phaser.Math.Wrap(y + GRID, 0, SCREEN_HEIGHT);
         }
         Phaser.Actions.ShiftPosition(this.body, x, y);
 
@@ -215,7 +221,7 @@ function create ()
     // x = width 25 grid
     // y width 19
 
-    for (let i = 0; i <= 25; i++) {
+    for (let i = 0; i <= END_X; i++) {
         wall = new Wall(this, i, 0);
         wall = new Wall(this, i, 19);
       }
