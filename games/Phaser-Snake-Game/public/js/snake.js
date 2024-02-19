@@ -123,6 +123,10 @@ function create ()
                 testGrid[fruit.x/GRID][fruit.y/GRID] = false;
             });
 
+            scene.portals.forEach(portal => {
+                testGrid[portal.x/GRID][portal.y/GRID] = false;
+            });
+
             
             var validLocations = [];
         
@@ -298,18 +302,9 @@ function create ()
     }
 
     makePair(this, [3,3], [18,18]);
-    //var portal = new Portal(this, [3,3], [18,18]);
-    //spawnPortalPair(this,new Portal([3,3]), [15,15]);
-
 
 }
 
-//function spawnPortalPair(pair) {
-    //console.log(pair);
-    //console.log(game.scene)
-    //var p1 = new Portal(game.scene, pair[0]);
-    //var p2 = new Portal(game.scene, pair[1]);
-//}
 
 function updateDirection(game, event) 
 {
