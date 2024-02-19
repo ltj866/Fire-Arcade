@@ -78,22 +78,25 @@ function create ()
         
         move: function (walls)
         {
-            //let x;
-            //let y;
+            let x;
+            let y;
 
             var safe = [];
             var safePoints = [];
             
             
-            var testGrid = [];
+            var testGrid = {};
 
-            for (var x = 0; x <= 25; x++)
+            // Start with all safe points as true
+            // This is important beacuse Javascript treats non initallized values
+            // as undefined and so comparison throws an error
+            for (var x1 = 0; x1 <= 25; x1++)
             {
-                testGrid[x] = [];
+                testGrid[x1] = {};
         
-                for (var y = 0; y <= 19; y++)
+                for (var y1 = 0; y1 <= 19; y1++)
                 {
-                    testGrid[x][y] = true;
+                    testGrid[x1][y1] = true;
                 }
             }
             console.log("GRID MADE");
@@ -101,9 +104,14 @@ function create ()
             // Change every wall to unsafe
             walls.forEach(wall => {
                 console.log(wall.x/GRID, wall.y/GRID);
-                console.log(testGrid[1][0])
-                testGrid[wall.x][wall.y] = false;
+                console.log(testGrid[10]);
+                console.log(testGrid[wall.x/GRID][wall.y/GRID]);
+                //console.log(testGrid[wall.x]);
+                testGrid[wall.x/GRID][wall.y/GRID] = false;
             });
+
+            // error is either walls.forEach accesing something that doesn't exist
+            // or testGrid[wall.x][wall.y] is accessing an undefined value
 
             console.log("WALLS DONE");
             
@@ -111,53 +119,22 @@ function create ()
             //  Purge out false positions
             var validLocations = [];
         
-            for (var x = 0; x <= 25; x++)
+            for (var x2 = 0; x2 <= 25; x2++)
             {
-                for (var y = 0; y <= 19; y++)
+                for (var y2 = 0; y2 <= 19; y2++)
                 {
-                    if (testGrid[x][y] === true)
+                    if (testGrid[x2][y2] === true)
                     {
                         //  Is this position valid for food? If so, add it here ...
-                        validLocations.push({ x: x, y: y });
+                        validLocations.push({ x: x2, y: y2 });
                     }
                 }
             }
-            
-            
-            // Start with all safe points as true
-            // This is important beacuse Javascript treats non initallized values
-            // as undefined and so comparison throws an error
-/*
-            for (let x = 0; x <= 25; x++) {
-                safe[x] = [];
-                for (let y = 0; y <= 19; y++) {
-                    safe[x][y] = true;
-
-                }
-            };
-
-
-            // generate full list of safe points
-            for (let x = 0; x <= 25; x++) {
-                for (let y = 0; y <= 19; y++) {
-                    if (safe[x][y]) {
-                        console.log(safe[x][y]);
-                        safePoints.push({ x: x, y: y });
-                    }
-                    
-
-                }
-            };*/
-
-            //console.log(safeSpawn[0]);
               
-
             var pos = Phaser.Math.RND.pick(validLocations)
-            //x = Phaser.Math.RND.between(0,25); //TODO Only Spawn on Safe Spaces
-            //y = Phaser.Math.RND.between(0,19);
 
             this.setPosition(pos.x * GRID, pos.y * GRID);
-            //this.setPosition(x * GRID, y * GRID);
+
 
         },    
 
@@ -262,6 +239,7 @@ function create ()
     var food0 = new Food(this);
     var food1 = new Food(this);
     var food2 = new Food(this);
+    var food3 = new Food(this);
 
 }
     
@@ -338,7 +316,7 @@ function updateDirection(game, event)
     //console.log(this.apples[0]);
    
     // Check collision for all Fruits
-    this.apples.forEach(fruit => {
+    this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
             console.log("EAT");
             fruit.move(this.walls)
