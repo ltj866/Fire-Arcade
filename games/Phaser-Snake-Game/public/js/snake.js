@@ -242,10 +242,10 @@ function create ()
     var wall = new Wall(this, 10, 13);
     var wall = new Wall(this, 10, 14);
 
-    var food0 = new Food(this);
-    var food1 = new Food(this);
-    var food2 = new Food(this);
-    var food3 = new Food(this);
+    for (let index = 0; index < 3; index++) {
+        var food = new Food(this);
+        
+    }
 
 }
     
