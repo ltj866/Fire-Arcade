@@ -302,6 +302,7 @@ function create ()
     }
 
     makePair(this, [3,3], [18,18]);
+    makePair(this, [11,11], [5,25])
 
 }
 
