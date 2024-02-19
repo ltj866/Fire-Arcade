@@ -35,6 +35,7 @@ function create ()
     
     this.apples = [];
     this.walls = [];
+    this.score = 0;
     
     this.lastMoveTime = 0; // The last time we called move()
     this.moveInterval = 96;
@@ -88,8 +89,8 @@ function create ()
             var testGrid = {};
 
             // Start with all safe points as true
-            // This is important beacuse Javascript treats non initallized values
-            // as undefined and so comparison throws an error
+            // This is important because Javascript treats non initallized values
+            // as undefined and so any comparison or look up throws an error.
             for (var x1 = 0; x1 <= 25; x1++)
             {
                 testGrid[x1] = {};
@@ -99,24 +100,13 @@ function create ()
                     testGrid[x1][y1] = true;
                 }
             }
-            console.log("GRID MADE");
         
             // Change every wall to unsafe
             walls.forEach(wall => {
-                console.log(wall.x/GRID, wall.y/GRID);
-                console.log(testGrid[10]);
-                console.log(testGrid[wall.x/GRID][wall.y/GRID]);
-                //console.log(testGrid[wall.x]);
                 testGrid[wall.x/GRID][wall.y/GRID] = false;
             });
 
-            // error is either walls.forEach accesing something that doesn't exist
-            // or testGrid[wall.x][wall.y] is accessing an undefined value
-
-            console.log("WALLS DONE");
             
-            
-            //  Purge out false positions
             var validLocations = [];
         
             for (var x2 = 0; x2 <= 25; x2++)
@@ -318,9 +308,11 @@ function updateDirection(game, event)
     // Check collision for all Fruits
     this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-            console.log("EAT");
-            fruit.move(this.walls)
-            return 'valid';
+            console.log("HIT");
+            fruit.move(this.walls);
+            this.score = this.score + fruit.points;
+            console.log("SCORE=", this.score);
+            return 'valid';  //Don't know why this is here but I left it -James
         }
     });
 
@@ -328,7 +320,7 @@ function updateDirection(game, event)
         if(snake.head.x === wall.x && snake.head.y === wall.y){
             console.log("DEAD");
             snake.alive = false;
-            return 'valid';
+            return 'valid'; //Don't know why this is here but I left it -James
         }
     });
 }
