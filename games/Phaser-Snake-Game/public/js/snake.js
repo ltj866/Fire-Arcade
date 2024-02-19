@@ -24,6 +24,13 @@ var GRID = 32; // Size of Sprites and GRID
 var SCREEN_WIDTH = 832; // In pixels needs to manually be the same in var config
 var SCREEN_HEIGHT = 640; // Same as above
 
+
+if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
+    throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
+}
+
+
+
 // Edge locations for X and Y
 var END_X = SCREEN_WIDTH/GRID -1;
 var END_Y = SCREEN_HEIGHT/GRID -1;
