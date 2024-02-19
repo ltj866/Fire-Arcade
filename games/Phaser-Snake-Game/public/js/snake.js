@@ -35,9 +35,6 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 
 
 
-
-
-
 const game = new Phaser.Game(config);
 
 function preload ()
@@ -83,7 +80,7 @@ function create ()
             Phaser.GameObjects.Image.call(this, scene)
 
             this.setTexture('blocks', 1);
-            this.move(scene.walls);
+            this.move(scene);
             this.setOrigin(0);
 
             this.points = 100;
@@ -93,7 +90,7 @@ function create ()
             scene.children.add(this);
         },
         
-        move: function (walls)
+        move: function (scene)
         {
             let x;
             let y;
@@ -116,9 +113,13 @@ function create ()
                 }
             }
         
-            // Change every wall to unsafe
-            walls.forEach(wall => {
+            // Make all the unsafe places unsafe
+            scene.walls.forEach(wall => {
                 testGrid[wall.x/GRID][wall.y/GRID] = false;
+            });
+
+            scene.apples.forEach(fruit => {
+                testGrid[fruit.x/GRID][fruit.y/GRID] = false;
             });
 
             
@@ -323,10 +324,10 @@ function updateDirection(game, event)
     // Check collision for all Fruits
     this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-            console.log("HIT");
-            fruit.move(this.walls);
+            //console.log("HIT");
+            fruit.move(this);
             this.score = this.score + fruit.points;
-            console.log("SCORE=", this.score);
+            console.log("HIT: ","SCORE=", this.score);
             return 'valid';  //Don't know why this is here but I left it -James
         }
     });
