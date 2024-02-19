@@ -33,6 +33,9 @@ function preload ()
 function create ()
 {
     
+    this.apples = [];
+    this.walls = [];
+    
     this.lastMoveTime = 0; // The last time we called move()
     this.moveInterval = 96;
 
@@ -57,31 +60,104 @@ function create ()
 
         initialize:
 
-        function Food (scene, x, y)
+        function Food (scene)
         {
+
             Phaser.GameObjects.Image.call(this, scene)
 
             this.setTexture('blocks', 1);
-            this.setPosition(x * GRID, y * GRID);
+            this.move(scene.walls);
             this.setOrigin(0);
 
             this.points = 100;
 
+            scene.apples.push(this);
+
             scene.children.add(this); // make sense of this
         },
         
-        move: function ()
+        move: function (walls)
         {
             let x;
             let y;
 
-            x = Phaser.Math.RND.between(0,25); //TODO Only Spawn on Safe Spaces
-            y = Phaser.Math.RND.between(0,19);
+            var safe = [];
+            var safePoints = [];
+            
+            
+            var testGrid = {};
 
-            this.setPosition(x * GRID, y * GRID);
+            // Start with all safe points as true
+            // This is important beacuse Javascript treats non initallized values
+            // as undefined and so comparison throws an error
+            for (var x1 = 0; x1 <= 25; x1++)
+            {
+                testGrid[x1] = {};
+        
+                for (var y1 = 0; y1 <= 19; y1++)
+                {
+                    testGrid[x1][y1] = true;
+                }
+            }
+            console.log("GRID MADE");
+        
+            // Change every wall to unsafe
+            walls.forEach(wall => {
+                console.log(wall.x/GRID, wall.y/GRID);
+                console.log(testGrid[10]);
+                console.log(testGrid[wall.x/GRID][wall.y/GRID]);
+                //console.log(testGrid[wall.x]);
+                testGrid[wall.x/GRID][wall.y/GRID] = false;
+            });
+
+            // error is either walls.forEach accesing something that doesn't exist
+            // or testGrid[wall.x][wall.y] is accessing an undefined value
+
+            console.log("WALLS DONE");
+            
+            
+            //  Purge out false positions
+            var validLocations = [];
+        
+            for (var x2 = 0; x2 <= 25; x2++)
+            {
+                for (var y2 = 0; y2 <= 19; y2++)
+                {
+                    if (testGrid[x2][y2] === true)
+                    {
+                        //  Is this position valid for food? If so, add it here ...
+                        validLocations.push({ x: x2, y: y2 });
+                    }
+                }
+            }
+              
+            var pos = Phaser.Math.RND.pick(validLocations)
+
+            this.setPosition(pos.x * GRID, pos.y * GRID);
+
 
         },    
 
+    });
+
+    var Wall = new Phaser.Class({
+
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Wall (scene, x, y)
+        {
+            Phaser.GameObjects.Image.call(this, scene)
+
+            this.setTexture('blocks', 0);
+            this.setPosition(x * GRID, y * GRID);
+            this.setOrigin(0);
+
+            scene.walls.push(this);
+
+            scene.children.add(this);
+        },
     });
 
 
@@ -92,13 +168,12 @@ function create ()
         {
         
             this.alive = true;
-            //this.parts = scene.add.group();
             this.body = []
             this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
             this.head.setOrigin(0);
             this.body.push(this.head);
 
-            // Trying to get one body part to follow correctly. WORKING HERE
+            // Trying to get one body part to follow correctly.
             //var part = scene.add.image((x-1) * 32, y * 32, 'blocks', 1);
             //part.setOrigin(0);
             //this.body.push(part);
@@ -112,7 +187,7 @@ function create ()
         update: function (time)
         {
             
-            //if (time >= this.moveTime)
+            //if (time >= this.moveTime) Why is this here, does it do anything?
             //{
             //    return this.move(time);
             //}
@@ -145,17 +220,26 @@ function create ()
         },
     });
 
-    snake = new Snake(this, 8, 4);
+    snake = new Snake(this, 8, 8);
+    
     // x = width 25 grid
     // y width 19
-    this.apples = [];
-    var food0 = new Food(this, 25, 19);
-    var food1 = new Food(this, 14, 10);
-    var food2 = new Food(this, 5, 13);
 
-    this.apples.push(food0);
-    this.apples.push(food1);
-    this.apples.push(food2);
+    for (let i = 0; i <= 25; i++) {
+        wall = new Wall(this, i, 0);
+        wall = new Wall(this, i, 19);
+      }
+    
+    var wall = new Wall(this, 10, 10);
+    var wall = new Wall(this, 10, 11);
+    var wall = new Wall(this, 10, 12);
+    var wall = new Wall(this, 10, 13);
+    var wall = new Wall(this, 10, 14);
+
+    var food0 = new Food(this);
+    var food1 = new Food(this);
+    var food2 = new Food(this);
+    var food3 = new Food(this);
 
 }
     
@@ -215,6 +299,7 @@ function updateDirection(game, event)
 // console.log("update -- time=" + time + " delta=" + delta);
     if (!snake.alive)
         {
+            // game.scene.scene.restart(); // This doesn't work correctly
             return;
         }
     
@@ -230,15 +315,22 @@ function updateDirection(game, event)
     }
     //console.log(this.apples[0]);
    
-    // Check if the head hits any fruite
-    this.apples.forEach(fruit => {
+    // Check collision for all Fruits
+    this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
             console.log("EAT");
-            fruit.move()
+            fruit.move(this.walls)
             return 'valid';
         }
-    })
-    
+    });
+
+    this.walls.forEach(wall => {
+        if(snake.head.x === wall.x && snake.head.y === wall.y){
+            console.log("DEAD");
+            snake.alive = false;
+            return 'valid';
+        }
+    });
 }
 
 
