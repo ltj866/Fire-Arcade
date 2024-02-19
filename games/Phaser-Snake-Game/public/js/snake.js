@@ -33,14 +33,13 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
-
-
 const game = new Phaser.Game(config);
 
 function preload ()
 {
     this.load.image('sky', 'assets/skies/pixelsky.png');
     this.load.spritesheet('blocks', 'assets/sprites/heartstar32.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 }
 
 function create ()
@@ -48,6 +47,8 @@ function create ()
     
     this.apples = [];
     this.walls = [];
+    this.portals = [];
+
     this.score = 0;
     
     this.lastMoveTime = 0; // The last time we called move()
@@ -132,7 +133,7 @@ function create ()
                     if (testGrid[x2][y2] === true)
                     {
                         //  Is this position valid for food? If so, add it here ...
-                        validLocations.push({ x: x2, y: y2 });
+                        validLocations.push({x: x2, y: y2});
                     }
                 }
             }
@@ -147,7 +148,6 @@ function create ()
     });
 
     var Wall = new Phaser.Class({
-
         Extends: Phaser.GameObjects.Image,
 
         initialize:
@@ -165,6 +165,41 @@ function create ()
             scene.children.add(this);
         },
     });
+  
+    var Portal = new Phaser.Class({
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Portal(scene, color, from, to)
+        {
+            Phaser.GameObjects.Image.call(this, scene);
+            this.setTexture('portals', 0);
+            this.setPosition(from[0] * GRID, from[0] * GRID);
+            this.setOrigin(0);
+
+            this.target = { x: to[0], y: to[1]};
+
+            scene.portals.push(this);
+
+            
+            this.tint = color.color;
+            scene.children.add(this);
+
+        },
+        
+    });
+
+    var makePair = function (scene, to, from){
+
+        var color = new Phaser.Display.Color()
+        color.random(1);
+        console.log(color);
+        
+        var p1 = new Portal(scene, color, to, from);
+        var p2 = new Portal(scene, color, from, to);
+
+    }
 
 
     var Snake = new Phaser.Class({
@@ -199,11 +234,26 @@ function create ()
             //}
         },
         
-        move: function (time)
+        move: function (scene)
         {
 
+        // start with current head position
         let x = this.head.x;
         let y = this.head.y;
+
+        
+        scene.portals.forEach(portal => { 
+            if(snake.head.x === portal.x && snake.head.y === portal.y){
+                console.log("PORTAL");
+
+                x = portal.target.x*GRID;
+                y = portal.target.y*GRID;
+                
+                return 'valid';  //Don't know why this is here but I left it -James
+            }
+        });
+
+        scene.portals[0];
 
         if (this.direction === LEFT)
         {
@@ -247,8 +297,20 @@ function create ()
         
     }
 
+    makePair(this, [3,3], [18,18]);
+    //var portal = new Portal(this, [3,3], [18,18]);
+    //spawnPortalPair(this,new Portal([3,3]), [15,15]);
+
+
 }
-    
+
+//function spawnPortalPair(pair) {
+    //console.log(pair);
+    //console.log(game.scene)
+    //var p1 = new Portal(game.scene, pair[0]);
+    //var p2 = new Portal(game.scene, pair[1]);
+//}
+
 function updateDirection(game, event) 
 {
     // console.log(event.keyCode, this.time.now); // all keys
@@ -311,7 +373,7 @@ function updateDirection(game, event)
     
     if(time >= this.lastMoveTime + this.moveInterval){
         this.lastMoveTime = time;
-        snake.move();
+        snake.move(this);
         //console.log(this.previousDirection)
     }
     if (!this.spaceBar.isDown){
