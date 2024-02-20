@@ -10,7 +10,6 @@ var config = {
     }
 };
 
-
 var snake;
 
 //  Direction consts
@@ -21,8 +20,8 @@ var DOWN = 3;
 
 // Screen Globals
 var GRID = 32; // Size of Sprites and GRID
-var SCREEN_WIDTH = 768; // In pixels needs to manually be the same in var config
-var SCREEN_HEIGHT = 640; // Same as above
+var SCREEN_WIDTH = config.width;
+var SCREEN_HEIGHT = config.height; 
 
 // Edge locations for X and Y
 var END_X = SCREEN_WIDTH/GRID -1;
@@ -35,14 +34,14 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 
 // DEBUG OPTIONS
 
-var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.00;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
 function preload ()
 {
     this.load.image('sky', 'assets/skies/pixelsky.png');
-    this.load.spritesheet('blocks', 'assets/sprites/heartstar32.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('blocks', 'assets/sprites/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 }
 
@@ -84,7 +83,7 @@ function create ()
 
             Phaser.GameObjects.Image.call(this, scene)
 
-            this.setTexture('blocks', 1);
+            this.setTexture('blocks', 2);
             this.move(scene);
             this.setOrigin(0);
 
@@ -97,11 +96,11 @@ function create ()
         
         move: function (scene)
         {
-            let x;
-            let y;
+            //let x;
+            //let y;
 
-            var safe = [];
-            var safePoints = [];
+            //var safe = [];
+            //var safePoints = [];
             
             
             var testGrid = {};
@@ -164,7 +163,7 @@ function create ()
         {
             Phaser.GameObjects.Image.call(this, scene)
 
-            this.setTexture('blocks', 0);
+            this.setTexture('blocks', 3);
             this.setPosition(x * GRID, y * GRID);
             this.setOrigin(0);
 
@@ -225,7 +224,6 @@ function create ()
             this.setOrigin(0,0);
 
             scene.children.add(this);
-
         },
 
         genPortalChords: function (scene)
@@ -256,13 +254,11 @@ function create ()
         },
     });
 
-
     var Snake = new Phaser.Class({
         initialize:
 
         function Snake (scene, x, y)
         {
-        
             this.alive = true;
             this.body = []
             this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
@@ -280,7 +276,7 @@ function create ()
             // Add a new part at the current tail position
             // The head moves away from the snake 
             // The Tail position stays where it is and then every thing moves in series
-            var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 0);
+            var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
             this.body.push(newPart);
 
             newPart.setOrigin(0);
@@ -302,6 +298,22 @@ function create ()
         let x = this.head.x;
         let y = this.head.y;
 
+        // Death by eating itself
+        let tail = this.body.slice(1);  // tail - headpos === any of tail positions
+
+        // if any tailpos == headpos
+        if(
+            tail.some(
+                quadrant => quadrant.x === this.body[0].x && 
+                quadrant.y === this.body[0].y
+                ) 
+                // arr.some() method checks whether 
+                // at least one of the elements of the array 
+                // satisfies the condition checked by the argument method 
+        ){
+            this.scene.restart();
+        }
+
         
         scene.portals.forEach(portal => { 
             if(snake.head.x === portal.x && snake.head.y === portal.y){
@@ -313,9 +325,6 @@ function create ()
                 return 'valid';  //Don't know why this is here but I left it -James
             }
         });
-
-  
-
 
         if (this.direction === LEFT)
         {
@@ -461,6 +470,7 @@ function updateDirection(game, event)
     // Check collision for all Fruits
     this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
+            this.lastMoveTime = 0;
             //console.log("HIT");
             snake.grow(this);
             fruit.move(this);
