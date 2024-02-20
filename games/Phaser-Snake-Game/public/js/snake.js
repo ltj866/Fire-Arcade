@@ -281,6 +281,16 @@ function create ()
             this.direction = LEFT;
         },
         
+        grow: function (scene)
+        {
+            // Add a new part at the current tail position
+            // The head moves away from the snake and then move moves all of the peices at once.
+            var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 0);
+            this.body.push(newPart);
+
+            newPart.setOrigin(0);
+        },
+        
         update: function (time)
         {
             
@@ -309,8 +319,7 @@ function create ()
             }
         });
 
-        //  Update the body segments and place the last coordinate into this.tail
-        Phaser.Actions.ShiftPosition(this.body, this.head.x * GRID, this.head.y * GRID, 1, this.tail);
+  
 
 
         if (this.direction === LEFT)
@@ -329,7 +338,7 @@ function create ()
         {
             y = Phaser.Math.Wrap(y + GRID, 0, SCREEN_HEIGHT);
         }
-        Phaser.Actions.ShiftPosition(this.body, x, y);
+        Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
         },
     });
@@ -459,6 +468,7 @@ function updateDirection(game, event)
     this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
             //console.log("HIT");
+            snake.grow(this);
             fruit.move(this);
             this.score = this.score + fruit.points;
             console.log("HIT: ","SCORE=", this.score);
