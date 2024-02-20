@@ -33,7 +33,9 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
+// DEBUG OPTIONS
 
+var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
@@ -41,6 +43,7 @@ function preload ()
 {
     this.load.image('sky', 'assets/skies/pixelsky.png');
     this.load.spritesheet('blocks', 'assets/sprites/heartstar32.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 }
 
 function create ()
@@ -48,6 +51,8 @@ function create ()
     
     this.apples = [];
     this.walls = [];
+    this.portals = [];
+
     this.score = 0;
     
     this.lastMoveTime = 0; // The last time we called move()
@@ -122,6 +127,10 @@ function create ()
                 testGrid[fruit.x/GRID][fruit.y/GRID] = false;
             });
 
+            scene.portals.forEach(portal => {
+                testGrid[portal.x/GRID][portal.y/GRID] = false;
+            });
+
             
             var validLocations = [];
         
@@ -132,7 +141,7 @@ function create ()
                     if (testGrid[x2][y2] === true)
                     {
                         //  Is this position valid for food? If so, add it here ...
-                        validLocations.push({ x: x2, y: y2 });
+                        validLocations.push({x: x2, y: y2});
                     }
                 }
             }
@@ -147,7 +156,6 @@ function create ()
     });
 
     var Wall = new Phaser.Class({
-
         Extends: Phaser.GameObjects.Image,
 
         initialize:
@@ -163,6 +171,92 @@ function create ()
             scene.walls.push(this);
 
             scene.children.add(this);
+        },
+    });
+  
+    var Portal = new Phaser.Class({
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Portal(scene, color, from, to)
+        {
+            Phaser.GameObjects.Image.call(this, scene);
+            this.setTexture('portals', 0);
+            this.setPosition(from[0] * GRID, from[1] * GRID);
+            this.setOrigin(0);
+
+            this.target = { x: to[0], y: to[1]};
+
+            scene.portals.push(this);
+
+            
+            this.tint = color.color;
+            scene.children.add(this);
+
+        },
+        
+    });
+
+    var makePair = function (scene, to, from){
+
+        var color = new Phaser.Display.Color()
+        color.random(1);
+        console.log(color);
+        
+        var p1 = new Portal(scene, color, to, from);
+        var p2 = new Portal(scene, color, from, to);
+
+    }
+
+    var SpawnArea = new Phaser.Class({
+        Extends: Phaser.GameObjects.Rectangle,
+
+        initialize:
+
+        function SpawnArea (scene, x, y, width , height , fillColor)
+        {
+            Phaser.GameObjects.Rectangle.call(this, scene, x, y, width, height, fillColor);
+            
+            this.setPosition(x * GRID, y * GRID); 
+            this.width = width*GRID;
+            this.height = height*GRID;
+            this.fillColor = 0x6666ff;
+            this.fillAlpha = DEBUG_AREA_ALPHA;
+
+            console.log(this.width/GRID,this.height/GRID);
+            
+            this.setOrigin(0,0);
+
+            scene.children.add(this);
+
+        },
+
+        genPortalChords: function (scene)
+        {
+            
+            var xMin = this.x/GRID;
+            var xMax = this.x/GRID + this.width/GRID - 1;
+
+            var yMin = this.y/GRID;
+            var yMax = this.y/GRID + this.height/GRID - 1;
+            
+            var x = (Phaser.Math.RND.between(xMin, xMax));
+            var y = (Phaser.Math.RND.between(yMin, yMax));
+
+         
+            // Recursively if there is a portal in the same spot try again until there isn't one.
+            scene.portals.forEach( portal => {
+                console.print("HELL YEAH REROLL THAT PORTAL");
+                if(portal.x === x && portal.y === y){
+                    this.genPortalChords()
+                }
+            }
+
+            )
+            
+            var cords = [x,y];
+            return cords;
         },
     });
 
@@ -199,11 +293,26 @@ function create ()
             //}
         },
         
-        move: function (time)
+        move: function (scene)
         {
 
+        // start with current head position
         let x = this.head.x;
         let y = this.head.y;
+
+        
+        scene.portals.forEach(portal => { 
+            if(snake.head.x === portal.x && snake.head.y === portal.y){
+                console.log("PORTAL");
+
+                x = portal.target.x*GRID;
+                y = portal.target.y*GRID;
+                
+                return 'valid';  //Don't know why this is here but I left it -James
+            }
+        });
+
+        scene.portals[0];
 
         if (this.direction === LEFT)
         {
@@ -247,8 +356,34 @@ function create ()
         
     }
 
-}
     
+    // TODO Check Portal Collision
+    var spawnAreaA = new SpawnArea(this, 1,1,6,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 17,1,6,5, 0x6666ff);
+    var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
+    var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,14,6,5, 0x6666ff);
+    var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 17,14,6,5, 0x6666ff);
+
+
+    var A1 = spawnAreaA.genPortalChords(this);
+    var H1 = spawnAreaH.genPortalChords(this);
+
+    var G1 = spawnAreaG.genPortalChords(this);
+    var A2 = spawnAreaA.genPortalChords(this);
+
+    var C1 = spawnAreaC.genPortalChords(this);
+    var F1 = spawnAreaF.genPortalChords(this);
+
+    makePair(this, A1, H1);
+    makePair(this, C1, F1);
+    makePair(this, G1, A2);
+
+}
+
+
 function updateDirection(game, event) 
 {
     // console.log(event.keyCode, this.time.now); // all keys
@@ -311,7 +446,7 @@ function updateDirection(game, event)
     
     if(time >= this.lastMoveTime + this.moveInterval){
         this.lastMoveTime = time;
-        snake.move();
+        snake.move(this);
         //console.log(this.previousDirection)
     }
     if (!this.spaceBar.isDown){
