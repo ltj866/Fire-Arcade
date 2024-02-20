@@ -33,6 +33,10 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
+// DEBUG OPTIONS
+
+var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
+
 const game = new Phaser.Game(config);
 
 function preload ()
@@ -179,7 +183,7 @@ function create ()
         {
             Phaser.GameObjects.Image.call(this, scene);
             this.setTexture('portals', 0);
-            this.setPosition(from[0] * GRID, from[0] * GRID);
+            this.setPosition(from[0] * GRID, from[1] * GRID);
             this.setOrigin(0);
 
             this.target = { x: to[0], y: to[1]};
@@ -204,6 +208,57 @@ function create ()
         var p2 = new Portal(scene, color, from, to);
 
     }
+
+    var SpawnArea = new Phaser.Class({
+        Extends: Phaser.GameObjects.Rectangle,
+
+        initialize:
+
+        function SpawnArea (scene, x, y, width , height , fillColor)
+        {
+            Phaser.GameObjects.Rectangle.call(this, scene, x, y, width, height, fillColor);
+            
+            this.setPosition(x * GRID, y * GRID); 
+            this.width = width*GRID;
+            this.height = height*GRID;
+            this.fillColor = 0x6666ff;
+            this.fillAlpha = DEBUG_AREA_ALPHA;
+
+            console.log(this.width/GRID,this.height/GRID);
+            
+            this.setOrigin(0,0);
+
+            scene.children.add(this);
+
+        },
+
+        genPortalChords: function (scene)
+        {
+            
+            var xMin = this.x/GRID;
+            var xMax = this.x/GRID + this.width/GRID - 1;
+
+            var yMin = this.y/GRID;
+            var yMax = this.y/GRID + this.height/GRID - 1;
+            
+            var x = (Phaser.Math.RND.between(xMin, xMax));
+            var y = (Phaser.Math.RND.between(yMin, yMax));
+
+         
+            // Recursively if there is a portal in the same spot try again until there isn't one.
+            scene.portals.forEach( portal => {
+                console.print("HELL YEAH REROLL THAT PORTAL");
+                if(portal.x === x && portal.y === y){
+                    this.genPortalChords()
+                }
+            }
+
+            )
+            
+            var cords = [x,y];
+            return cords;
+        },
+    });
 
 
     var Snake = new Phaser.Class({
@@ -301,8 +356,30 @@ function create ()
         
     }
 
-    makePair(this, [3,3], [18,18]);
-    makePair(this, [11,11], [5,25])
+    
+    // TODO Check Portal Collision
+    var spawnAreaA = new SpawnArea(this, 1,1,6,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 17,1,6,5, 0x6666ff);
+    var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
+    var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,14,6,5, 0x6666ff);
+    var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 17,14,6,5, 0x6666ff);
+
+
+    var A1 = spawnAreaA.genPortalChords(this);
+    var H1 = spawnAreaH.genPortalChords(this);
+
+    var G1 = spawnAreaG.genPortalChords(this);
+    var A2 = spawnAreaA.genPortalChords(this);
+
+    var C1 = spawnAreaC.genPortalChords(this);
+    var F1 = spawnAreaF.genPortalChords(this);
+
+    makePair(this, A1, H1);
+    makePair(this, C1, F1);
+    makePair(this, G1, A2);
 
 }
 
