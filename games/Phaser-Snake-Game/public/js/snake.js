@@ -470,7 +470,6 @@ function updateDirection(game, event)
     // Check collision for all Fruits
     this.apples.forEach(fruit => { 
         if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-            this.lastMoveTime = 0;
             //console.log("HIT");
             snake.grow(this);
             fruit.move(this);
