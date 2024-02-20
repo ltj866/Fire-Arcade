@@ -360,14 +360,14 @@ function create ()
     }
 
     // Todo Portal Spawning Algorithm
-    var spawnAreaA = new SpawnArea(this, 1,1,6,5, 0x6666ff);
+    var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
     var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
-    var spawnAreaC = new SpawnArea(this, 17,1,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
     var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
     var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
-    var spawnAreaF = new SpawnArea(this, 1,14,6,5, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
     var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
-    var spawnAreaH = new SpawnArea(this, 17,14,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
 
 
     var A1 = spawnAreaA.genPortalChords(this);
