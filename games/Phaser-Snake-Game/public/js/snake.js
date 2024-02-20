@@ -140,7 +140,7 @@ function create ()
                 {
                     if (testGrid[x2][y2] === true)
                     {
-                        //  Is this position valid for food? If so, add it here ...
+                        // Push only valid positions to an array.
                         validLocations.push({x: x2, y: y2});
                     }
                 }
@@ -189,7 +189,6 @@ function create ()
             this.target = { x: to[0], y: to[1]};
 
             scene.portals.push(this);
-
             
             this.tint = color.color;
             scene.children.add(this);
@@ -242,11 +241,11 @@ function create ()
             var y = (Phaser.Math.RND.between(yMin, yMax));
 
          
-            // Recursively if there is a portal in the same spot try again until there isn't one.
+            // Recursively if there is a portal in the same spot as this point try again until there isn't one.
             scene.portals.forEach( portal => {
                 console.print("HELL YEAH REROLL THAT PORTAL");
                 if(portal.x === x && portal.y === y){
-                    this.genPortalChords()
+                    this.genPortalChords();
                 }
             }
 
@@ -270,11 +269,6 @@ function create ()
             this.head.setOrigin(0);
             this.body.push(this.head);
 
-            // Trying to get one body part to follow correctly.
-            //var part = scene.add.image((x-1) * 32, y * 32, 'blocks', 1);
-            //part.setOrigin(0);
-            //this.body.push(part);
-
             this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
             
             this.moveTime = 0;
@@ -284,7 +278,8 @@ function create ()
         grow: function (scene)
         {
             // Add a new part at the current tail position
-            // The head moves away from the snake and then move moves all of the peices at once.
+            // The head moves away from the snake 
+            // The Tail position stays where it is and then every thing moves in series
             var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 0);
             this.body.push(newPart);
 
@@ -345,8 +340,8 @@ function create ()
 
     snake = new Snake(this, 8, 8);
     
-    // x = width 25 grid
-    // y width 19
+    // width 25 grid
+    // width 19
 
     for (let i = 0; i <= END_X; i++) {
         wall = new Wall(this, i, 0);
@@ -364,8 +359,7 @@ function create ()
         
     }
 
-    
-    // TODO Check Portal Collision
+    // Todo Portal Spawning Algorithm
     var spawnAreaA = new SpawnArea(this, 1,1,6,5, 0x6666ff);
     var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
     var spawnAreaC = new SpawnArea(this, 17,1,6,5, 0x6666ff);
