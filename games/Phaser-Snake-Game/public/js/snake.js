@@ -202,7 +202,6 @@ function create ()
 
         var color = new Phaser.Display.Color()
         color.random(1);
-        console.log(color);
         
         var p1 = new Portal(scene, color, to, from);
         var p2 = new Portal(scene, color, from, to);
@@ -223,8 +222,6 @@ function create ()
             this.height = height*GRID;
             this.fillColor = 0x6666ff;
             this.fillAlpha = DEBUG_AREA_ALPHA;
-
-            console.log(this.width/GRID,this.height/GRID);
             
             this.setOrigin(0,0);
 
@@ -278,8 +275,8 @@ function create ()
             //part.setOrigin(0);
             //this.body.push(part);
 
-
-
+            this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
+            
             this.moveTime = 0;
             this.direction = LEFT;
         },
@@ -312,7 +309,9 @@ function create ()
             }
         });
 
-        scene.portals[0];
+        //  Update the body segments and place the last coordinate into this.tail
+        Phaser.Actions.ShiftPosition(this.body, this.head.x * GRID, this.head.y * GRID, 1, this.tail);
+
 
         if (this.direction === LEFT)
         {
