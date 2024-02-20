@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.WEBGL,
-    width: 832,
-    height: 640,
+    width: 768, // If you change these remember 
+    height: 640,// to update below as well
     parent: 'phaser-example',
     scene: {
         preload: preload,
@@ -21,7 +21,7 @@ var DOWN = 3;
 
 // Screen Globals
 var GRID = 32; // Size of Sprites and GRID
-var SCREEN_WIDTH = 832; // In pixels needs to manually be the same in var config
+var SCREEN_WIDTH = 768; // In pixels needs to manually be the same in var config
 var SCREEN_HEIGHT = 640; // Same as above
 
 // Edge locations for X and Y
