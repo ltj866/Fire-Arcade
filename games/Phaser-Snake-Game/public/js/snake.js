@@ -52,7 +52,14 @@ function create ()
     this.walls = [];
     this.portals = [];
 
+    // Start Fruit Score Timer
     this.score = 0;
+    console.log("STARTING SCORE TIMER");
+    this.scoreTimer = this.time.addEvent({
+        delay: 10000,
+        paused: false
+      });
+
     
     this.lastMoveTime = 0; // The last time we called move()
     this.moveInterval = 96;
@@ -473,9 +480,14 @@ function updateDirection(game, event)
             //console.log("HIT");
             snake.grow(this);
             fruit.move(this);
-            this.score = this.score + fruit.points;
+            console.log(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+            this.score = this.score + this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             console.log("HIT: ","SCORE=", this.score);
-            return 'valid';  //Don't know why this is here but I left it -James
+            this.scoreTimer = this.time.addEvent({
+                delay: 10000,
+                paused: false
+              });
+            return 'valid';
         }
     });
 
@@ -483,7 +495,7 @@ function updateDirection(game, event)
         if(snake.head.x === wall.x && snake.head.y === wall.y){
             console.log("DEAD");
             snake.alive = false;
-            return 'valid'; //Don't know why this is here but I left it -James
+            return 'valid';
         }
     });
 }
