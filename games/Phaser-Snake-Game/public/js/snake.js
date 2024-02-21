@@ -34,6 +34,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 
 // DEBUG OPTIONS
 
+var DEBUG = true;
 var DEBUG_AREA_ALPHA = 0.00;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
@@ -54,7 +55,8 @@ function create ()
 
     // Start Fruit Score Timer
     this.score = 0;
-    console.log("STARTING SCORE TIMER");
+    if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+    
     this.scoreTimer = this.time.addEvent({
         delay: 10000,
         paused: false
@@ -484,11 +486,14 @@ function updateDirection(game, event)
             var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             this.score = this.score + pointsToAdd;
             this.fruitCount++;
-            console.log("HIT: ",
-                        "SCORE=", this.score, 
-                        "FRUIT=", pointsToAdd,
-                        "FRUITCOUNT=", this.fruitCount,
-                        "FRUIT/SCORE=", this.score/this.fruitCount);
+            
+            if (DEBUG) {console.log(                         
+                "SCORE=", this.score, 
+                "FRUIT=", pointsToAdd,
+                "FRUITCOUNT=", this.fruitCount,
+                "FRUIT/SCORE=", this.score/this.fruitCount);
+            }
+
             this.scoreTimer = this.time.addEvent({
                 delay: 10000,
                 paused: false
