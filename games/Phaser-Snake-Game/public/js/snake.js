@@ -34,6 +34,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 
 // DEBUG OPTIONS
 
+var DEBUG = true;
 var DEBUG_AREA_ALPHA = 0.00;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
@@ -52,7 +53,16 @@ function create ()
     this.walls = [];
     this.portals = [];
 
+    // Start Fruit Score Timer
     this.score = 0;
+    if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+    
+    this.scoreTimer = this.time.addEvent({
+        delay: 10000,
+        paused: false
+        });
+    this.fruitCount = 0;
+
     
     this.lastMoveTime = 0; // The last time we called move()
     this.moveInterval = 96;
@@ -473,9 +483,22 @@ function updateDirection(game, event)
             //console.log("HIT");
             snake.grow(this);
             fruit.move(this);
-            this.score = this.score + fruit.points;
-            console.log("HIT: ","SCORE=", this.score);
-            return 'valid';  //Don't know why this is here but I left it -James
+            var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            this.score = this.score + pointsToAdd;
+            this.fruitCount++;
+            
+            if (DEBUG) {console.log(                         
+                "SCORE=", this.score, 
+                "FRUIT=", pointsToAdd,
+                "FRUITCOUNT=", this.fruitCount,
+                "FRUIT/SCORE=", this.score/this.fruitCount);
+            }
+
+            this.scoreTimer = this.time.addEvent({
+                delay: 10000,
+                paused: false
+              });
+            return 'valid';
         }
     });
 
@@ -483,7 +506,7 @@ function updateDirection(game, event)
         if(snake.head.x === wall.x && snake.head.y === wall.y){
             console.log("DEAD");
             snake.alive = false;
-            return 'valid'; //Don't know why this is here but I left it -James
+            return 'valid';
         }
     });
 }
