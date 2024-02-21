@@ -58,7 +58,8 @@ function create ()
     this.scoreTimer = this.time.addEvent({
         delay: 10000,
         paused: false
-      });
+        });
+    this.fruitCount = 0;
 
     
     this.lastMoveTime = 0; // The last time we called move()
@@ -480,9 +481,14 @@ function updateDirection(game, event)
             //console.log("HIT");
             snake.grow(this);
             fruit.move(this);
-            console.log(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
-            this.score = this.score + this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            console.log("HIT: ","SCORE=", this.score);
+            var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            this.score = this.score + pointsToAdd;
+            this.fruitCount++;
+            console.log("HIT: ",
+                        "SCORE=", this.score, 
+                        "FRUIT=", pointsToAdd,
+                        "FRUITCOUNT=", this.fruitCount,
+                        "FRUIT/SCORE=", this.score/this.fruitCount);
             this.scoreTimer = this.time.addEvent({
                 delay: 10000,
                 paused: false
