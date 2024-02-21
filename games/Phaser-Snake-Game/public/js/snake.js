@@ -314,14 +314,9 @@ function create ()
         // if any tailpos == headpos
         if(
             tail.some(
-                quadrant => quadrant.x === this.body[0].x && 
-                quadrant.y === this.body[0].y
-                ) 
-                // arr.some() method checks whether 
-                // at least one of the elements of the array 
-                // satisfies the condition checked by the argument method 
+                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
         ){
-            this.scene.restart();
+            this.alive = false;
         }
 
         
@@ -462,6 +457,8 @@ function updateDirection(game, event)
     if (!snake.alive)
         {
             // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
+            game.destroy();
             return;
         }
     
@@ -504,7 +501,6 @@ function updateDirection(game, event)
 
     this.walls.forEach(wall => {
         if(snake.head.x === wall.x && snake.head.y === wall.y){
-            console.log("DEAD");
             snake.alive = false;
             return 'valid';
         }
