@@ -35,7 +35,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.00;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.2;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
@@ -406,42 +406,58 @@ function updateDirection(game, event)
     switch (event.keyCode) {
         case 87: // w
         //console.log(event.code, game.time.now);
-        snake.direction = UP;
+        if (snake.direction != DOWN) { // Prevents backtracking
+            snake.direction = UP;
+        }
         break;
 
         case 65: // a
         //console.log(event.code, game.time.now);
-        snake.direction = LEFT;
+        if (snake.direction != RIGHT) {
+            snake.direction = LEFT;
+        }
         break;
 
         case 83: // s
         //console.log(event.code, game.time.now);
-        snake.direction = DOWN;
+        if (snake.direction != UP) { 
+            snake.direction = DOWN;
+        }
         break;
 
         case 68: // d
         //console.log(event.code, game.time.now);
-        snake.direction = RIGHT;
+        if (snake.direction != LEFT) { 
+            snake.direction = RIGHT;
+        }
         break;
 
         case 38: // UP
         //console.log(event.code, game.time.now);
-        snake.direction = UP;
+        if (snake.direction != DOWN) {
+            snake.direction = UP;
+        }
         break;
 
         case 37: // LEFT
         //console.log(event.code, game.time.now);
-        snake.direction = LEFT;
+        if (snake.direction != RIGHT) { 
+            snake.direction = LEFT;
+        }
         break;
 
         case 40: // DOWN
         //console.log(event.code, game.time.now);
-        snake.direction = DOWN;
+        if (snake.direction != UP) { 
+            snake.direction = DOWN;
+        }
         break;
 
         case 39: // RIGHT
         //console.log(event.code, game.time.now);
-        snake.direction = RIGHT;
+        if (snake.direction != LEFT) { 
+            snake.direction = RIGHT;
+        }
         break;
 
         case 32: // SPACE
