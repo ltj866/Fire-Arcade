@@ -434,28 +434,29 @@ function updateDirection(game, event)
 
         case 38: // UP
         //console.log(event.code, game.time.now);
-        if (snake.direction != DOWN) {
+        console.log(snake.body.length)
+        if (snake.direction != DOWN || snake.body.length <= 2) {
             snake.direction = UP;
         }
         break;
 
         case 37: // LEFT
         //console.log(event.code, game.time.now);
-        if (snake.direction != RIGHT) { 
+        if (snake.direction != RIGHT || snake.body.length <= 2) { 
             snake.direction = LEFT;
         }
         break;
 
         case 40: // DOWN
         //console.log(event.code, game.time.now);
-        if (snake.direction != UP) { 
+        if (snake.direction != UP || snake.body.length <= 2) { 
             snake.direction = DOWN;
         }
         break;
 
         case 39: // RIGHT
         //console.log(event.code, game.time.now);
-        if (snake.direction != LEFT) { 
+        if (snake.direction != LEFT  || snake.body.length <= 2) { 
             snake.direction = RIGHT;
         }
         break;
