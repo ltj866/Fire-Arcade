@@ -406,35 +406,34 @@ function updateDirection(game, event)
     switch (event.keyCode) {
         case 87: // w
         //console.log(event.code, game.time.now);
-        if (snake.direction != DOWN) { // Prevents backtracking
-            snake.direction = UP;
+        if (snake.direction != DOWN || snake.body.length <= 2) { 
+            snake.direction = UP; // Prevents backtracking to death
         }
         break;
 
         case 65: // a
         //console.log(event.code, game.time.now);
-        if (snake.direction != RIGHT) {
+        if (snake.direction != RIGHT || snake.body.length <= 2) {
             snake.direction = LEFT;
         }
         break;
 
         case 83: // s
         //console.log(event.code, game.time.now);
-        if (snake.direction != UP) { 
+        if (snake.direction != UP || snake.body.length <= 2) { 
             snake.direction = DOWN;
         }
         break;
 
         case 68: // d
         //console.log(event.code, game.time.now);
-        if (snake.direction != LEFT) { 
+        if (snake.direction != LEFT || snake.body.length <= 2) { 
             snake.direction = RIGHT;
         }
         break;
 
         case 38: // UP
         //console.log(event.code, game.time.now);
-        console.log(snake.body.length)
         if (snake.direction != DOWN || snake.body.length <= 2) {
             snake.direction = UP;
         }
