@@ -44,11 +44,19 @@ function preload ()
     this.load.image('sky', 'assets/skies/pixelsky.png');
     this.load.spritesheet('blocks', 'assets/sprites/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
+
+    // load the PNG file
+    this.load.image('base_tiles', 'assets/Tiled/SnakeTiledProject.png',{
+        frameWidth: 64,
+        frameHeight: 64
+    });
+    // load the JSON file
+	this.load.tilemapTiledJSON('tilemap', 'assets/Tiled/SnakeTiledProject.json');
 }
 
 function create ()
 {
-    
+
     this.apples = [];
     this.walls = [];
     this.portals = [];
@@ -79,8 +87,13 @@ function create ()
         console.log(e.code+" unPress", this.time.now);
     }) 
     
+	// create the Tilemap
+	var map = this.make.tilemap({ key: 'tilemap' })
+
+
     // add background
     this.add.image(416, 320, 'sky');
+    // adds background tileset
 
     var Food = new Phaser.Class({
 
@@ -173,7 +186,7 @@ function create ()
         {
             Phaser.GameObjects.Image.call(this, scene)
 
-            this.setTexture('blocks', 3);
+            //this.setTexture('blocks', 3);
             this.setPosition(x * GRID, y * GRID);
             this.setOrigin(0);
 
