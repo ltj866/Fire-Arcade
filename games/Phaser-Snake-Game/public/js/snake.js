@@ -6,7 +6,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 }
+            gravity: { y: 0}
         }
     },
     scene: {
@@ -46,14 +46,14 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.2;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
 function preload ()
 {
     //this.load.image('sky', 'assets/skies/pixelsky.png');
-    this.load.spritesheet('blocks', 'assets/sprites/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 
     // Tilemap
