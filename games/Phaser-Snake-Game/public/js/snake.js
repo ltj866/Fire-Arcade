@@ -85,44 +85,25 @@ function create ()
     this.walls = [];
     this.portals = [];
 
-    // Start Fruit Score Timer
-    this.score = 0;
-    if (DEBUG) { console.log("STARTING SCORE TIMER"); }
-    
-    this.scoreTimer = this.time.addEvent({
-        delay: 10000,
-        paused: false
-        });
-    this.fruitCount = 0;
 
-    
-    this.lastMoveTime = 0; // The last time we called move()
-    this.moveInterval = 96;
+    create ()
+    {
+        this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
+        this.tileset = this.map.addTilesetImage('tileSheet');
+        this.layer = this.map.createLayer('Wall', this.tileset);
 
-    // define keys       
-    this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
+        this.map.setCollision([1,4]);
 
-    this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.input.keyboard.on('keydown', e => {
-        updateDirection(this, e);
-    })
+        this.pickups = this.map.filterTiles(tile => tile.index === 82);
 
-    this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-        console.log(e.code+" unPress", this.time.now);
-    }) 
-    
-    // add background
-    this.add.image(416, 320, 'sky');
+        this.player = this.add.rectangle(96, 96, 24, 38, 0xffff00);
 
-    var Food = new Phaser.Class({
+        this.physics.add.existing(this.player);
 
-        Extends: Phaser.GameObjects.Image,
+        this.cursors = this.input.keyboard.createCursorKeys();
 
-        initialize:
-
-        function Food (scene)
+        this.cursors.up.on('down', () =>
         {
-
             Phaser.GameObjects.Image.call(this, scene)
 
             this.setTexture('blocks', 2);
@@ -176,15 +157,9 @@ function create ()
             var validLocations = [];
         
             for (var x2 = 0; x2 <= END_X; x2++)
+
             {
-                for (var y2 = 0; y2 <= END_Y; y2++)
-                {
-                    if (testGrid[x2][y2] === true)
-                    {
-                        // Push only valid positions to an array.
-                        validLocations.push({x: x2, y: y2});
-                    }
-                }
+                this.player.body.setVelocityY(-360);
             }
               
             var pos = Phaser.Math.RND.pick(validLocations)
@@ -246,29 +221,14 @@ function create ()
         var p1 = new Portal(scene, color, to, from);
         var p2 = new Portal(scene, color, from, to);
 
+        this.info = this.add.text(10, 10, 'Player');
     }
 
-    var SpawnArea = new Phaser.Class({
-        Extends: Phaser.GameObjects.Rectangle,
+    update ()
+    {
+        this.player.body.setVelocityX(0);
 
-        initialize:
-
-        function SpawnArea (scene, x, y, width , height , fillColor)
-        {
-            Phaser.GameObjects.Rectangle.call(this, scene, x, y, width, height, fillColor);
-            
-            this.setPosition(x * GRID, y * GRID); 
-            this.width = width*GRID;
-            this.height = height*GRID;
-            this.fillColor = 0x6666ff;
-            this.fillAlpha = DEBUG_AREA_ALPHA;
-            
-            this.setOrigin(0,0);
-
-            scene.children.add(this);
-        },
-
-        genPortalChords: function (scene)
+        if (this.cursors.left.isDown)
         {
             
             var xMin = this.x/GRID;
@@ -352,77 +312,16 @@ function create ()
         ){
             this.alive = false;
         }
-
-        
-        scene.portals.forEach(portal => { 
-            if(snake.head.x === portal.x && snake.head.y === portal.y){
-                console.log("PORTAL");
-
-                x = portal.target.x*GRID;
-                y = portal.target.y*GRID;
-                
-                return 'valid';  //Don't know why this is here but I left it -James
-            }
-        });
-
-        if (this.direction === LEFT)
+        else if (this.cursors.right.isDown)
         {
-            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
+            this.player.body.setVelocityX(200);
         }
-        else if (this.direction === RIGHT)
-        {
-            x = Phaser.Math.Wrap(x + GRID, 0, SCREEN_WIDTH);
-        }
-        else if (this.direction === UP)
-        {
-            y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
-        }
-        else if (this.direction === DOWN)
-        {
-            y = Phaser.Math.Wrap(y + GRID, 0, SCREEN_HEIGHT);
-        }
-        Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
-        },
-    });
+        //  Collide player against the tilemap layer
+        this.physics.collide(this.player, this.layer);
 
-    snake = new Snake(this, 8, 8);
-    
-    // width 25 grid
-    // width 19
-
-    for (let i = 0; i <= END_X; i++) {
-        wall = new Wall(this, i, 0);
-        wall = new Wall(this, i, 19);
-      }
-    
-    var wall = new Wall(this, 10, 10);
-    var wall = new Wall(this, 10, 11);
-    var wall = new Wall(this, 10, 12);
-    var wall = new Wall(this, 10, 13);
-    var wall = new Wall(this, 10, 14);
-
-    for (let index = 0; index < 3; index++) {
-        var food = new Food(this);
-        
-    }
-
-    // Todo Portal Spawning Algorithm
-    var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
-    var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
-    var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
-    var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
-    var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
-    var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
-    var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
-    var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
-
-
-    var A1 = spawnAreaA.genPortalChords(this);
-    var H1 = spawnAreaH.genPortalChords(this);
-
-    var G1 = spawnAreaG.genPortalChords(this);
-    var A2 = spawnAreaA.genPortalChords(this);
+        //  Custom tile overlap check
+        this.physics.world.overlapTiles(this.player, this.pickups, this.hitPickup, null, this);
 
     var C1 = spawnAreaC.genPortalChords(this);
     var F1 = spawnAreaF.genPortalChords(this);
@@ -497,10 +396,10 @@ function updateDirection(game, event)
         case 32: // SPACE
         console.log(event.code, game.time.now);
 
+        this.info.setText(`left: ${blocked.left} right: ${blocked.right} down: ${blocked.down}`);
     }
-
 }
-
+  
     function update (time, delta) 
 {
 // console.log("update -- time=" + time + " delta=" + delta);
@@ -558,7 +457,8 @@ function updateDirection(game, event)
             snake.alive = false;
             return 'valid';
         }
-    });
-}
+    },
+    scene: Example
+};
 
-
+const game = new Phaser.Game(config);
