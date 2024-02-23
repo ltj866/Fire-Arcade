@@ -3,6 +3,12 @@ var config = {
     width: 768, // If you change these remember 
     height: 640,// to update below as well
     parent: 'phaser-example',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 }
+        }
+    },
     scene: {
         preload: preload,
         create: create,
@@ -11,6 +17,11 @@ var config = {
 };
 
 var snake;
+
+// Tilemap variables
+var layer;
+var tileset;
+var map;
 
 //  Direction consts
 var LEFT = 0;
@@ -41,14 +52,35 @@ const game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'assets/skies/pixelsky.png');
+    //this.load.image('sky', 'assets/skies/pixelsky.png');
     this.load.spritesheet('blocks', 'assets/sprites/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
+
+    // Tilemap
+    this.load.image('tileSheet', 'assets/Tiled/snakeMap.png');
+    this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
+
 }
 
 function create ()
 {
-    
+    // Tilemap
+    this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
+    this.tileset = this.map.addTilesetImage('tileSheet');
+    this.layer = this.map.createLayer('Wall', this.tileset);
+
+    this.map.setCollision([1,4]);
+
+    this.snake = this.physics.add.sprite(0, 0, 'ball'),
+    this.snake.setOrigin(0);
+
+    this.physics.add.collider(this.snake, layer);
+
+
+    // this.physics.add.overlap(player, layer, () => {
+    //     console.log('overlapping');
+    // });
+
     this.apples = [];
     this.walls = [];
     this.portals = [];
@@ -128,9 +160,9 @@ function create ()
             }
         
             // Make all the unsafe places unsafe
-            scene.walls.forEach(wall => {
+            /*scene.walls.forEach(wall => {
                 testGrid[wall.x/GRID][wall.y/GRID] = false;
-            });
+            });*/
 
             scene.apples.forEach(fruit => {
                 testGrid[fruit.x/GRID][fruit.y/GRID] = false;
@@ -173,9 +205,9 @@ function create ()
         {
             Phaser.GameObjects.Image.call(this, scene)
 
-            this.setTexture('blocks', 3);
-            this.setPosition(x * GRID, y * GRID);
-            this.setOrigin(0);
+            //this.setTexture('blocks', 3);
+            //this.setPosition(x * GRID, y * GRID);
+            //this.setOrigin(0);
 
             scene.walls.push(this);
 
@@ -275,6 +307,9 @@ function create ()
             this.head.setOrigin(0);
             this.body.push(this.head);
 
+            //this.snake here?
+            //this.physics.add.existing(this.snake);
+
             this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
             
             this.moveTime = 0;
@@ -294,7 +329,6 @@ function create ()
         
         update: function (time)
         {
-            
             //if (time >= this.moveTime) Why is this here, does it do anything?
             //{
             //    return this.move(time);
@@ -477,6 +511,10 @@ function updateDirection(game, event)
             game.destroy();
             return;
         }
+    //  Collide snake against the tilemap layer
+    if (this.physics.collide(this.snake, this.layer)){
+        console.log("HIT");
+    }
     
     if(time >= this.lastMoveTime + this.moveInterval){
         this.lastMoveTime = time;
