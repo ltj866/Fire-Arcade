@@ -1,267 +1,335 @@
-export default class Snake {
-    constructor(scene) {
-        this.scene = scene;
-        this.lastMoveTime = 0; // The last time we called move()
-        this.moveInterval = 120;
-        this.tileSize = 16;
-        this.spawnZone = this.tileSize*4
-        this.direction = Phaser.Math.Vector2.DOWN;
-        this.body = []; // body will be a set of boxes
-
-        //head of the snake
-        this.body.push(this.scene.add.rectangle(
-            this.scene.game.config.width -this.tileSize*4, 
-            this.scene.game.config.height/2, 
-            this.tileSize, 
-            this.tileSize, 
-            0xff0000
-        ).setOrigin(0));
-        // setOrigin will show the full square at 0,0
-
-        this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
-        this.wall = []; // define walls
-        this.wall2 = [];
-        this.portal = []; // define a array for portals
-
-        // colors
-        this.color = [];
-        this.color[0] = "0x0000ff";
-        this.color[1] = "0xffff00"
-        this.color[2] = "0xFFA500"
-        this.color[3] = "0x8300ff"
-
-        // map out portal spawns
-        this.map1 = [];
-        this.map2 = [];
-        this.map1 = this.mapArray();
-        this.map2 = this.mapArray();
-
-        // redo second sequence until it is nothing like the first one
-        while (JSON.stringify(this.map1) === JSON.stringify(this.map2)) {
-            this.map2 = mapArray();
+var config = {
+    type: Phaser.WEBGL,
+    width: 768, // If you change these remember 
+    height: 640,// to update below as well
+    parent: 'phaser-example',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0}
         }
-        // combine two random quadrant arrays for mapping
-        this.combinedMapping = this.map1.concat(this.map2);
-
-        // call methods
-        this.positionApple(); // drop first apple
-        this.positionPortal(); // position portals
-        this.positionWall(); // position walls
-        
-        // define keys
-        scene.input.keyboard.on('keydown', e => {
-            this.keydown(e);
-        })
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
     }
+};
 
-    createMap() {
+var snake;
 
-    }
+// Tilemap variables
+var layer;
+var tileset;
+var map;
 
-    positionApple() {
-        this.apple.x = Math.floor(
-            (Math.random() * this.scene.game.config.width)/this.tileSize
-            ) * this.tileSize;
-        this.apple.y = Math.floor(
-            (Math.random() * this.scene.game.config.height)/this.tileSize
-            ) * this.tileSize;
-        if (this.apple.x == this.scene.game.config.width/2 || this.apple.y == this.scene.game.config.width/2) {
-            this.apple.x += this.tileSize;
-        }
-    }
-    positionPortal(){
-        console.log("*********************************");
-        let c = 0;
-        for (let i = 0; i < 8; i++) {
-            if (this.combinedMapping[i] == 0) { // quadrant 0
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - (this.scene.game.config.height/2+this.spawnZone)) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
+//  Direction consts
+var LEFT = 0;
+var RIGHT = 1;
+var UP = 2;
+var DOWN = 3;
 
-            } else if (this.combinedMapping[i] == 1) { // quadrant 1
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - this.scene.game.config.width/2+this.spawnZone) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - this.scene.game.config.height/2+this.spawnZone) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
+// Screen Globals
+var GRID = 32; // Size of Sprites and GRID
+var SCREEN_WIDTH = config.width;
+var SCREEN_HEIGHT = config.height; 
 
-            } else if (this.combinedMapping[i] == 2) { // quadrant 2
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * (this.scene.game.config.height/2 - this.spawnZone*2) + this.spawnZone)/this.tileSize) * this.tileSize;
+// Edge locations for X and Y
+var END_X = SCREEN_WIDTH/GRID -1;
+var END_Y = SCREEN_HEIGHT/GRID -1;
 
-            } else if (this.combinedMapping[i] == 3) { // quadrant 3
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - this.scene.game.config.width/2+this.spawnZone) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
+// Collision only works if GRID is whole divisor of HEIGHT and WIDTH
+if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
+    throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
+}
 
-            }
-            
-            if (i % 2 > 0) {
-                c++; // change color every even number
-            }
-            console.log(this.portal[i].x, this.portal[i].y);
-        }
-        console.log("*********************************");
-        // let j = 0;
-        // while ( j < this.portal.length) {
+// DEBUG OPTIONS
 
-        // }
-    }
-  
-    positionWall() {
-       for (let i = 0; i < this.scene.game.config.height; i++) {
-            this.wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-            this.wall[i].x = this.scene.game.config.height/2;
-            this.wall[i].y = i;
-            this.wall2[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-            this.wall2[i].x = i;
-            this.wall2[i].y = this.scene.game.config.height/2;
-        
-        }
-    }
+var DEBUG = true;
+var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
-    keydown(event) {
-        // console.log(event);
-        switch(event.keyCode){
-            case 37:    //left
-                if(this.direction !== Phaser.Math.Vector2.RIGHT)    
-                    this.direction = Phaser.Math.Vector2.LEFT;
-                break;
-            case 38:    //up
-                if(this.direction !== Phaser.Math.Vector2.DOWN)
-                    this.direction = Phaser.Math.Vector2.UP;
-                break;
-            case 39:    //right
-                if(this.direction !== Phaser.Math.Vector2.LEFT)
-                    this.direction = Phaser.Math.Vector2.RIGHT;
-                break;
-            case 40:    //down
-                if(this.direction !== Phaser.Math.Vector2.UP)
-                    this.direction = Phaser.Math.Vector2.DOWN;
-                break;
-        }
-    }
+const game = new Phaser.Game(config);
 
-    // Randomly generates a sequence of 0-3 for choosing a portals quadrant
-    // 0 | 1
-    // __|__
-    //   | 
-    // 2 | 3
-    mapArray() {
-        let numbers = [0, 1, 2, 3, 0, 1, 2, 3];
-        let mapping = [];
+function preload ()
+{
+    this.load.image('bg01', 'assets/sprites/background01.png');
+    this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 
-        while (numbers.length > 0) {
-            // Exclude numbers that are the same as the last number added
-            let options = numbers.filter(n => n !== mapping[mapping.length - 1]);
+    // Tilemap
+    this.load.image('tileSheet', 'assets/Tiled/snakeMap.png');
+    this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
-            // Select a random number from the options
-            let randomIndex = Math.floor(Math.random() * options.length);
-            let number = options[randomIndex];
+}
 
-            // Add the number to the mapping
-            mapping.push(number);
-
-            // Remove the number from the numbers array
-            numbers = numbers.filter(n => n !== number);
-        }
-
-        return mapping;
-    }
-
-    createMapQuadrant(rows, cols, leftWall = false, rightWall = false, topWall = false, bottomWall = false) {
-        let map = new Array(cols).fill(new Array(rows).fill(0))
-      
-        if (leftWall) {
-            for (let i = 0; i < rows; i++) {
-                map[i][0] = 1;
-            }
-        }
-        if (rightWall) {
-            for (let i = 0; i < rows; i++) {
-                map[i][cols - 1] = 1;
-            }
-        }
-        if (topWall) {
-            for (let i = 0; i < cols; i++) {
-                map[0][i] = 1;
-            }
-        }
-        if (bottomWall) {
-            for (let i = 0; i < cols; i++) {
-                map[rows - 1][i] = 1;
-            }
-        }
-        return map;
-      }
+function create ()
+{
+    // Tilemap
+    this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
+    this.tileset = this.map.addTilesetImage('tileSheet');
+    this.layer = this.map.createLayer('Wall', this.tileset);
     
-    // Game Loop
-    update(time){
-        if(time >= this.lastMoveTime + this.moveInterval){
-            this.lastMoveTime = time;
-            this.move();
-        }
-    }
 
-    move(){
-        let x = this.body[0].x + this.direction.x * this.tileSize;
-        let y = this.body[0].y + this.direction.y * this.tileSize;
-       
+    // add background
+    this.add.image(286, 286, 'bg01').setDepth(-1);
 
-        // if snakes eat the apple
-        if(this.apple.x === x && this.apple.y === y){
-            this.body.push(
-                this.scene.add.
-                rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff)
-                .setOrigin(0)
-            );
-            this.positionApple();
+    // arrays for collision detection
+    this.apples = [];
+    this.walls = [];
+    this.portals = [];
 
-        }
+    // Start Fruit Score Timer
+    this.score = 0;
+    if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+    
+    this.scoreTimer = this.time.addEvent({
+        delay: 10000,
+        paused: false
+        });
+    this.fruitCount = 0;
 
-        let j; // check even/odds
-        for (let i = 0; i < 8; i++) {
-            if (this.portal[i].x == x && this.portal[i].y == y) {
-                let check = i % 2; // if portal # even = 0 | if portal # odd = 1
-                if (check < 1) { // if even spawn to portal after it
-                    j = i+1;
-                } else {        // if odd spawn in portal behind it
-                    j = i-1;
-                }
-                if (this.direction.x == 1 && this.direction.y == 0) {
-                    x = this.portal[j].x+this.tileSize;
-                    y = this.portal[j].y;
-                } else if (this.direction.x == -1 && this.direction.y == 0) {
-                    x = this.portal[j].x-this.tileSize;
-                    y = this.portal[j].y;
-                } else if (this.direction.x == 0 && this.direction.y == -1) {
-                    x = this.portal[j].x;
-                    y = this.portal[j].y-this.tileSize;
-                } else if (this.direction.x == 0 && this.direction.y == 1) {
-                    x = this.portal[j].x;
-                    y = this.portal[j].y+this.tileSize;
+    
+    this.lastMoveTime = 0; // The last time we called move()
+    this.moveInterval = 96;
+
+    // define keys       
+    this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
+
+    this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.input.keyboard.on('keydown', e => {
+        updateDirection(this, e);
+    })
+
+    this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+        console.log(e.code+" unPress", this.time.now);
+    }) 
+
+    var Food = new Phaser.Class({
+
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Food (scene)
+        {
+
+            Phaser.GameObjects.Image.call(this, scene)
+
+            this.setTexture('blocks', 2);
+            this.move(scene);
+            this.setOrigin(0);
+
+            this.points = 100;
+
+            scene.apples.push(this);
+
+            scene.children.add(this);
+        },
+        
+        move: function (scene)
+        {
+            //let x;
+            //let y;
+
+            //var safe = [];
+            //var safePoints = [];
+            
+            
+            var testGrid = {};
+
+            // Start with all safe points as true. This is important because Javascript treats 
+            // non initallized values as undefined and so any comparison or look up throws an error.
+            for (var x1 = 0; x1 <= END_X; x1++)
+            {
+                testGrid[x1] = {};
+        
+                for (var y1 = 0; y1 <= END_Y; y1++)
+                {
+                    testGrid[x1][y1] = true;
                 }
             }
-        }
+        
+            // Make all the unsafe places unsafe
+            /*scene.walls.forEach(wall => {
+                testGrid[wall.x/GRID][wall.y/GRID] = false;
+            });*/
 
-        for (let index = this.body.length-1; index>0; index--){
-            this.body[index].x = this.body[index-1].x;
-            this.body[index].y = this.body[index-1].y;
-        }
+            scene.apples.forEach(fruit => {
+                testGrid[fruit.x/GRID][fruit.y/GRID] = false;
+            });
 
-        this.body[0].x = x;
-        this.body[0].y = y;
+            scene.portals.forEach(portal => {
+                testGrid[portal.x/GRID][portal.y/GRID] = false;
+            });
 
-        // Death by hitting the wall
-        if(
-            this.body[0].x < 0 || 
-            this.body[0].x >= this.scene.game.config.width ||
-            this.body[0].y < 0 || 
-            this.body[0].y >= this.scene.game.config.height ||
-            this.body[0].x == this.scene.game.config.width/2 ||
-            this.body[0].y == this.scene.game.config.height/2 
-        ){
-            this.scene.scene.restart();
-        }
+            
+            var validLocations = [];
+        
+            for (var x2 = 0; x2 <= END_X; x2++)
+            {
+                for (var y2 = 0; y2 <= END_Y; y2++)
+                {
+                    if (testGrid[x2][y2] === true)
+                    {
+                        // Push only valid positions to an array.
+                        validLocations.push({x: x2, y: y2});
+                    }
+                }
+            }
+              
+            var pos = Phaser.Math.RND.pick(validLocations)
+
+            this.setPosition(pos.x * GRID, pos.y * GRID);
+
+
+        },    
+
+    });
+
+    var Wall = new Phaser.Class({
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Wall (scene, x, y)
+        {
+            // Phaser.GameObjects.Image.call(this, scene) // commented out because we don't need to redraw
+
+            //this.setTexture('blocks', 3); // or use a texture
+            this.setPosition(x * GRID, y * GRID);
+            this.setOrigin(0);
+
+            scene.walls.push(this);
+
+            // scene.children.add(this);   // walls are added through tilemaps now
+        },
+    });
+  
+    var Portal = new Phaser.Class({
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Portal(scene, color, from, to)
+        {
+            Phaser.GameObjects.Image.call(this, scene);
+            this.setTexture('portals', 0);
+            this.setPosition(from[0] * GRID, from[1] * GRID);
+            this.setOrigin(0);
+
+            this.target = { x: to[0], y: to[1]};
+
+            scene.portals.push(this);
+            
+            this.tint = color.color;
+            scene.children.add(this);
+
+        },
+        
+    });
+
+    var makePair = function (scene, to, from){
+
+        var color = new Phaser.Display.Color()
+        color.random(1);
+        
+        var p1 = new Portal(scene, color, to, from);
+        var p2 = new Portal(scene, color, from, to);
+
+    }
+
+    var SpawnArea = new Phaser.Class({
+        Extends: Phaser.GameObjects.Rectangle,
+
+        initialize:
+
+        function SpawnArea (scene, x, y, width , height , fillColor)
+        {
+            Phaser.GameObjects.Rectangle.call(this, scene, x, y, width, height, fillColor);
+            
+            this.setPosition(x * GRID, y * GRID); 
+            this.width = width*GRID;
+            this.height = height*GRID;
+            this.fillColor = 0x6666ff;
+            this.fillAlpha = DEBUG_AREA_ALPHA;
+            
+            this.setOrigin(0,0);
+
+            scene.children.add(this);
+        },
+
+        genPortalChords: function (scene)
+        {
+            
+            var xMin = this.x/GRID;
+            var xMax = this.x/GRID + this.width/GRID - 1;
+
+            var yMin = this.y/GRID;
+            var yMax = this.y/GRID + this.height/GRID - 1;
+            
+            var x = (Phaser.Math.RND.between(xMin, xMax));
+            var y = (Phaser.Math.RND.between(yMin, yMax));
+
+         
+            // Recursively if there is a portal in the same spot as this point try again until there isn't one.
+            scene.portals.forEach( portal => {
+                console.print("HELL YEAH REROLL THAT PORTAL");
+                if(portal.x === x && portal.y === y){
+                    this.genPortalChords();
+                }
+            }
+
+            )
+            
+            var cords = [x,y];
+            return cords;
+        },
+    });
+
+    var Snake = new Phaser.Class({
+        initialize:
+
+        function Snake (scene, x, y)
+        {
+            this.alive = true;
+            this.body = []
+            this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
+            this.head.setOrigin(0);
+            this.body.push(this.head);
+
+
+            this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
+            
+            this.moveTime = 0;
+            this.direction = LEFT;
+            this.previousDirection = LEFT;
+        },
+        
+        grow: function (scene)
+        {
+            // Add a new part at the current tail position
+            // The head moves away from the snake 
+            // The Tail position stays where it is and then every thing moves in series
+            var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
+            this.body.push(newPart);
+
+            newPart.setOrigin(0);
+        },
+        
+        update: function (time)
+        {
+            //if (time >= this.moveTime) Why is this here, does it do anything?
+            //{
+            //    return this.move(time);
+            //}
+        },
+        
+        move: function (scene)
+        {
+        snake.previousDirection = snake.direction; //this prevents snake from being able to 180
+        // start with current head position
+        let x = this.head.x;
+        let y = this.head.y;
 
         // Death by eating itself
         let tail = this.body.slice(1);  // tail - headpos === any of tail positions
@@ -269,15 +337,211 @@ export default class Snake {
         // if any tailpos == headpos
         if(
             tail.some(
-                quadrant => quadrant.x === this.body[0].x && 
-                quadrant.y === this.body[0].y
-                ) 
-                // arr.some() method checks whether 
-                // at least one of the elements of the array 
-                // satisfies the condition checked by the argument method 
+                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
         ){
-            this.scene.scene.restart();
+            this.alive = false;
         }
+
+        scene.portals.forEach(portal => { 
+            if(snake.head.x === portal.x && snake.head.y === portal.y){
+                console.log("PORTAL");
+
+                x = portal.target.x*GRID;
+                y = portal.target.y*GRID;
+                
+                return 'valid';  //Don't know why this is here but I left it -James
+            }
+        });
+
+        if (this.direction === LEFT)
+        {
+            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
+        }
+        else if (this.direction === RIGHT)
+        {
+            x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+        }
+        else if (this.direction === UP)
+        {
+            y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
+        }
+        else if (this.direction === DOWN)
+        {
+            y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
+        }
+        Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
+
+        },
+    });
+
+    snake = new Snake(this, 8, 8);
+    
+    // width 25 grid
+    // width 19
+
+    this.map.forEachTile( tile => {
+        // Empty tiles are indexed at -1. So any tilemap object that is not empty will be considered a wall
+        // Index is the sprite value, not the array index. Normal wall is Index 4
+        if (tile.index > 0) {  
+            var wall = new Wall(this, tile.x, tile.y);
+        }
+
+    });
+
+    for (let index = 0; index < 3; index++) {
+        var food = new Food(this);
         
     }
+
+    // Todo Portal Spawning Algorithm
+    var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
+    var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
+    var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
+    var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
+
+
+    var A1 = spawnAreaA.genPortalChords(this);
+    var H1 = spawnAreaH.genPortalChords(this);
+
+    var G1 = spawnAreaG.genPortalChords(this);
+    var A2 = spawnAreaA.genPortalChords(this);
+
+    var C1 = spawnAreaC.genPortalChords(this);
+    var F1 = spawnAreaF.genPortalChords(this);
+
+    makePair(this, A1, H1);
+    makePair(this, C1, F1);
+    makePair(this, G1, A2);
+
 }
+
+
+function updateDirection(game, event) 
+{
+    // console.log(event.keyCode, this.time.now); // all keys
+    switch (event.keyCode) {
+        case 87: // w
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != DOWN || snake.body.length <= 2) { 
+            snake.direction = UP; // Prevents backtracking to death
+        }
+        break;
+
+        case 65: // a
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != RIGHT || snake.body.length <= 2) {
+            snake.direction = LEFT;
+        }
+        break;
+
+        case 83: // s
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != UP || snake.body.length <= 2) { 
+            snake.direction = DOWN;
+        }
+        break;
+
+        case 68: // d
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != LEFT || snake.body.length <= 2) { 
+            snake.direction = RIGHT;
+        }
+        break;
+
+        case 38: // UP
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != DOWN || snake.body.length <= 2) {
+            snake.direction = UP;
+        }
+        break;
+
+        case 37: // LEFT
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != RIGHT || snake.body.length <= 2) { 
+            snake.direction = LEFT;
+        }
+        break;
+
+        case 40: // DOWN
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != UP || snake.body.length <= 2) { 
+            snake.direction = DOWN;
+        }
+        break;
+
+        case 39: // RIGHT
+        //console.log(event.code, game.time.now);
+        if (snake.previousDirection != LEFT  || snake.body.length <= 2) { 
+            snake.direction = RIGHT;
+        }
+        break;
+
+        case 32: // SPACE
+        console.log(event.code, game.time.now);
+
+    }
+
+}
+
+    function update (time, delta) 
+{
+// console.log("update -- time=" + time + " delta=" + delta);
+    if (!snake.alive)
+        {
+            // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
+            game.destroy();
+            return;
+        }
+
+    
+    if(time >= this.lastMoveTime + this.moveInterval){
+        this.lastMoveTime = time;
+        snake.previousDirection == snake.direction;
+        snake.move(this);
+    }
+    if (!this.spaceBar.isDown){
+        this.moveInterval = 96;} // Less is Faster
+    else{
+        this.moveInterval = 32;
+    }
+    //console.log(this.apples[0]);
+   
+    // Check collision for all Fruits
+    this.apples.forEach(fruit => { 
+        if(snake.head.x === fruit.x && snake.head.y === fruit.y){
+            //console.log("HIT");
+            snake.grow(this);
+            fruit.move(this);
+            var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            this.score = this.score + pointsToAdd;
+            this.fruitCount++;
+            
+            if (DEBUG) {console.log(                         
+                "SCORE=", this.score, 
+                "FRUIT=", pointsToAdd,
+                "FRUITCOUNT=", this.fruitCount,
+                "FRUIT/SCORE=", this.score/this.fruitCount);
+            }
+
+            this.scoreTimer = this.time.addEvent({
+                delay: 10000,
+                paused: false
+              });
+            return 'valid';
+        }
+    });
+
+    this.walls.forEach(wall => {
+        if(snake.head.x === wall.x && snake.head.y === wall.y){
+            snake.alive = false;
+            return 'valid';
+        }
+    });
+}
+
+
