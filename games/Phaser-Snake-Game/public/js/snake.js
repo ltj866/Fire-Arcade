@@ -69,7 +69,6 @@ function create ()
     this.tileset = this.map.addTilesetImage('tileSheet');
     this.layer = this.map.createLayer('Wall', this.tileset);
     
-
     // add background
     this.add.image(286, 286, 'bg01').setDepth(-1);
 
@@ -77,6 +76,7 @@ function create ()
     this.apples = [];
     this.walls = [];
     this.portals = [];
+
 
     // Start Fruit Score Timer
     this.score = 0;
@@ -87,6 +87,21 @@ function create ()
         paused: false
         });
     this.fruitCount = 0;
+
+    // Initalize Screen Text Objects
+    this.scoreText = this.add.text(1*GRID, 1*GRID , this.score, { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: "32px" });
+    // this.scoreText.setOrigin(0,0);
+    this.timerText = this.add.text(SCREEN_WIDTH/2, 1*GRID , 
+                                this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                                { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+                                    fontSize: "32px"});
+    this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
+                                        this.fruitCount,
+                                        { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+                                        fontSize: "32px"});
+
+
+
 
     
     this.lastMoveTime = 0; // The last time we called move()
@@ -509,6 +524,8 @@ function updateDirection(game, event)
     else{
         this.moveInterval = 32;
     }
+
+    this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
     //console.log(this.apples[0]);
    
     // Check collision for all Fruits
@@ -520,6 +537,10 @@ function updateDirection(game, event)
             var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             this.score = this.score + pointsToAdd;
             this.fruitCount++;
+            
+            // Text Update
+            this.scoreText.setText(this.score);
+            this.fruitCountText.setText(this.fruitCount);
             
             if (DEBUG) {console.log(                         
                 "SCORE=", this.score, 
