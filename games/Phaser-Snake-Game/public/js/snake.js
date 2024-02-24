@@ -69,8 +69,6 @@ function create ()
     this.tileset = this.map.addTilesetImage('tileSheet');
     this.layer = this.map.createLayer('Wall', this.tileset);
     
-    this.snake = this.physics.add.sprite(0, 0, 'ball'),
-    this.snake.setOrigin(0);
 
     // add background
     this.add.image(286, 286, 'bg01').setDepth(-1);
@@ -299,8 +297,6 @@ function create ()
             this.head.setOrigin(0);
             this.body.push(this.head);
 
-            //this.snake here?
-            //this.physics.add.existing(this.snake);
 
             this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
             
@@ -501,10 +497,7 @@ function updateDirection(game, event)
             game.destroy();
             return;
         }
-    //  Collide snake against the tilemap layer
-    if (this.physics.collide(this.snake, this.layer)){
-        console.log("HIT");
-    }
+
     
     if(time >= this.lastMoveTime + this.moveInterval){
         this.lastMoveTime = time;
