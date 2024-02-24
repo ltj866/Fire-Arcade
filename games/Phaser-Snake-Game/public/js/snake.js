@@ -46,7 +46,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
@@ -64,6 +64,10 @@ function preload ()
 
 function create ()
 {
+    // Game Settings
+    this.fruitGoal = 16;
+    
+
     // Tilemap
     this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
     this.tileset = this.map.addTilesetImage('tileSheet');
@@ -96,7 +100,7 @@ function create ()
                                 { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                     fontSize: "32px"});
     this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
-                                        this.fruitCount,
+                                        this.fruitGoal - this.fruitCount,
                                         { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                         fontSize: "32px"});
 
@@ -165,15 +169,12 @@ function create ()
             }
         
             
-            console.log(scene.walls);
             // Make all the unsafe places unsafe
             scene.walls.forEach(wall => {
                 // Hack to sanitize index undefined value
                 // Current Tiled input script adds additional X values.
                 if (wall.x < SCREEN_WIDTH) {
-                    console.log(wall.x/GRID, wall.y/GRID);
-                    testGrid[wall.x/GRID][wall.y/GRID] = false; //
-                    console.log(testGrid[wall.x/GRID][wall.y/GRID]) 
+                    testGrid[wall.x/GRID][wall.y/GRID] = false; 
                 }
             });
 
@@ -417,6 +418,7 @@ function create ()
     }
 
     // Todo Portal Spawning Algorithm
+    /* 9x9 grid
     var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
     var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
     var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
@@ -425,8 +427,7 @@ function create ()
     var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
     var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
     var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
-
-
+    
     var A1 = spawnAreaA.genPortalChords(this);
     var H1 = spawnAreaH.genPortalChords(this);
 
@@ -439,6 +440,31 @@ function create ()
     makePair(this, A1, H1);
     makePair(this, C1, F1);
     makePair(this, G1, A2);
+    */
+
+    var spawnAreaA = new SpawnArea(this, 1,2,7,7, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 9,2,6,7, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 16,2,7,7, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,12,7,6, 0x6666ff);
+    var spawnAreaG = new SpawnArea(this, 9,12,6,6, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 16,12,7,6, 0x6666ff);
+
+
+
+
+
+    var A1 = spawnAreaA.genPortalChords(this);
+    var H1 = spawnAreaH.genPortalChords(this);
+
+    var B1 = spawnAreaB.genPortalChords(this);
+    var G1 = spawnAreaG.genPortalChords(this);
+
+    var C1 = spawnAreaC.genPortalChords(this);
+    var F1 = spawnAreaF.genPortalChords(this);
+
+    makePair(this, A1, H1);
+    makePair(this, B1, G1);
+    makePair(this, C1, F1);
 
 }
 
@@ -548,7 +574,7 @@ function updateDirection(game, event)
             
             // Text Update
             this.scoreText.setText(this.score);
-            this.fruitCountText.setText(this.fruitCount);
+            this.fruitCountText.setText(this.fruitGoal - this.fruitCount);
             
             if (DEBUG) {console.log(                         
                 "SCORE=", this.score, 
@@ -571,6 +597,13 @@ function updateDirection(game, event)
             return 'valid';
         }
     });
+
+    if (this.fruitCount >= this.fruitGoal) {
+        console.log("YOU WIN");
+        console.log("SCORE = ", this.score);
+        this.children.bringToTop(this.scoreText);
+        game.destroy();
+    }
 }
 
 
