@@ -68,21 +68,14 @@ function create ()
     this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
     this.tileset = this.map.addTilesetImage('tileSheet');
     this.layer = this.map.createLayer('Wall', this.tileset);
-
-    this.map.setCollision([1,4]);
-
+    
     this.snake = this.physics.add.sprite(0, 0, 'ball'),
     this.snake.setOrigin(0);
-
-    this.physics.add.collider(this.snake, layer);
-
-    /*this.physics.add.overlap(this.snake, layer, () => {
-        console.log('overlapping');
-    });*/
 
     // add background
     this.add.image(286, 286, 'bg01').setDepth(-1);
 
+    // arrays for collision detection
     this.apples = [];
     this.walls = [];
     this.portals = [];
@@ -202,15 +195,15 @@ function create ()
 
         function Wall (scene, x, y)
         {
-            Phaser.GameObjects.Image.call(this, scene)
+            // Phaser.GameObjects.Image.call(this, scene) // commented out because we don't need to redraw
 
-            //this.setTexture('blocks', 3);
-            //this.setPosition(x * GRID, y * GRID);
-            //this.setOrigin(0);
+            //this.setTexture('blocks', 3); // or use a texture
+            this.setPosition(x * GRID, y * GRID);
+            this.setOrigin(0);
 
             scene.walls.push(this);
 
-            scene.children.add(this);
+            // scene.children.add(this);   // walls are added through tilemaps now
         },
     });
   
@@ -390,16 +383,14 @@ function create ()
     // width 25 grid
     // width 19
 
-    for (let i = 0; i <= END_X; i++) {
-        wall = new Wall(this, i, 0);
-        wall = new Wall(this, i, 19);
-      }
-    
-    var wall = new Wall(this, 10, 10);
-    var wall = new Wall(this, 10, 11);
-    var wall = new Wall(this, 10, 12);
-    var wall = new Wall(this, 10, 13);
-    var wall = new Wall(this, 10, 14);
+    this.map.forEachTile( tile => {
+        // Empty tiles are indexed at -1. So any tilemap object that is not empty will be considered a wall
+        // Index is the sprite value, not the array index. Normal wall is Index 4
+        if (tile.index > 0) {  
+            var wall = new Wall(this, tile.x, tile.y);
+        }
+
+    });
 
     for (let index = 0; index < 3; index++) {
         var food = new Food(this);
