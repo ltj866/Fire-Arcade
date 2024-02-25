@@ -9,6 +9,12 @@ var config = {
             gravity: { y: 0}
         }
     },
+    fx: {
+        glow: {
+            distance: 32,
+            quality: 0.1
+        }
+    },
     scene: {
         preload: preload,
         create: create,
@@ -46,7 +52,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
@@ -248,6 +254,23 @@ function create ()
             this.tint = color.color;
             scene.children.add(this);
 
+            // Add Glow
+            this.preFX.setPadding(32);
+
+            this.fx = this.preFX.addGlow();
+
+            //  For PreFX Glow the quality and distance are set in the Game Configuration
+
+            scene.tweens.add({
+                targets: this.fx,
+                outerStrength: 10,
+                yoyo: true,
+                loop: -1,
+                ease: 'sine.inout'
+            });
+
+            this.fx.setActive(false);
+
         },
         
     });
@@ -398,7 +421,7 @@ function create ()
         },
     });
 
-    snake = new Snake(this, 8, 8);
+    snake = new Snake(this, 11, 6);
     
     // width 25 grid
     // width 19
@@ -442,12 +465,12 @@ function create ()
     makePair(this, G1, A2);
     */
 
-    var spawnAreaA = new SpawnArea(this, 1,2,7,7, 0x6666ff);
-    var spawnAreaB = new SpawnArea(this, 9,2,6,7, 0x6666ff);
-    var spawnAreaC = new SpawnArea(this, 16,2,7,7, 0x6666ff);
-    var spawnAreaF = new SpawnArea(this, 1,12,7,6, 0x6666ff);
-    var spawnAreaG = new SpawnArea(this, 9,12,6,6, 0x6666ff);
-    var spawnAreaH = new SpawnArea(this, 16,12,7,6, 0x6666ff);
+    var spawnAreaA = new SpawnArea(this, 1,3,7,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 9,3,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 16,3,7,5, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,13,7,5, 0x6666ff);
+    var spawnAreaG = new SpawnArea(this, 9,13,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 16,13,7,5, 0x6666ff);
 
 
 
@@ -597,6 +620,40 @@ function updateDirection(game, event)
             return 'valid';
         }
     });
+
+    // Calculate Closest Portal to Snake Head
+    let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
+    closestPortal.fx.setActive(false);
+    var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+                                                           closestPortal.x/GRID, closestPortal.y/GRID);
+
+    this.portals.forEach( portal => {
+        var dist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+                                              portal.x/GRID, portal.y/GRID);
+
+        if (dist < closestPortalDist) { // Compare and choose closer portals
+            closestPortalDist = dist;
+            closestPortal = portal;
+        }
+    });
+
+    //closestPortal.fx.setActive(true);
+
+    // This is a bit eccessive because I only store the target portal coordinates
+    // and I need to get the portal object to turn on the effect. Probably can be optimized.
+    // Good enough for testing.
+    if (closestPortalDist < 5) {
+        this.portals.forEach(portal => {
+            if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                portal.fx.setActive(true);
+            }
+        });
+    };
+
+
+
+    
+    //console.log(closestPortal.x, closestPortal.y);
 
     if (this.fruitCount >= this.fruitGoal) {
         console.log("YOU WIN");
