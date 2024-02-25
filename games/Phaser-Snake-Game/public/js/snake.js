@@ -624,6 +624,8 @@ function updateDirection(game, event)
     // Calculate Closest Portal to Snake Head
     let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
     closestPortal.fx.setActive(false);
+    
+    // Snake gets the manhatten distance between two objects.
     var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
                                                            closestPortal.x/GRID, closestPortal.y/GRID);
 
@@ -637,10 +639,8 @@ function updateDirection(game, event)
         }
     });
 
-    //closestPortal.fx.setActive(true);
-
     // This is a bit eccessive because I only store the target portal coordinates
-    // and I need to get the portal object to turn on the effect. Probably can be optimized.
+    // and I need to get the portal object to turn on the effect. Of course can be optimized.
     // Good enough for testing.
     if (closestPortalDist < 5) {
         this.portals.forEach(portal => {
