@@ -9,6 +9,12 @@ var config = {
             gravity: { y: 0}
         }
     },
+    fx: {
+        glow: {
+            distance: 32,
+            quality: 0.1
+        }
+    },
     scene: {
         preload: preload,
         create: create,
@@ -64,6 +70,10 @@ function preload ()
 
 function create ()
 {
+    // Game Settings
+    this.fruitGoal = 16;
+    
+
     // Tilemap
     this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
     this.tileset = this.map.addTilesetImage('tileSheet');
@@ -96,7 +106,7 @@ function create ()
                                 { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                     fontSize: "32px"});
     this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
-                                        this.fruitCount,
+                                        this.fruitGoal - this.fruitCount,
                                         { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                         fontSize: "32px"});
 
@@ -165,15 +175,12 @@ function create ()
             }
         
             
-            console.log(scene.walls);
             // Make all the unsafe places unsafe
             scene.walls.forEach(wall => {
                 // Hack to sanitize index undefined value
                 // Current Tiled input script adds additional X values.
                 if (wall.x < SCREEN_WIDTH) {
-                    console.log(wall.x/GRID, wall.y/GRID);
-                    testGrid[wall.x/GRID][wall.y/GRID] = false; //
-                    console.log(testGrid[wall.x/GRID][wall.y/GRID]) 
+                    testGrid[wall.x/GRID][wall.y/GRID] = false; 
                 }
             });
 
@@ -246,6 +253,23 @@ function create ()
             
             this.tint = color.color;
             scene.children.add(this);
+
+            // Add Glow
+            this.preFX.setPadding(32);
+
+            this.fx = this.preFX.addGlow();
+
+            //  For PreFX Glow the quality and distance are set in the Game Configuration
+
+            scene.tweens.add({
+                targets: this.fx,
+                outerStrength: 10,
+                yoyo: true,
+                loop: -1,
+                ease: 'sine.inout'
+            });
+
+            this.fx.setActive(false);
 
         },
         
@@ -397,7 +421,7 @@ function create ()
         },
     });
 
-    snake = new Snake(this, 8, 8);
+    snake = new Snake(this, 11, 6);
     
     // width 25 grid
     // width 19
@@ -417,6 +441,7 @@ function create ()
     }
 
     // Todo Portal Spawning Algorithm
+    /* 9x9 grid
     var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
     var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
     var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
@@ -425,8 +450,7 @@ function create ()
     var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
     var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
     var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
-
-
+    
     var A1 = spawnAreaA.genPortalChords(this);
     var H1 = spawnAreaH.genPortalChords(this);
 
@@ -439,6 +463,31 @@ function create ()
     makePair(this, A1, H1);
     makePair(this, C1, F1);
     makePair(this, G1, A2);
+    */
+
+    var spawnAreaA = new SpawnArea(this, 1,3,7,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 9,3,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 16,3,7,5, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 1,13,7,5, 0x6666ff);
+    var spawnAreaG = new SpawnArea(this, 9,13,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 16,13,7,5, 0x6666ff);
+
+
+
+
+
+    var A1 = spawnAreaA.genPortalChords(this);
+    var H1 = spawnAreaH.genPortalChords(this);
+
+    var B1 = spawnAreaB.genPortalChords(this);
+    var G1 = spawnAreaG.genPortalChords(this);
+
+    var C1 = spawnAreaC.genPortalChords(this);
+    var F1 = spawnAreaF.genPortalChords(this);
+
+    makePair(this, A1, H1);
+    makePair(this, B1, G1);
+    makePair(this, C1, F1);
 
 }
 
@@ -548,7 +597,7 @@ function updateDirection(game, event)
             
             // Text Update
             this.scoreText.setText(this.score);
-            this.fruitCountText.setText(this.fruitCount);
+            this.fruitCountText.setText(this.fruitGoal - this.fruitCount);
             
             if (DEBUG) {console.log(                         
                 "SCORE=", this.score, 
@@ -572,6 +621,40 @@ function updateDirection(game, event)
         }
     });
 
+    // Calculate Closest Portal to Snake Head
+    let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
+    closestPortal.fx.setActive(false);
+    var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+                                                           closestPortal.x/GRID, closestPortal.y/GRID);
+
+    this.portals.forEach( portal => {
+        var dist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+                                              portal.x/GRID, portal.y/GRID);
+
+        if (dist < closestPortalDist) { // Compare and choose closer portals
+            closestPortalDist = dist;
+            closestPortal = portal;
+        }
+    });
+
+    //closestPortal.fx.setActive(true);
+
+    // This is a bit eccessive because I only store the target portal coordinates
+    // and I need to get the portal object to turn on the effect. Probably can be optimized.
+    // Good enough for testing.
+    if (closestPortalDist < 5) {
+        this.portals.forEach(portal => {
+            if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                portal.fx.setActive(true);
+            }
+        });
+    };
+
+
+
+    
+    //console.log(closestPortal.x, closestPortal.y);
+
     if (this.fruitCount >= this.fruitGoal) {
         console.log("YOU WIN");
         console.log("SCORE = ", this.score);
@@ -583,7 +666,6 @@ function updateDirection(game, event)
             fontSize: "32px",
             align: "center",
         });
-
 
         game.destroy();
     }
