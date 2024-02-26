@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.WEBGL,
     width: 768, // If you change these remember 
-    height: 640,// to update below as well
+    height: 720,// to update below as well
     parent: 'phaser-example',
     physics: {
         default: 'arcade',
@@ -36,7 +36,7 @@ var UP = 2;
 var DOWN = 3;
 
 // Screen Globals
-var GRID = 32; // Size of Sprites and GRID
+var GRID = 24; // Size of Sprites and GRID
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
 
@@ -59,7 +59,7 @@ const game = new Phaser.Game(config);
 function preload ()
 {
     this.load.image('bg01', 'assets/sprites/background01.png');
-    this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 
     // Tilemap
@@ -75,7 +75,7 @@ function create ()
     
 
     // Tilemap
-    this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
+    this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
     this.tileset = this.map.addTilesetImage('tileSheet');
     this.layer = this.map.createLayer('Wall', this.tileset);
     
