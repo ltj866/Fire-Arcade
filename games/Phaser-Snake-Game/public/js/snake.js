@@ -63,7 +63,7 @@ function preload ()
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 
     // Tilemap
-    this.load.image('tileSheet', 'assets/Tiled/snakeMap.png');
+    this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
     this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
 }
@@ -76,7 +76,7 @@ function create ()
 
     // Tilemap
     this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
-    this.tileset = this.map.addTilesetImage('tileSheet');
+    this.tileset = this.map.addTilesetImage('tileSheetx24');
     this.layer = this.map.createLayer('Wall', this.tileset);
     
     // add background

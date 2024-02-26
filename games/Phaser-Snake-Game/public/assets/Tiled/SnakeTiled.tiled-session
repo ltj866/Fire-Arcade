@@ -7,6 +7,7 @@
     "expandedProjectPaths": [
         "."
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "C:/Users/holde/Desktop/Tiled/snakeMap.tmx": {
             "scale": 0.8049879807692307,
@@ -34,35 +35,52 @@
             "scale": 0.7650240384615384,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 436.5875883739199,
+                "x": 435.2804399057345,
                 "y": 132.6755695208169
             }
         },
         "snakeMap..tmx#tileSheet": {
             "scaleInDock": 1
         },
+        "snakeMap.json": {
+            "scale": 0.63828125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.876376988984,
+                "y": 347.8090575275397
+            }
+        },
+        "snakeMap.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "snakeMap.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "snakeMap.tmj": {
             "scale": 0.5891826923076923,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 414.1330069359445,
-                "y": 321.63198694410437
+                "x": 410.73847409220724,
+                "y": 319.93472052223586
             }
         },
         "snakeMap.tmj#tileSheet": {
             "scaleInDock": 1
         },
         "snakeMap.tmx": {
-            "scale": 0.5,
+            "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 452,
-                "y": 531
+                "x": 405.3333333333333,
+                "y": 412.66666666666674
             }
         },
         "snakeMap.tmx#tileSheet": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "snakeMap.tmx#tileSheetx24": {
+            "scaleInDock": 1
         }
     },
     "last.exportedFilePath": "E:/FireArcade/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
@@ -75,10 +93,16 @@
     ],
     "project": "SnakeTiled.tiled-project",
     "recentFiles": [
+        "snakeMap.json",
+        "snakeMap..tmx",
         "snakeMap.tmx",
         "snakeMap.tmj",
-        "snakeMap..tmx",
         "SnakeTiledProject.json"
     ],
-    "tileset.embedInMap": true
+    "resizeMap.removeObjects": false,
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 24,
+        "width": 24
+    }
 }
