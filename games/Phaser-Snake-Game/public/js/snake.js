@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.WEBGL,
-    width: 768, // If you change these remember 
-    height: 720,// to update below as well
+    width: 768,
+    height: 720,
     parent: 'phaser-example',
     physics: {
         default: 'arcade',
@@ -61,8 +61,8 @@ const game = new Phaser.Game(config);
 function preload ()
 {
     this.load.image('bg01', 'assets/sprites/background01.png');
-    this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
 
     // Tilemap
     this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
@@ -146,8 +146,6 @@ function create ()
             this.setTexture('blocks', 2);
             this.move(scene);
             this.setOrigin(0);
-            
-            this.setScale(.75);
 
             this.points = 100;
 
@@ -251,7 +249,6 @@ function create ()
             this.setTexture('portals', 0);
             this.setPosition(from[0] * GRID, from[1] * GRID);
             this.setOrigin(0);
-            this.setScale(0.75);
 
             this.target = { x: to[0], y: to[1]};
 
@@ -348,7 +345,6 @@ function create ()
             this.body = []
             this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
             this.head.setOrigin(0);
-            this.head.setScale(.75);
             
             this.body.push(this.head);
 
@@ -366,7 +362,6 @@ function create ()
             // The head moves away from the snake 
             // The Tail position stays where it is and then every thing moves in series
             var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
-            newPart.setScale(.75);
             this.body.push(newPart);
 
             newPart.setOrigin(0);
