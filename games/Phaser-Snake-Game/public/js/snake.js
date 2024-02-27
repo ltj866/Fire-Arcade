@@ -74,7 +74,7 @@ function preload ()
 function create ()
 {
     // Game Settings
-    this.fruitGoal = 16;
+    this.fruitGoal = 20;
     
 
     // Tilemap
