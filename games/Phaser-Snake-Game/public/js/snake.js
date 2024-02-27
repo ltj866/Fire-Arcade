@@ -36,7 +36,9 @@ var UP = 2;
 var DOWN = 3;
 
 // Screen Globals
-var GRID = 24; // Size of Sprites and GRID. TileSheet specified separately 
+
+var GRID = 24; // Size of Sprites and GRID
+
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
 
@@ -63,7 +65,7 @@ function preload ()
     this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: 32, frameHeight: 32 });
 
     // Tilemap
-    this.load.image('tileSheet', 'assets/Tiled/snakeMap.png');
+    this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
     this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
 }
@@ -75,8 +77,9 @@ function create ()
     
 
     // Tilemap
-    this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 }); // 
-    this.tileset = this.map.addTilesetImage('tileSheet');
+    this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
+    this.tileset = this.map.addTilesetImage('tileSheetx24');
+
     this.layer = this.map.createLayer('Wall', this.tileset);
     
     // add background
@@ -630,6 +633,9 @@ function updateDirection(game, event)
     // Calculate Closest Portal to Snake Head
     let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
     closestPortal.fx.setActive(false);
+    
+    // Snake gets the manhatten distance between two objects.
+
     var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
                                                            closestPortal.x/GRID, closestPortal.y/GRID);
 
@@ -643,7 +649,6 @@ function updateDirection(game, event)
         }
     });
 
-    //closestPortal.fx.setActive(true);
 
     // This is a bit eccessive because I only store the target portal coordinates
     // and I need to get the portal object to turn on the effect. Probably can be optimized.
@@ -665,6 +670,7 @@ function updateDirection(game, event)
         console.log("YOU WIN");
         console.log("SCORE = ", this.score);
         this.children.bringToTop(this.scoreText);
+
 
         this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
         ["YOU WIN YAY!", this.score],
