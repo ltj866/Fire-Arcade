@@ -62,7 +62,7 @@ function preload ()
 {
     this.load.image('bg01', 'assets/sprites/background01.png');
     this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
-    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
     // Tilemap
     this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
@@ -248,7 +248,7 @@ function create ()
             Phaser.GameObjects.Image.call(this, scene);
             this.setTexture('portals', 0);
             this.setPosition(from[0] * GRID, from[1] * GRID);
-            this.setOrigin(0);
+            this.setOrigin(.125,.125);
 
             this.target = { x: to[0], y: to[1]};
 
