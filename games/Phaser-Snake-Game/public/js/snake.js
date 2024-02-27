@@ -37,11 +37,14 @@ var DOWN = 3;
 
 //******************************************************************** */
 // GameSettings
+//******************************************************************** */
 
 var GRID = 24; // Size of Sprites and GRID
 var FRUIT = 4; // Number of fruit to spawn
 var FRUITGOAL = 24;
 
+
+// Screen Settings
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
 
