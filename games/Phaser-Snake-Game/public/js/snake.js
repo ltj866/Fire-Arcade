@@ -35,10 +35,12 @@ var RIGHT = 1;
 var UP = 2;
 var DOWN = 3;
 
-// Screen Globals
+//******************************************************************** */
+// GameSettings
 
 var GRID = 24; // Size of Sprites and GRID
 var FRUIT = 4; // Number of fruit to spawn
+var FRUITGOAL = 24;
 
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
@@ -73,8 +75,6 @@ function preload ()
 
 function create ()
 {
-    // Game Settings
-    this.fruitGoal = 24;
     
 
     // Tilemap
@@ -110,7 +110,7 @@ function create ()
                                 { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                     fontSize: "32px"});
     this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
-                                        this.fruitGoal - this.fruitCount,
+                                        FRUITGOAL - this.fruitCount,
                                         { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                         fontSize: "32px"});
 
@@ -147,8 +147,6 @@ function create ()
             this.setTexture('blocks', 2);
             this.move(scene);
             this.setOrigin(0);
-
-            this.points = 100;
 
             scene.apples.push(this);
 
@@ -611,7 +609,7 @@ function updateDirection(game, event)
             
             // Text Update
             this.scoreText.setText(this.score);
-            this.fruitCountText.setText(this.fruitGoal - this.fruitCount);
+            this.fruitCountText.setText(FRUITGOAL - this.fruitCount);
             
             if (DEBUG) {console.log(                         
                 "SCORE=", this.score, 
@@ -681,7 +679,7 @@ function updateDirection(game, event)
     
     //console.log(closestPortal.x, closestPortal.y);
 
-    if (this.fruitCount >= this.fruitGoal) {
+    if (this.fruitCount >= FRUITGOAL) {
         console.log("YOU WIN");
         console.log("SCORE = ", this.score);
         this.children.bringToTop(this.scoreText);
