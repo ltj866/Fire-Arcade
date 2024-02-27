@@ -264,13 +264,14 @@ function create ()
 
             //  For PreFX Glow the quality and distance are set in the Game Configuration
 
+            /*
             scene.tweens.add({
                 targets: this.fx,
                 outerStrength: 10,
                 yoyo: true,
                 loop: -1,
                 ease: 'sine.inout'
-            });
+            });*/
 
             this.fx.setActive(false);
 
@@ -628,14 +629,16 @@ function updateDirection(game, event)
     // Calculate Closest Portal to Snake Head
     let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
     closestPortal.fx.setActive(false);
+
+    //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
     
     // Snake gets the manhatten distance between two objects.
 
-    var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+    var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
                                                            closestPortal.x/GRID, closestPortal.y/GRID);
 
     this.portals.forEach( portal => {
-        var dist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+        var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
                                               portal.x/GRID, portal.y/GRID);
 
         if (dist < closestPortalDist) { // Compare and choose closer portals
@@ -648,10 +651,19 @@ function updateDirection(game, event)
     // This is a bit eccessive because I only store the target portal coordinates
     // and I need to get the portal object to turn on the effect. Probably can be optimized.
     // Good enough for testing.
-    if (closestPortalDist < 5) {
+    if (closestPortalDist < 6) {
         this.portals.forEach(portal => {
             if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
                 portal.fx.setActive(true);
+                
+                //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                portal.fx.outerStrength = 6 - closestPortalDist;
+
+                closestPortal.fx.setActive(true);
+                closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                console.log(3 - closestPortalDist);
+                closestPortal.fx.outerStrength = 0;
+
             }
         });
     };
