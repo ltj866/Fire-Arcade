@@ -38,6 +38,7 @@ var DOWN = 3;
 // Screen Globals
 
 var GRID = 24; // Size of Sprites and GRID
+var FRUIT = 4; // Number of fruit to spawn
 
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
@@ -54,7 +55,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
@@ -440,7 +441,7 @@ function create ()
 
     });
 
-    for (let index = 0; index < 3; index++) {
+    for (let index = 0; index < FRUIT; index++) {
         var food = new Food(this);
         
     }
@@ -470,12 +471,16 @@ function create ()
     makePair(this, G1, A2);
     */
 
-    var spawnAreaA = new SpawnArea(this, 1,3,7,5, 0x6666ff);
-    var spawnAreaB = new SpawnArea(this, 9,3,6,5, 0x6666ff);
-    var spawnAreaC = new SpawnArea(this, 16,3,7,5, 0x6666ff);
-    var spawnAreaF = new SpawnArea(this, 1,13,7,5, 0x6666ff);
-    var spawnAreaG = new SpawnArea(this, 9,13,6,5, 0x6666ff);
-    var spawnAreaH = new SpawnArea(this, 16,13,7,5, 0x6666ff);
+    var spawnAreaA = new SpawnArea(this, 2,3,6,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 10,3,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 24,3,6,5, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 2,23,6,5, 0x6666ff);
+
+    var spawnAreaG = new SpawnArea(this, 10,13,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 24,23,6,5, 0x6666ff);
+
+    var spawnAreaJ = new SpawnArea(this, 16,13,6,5, 0x6666ff);
+    var spawnAreaI = new SpawnArea(this, 16,23,6,5, 0x6666ff);
 
 
 
@@ -490,9 +495,13 @@ function create ()
     var C1 = spawnAreaC.genPortalChords(this);
     var F1 = spawnAreaF.genPortalChords(this);
 
+    var J1 = spawnAreaJ.genPortalChords(this);
+    var I1 = spawnAreaI.genPortalChords(this);
+
     makePair(this, A1, H1);
     makePair(this, B1, G1);
     makePair(this, C1, F1);
+    makePair(this, J1, I1);
 
 }
 
@@ -582,9 +591,9 @@ function updateDirection(game, event)
         snake.move(this);
     }
     if (!this.spaceBar.isDown){
-        this.moveInterval = 112;} // Less is Faster
+        this.moveInterval = 96;} // Less is Faster
     else{
-        this.moveInterval = 32;
+        this.moveInterval = 24;
     }
 
     this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
@@ -661,7 +670,6 @@ function updateDirection(game, event)
 
                 closestPortal.fx.setActive(true);
                 closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                console.log(3 - closestPortalDist);
                 closestPortal.fx.outerStrength = 0;
 
             }
