@@ -38,6 +38,7 @@ var DOWN = 3;
 // Screen Globals
 
 var GRID = 24; // Size of Sprites and GRID
+var FRUIT = 4; // Number of fruit to spawn
 
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
@@ -264,13 +265,14 @@ function create ()
 
             //  For PreFX Glow the quality and distance are set in the Game Configuration
 
+            /*
             scene.tweens.add({
                 targets: this.fx,
                 outerStrength: 10,
                 yoyo: true,
                 loop: -1,
                 ease: 'sine.inout'
-            });
+            });*/
 
             this.fx.setActive(false);
 
@@ -439,7 +441,7 @@ function create ()
 
     });
 
-    for (let index = 0; index < 3; index++) {
+    for (let index = 0; index < FRUIT; index++) {
         var food = new Food(this);
         
     }
@@ -469,12 +471,16 @@ function create ()
     makePair(this, G1, A2);
     */
 
-    var spawnAreaA = new SpawnArea(this, 1,3,7,5, 0x6666ff);
-    var spawnAreaB = new SpawnArea(this, 9,3,6,5, 0x6666ff);
-    var spawnAreaC = new SpawnArea(this, 16,3,7,5, 0x6666ff);
-    var spawnAreaF = new SpawnArea(this, 1,13,7,5, 0x6666ff);
-    var spawnAreaG = new SpawnArea(this, 9,13,6,5, 0x6666ff);
-    var spawnAreaH = new SpawnArea(this, 16,13,7,5, 0x6666ff);
+    var spawnAreaA = new SpawnArea(this, 2,3,6,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 10,3,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 24,3,6,5, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 2,23,6,5, 0x6666ff);
+
+    var spawnAreaG = new SpawnArea(this, 10,13,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 24,23,6,5, 0x6666ff);
+
+    var spawnAreaJ = new SpawnArea(this, 16,13,6,5, 0x6666ff);
+    var spawnAreaI = new SpawnArea(this, 16,23,6,5, 0x6666ff);
 
 
 
@@ -489,9 +495,13 @@ function create ()
     var C1 = spawnAreaC.genPortalChords(this);
     var F1 = spawnAreaF.genPortalChords(this);
 
+    var J1 = spawnAreaJ.genPortalChords(this);
+    var I1 = spawnAreaI.genPortalChords(this);
+
     makePair(this, A1, H1);
     makePair(this, B1, G1);
     makePair(this, C1, F1);
+    makePair(this, J1, I1);
 
 }
 
@@ -581,9 +591,9 @@ function updateDirection(game, event)
         snake.move(this);
     }
     if (!this.spaceBar.isDown){
-        this.moveInterval = 112;} // Less is Faster
+        this.moveInterval = 96;} // Less is Faster
     else{
-        this.moveInterval = 32;
+        this.moveInterval = 24;
     }
 
     this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
@@ -628,14 +638,16 @@ function updateDirection(game, event)
     // Calculate Closest Portal to Snake Head
     let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
     closestPortal.fx.setActive(false);
+
+    //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
     
     // Snake gets the manhatten distance between two objects.
 
-    var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+    var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
                                                            closestPortal.x/GRID, closestPortal.y/GRID);
 
     this.portals.forEach( portal => {
-        var dist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
+        var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
                                               portal.x/GRID, portal.y/GRID);
 
         if (dist < closestPortalDist) { // Compare and choose closer portals
@@ -648,10 +660,18 @@ function updateDirection(game, event)
     // This is a bit eccessive because I only store the target portal coordinates
     // and I need to get the portal object to turn on the effect. Probably can be optimized.
     // Good enough for testing.
-    if (closestPortalDist < 5) {
+    if (closestPortalDist < 6) {
         this.portals.forEach(portal => {
             if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
                 portal.fx.setActive(true);
+                
+                //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                portal.fx.outerStrength = 6 - closestPortalDist;
+
+                closestPortal.fx.setActive(true);
+                closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                closestPortal.fx.outerStrength = 0;
+
             }
         });
     };
