@@ -36,7 +36,9 @@ var UP = 2;
 var DOWN = 3;
 
 // Screen Globals
+
 var GRID = 24; // Size of Sprites and GRID
+
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
 
@@ -59,8 +61,8 @@ const game = new Phaser.Game(config);
 function preload ()
 {
     this.load.image('bg01', 'assets/sprites/background01.png');
-    this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
-    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: 32, frameHeight: 32 });
 
     // Tilemap
     this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
@@ -77,6 +79,7 @@ function create ()
     // Tilemap
     this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
     this.tileset = this.map.addTilesetImage('tileSheetx24');
+
     this.layer = this.map.createLayer('Wall', this.tileset);
     
     // add background
@@ -143,6 +146,8 @@ function create ()
             this.setTexture('blocks', 2);
             this.move(scene);
             this.setOrigin(0);
+            
+            this.setScale(.75);
 
             this.points = 100;
 
@@ -246,6 +251,7 @@ function create ()
             this.setTexture('portals', 0);
             this.setPosition(from[0] * GRID, from[1] * GRID);
             this.setOrigin(0);
+            this.setScale(0.75);
 
             this.target = { x: to[0], y: to[1]};
 
@@ -342,6 +348,8 @@ function create ()
             this.body = []
             this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
             this.head.setOrigin(0);
+            this.head.setScale(.75);
+            
             this.body.push(this.head);
 
 
@@ -358,6 +366,7 @@ function create ()
             // The head moves away from the snake 
             // The Tail position stays where it is and then every thing moves in series
             var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
+            newPart.setScale(.75);
             this.body.push(newPart);
 
             newPart.setOrigin(0);
@@ -626,6 +635,7 @@ function updateDirection(game, event)
     closestPortal.fx.setActive(false);
     
     // Snake gets the manhatten distance between two objects.
+
     var closestPortalDist = Phaser.Math.Distance.Snake(snake.head.x/GRID, snake.head.y/GRID, 
                                                            closestPortal.x/GRID, closestPortal.y/GRID);
 
@@ -639,8 +649,9 @@ function updateDirection(game, event)
         }
     });
 
+
     // This is a bit eccessive because I only store the target portal coordinates
-    // and I need to get the portal object to turn on the effect. Of course can be optimized.
+    // and I need to get the portal object to turn on the effect. Probably can be optimized.
     // Good enough for testing.
     if (closestPortalDist < 5) {
         this.portals.forEach(portal => {
@@ -659,6 +670,15 @@ function updateDirection(game, event)
         console.log("YOU WIN");
         console.log("SCORE = ", this.score);
         this.children.bringToTop(this.scoreText);
+
+
+        this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
+        ["YOU WIN YAY!", this.score],
+        { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+            fontSize: "32px",
+            align: "center",
+        });
+
         game.destroy();
     }
 }
