@@ -55,7 +55,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
