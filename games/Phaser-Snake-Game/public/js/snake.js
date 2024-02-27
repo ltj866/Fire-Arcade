@@ -1,12 +1,18 @@
 var config = {
     type: Phaser.WEBGL,
-    width: 768, // If you change these remember 
-    height: 640,// to update below as well
+    width: 768,
+    height: 720,
     parent: 'phaser-example',
     physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 0}
+        }
+    },
+    fx: {
+        glow: {
+            distance: 32,
+            quality: 0.1
         }
     },
     scene: {
@@ -30,7 +36,10 @@ var UP = 2;
 var DOWN = 3;
 
 // Screen Globals
-var GRID = 32; // Size of Sprites and GRID
+
+var GRID = 24; // Size of Sprites and GRID
+var FRUIT = 4; // Number of fruit to spawn
+
 var SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
 
@@ -54,19 +63,24 @@ function preload ()
 {
     this.load.image('bg01', 'assets/sprites/background01.png');
     this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
-    this.load.spritesheet('portals', 'assets/sprites/portalBluex32.png', { frameWidth: GRID, frameHeight: GRID });
+    this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
     // Tilemap
-    this.load.image('tileSheet', 'assets/Tiled/snakeMap.png');
+    this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
     this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
 }
 
 function create ()
 {
+    // Game Settings
+    this.fruitGoal = 16;
+    
+
     // Tilemap
-    this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
-    this.tileset = this.map.addTilesetImage('tileSheet');
+    this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
+    this.tileset = this.map.addTilesetImage('tileSheetx24');
+
     this.layer = this.map.createLayer('Wall', this.tileset);
     
     // add background
@@ -96,7 +110,7 @@ function create ()
                                 { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                     fontSize: "32px"});
     this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
-                                        this.fruitCount,
+                                        this.fruitGoal - this.fruitCount,
                                         { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                         fontSize: "32px"});
 
@@ -165,15 +179,12 @@ function create ()
             }
         
             
-            console.log(scene.walls);
             // Make all the unsafe places unsafe
             scene.walls.forEach(wall => {
                 // Hack to sanitize index undefined value
                 // Current Tiled input script adds additional X values.
                 if (wall.x < SCREEN_WIDTH) {
-                    console.log(wall.x/GRID, wall.y/GRID);
-                    testGrid[wall.x/GRID][wall.y/GRID] = false; //
-                    console.log(testGrid[wall.x/GRID][wall.y/GRID]) 
+                    testGrid[wall.x/GRID][wall.y/GRID] = false; 
                 }
             });
 
@@ -238,7 +249,7 @@ function create ()
             Phaser.GameObjects.Image.call(this, scene);
             this.setTexture('portals', 0);
             this.setPosition(from[0] * GRID, from[1] * GRID);
-            this.setOrigin(0);
+            this.setOrigin(.125,.125);
 
             this.target = { x: to[0], y: to[1]};
 
@@ -246,6 +257,24 @@ function create ()
             
             this.tint = color.color;
             scene.children.add(this);
+
+            // Add Glow
+            this.preFX.setPadding(32);
+
+            this.fx = this.preFX.addGlow();
+
+            //  For PreFX Glow the quality and distance are set in the Game Configuration
+
+            /*
+            scene.tweens.add({
+                targets: this.fx,
+                outerStrength: 10,
+                yoyo: true,
+                loop: -1,
+                ease: 'sine.inout'
+            });*/
+
+            this.fx.setActive(false);
 
         },
         
@@ -318,6 +347,7 @@ function create ()
             this.body = []
             this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
             this.head.setOrigin(0);
+            
             this.body.push(this.head);
 
 
@@ -397,7 +427,7 @@ function create ()
         },
     });
 
-    snake = new Snake(this, 8, 8);
+    snake = new Snake(this, 11, 6);
     
     // width 25 grid
     // width 19
@@ -411,12 +441,13 @@ function create ()
 
     });
 
-    for (let index = 0; index < 3; index++) {
+    for (let index = 0; index < FRUIT; index++) {
         var food = new Food(this);
         
     }
 
     // Todo Portal Spawning Algorithm
+    /* 9x9 grid
     var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
     var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
     var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
@@ -425,8 +456,7 @@ function create ()
     var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
     var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
     var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
-
-
+    
     var A1 = spawnAreaA.genPortalChords(this);
     var H1 = spawnAreaH.genPortalChords(this);
 
@@ -439,6 +469,39 @@ function create ()
     makePair(this, A1, H1);
     makePair(this, C1, F1);
     makePair(this, G1, A2);
+    */
+
+    var spawnAreaA = new SpawnArea(this, 2,3,6,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 10,3,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 24,3,6,5, 0x6666ff);
+    var spawnAreaF = new SpawnArea(this, 2,23,6,5, 0x6666ff);
+
+    var spawnAreaG = new SpawnArea(this, 10,13,6,5, 0x6666ff);
+    var spawnAreaH = new SpawnArea(this, 24,23,6,5, 0x6666ff);
+
+    var spawnAreaJ = new SpawnArea(this, 16,13,6,5, 0x6666ff);
+    var spawnAreaI = new SpawnArea(this, 16,23,6,5, 0x6666ff);
+
+
+
+
+
+    var A1 = spawnAreaA.genPortalChords(this);
+    var H1 = spawnAreaH.genPortalChords(this);
+
+    var B1 = spawnAreaB.genPortalChords(this);
+    var G1 = spawnAreaG.genPortalChords(this);
+
+    var C1 = spawnAreaC.genPortalChords(this);
+    var F1 = spawnAreaF.genPortalChords(this);
+
+    var J1 = spawnAreaJ.genPortalChords(this);
+    var I1 = spawnAreaI.genPortalChords(this);
+
+    makePair(this, A1, H1);
+    makePair(this, B1, G1);
+    makePair(this, C1, F1);
+    makePair(this, J1, I1);
 
 }
 
@@ -528,9 +591,9 @@ function updateDirection(game, event)
         snake.move(this);
     }
     if (!this.spaceBar.isDown){
-        this.moveInterval = 112;} // Less is Faster
+        this.moveInterval = 96;} // Less is Faster
     else{
-        this.moveInterval = 32;
+        this.moveInterval = 24;
     }
 
     this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
@@ -548,7 +611,7 @@ function updateDirection(game, event)
             
             // Text Update
             this.scoreText.setText(this.score);
-            this.fruitCountText.setText(this.fruitCount);
+            this.fruitCountText.setText(this.fruitGoal - this.fruitCount);
             
             if (DEBUG) {console.log(                         
                 "SCORE=", this.score, 
@@ -571,6 +634,68 @@ function updateDirection(game, event)
             return 'valid';
         }
     });
+
+    // Calculate Closest Portal to Snake Head
+    let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
+    closestPortal.fx.setActive(false);
+
+    //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
+    
+    // Snake gets the manhatten distance between two objects.
+
+    var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+                                                           closestPortal.x/GRID, closestPortal.y/GRID);
+
+    this.portals.forEach( portal => {
+        var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+                                              portal.x/GRID, portal.y/GRID);
+
+        if (dist < closestPortalDist) { // Compare and choose closer portals
+            closestPortalDist = dist;
+            closestPortal = portal;
+        }
+    });
+
+
+    // This is a bit eccessive because I only store the target portal coordinates
+    // and I need to get the portal object to turn on the effect. Probably can be optimized.
+    // Good enough for testing.
+    if (closestPortalDist < 6) {
+        this.portals.forEach(portal => {
+            if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                portal.fx.setActive(true);
+                
+                //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                portal.fx.outerStrength = 6 - closestPortalDist;
+
+                closestPortal.fx.setActive(true);
+                closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                closestPortal.fx.outerStrength = 0;
+
+            }
+        });
+    };
+
+
+
+    
+    //console.log(closestPortal.x, closestPortal.y);
+
+    if (this.fruitCount >= this.fruitGoal) {
+        console.log("YOU WIN");
+        console.log("SCORE = ", this.score);
+        this.children.bringToTop(this.scoreText);
+
+
+        this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
+        ["YOU WIN YAY!", this.score],
+        { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+            fontSize: "32px",
+            align: "center",
+        });
+
+        game.destroy();
+    }
 }
 
 
