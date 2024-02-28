@@ -548,7 +548,6 @@ class GameScene extends Phaser.Scene
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
             snake.previousDirection == snake.direction;
-            snake.move(this);
 
             //Snake head is moved, check collisions
 
@@ -634,6 +633,8 @@ class GameScene extends Phaser.Scene
     
                 game.destroy();
             }
+            
+            snake.move(this);
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = 96;} // Less is Faster
