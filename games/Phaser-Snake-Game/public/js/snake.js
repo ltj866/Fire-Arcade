@@ -340,7 +340,7 @@ class GameScene extends Phaser.Scene
             let y = this.head.y;
 
             // Death by eating itself
-            let tail = this.body.slice(1);  // tail - headpos === any of tail positions
+            let tail = this.body.slice(1);
 
             // if any tailpos == headpos
             if(
@@ -539,8 +539,8 @@ class GameScene extends Phaser.Scene
                 if (DEBUG) { console.log("DEAD"); }
                 
                 this.events.emit('saveScore');
-                this.scene.restart();
                 //game.destroy();
+                this.scene.restart();
                 return;
             }
 
@@ -643,12 +643,18 @@ class GameScene extends Phaser.Scene
                 game.destroy();
             }
             
+            // Move at last second
             snake.move(this);
+
+            // Check if dead by map
+            //if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
+            //    snake.alive = false;
+            //}
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = 96;} // Less is Faster
         else{
-            this.moveInterval = 24;
+            this.moveInterval = 24; // Sprinting now
         }
     }
 }
