@@ -101,13 +101,24 @@ class GameScene extends Phaser.Scene
 
                 Phaser.GameObjects.Image.call(this, scene)
 
+                // Add Timer Text under the fruit
+                const ourUI = scene.scene.get('UIScene');
+                this.fruitTimerText = scene.add.text(this.x , this.y , 
+                    ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                    { font: '11px Arial', 
+                        fill: '#FFFFFF',
+                        fontSize: "32px"
+                        
+                });
+                this.fruitTimerText.setOrigin(0,0);
+
                 this.setTexture('blocks', 2);
                 this.move(scene);
                 this.setOrigin(0);
 
                 scene.apples.push(this);
 
-                scene.children.add(this);
+                scene.children.add(this); // Shows on screen
             },
             
             move: function (scene)
@@ -170,6 +181,7 @@ class GameScene extends Phaser.Scene
 
                 this.setPosition(pos.x * GRID, pos.y * GRID);
 
+                this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
 
             },    
 
@@ -395,8 +407,6 @@ class GameScene extends Phaser.Scene
             }
 
         });
-
-        window.myScene=this.map;
 
         for (let index = 0; index < FRUIT; index++) {
             var food = new Food(this);
@@ -642,6 +652,16 @@ class GameScene extends Phaser.Scene
     
                 game.destroy();
             }
+       
+            const ourUI = this.scene.get('UIScene');
+            var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            if (timeTick < 10) {
+                
+            } else {
+                this.apples.forEach( fruit => {
+                    fruit.fruitTimerText.setText(timeTick);
+                });
+            }
             
             // Move at last second
             snake.move(this);
@@ -686,16 +706,24 @@ class UIScene extends Phaser.Scene
          });
         
         this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 1.5*GRID , 
-        this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-                { font: '30px Arial', 
-                  fill: '#FFFFFF',
-                  fontSize: "32px"});
+                                       this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                                       { font: '30px Arial', 
+                                         fill: '#FFFFFF',
+                                         fontSize: "32px"
+                                       });
 
         //  Event: addScore
         ourGame.events.on('addScore', function ()
         {
 
-            this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+            if (timeLeft > 10) {
+                this.score += timeLeft;
+            } else {
+                this.score += 10;
+            }
+
+            //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
             currentScore.setText(`Score: ${this.score}`);
 
