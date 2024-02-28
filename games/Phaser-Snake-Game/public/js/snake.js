@@ -662,7 +662,7 @@ class UIScene extends Phaser.Scene
         const ourGame = this.scene.get('GameScene');
         
         const currentScore = this.add.text(0.5*GRID, 1.5*GRID, 'Score: 0', { font: '18px Arial', fill: '#FFFFFF' });
-        const bestScore = this.add.text(4.5*GRID, 1.5*GRID, 'Best: 0', { font: '18px Arial', fill: '#FFFFFF' });
+        const bestScore = this.add.text(5*GRID, 1.5*GRID, 'Best: 0', { font: '18px Arial', fill: '#FFFFFF' });
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -708,7 +708,12 @@ class UIScene extends Phaser.Scene
     }
     update()
     {
-        this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        if (timeTick < 10) {
+            
+        } else {
+            this.timerText.setText(timeTick);
+        }
 
     }
     
