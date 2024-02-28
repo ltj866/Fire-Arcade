@@ -544,104 +544,101 @@ class GameScene extends Phaser.Scene
             }
 
         
+        // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
             snake.previousDirection == snake.direction;
             snake.move(this);
+
+            //Snake head is moved, check collisions
+
+            // Check collision for all Fruits
+            this.apples.forEach(fruit => { 
+                if(snake.head.x === fruit.x && snake.head.y === fruit.y){
+                    //console.log("HIT");
+                    snake.grow(this);
+                    fruit.move(this);
+
+                    //  Dispatch a Scene event
+                    this.events.emit('addScore'); // Sends to UI Listener
+                    this.fruitCount++;
+                    
+                    this.fruitCountText.setText(FRUITGOAL - this.fruitCount);
+                    
+                    if (DEBUG) {console.log(                         
+                        "FRUITCOUNT=", this.fruitCount,
+                        );
+                    }
+                    return 'valid';
+                }
+            });
+
+            this.walls.forEach(wall => {
+                if(snake.head.x === wall.x && snake.head.y === wall.y){
+                    snake.alive = false;
+                    return 'valid';
+                }
+            });
+
+            
+            // Calculate Closest Portal to Snake Head
+            let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
+            closestPortal.fx.setActive(false);
+
+            //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
+            
+            // Snake gets the manhatten distance between two objects.
+
+            var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+                                                                closestPortal.x/GRID, closestPortal.y/GRID);
+
+            this.portals.forEach( portal => {
+                var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+                                                    portal.x/GRID, portal.y/GRID);
+
+                if (dist < closestPortalDist) { // Compare and choose closer portals
+                    closestPortalDist = dist;
+                    closestPortal = portal;
+                }
+            });
+
+
+            // This is a bit eccessive because I only store the target portal coordinates
+            // and I need to get the portal object to turn on the effect. Probably can be optimized.
+            // Good enough for testing.
+            if (closestPortalDist < 6) {
+                this.portals.forEach(portal => {
+                    if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                        portal.fx.setActive(true);
+                        
+                        //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                        portal.fx.outerStrength = 6 - closestPortalDist;
+
+                        closestPortal.fx.setActive(true);
+                        closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                        closestPortal.fx.outerStrength = 0;
+
+                    }
+                });
+            };
+            if (this.fruitCount >= FRUITGOAL) {
+                console.log("YOU WIN");
+    
+                this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
+                ["YOU WIN YAY!"
+                ],
+                { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+                    fontSize: "32px",
+                    align: "center",
+                });
+    
+                game.destroy();
+            }
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = 96;} // Less is Faster
         else{
             this.moveInterval = 24;
-        }
-        //console.log(this.apples[0]);
-    
-        // Check collision for all Fruits
-        this.apples.forEach(fruit => { 
-            if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-                //console.log("HIT");
-                snake.grow(this);
-                fruit.move(this);
-
-                //  Dispatch a Scene event
-                this.events.emit('addScore'); // Sends to UI Listener
-                this.fruitCount++;
-                
-                this.fruitCountText.setText(FRUITGOAL - this.fruitCount);
-                
-                if (DEBUG) {console.log(                         
-                    "FRUITCOUNT=", this.fruitCount,
-                    );
-                }
-                return 'valid';
-            }
-        });
-
-        this.walls.forEach(wall => {
-            if(snake.head.x === wall.x && snake.head.y === wall.y){
-                snake.alive = false;
-                return 'valid';
-            }
-        });
-
-        // Calculate Closest Portal to Snake Head
-        let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
-        closestPortal.fx.setActive(false);
-
-        //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
-        
-        // Snake gets the manhatten distance between two objects.
-
-        var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
-                                                            closestPortal.x/GRID, closestPortal.y/GRID);
-
-        this.portals.forEach( portal => {
-            var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
-                                                portal.x/GRID, portal.y/GRID);
-
-            if (dist < closestPortalDist) { // Compare and choose closer portals
-                closestPortalDist = dist;
-                closestPortal = portal;
-            }
-        });
-
-
-        // This is a bit eccessive because I only store the target portal coordinates
-        // and I need to get the portal object to turn on the effect. Probably can be optimized.
-        // Good enough for testing.
-        if (closestPortalDist < 6) {
-            this.portals.forEach(portal => {
-                if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
-                    portal.fx.setActive(true);
-                    
-                    //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
-                    portal.fx.outerStrength = 6 - closestPortalDist;
-
-                    closestPortal.fx.setActive(true);
-                    closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                    closestPortal.fx.outerStrength = 0;
-
-                }
-            });
-        };
-
-
-
-        
-        //console.log(closestPortal.x, closestPortal.y);
-
-        if (this.fruitCount >= FRUITGOAL) {
-            console.log("YOU WIN");
-
-            this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
-            ["YOU WIN YAY!"
-            ],
-            { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
-                fontSize: "32px",
-                align: "center",
-            });
-
-            game.destroy();
         }
     }
 }
