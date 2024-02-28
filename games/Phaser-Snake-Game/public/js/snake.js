@@ -548,7 +548,6 @@ class GameScene extends Phaser.Scene
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
-            snake.previousDirection == snake.direction;
 
             //Snake head is moved, check collisions
 
