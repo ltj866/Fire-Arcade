@@ -580,12 +580,13 @@ class GameScene extends Phaser.Scene
             //}
 
             // ForEach method
-            this.walls.forEach(wall => {
+            /*this.walls.forEach(wall => {
                 if(snake.head.x === wall.x && snake.head.y === wall.y){
                     snake.alive = false;
                     return 'valid';
                 }
             });
+            */
 
             
             // Calculate Closest Portal to Snake Head
@@ -646,9 +647,9 @@ class GameScene extends Phaser.Scene
             snake.move(this);
 
             // Check if dead by map
-            //if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-            //    snake.alive = false;
-            //}
+            if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
+                snake.alive = false;
+            }
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = 96;} // Less is Faster
