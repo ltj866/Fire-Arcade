@@ -1,10 +1,15 @@
 //******************************************************************** */
-// GameSettings
+// GameSettings           SnakeHole
 //******************************************************************** */
 
 var GRID = 24; // Size of Sprites and GRID
 var FRUIT = 4; // Number of fruit to spawn
 var FRUITGOAL = 24;
+
+// DEBUG OPTIONS
+
+var DEBUG = true;
+var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 var snake;
@@ -19,12 +24,6 @@ var LEFT = 0;
 var RIGHT = 1;
 var UP = 2;
 var DOWN = 3;
-
-// DEBUG OPTIONS
-
-var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
-
 
 
 class GameScene extends Phaser.Scene
@@ -573,6 +572,7 @@ class GameScene extends Phaser.Scene
                 }
             });
 
+            // Can make this more efficient with looking at the specific head position and identifying if a wall is there.
             this.walls.forEach(wall => {
                 if(snake.head.x === wall.x && snake.head.y === wall.y){
                     snake.alive = false;
@@ -675,7 +675,7 @@ class UIScene extends Phaser.Scene
                   fill: '#FFFFFF',
                   fontSize: "32px"});
 
-        //  Listen for events from it
+        //  Event: addScore
         ourGame.events.on('addScore', function ()
         {
 
@@ -690,6 +690,7 @@ class UIScene extends Phaser.Scene
             });
         }, this);
 
+        //  Event: saveScore
         ourGame.events.on('saveScore', function ()
         {
             if (this.score > this.bestScore) {
@@ -699,6 +700,7 @@ class UIScene extends Phaser.Scene
             
             // Reset Score for new game
             this.score = 0;
+            currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
 
         }, this);
         
