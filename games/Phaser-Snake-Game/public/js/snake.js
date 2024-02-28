@@ -719,7 +719,7 @@ class UIScene extends Phaser.Scene
                 this.score += 10;
             }
 
-            this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
             currentScore.setText(`Score: ${this.score}`);
 
