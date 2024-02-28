@@ -1,30 +1,29 @@
 //******************************************************************** */
-// GameSettings
+// GameSettings           SnakeHole
 //******************************************************************** */
 
-var GRID = 24; // Size of Sprites and GRID
-var FRUIT = 4; // Number of fruit to spawn
-var FRUITGOAL = 24;
-
-// Game Objects
-var snake;
-
-// Tilemap variables
-var layer;
-var tileset;
-var map;
-
-//  Direction consts
-var LEFT = 0;
-var RIGHT = 1;
-var UP = 2;
-var DOWN = 3;
+var GRID = 24;           //.................. Size of Sprites and GRID
+var FRUIT = 4;           //.................. Number of fruit to spawn
+var FRUITGOAL = 24;      //............................. Win Condition
 
 // DEBUG OPTIONS
 
 var DEBUG = true;
 var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
+// Game Objects
+var snake;
+
+// Tilemap variables
+var map;  // Phaser.Tilemaps.Tilemap 
+var tileset;
+
+
+//  Direction consts
+var LEFT = 0;
+var RIGHT = 1;
+var UP = 2;
+var DOWN = 3;
 
 
 class GameScene extends Phaser.Scene
@@ -137,9 +136,9 @@ class GameScene extends Phaser.Scene
                 
                 // Make all the unsafe places unsafe
                 scene.walls.forEach(wall => {
-                    // Hack to sanitize index undefined value
-                    // Current Tiled input script adds additional X values.
                     if (wall.x < SCREEN_WIDTH) {
+                        // Hack to sanitize index undefined value
+                        // Current Tiled input script adds additional X values.
                         testGrid[wall.x/GRID][wall.y/GRID] = false; 
                     }
                 });
@@ -397,6 +396,8 @@ class GameScene extends Phaser.Scene
 
         });
 
+        window.myScene=this.map;
+
         for (let index = 0; index < FRUIT; index++) {
             var food = new Food(this);
             
@@ -572,6 +573,14 @@ class GameScene extends Phaser.Scene
                 }
             });
 
+            // Different ways to look for collisions (keep both for documentation)
+            
+            // Direct lookup method
+            //if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
+            //    console.log(this.map.getTileAtWorldXY(snake.head.x, snake.head.y ));
+            //}
+
+            // ForEach method
             this.walls.forEach(wall => {
                 if(snake.head.x === wall.x && snake.head.y === wall.y){
                     snake.alive = false;
@@ -586,7 +595,7 @@ class GameScene extends Phaser.Scene
 
             //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
             
-            // Snake gets the manhatten distance between two objects.
+            // Distance on an x y grid
 
             var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
                                                                 closestPortal.x/GRID, closestPortal.y/GRID);
@@ -676,7 +685,7 @@ class UIScene extends Phaser.Scene
                   fill: '#FFFFFF',
                   fontSize: "32px"});
 
-        //  Listen for events from it
+        //  Event: addScore
         ourGame.events.on('addScore', function ()
         {
 
@@ -691,6 +700,7 @@ class UIScene extends Phaser.Scene
             });
         }, this);
 
+        //  Event: saveScore
         ourGame.events.on('saveScore', function ()
         {
             if (this.score > this.bestScore) {
@@ -700,6 +710,7 @@ class UIScene extends Phaser.Scene
             
             // Reset Score for new game
             this.score = 0;
+            currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
 
         }, this);
         
