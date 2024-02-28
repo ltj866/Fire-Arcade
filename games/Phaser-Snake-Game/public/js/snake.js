@@ -352,7 +352,7 @@ class GameScene extends Phaser.Scene
             let y = this.head.y;
 
             // Death by eating itself
-            let tail = this.body.slice(1);  // tail - headpos === any of tail positions
+            let tail = this.body.slice(1);
 
             // if any tailpos == headpos
             if(
@@ -549,8 +549,8 @@ class GameScene extends Phaser.Scene
                 if (DEBUG) { console.log("DEAD"); }
                 
                 this.events.emit('saveScore');
-                this.scene.restart();
                 //game.destroy();
+                this.scene.restart();
                 return;
             }
 
@@ -558,8 +558,6 @@ class GameScene extends Phaser.Scene
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
-            snake.previousDirection == snake.direction;
-            snake.move(this);
 
             //Snake head is moved, check collisions
 
@@ -592,12 +590,13 @@ class GameScene extends Phaser.Scene
             //}
 
             // ForEach method
-            this.walls.forEach(wall => {
+            /*this.walls.forEach(wall => {
                 if(snake.head.x === wall.x && snake.head.y === wall.y){
                     snake.alive = false;
                     return 'valid';
                 }
             });
+            */
 
             
             // Calculate Closest Portal to Snake Head
@@ -653,8 +652,7 @@ class GameScene extends Phaser.Scene
     
                 game.destroy();
             }
-
-            
+       
             const ourUI = this.scene.get('UIScene');
             var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             if (timeTick < 10) {
@@ -664,13 +662,19 @@ class GameScene extends Phaser.Scene
                     fruit.fruitTimerText.setText(timeTick);
                 });
             }
+            
+            // Move at last second
+            snake.move(this);
 
-
+            // Check if dead by map
+            if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
+                snake.alive = false;
+            }
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = 96;} // Less is Faster
         else{
-            this.moveInterval = 24;
+            this.moveInterval = 24; // Sprinting now
         }
     }
 }
