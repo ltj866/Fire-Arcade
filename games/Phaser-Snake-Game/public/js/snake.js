@@ -1,5 +1,13 @@
+//******************************************************************** */
+// GameSettings
+//******************************************************************** */
+
+var GRID = 24; // Size of Sprites and GRID
+var FRUIT = 4; // Number of fruit to spawn
+var FRUITGOAL = 24;
+
+// Game Objects
 var snake;
-var highScore;
 
 // Tilemap variables
 var layer;
@@ -11,15 +19,6 @@ var LEFT = 0;
 var RIGHT = 1;
 var UP = 2;
 var DOWN = 3;
-
-//******************************************************************** */
-// GameSettings
-//******************************************************************** */
-
-var GRID = 24; // Size of Sprites and GRID
-var FRUIT = 4; // Number of fruit to spawn
-var FRUITGOAL = 24;
-
 
 // DEBUG OPTIONS
 
@@ -66,31 +65,14 @@ class GameScene extends Phaser.Scene
         this.walls = [];
         this.portals = [];
 
-
-        // Start Fruit Score Timer
-        this.score = 0;
-        if (DEBUG) { console.log("STARTING SCORE TIMER"); }
-        
-        this.scoreTimer = this.time.addEvent({
-            delay: 10000,
-            paused: false
-            });
         this.fruitCount = 0;
 
         // Initalize Screen Text Objects
-        this.scoreText = this.add.text(1*GRID, 1*GRID , this.score, { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: "32px" });
-        // this.scoreText.setOrigin(0,0);
-        this.timerText = this.add.text(SCREEN_WIDTH/2, 1*GRID , 
-                                    this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-                                    { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
-                                        fontSize: "32px"});
+        
         this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
                                             FRUITGOAL - this.fruitCount,
                                             { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                                             fontSize: "32px"});
-
-
-
 
         
         this.lastMoveTime = 0; // The last time we called move()
@@ -555,10 +537,7 @@ class GameScene extends Phaser.Scene
                 // game.scene.scene.restart(); // This doesn't work correctly
                 if (DEBUG) { console.log("DEAD"); }
                 
-                if (this.score > highScore) {
-                    highScore = this.score;
-                }
-                
+                this.events.emit('saveScore');
                 this.scene.restart();
                 //game.destroy();
                 return;
@@ -575,8 +554,6 @@ class GameScene extends Phaser.Scene
         else{
             this.moveInterval = 24;
         }
-
-        this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
         //console.log(this.apples[0]);
     
         // Check collision for all Fruits
@@ -585,27 +562,17 @@ class GameScene extends Phaser.Scene
                 //console.log("HIT");
                 snake.grow(this);
                 fruit.move(this);
-                var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-                this.score = this.score + pointsToAdd;
+
+                //  Dispatch a Scene event
+                this.events.emit('addScore'); // Sends to UI Listener
                 this.fruitCount++;
                 
-                // Text Update
-                this.scoreText.setText(this.score);
                 this.fruitCountText.setText(FRUITGOAL - this.fruitCount);
                 
                 if (DEBUG) {console.log(                         
-                    "SCORE=", this.score, 
-                    "FRUIT=", pointsToAdd,
                     "FRUITCOUNT=", this.fruitCount,
-                    "FRUIT/SCORE=", this.score/this.fruitCount,
-                    "HIGHSCORE=", highScore
                     );
                 }
-
-                this.scoreTimer = this.time.addEvent({
-                    delay: 10000,
-                    paused: false
-                });
                 return 'valid';
             }
         });
@@ -665,14 +632,9 @@ class GameScene extends Phaser.Scene
 
         if (this.fruitCount >= FRUITGOAL) {
             console.log("YOU WIN");
-            console.log("SCORE = ", this.score);
-            this.children.bringToTop(this.scoreText);
-
 
             this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
-            ["YOU WIN YAY!", 
-            this.score,
-            highScore
+            ["YOU WIN YAY!"
             ],
             { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                 fontSize: "32px",
@@ -684,6 +646,73 @@ class GameScene extends Phaser.Scene
     }
 }
 
+class UIScene extends Phaser.Scene
+{
+    constructor ()
+    {
+        super({ key: 'UIScene', active: true });
+
+        this.score = 0;
+        this.bestScore = 0;
+        this.fruitCount = 0;
+    }
+
+    create()
+    {
+        const ourGame = this.scene.get('GameScene');
+        
+        const currentScore = this.add.text(0.5*GRID, 1.5*GRID, 'Score: 0', { font: '18px Arial', fill: '#FFFFFF' });
+        const bestScore = this.add.text(4.5*GRID, 1.5*GRID, 'Best: 0', { font: '18px Arial', fill: '#FFFFFF' });
+
+        // Start Fruit Score Timer
+        if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+
+        this.scoreTimer = this.time.addEvent({
+            delay: 10000,
+            paused: false
+         });
+        
+        this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 1.5*GRID , 
+        this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                { font: '30px Arial', 
+                  fill: '#FFFFFF',
+                  fontSize: "32px"});
+
+        //  Listen for events from it
+        ourGame.events.on('addScore', function ()
+        {
+
+            this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+            currentScore.setText(`Score: ${this.score}`);
+
+             // Restart Score Timer
+            this.scoreTimer = this.time.addEvent({
+            delay: 10000,
+            paused: false
+            });
+        }, this);
+
+        ourGame.events.on('saveScore', function ()
+        {
+            if (this.score > this.bestScore) {
+                this.bestScore = this.score;
+                bestScore.setText(`Best: ${this.bestScore}`);
+            }
+            
+            // Reset Score for new game
+            this.score = 0;
+
+        }, this);
+        
+    }
+    update()
+    {
+        this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+
+    }
+    
+}
 
 var config = {
     type: Phaser.WEBGL,
@@ -702,7 +731,7 @@ var config = {
             quality: 0.1
         }
     },
-    scene: [ GameScene]
+    scene: [GameScene, UIScene]
 };
 
 // Screen Settings
