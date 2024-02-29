@@ -48,8 +48,6 @@ class GameScene extends Phaser.Scene
 
     create ()
     {
-        
-
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -80,9 +78,10 @@ class GameScene extends Phaser.Scene
         // define keys       
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
+        var ourGame = this.scene.get('GameScene');
+
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.input.keyboard.on('keydown', e => {
-            var ourGame = this.scene.get('GameScene');
             ourGame.updateDirection(this, e);
         })
 
@@ -321,8 +320,8 @@ class GameScene extends Phaser.Scene
                 this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
                 
                 this.moveTime = 0;
-                this.direction = LEFT;
-                this.previousDirection = LEFT;
+                this.heading = LEFT;
+                this.direction= LEFT;
             },
             
             grow: function (scene)
@@ -346,7 +345,6 @@ class GameScene extends Phaser.Scene
             
             move: function (scene)
             {
-            snake.previousDirection = snake.direction; //this prevents snake from being able to 180
             // start with current head position
             let x = this.head.x;
             let y = this.head.y;
@@ -361,6 +359,8 @@ class GameScene extends Phaser.Scene
             ){
                 this.alive = false;
             }
+            
+            this.direction = this.heading;
 
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
@@ -373,19 +373,19 @@ class GameScene extends Phaser.Scene
                 }
             });
 
-            if (this.direction === LEFT)
+            if (this.heading === LEFT)
             {
                 x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
             }
-            else if (this.direction === RIGHT)
+            else if (this.heading === RIGHT)
             {
                 x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
             }
-            else if (this.direction === UP)
+            else if (this.heading === UP)
             {
                 y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
             }
-            else if (this.direction === DOWN)
+            else if (this.heading === DOWN)
             {
                 y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
             }
@@ -479,57 +479,57 @@ class GameScene extends Phaser.Scene
         switch (event.keyCode) {
             case 87: // w
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != DOWN || snake.body.length <= 2) { 
-                snake.direction = UP; // Prevents backtracking to death
+            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) { 
+                snake.heading = UP; // Prevents backtracking to death
             }
             break;
 
             case 65: // a
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != RIGHT || snake.body.length <= 2) {
-                snake.direction = LEFT;
+            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) {
+                snake.heading = LEFT;
             }
             break;
 
             case 83: // s
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != UP || snake.body.length <= 2) { 
-                snake.direction = DOWN;
+            if (snake.direction === LEFT || snake.direction === RIGHT|| snake.body.length <= 2) { 
+                snake.heading = DOWN;
             }
             break;
 
             case 68: // d
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != LEFT || snake.body.length <= 2) { 
-                snake.direction = RIGHT;
+            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+                snake.heading = RIGHT;
             }
             break;
 
             case 38: // UP
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != DOWN || snake.body.length <= 2) {
-                snake.direction = UP;
+            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) {
+                snake.heading = UP;
             }
             break;
 
             case 37: // LEFT
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != RIGHT || snake.body.length <= 2) { 
-                snake.direction = LEFT;
+            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+                snake.heading = LEFT;
             }
             break;
 
             case 40: // DOWN
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != UP || snake.body.length <= 2) { 
-                snake.direction = DOWN;
+            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) { 
+                snake.heading = DOWN;
             }
             break;
 
             case 39: // RIGHT
             //console.log(event.code, game.time.now);
-            if (snake.previousDirection != LEFT  || snake.body.length <= 2) { 
-                snake.direction = RIGHT;
+            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+                snake.heading = RIGHT;
             }
             break;
 
