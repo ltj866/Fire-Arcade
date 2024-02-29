@@ -246,14 +246,17 @@ class GameScene extends Phaser.Scene
             
         });
 
-        var makePair = function (scene, to, from){
-
-            var color = new Phaser.Display.Color()
-            color.random(1);
+        var makePair = function (scene, to, from,i){
+            var color = [Phaser.Display.Color.ValueToColor('#fc0303'),
+            Phaser.Display.Color.ValueToColor('#06f202'),
+            Phaser.Display.Color.ValueToColor('#e2f202'),
+            Phaser.Display.Color.ValueToColor('#fc03f8')
+        ];
+            var p1 = []
+            var p2 = []
             
-            var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
-
+            p1[i] = new Portal(scene, color[i], to, from);
+            p2[i]= new Portal(scene, color[i], from, to);
         }
 
         var SpawnArea = new Phaser.Class({
@@ -360,7 +363,7 @@ class GameScene extends Phaser.Scene
                 this.alive = false;
             }
             
-            this.direction = this.heading;
+            this.direction = this.heading; //this will probably need to be moved again -Holden
 
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
@@ -465,10 +468,10 @@ class GameScene extends Phaser.Scene
         var J1 = spawnAreaJ.genPortalChords(this);
         var I1 = spawnAreaI.genPortalChords(this);
 
-        makePair(this, A1, H1);
-        makePair(this, B1, G1);
-        makePair(this, C1, F1);
-        makePair(this, J1, I1);
+        makePair(this, A1, H1,0);
+        makePair(this, B1, G1,1);
+        makePair(this, C1, F1,2);
+        makePair(this, J1, I1,3);
 
     }
 
