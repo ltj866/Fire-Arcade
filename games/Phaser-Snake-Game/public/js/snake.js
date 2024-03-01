@@ -365,7 +365,6 @@ class GameScene extends Phaser.Scene
                 this.alive = false;
             }
             
-            this.direction = this.heading; //this will probably need to be moved again -Holden
 
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
