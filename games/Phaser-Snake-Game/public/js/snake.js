@@ -6,6 +6,9 @@ var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 var FRUITGOAL = 24;      //............................. Win Condition
 
+var SPEEDWALK = 256; // 96 In milliseconds 
+var SPEEDSPRINT = 24; // 24
+
 // DEBUG OPTIONS
 
 var DEBUG = true;
@@ -73,7 +76,6 @@ class GameScene extends Phaser.Scene
 
         
         this.lastMoveTime = 0; // The last time we called move()
-        //this.moveInterval = 128;
 
         // define keys       
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
@@ -81,6 +83,7 @@ class GameScene extends Phaser.Scene
         var ourGame = this.scene.get('GameScene');
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        var ourGame = this.scene.get('GameScene');
         this.input.keyboard.on('keydown', e => {
             ourGame.updateDirection(this, e);
         })
@@ -321,7 +324,6 @@ class GameScene extends Phaser.Scene
                 
                 this.moveTime = 0;
                 this.heading = LEFT;
-                this.direction= LEFT;
             },
             
             grow: function (scene)
@@ -391,8 +393,33 @@ class GameScene extends Phaser.Scene
             }
             Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
-            },
-        });
+            // Check if dead by map
+            if (scene.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
+                snake.alive = false;
+            }
+
+            // Check collision for all Fruits
+            scene.apples.forEach(fruit => { 
+                if(snake.head.x === fruit.x && snake.head.y === fruit.y){
+                    //console.log("HIT");
+                    snake.grow(scene);
+                    fruit.move(scene);
+
+                    //  Dispatch a Scene event
+                    scene.events.emit('addScore'); // Sends to UI Listener
+                    scene.fruitCount++;
+                    
+                    scene.fruitCountText.setText(FRUITGOAL - scene.fruitCount);
+                    
+                    if (DEBUG) {console.log(                         
+                        "FRUITCOUNT=", scene.fruitCount,
+                        );
+                    }
+                    return 'valid';
+                }
+            });
+        },
+    });
 
         snake = new Snake(this, 11, 6);
         
@@ -476,60 +503,78 @@ class GameScene extends Phaser.Scene
     updateDirection(game, event) 
     {
         // console.log(event.keyCode, this.time.now); // all keys
+        //console.profile("UpdateDirection");
+        //console.time("UpdateDirection");
         switch (event.keyCode) {
             case 87: // w
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) { 
+            if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = UP; // Prevents backtracking to death
+                snake.move(game);
+                game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
 
             case 65: // a
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) {
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
                 snake.heading = LEFT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
             case 83: // s
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT|| snake.body.length <= 2) { 
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
             case 68: // d
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
             case 38: // UP
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) {
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
                 snake.heading = UP;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
             case 37: // LEFT
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = LEFT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
             case 40: // DOWN
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) { 
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
             case 39: // RIGHT
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
             }
             break;
 
@@ -537,6 +582,8 @@ class GameScene extends Phaser.Scene
             console.log(event.code, game.time.now);
 
         }
+        //console.timeEnd("UpdateDirection");
+        //console.profileEnd();
 
     }
 
@@ -557,30 +604,11 @@ class GameScene extends Phaser.Scene
         
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval){
+            //console.log(time, this.lastMoveTime, this.moveInterval);
             this.lastMoveTime = time;
 
             //Snake head is moved, check collisions
 
-            // Check collision for all Fruits
-            this.apples.forEach(fruit => { 
-                if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-                    //console.log("HIT");
-                    snake.grow(this);
-                    fruit.move(this);
-
-                    //  Dispatch a Scene event
-                    this.events.emit('addScore'); // Sends to UI Listener
-                    this.fruitCount++;
-                    
-                    this.fruitCountText.setText(FRUITGOAL - this.fruitCount);
-                    
-                    if (DEBUG) {console.log(                         
-                        "FRUITCOUNT=", this.fruitCount,
-                        );
-                    }
-                    return 'valid';
-                }
-            });
 
             // Different ways to look for collisions (keep both for documentation)
             
@@ -639,7 +667,7 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
-            if (this.fruitCount >= FRUITGOAL) {
+            if (this.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
@@ -665,16 +693,11 @@ class GameScene extends Phaser.Scene
             
             // Move at last second
             snake.move(this);
-
-            // Check if dead by map
-            if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-                snake.alive = false;
-            }
         }
         if (!this.spaceBar.isDown){
-            this.moveInterval = 96;} // Less is Faster
+            this.moveInterval = SPEEDWALK;} // Less is Faster
         else{
-            this.moveInterval = 24; // Sprinting now
+            this.moveInterval = SPEEDSPRINT; // Sprinting now
         }
     }
 }
