@@ -6,7 +6,7 @@ var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 var FRUITGOAL = 24;      //............................. Win Condition
 
-var SPEEDWALK = 256; // 96 In milliseconds 
+var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDSPRINT = 24; // 24
 
 // DEBUG OPTIONS
@@ -90,6 +90,8 @@ class GameScene extends Phaser.Scene
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             console.log(e.code+" unPress", this.time.now);
+            var ourUI = this.scene.get('UIScene');
+            console.log(ourUI.scoreMulti, Math.sqrt(ourUI.scoreMulti));
         }) 
 
         var Food = new Phaser.Class({
@@ -249,7 +251,7 @@ class GameScene extends Phaser.Scene
             
         });
 
-        var makePair = function (scene, to, from,i){
+        var makePair = function (scene, to, from, i){
             var color = [Phaser.Display.Color.ValueToColor('#fc0303'),
             Phaser.Display.Color.ValueToColor('#06f202'),
             Phaser.Display.Color.ValueToColor('#e2f202'),
@@ -700,6 +702,8 @@ class GameScene extends Phaser.Scene
             this.moveInterval = SPEEDWALK;} // Less is Faster
         else{
             this.moveInterval = SPEEDSPRINT; // Sprinting now
+            var ourUI = this.scene.get('UIScene');
+            ourUI.scoreMulti ++;
         }
     }
 }
@@ -713,6 +717,8 @@ class UIScene extends Phaser.Scene
         this.score = 0;
         this.bestScore = 0;
         this.fruitCount = 0;
+
+        this.scoreMulti = 0;
     }
 
     create()
@@ -769,6 +775,7 @@ class UIScene extends Phaser.Scene
             
             // Reset Score for new game
             this.score = 0;
+            this.scoreMulti = 0;
             currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
 
         }, this);
