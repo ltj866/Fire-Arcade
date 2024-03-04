@@ -17,6 +17,7 @@ var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 var snake;
+var crunchSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -35,6 +36,17 @@ var PORTAL_COLORS = [
     '#e2f202',
     '#fc03f8',
     //'#AABBCC'
+];
+
+var SOUND_CRUNCH = [
+    ['crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]],
+    ['crunch02', [ 'crunch02.ogg', 'crunch02.mp3' ]],
+    ['crunch03', [ 'crunch03.ogg', 'crunch03.mp3' ]],
+    ['crunch04', [ 'crunch04.ogg', 'crunch04.mp3' ]],
+    ['crunch05', [ 'crunch05.ogg', 'crunch05.mp3' ]],
+    ['crunch06', [ 'crunch06.ogg', 'crunch06.mp3' ]],
+    ['crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]],
+    ['crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]]
 ];
 
 // TODOL: Need to truncate this list based on number of portals areas.
@@ -59,10 +71,31 @@ class GameScene extends Phaser.Scene
         this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
+        // Audio
+        this.load.setPath('assets/audio');
+
+        SOUND_CRUNCH.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        //this.load.audio('crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]);
+        //this.load.audio('crunch02', [ 'crunch02.ogg', 'crunch02.mp3' ]);
+        //this.load.audio('crunch03', [ 'crunch03.ogg', 'crunch03.mp3' ]);
+        //this.load.audio('crunch04', [ 'crunch04.ogg', 'crunch04.mp3' ]);
+        //this.load.audio('crunch05', [ 'crunch05.ogg', 'crunch05.mp3' ]);
+        //this.load.audio('crunch06', [ 'crunch06.ogg', 'crunch06.mp3' ]);
+        //this.load.audio('crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]);
+        //this.load.audio('crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]);
     }
+
+    
 
     create ()
     {
+        //RESET
+        this.crunchSounds = [];
+        crunchSounds = this.crunchSounds;
+
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -71,6 +104,23 @@ class GameScene extends Phaser.Scene
         
         // add background
         this.add.image(286, 286, 'bg01').setDepth(-1);
+
+        // Audio
+        SOUND_CRUNCH.forEach(soundID =>
+            {
+                this.crunchSounds.push(this.sound.add(soundID[0]));
+            });
+        //sounds.push(this.sound.add('crunch01'));
+        //sounds.push(this.sound.add('crunch02'));
+        //sounds.push(this.sound.add('crunch03'));
+        //sounds.push(this.sound.add('crunch04'));
+        //sounds.push(this.sound.add('crunch05'));
+        //sounds.push(this.sound.add('crunch06'));
+        //sounds.push(this.sound.add('crunch07'));
+        //sounds.push(this.sound.add('crunch08'));
+
+        this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
+        //console.log(this.sound.length)
 
         // arrays for collision detection
         this.apples = [];
@@ -420,7 +470,18 @@ class GameScene extends Phaser.Scene
                     //console.log("HIT");
                     snake.grow(scene);
                     fruit.move(scene);
+                    
+                    // Play crunch sound
+                    var index = Math.round(Math.random() * scene.crunchSounds.length); 
+                    if (index == 8){ //this is to ensure index isn't called outside of array length
+                        index = 7;
+                    }
+                    console.log(index);
+                    var soundRandom = scene.crunchSounds[index];
+                    
+                    soundRandom.play();
 
+                    //  Scene.crunch01.play();
                     //  Dispatch a Scene event
                     scene.events.emit('addScore'); // Sends to UI Listener
                     scene.fruitCount++;
