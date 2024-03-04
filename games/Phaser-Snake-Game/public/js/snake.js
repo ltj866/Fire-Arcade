@@ -4,15 +4,20 @@
 
 var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-var FRUITGOAL = 24;      //............................. Win Condition
+var FRUITGOAL = 256; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDSPRINT = 24; // 24
 
+
+var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
+var BOOST_FLOOR = 80;
+var SCORE_MULTI_GROWTH = 0.01;
+
 // DEBUG OPTIONS
 
-var DEBUG = true;
+var DEBUG = false;
 var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
@@ -155,9 +160,8 @@ class GameScene extends Phaser.Scene
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-            console.log(e.code+" unPress", this.time.now);
+            if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             var ourUI = this.scene.get('UIScene');
-            console.log(ourUI.scoreMulti, Math.sqrt(ourUI.scoreMulti));
         }) 
 
         var Food = new Phaser.Class({
@@ -432,7 +436,7 @@ class GameScene extends Phaser.Scene
             
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
-                    console.log("PORTAL");
+                    if (DEBUG) { console.log("PORTAL"); }
 
                     x = portal.target.x*GRID;
                     y = portal.target.y*GRID;
@@ -656,12 +660,9 @@ class GameScene extends Phaser.Scene
             break;
 
             case 32: // SPACE
-            console.log(event.code, game.time.now);
+            if (DEBUG) { console.log(event.code, game.time.now); }
 
         }
-        //console.timeEnd("UpdateDirection");
-        //console.profileEnd();
-
     }
 
     update (time, delta) 
@@ -683,32 +684,10 @@ class GameScene extends Phaser.Scene
         if(time >= this.lastMoveTime + this.moveInterval){
             //console.log(time, this.lastMoveTime, this.moveInterval);
             this.lastMoveTime = time;
-
-            //Snake head is moved, check collisions
-
-
-            // Different ways to look for collisions (keep both for documentation)
-            
-            // Direct lookup method
-            //if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-            //    console.log(this.map.getTileAtWorldXY(snake.head.x, snake.head.y ));
-            //}
-
-            // ForEach method
-            /*this.walls.forEach(wall => {
-                if(snake.head.x === wall.x && snake.head.y === wall.y){
-                    snake.alive = false;
-                    return 'valid';
-                }
-            });
-            */
-
-            
+ 
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
             closestPortal.fx.setActive(false);
-
-            //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
             
             // Distance on an x y grid
 
@@ -760,7 +739,7 @@ class GameScene extends Phaser.Scene
        
             const ourUI = this.scene.get('UIScene');
             var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            if (timeTick < 10) {
+            if (timeTick < SCORE_FLOOR ) {
                 
             } else {
                 this.apples.forEach( fruit => {
@@ -775,8 +754,19 @@ class GameScene extends Phaser.Scene
             this.moveInterval = SPEEDWALK;} // Less is Faster
         else{
             this.moveInterval = SPEEDSPRINT; // Sprinting now
-            var ourUI = this.scene.get('UIScene');
-            ourUI.scoreMulti ++;
+
+            var ourUI = this.scene.get('UIScene'); 
+            var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
+            if (timeLeft >= BOOST_FLOOR ) { 
+                // STOPS ADDING IF UNDER 10
+                ourUI.scoreMulti += SCORE_MULTI_GROWTH;
+                //console.log(Math.sqrt(ourUI.scoreMulti));
+            } else {
+                
+            }
+ 
+
+
         }
     }
 }
@@ -836,6 +826,16 @@ class UIScene extends Phaser.Scene
             delay: 10000,
             paused: false
             });
+
+            var multiScore = Math.sqrt(this.scoreMulti);
+            
+            console.log(
+                ourGame.fruitCount + 1,
+                timeLeft,
+                this.score, 
+                multiScore.toFixed(2), 
+                (this.score * multiScore).toFixed(2));
+            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
         }, this);
 
         //  Event: saveScore
@@ -850,6 +850,11 @@ class UIScene extends Phaser.Scene
             this.score = 0;
             this.scoreMulti = 0;
             currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+
+            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                delay: 10000,
+                paused: false
+             });
 
         }, this);
         
