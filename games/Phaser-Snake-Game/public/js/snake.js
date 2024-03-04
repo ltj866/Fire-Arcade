@@ -6,8 +6,7 @@ var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 var FRUITGOAL = 256; //24 //............................. Win Condition
 
-var SPEEDWALK = 96; // 96 In milliseconds 
-var SPEEDWALK = 96; // 96 In milliseconds 
+var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
 
 
@@ -418,6 +417,7 @@ class GameScene extends Phaser.Scene
             
             move: function (scene)
             {
+            snake.moveTime = 0;
             // start with current head position
             let x = this.head.x;
             let y = this.head.y;
@@ -480,7 +480,7 @@ class GameScene extends Phaser.Scene
                     if (index == 8){ //this is to ensure index isn't called outside of array length
                         index = 7;
                     }
-                    console.log(index);
+                    //console.log(index);
                     var soundRandom = scene.crunchSounds[index];
                     
                     soundRandom.play();
