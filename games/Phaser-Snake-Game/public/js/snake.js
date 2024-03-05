@@ -744,11 +744,8 @@ class GameScene extends Phaser.Scene
         if (timeLeft <= BOOST_FLOOR && timeLeft >= SCORE_FLOOR) {
             // Boost meter slowly drains after boost floor and before score floor
             ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
-            console.log(ourUI.scoreMulti);
+            //console.log(ourUI.scoreMulti);
         }
-        // After score floor it is equivilent to paused.
-
-        
     }
 }
 
