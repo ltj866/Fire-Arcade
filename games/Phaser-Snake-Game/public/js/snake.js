@@ -843,7 +843,7 @@ class UIScene extends Phaser.Scene
     update()
     {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
-        if (timeTick < 10) {
+        if (timeTick < SCORE_FLOOR) {
             
         } else {
             this.timerText.setText(timeTick);
