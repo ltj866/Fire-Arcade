@@ -10,7 +10,7 @@ var SPEEDWALK = 96; // 96 In milliseconds
 var SPEEDSPRINT = 24; // 24
 
 
-var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
+var SCORE_FLOOR = 25; // Floor of Fruit score as it counts down.
 var BOOST_FLOOR = 80;
 var SCORE_MULTI_GROWTH = 0.01;
 
@@ -82,14 +82,6 @@ class GameScene extends Phaser.Scene
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
-        //this.load.audio('crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]);
-        //this.load.audio('crunch02', [ 'crunch02.ogg', 'crunch02.mp3' ]);
-        //this.load.audio('crunch03', [ 'crunch03.ogg', 'crunch03.mp3' ]);
-        //this.load.audio('crunch04', [ 'crunch04.ogg', 'crunch04.mp3' ]);
-        //this.load.audio('crunch05', [ 'crunch05.ogg', 'crunch05.mp3' ]);
-        //this.load.audio('crunch06', [ 'crunch06.ogg', 'crunch06.mp3' ]);
-        //this.load.audio('crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]);
-        //this.load.audio('crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]);
     }
 
     
@@ -114,17 +106,9 @@ class GameScene extends Phaser.Scene
             {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
-        //sounds.push(this.sound.add('crunch01'));
-        //sounds.push(this.sound.add('crunch02'));
-        //sounds.push(this.sound.add('crunch03'));
-        //sounds.push(this.sound.add('crunch04'));
-        //sounds.push(this.sound.add('crunch05'));
-        //sounds.push(this.sound.add('crunch06'));
-        //sounds.push(this.sound.add('crunch07'));
-        //sounds.push(this.sound.add('crunch08'));
+
 
         this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
-        //console.log(this.sound.length)
 
         // arrays for collision detection
         this.apples = [];
@@ -392,7 +376,6 @@ class GameScene extends Phaser.Scene
 
                 this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
                 
-                this.moveTime = 0;
                 this.heading = LEFT;
             },
             
@@ -407,17 +390,9 @@ class GameScene extends Phaser.Scene
                 newPart.setOrigin(0);
             },
             
-            update: function (time)
-            {
-                //if (time >= this.moveTime) Why is this here, does it do anything?
-                //{
-                //    return this.move(time);
-                //}
-            },
             
             move: function (scene)
             {
-            snake.moveTime = 0;
             // start with current head position
             let x = this.head.x;
             let y = this.head.y;
@@ -750,24 +725,30 @@ class GameScene extends Phaser.Scene
             // Move at last second
             snake.move(this);
         }
+        
+        // Boost and Boot Multi Code
+        var ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
+        var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
+
         if (!this.spaceBar.isDown){
             this.moveInterval = SPEEDWALK;} // Less is Faster
         else{
-            this.moveInterval = SPEEDSPRINT; // Sprinting now
-
-            var ourUI = this.scene.get('UIScene'); 
-            var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
+            this.moveInterval = SPEEDSPRINT; // Sprinting now 
             if (timeLeft >= BOOST_FLOOR ) { 
-                // STOPS ADDING IF UNDER 10
+                // Don't add boost multi after 20 seconds
                 ourUI.scoreMulti += SCORE_MULTI_GROWTH;
                 //console.log(Math.sqrt(ourUI.scoreMulti));
             } else {
-                
             }
- 
-
-
         }
+        if (timeLeft <= BOOST_FLOOR && timeLeft >= SCORE_FLOOR) {
+            // Boost meter slowly drains after boost floor and before score floor
+            ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
+            console.log(ourUI.scoreMulti);
+        }
+        // After score floor it is equivilent to paused.
+
+        
     }
 }
 
