@@ -1,5 +1,4 @@
 import { Food } from './classes/Food.js';
-//import { Wall } from './classes/Wall.js';
 import { Portal } from './classes/Portal.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
@@ -212,7 +211,6 @@ class GameScene extends Phaser.Scene
             // Index is the sprite value, not the array index. Normal wall is Index 4
             if (tile.index > 0) {  
                 //console.log(tile.x);
-                //var wall = new Wall(this, tile.x, tile.y);
                 var wall = new Phaser.Geom.Point(tile.x,tile.y);
                 this.walls.push(wall);
             }
@@ -349,7 +347,7 @@ class GameScene extends Phaser.Scene
         
         // Boost and Boot Multi Code
         var ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
-        var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
+        var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
         if (!this.spaceBar.isDown){
             this.moveInterval = SPEEDWALK;} // Less is Faster
