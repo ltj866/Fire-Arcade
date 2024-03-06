@@ -32,14 +32,15 @@ var Food = new Phaser.Class({
 
 
         // this.time.delayedCall(3000, this.onEvent, [], this); // delayedCall does not return anything and so can not be stopped.
+        this.startDecay(scene);
         
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
+        /*this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
             this.setTexture('blocks', 9).setDepth(10);
         }, callbackScope: this });
 
         this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
             this.setTexture('blocks', 10).setDepth(10);
-        }, callbackScope: this });
+        }, callbackScope: this });*/
 
         scene.apples.push(this);
 
@@ -112,17 +113,20 @@ var Food = new Phaser.Class({
         
         
         // reset to Fresh Fruit
-        this.setTexture('blocks', 8).setDepth(10); // Or maybe this.
-        this.restartDecay(scene);
+        //this.setTexture('blocks', 8).setDepth(10); // Or maybe this.
+        //this.startDecay(scene);
     },
 
-    restartDecay: function(scene){
+    startDecay: function(scene){
         
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
+        
+        this.setTexture('blocks', 8).setDepth(10); // Fresh now!
+
+        scene.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
             this.setTexture('blocks', 9).setDepth(10);
         }, callbackScope: this });
 
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+        scene.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
             this.setTexture('blocks', 10).setDepth(10);
         }, callbackScope: this });
 

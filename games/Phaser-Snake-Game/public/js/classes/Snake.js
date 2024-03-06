@@ -106,7 +106,14 @@ var Snake = new Phaser.Class({
             scene.events.emit('addScore'); // Sends to UI Listener
             scene.fruitCount++;
             
+            
+            
             scene.fruitCountText.setText(FRUITGOAL - scene.fruitCount);
+
+            scene.apples.forEach(fruit => {
+                fruit.startDecay(scene);
+
+            });
             
             if (DEBUG) {console.log(                         
                 "FRUITCOUNT=", scene.fruitCount,
