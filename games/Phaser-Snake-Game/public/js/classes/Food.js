@@ -1,4 +1,4 @@
-import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID} from "../SnakeHole.js";
+import {END_X, END_Y, SCREEN_WIDTH, GRID} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
@@ -11,35 +11,20 @@ var Food = new Phaser.Class({
 
         Phaser.GameObjects.Image.call(this, scene)
 
-        if (DEBUG) {
-            // Add Timer Text under the fruit
-            const ourUI = scene.scene.get('UIScene');
-            this.fruitTimerText = scene.add.text(this.x , this.y , 
-                ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-                { font: '11px Arial', 
-                    fill: '#FFFFFF',
-                    fontSize: "32px"
-                    
-            });
-            this.fruitTimerText.setOrigin(0,0);  
-        }
-        
-
+        // Add Timer Text under the fruit
+        const ourUI = scene.scene.get('UIScene');
+        this.fruitTimerText = scene.add.text(this.x , this.y , 
+            ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+            { font: '11px Arial', 
+                fill: '#FFFFFF',
+                fontSize: "32px"
+                
+        });
+        this.fruitTimerText.setOrigin(0,0);
 
         this.setTexture('blocks', 8).setDepth(10);
         this.move(scene);
         this.setOrigin(0);
-
-
-        // this.time.delayedCall(3000, this.onEvent, [], this); // delayedCall does not return anything and so can not be stopped.
-        
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.setTexture('blocks', 9).setDepth(10);
-        }, callbackScope: this });
-
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            this.setTexture('blocks', 10).setDepth(10);
-        }, callbackScope: this });
 
         scene.apples.push(this);
 
@@ -104,29 +89,11 @@ var Food = new Phaser.Class({
         
         var pos = Phaser.Math.RND.pick(validLocations)
 
-        this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
-        
-        if (DEBUG) { // Reset Fruit Timer Text
-            this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
-        }
-        
-        
-        // reset to Fresh Fruit
-        this.setTexture('blocks', 8).setDepth(10); // Or maybe this.
-        this.restartDecay(scene);
-    },
+        this.setPosition(pos.x * GRID, pos.y * GRID);
 
-    restartDecay: function(scene){
-        
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.setTexture('blocks', 9).setDepth(10);
-        }, callbackScope: this });
+        this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
 
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            this.setTexture('blocks', 10).setDepth(10);
-        }, callbackScope: this });
-
-    },
+    },    
 
 });
 

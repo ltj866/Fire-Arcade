@@ -22,7 +22,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-export const DEBUG = false;
+export const DEBUG = true;
 export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
@@ -218,8 +218,33 @@ class GameScene extends Phaser.Scene
 
         for (let index = 0; index < FRUIT; index++) {
             var food = new Food(this);
+            
         }
 
+        // Todo Portal Spawning Algorithm
+        /* 9x9 grid
+        var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
+        var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
+        var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
+        var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
+        var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
+        var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
+        var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
+        var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
+        
+        var A1 = spawnAreaA.genPortalChords(this);
+        var H1 = spawnAreaH.genPortalChords(this);
+
+        var G1 = spawnAreaG.genPortalChords(this);
+        var A2 = spawnAreaA.genPortalChords(this);
+
+        var C1 = spawnAreaC.genPortalChords(this);
+        var F1 = spawnAreaF.genPortalChords(this);
+
+        makePair(this, A1, H1);
+        makePair(this, C1, F1);
+        makePair(this, G1, A2);
+        */
 
         var spawnAreaA = new SpawnArea(this, 2,3,6,5, 0x6666ff);
         var spawnAreaB = new SpawnArea(this, 10,3,6,5, 0x6666ff);
@@ -327,18 +352,15 @@ class GameScene extends Phaser.Scene
                 game.destroy();
             }
        
-            if (DEBUG) {
-                const ourUI = this.scene.get('UIScene');
-                var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-                if (timeTick < SCORE_FLOOR ) {
-                    
-                } else {
-                    this.apples.forEach( fruit => {
-                        fruit.fruitTimerText.setText(timeTick);
-                    });
-                }
+            const ourUI = this.scene.get('UIScene');
+            var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            if (timeTick < SCORE_FLOOR ) {
                 
-            } 
+            } else {
+                this.apples.forEach( fruit => {
+                    fruit.fruitTimerText.setText(timeTick);
+                });
+            }
             
             // Move at last second
             snake.move(this);
@@ -527,16 +549,12 @@ class UIScene extends Phaser.Scene
             paused: false
          });
         
-        if (DEBUG) {
-            this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
-            this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-            { font: '30px Arial', 
-              fill: '#FFFFFF',
-              fontSize: "32px"
-            });
-        }
-        
-
+        this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 1.5*GRID , 
+                                       this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                                       { font: '30px Arial', 
+                                         fill: '#FFFFFF',
+                                         fontSize: "32px"
+                                       });
 
         //  Event: addScore
         ourGame.events.on('addScore', function ()
@@ -594,14 +612,12 @@ class UIScene extends Phaser.Scene
     update()
     {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
-        
-        if (DEBUG) {
-            if (timeTick < SCORE_FLOOR) {
+        if (timeTick < SCORE_FLOOR) {
             
-            } else {
-                this.timerText.setText(timeTick);
-            }  
+        } else {
+            this.timerText.setText(timeTick);
         }
+
     }
     
 }
@@ -640,8 +656,6 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
-export const game = new Phaser.Game(config);
-
-
+const game = new Phaser.Game(config);
 
 
