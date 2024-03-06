@@ -86,7 +86,6 @@ class StartScene extends Phaser.Scene
         card.setOrigin(0,0);
 
         card.setScale(0.7);
-        console.log(this.card);
 
         this.add.text(SCREEN_WIDTH/2 - GRID*10, GRID*24, 'PRESS TO CONTINUE',{"fontSize":'48px'});
 
@@ -415,7 +414,7 @@ class InputScene extends Phaser.Scene
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
-        console.log(this.turns);
+        //console.log(this.turns);
         switch (event.keyCode) {
             case 87: // w
 
