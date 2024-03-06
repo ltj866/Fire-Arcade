@@ -1,5 +1,5 @@
 import { Food } from './classes/Food.js';
-import { Wall } from './classes/Wall.js';
+//import { Wall } from './classes/Wall.js';
 import { Portal } from './classes/Portal.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
@@ -211,7 +211,10 @@ class GameScene extends Phaser.Scene
             // Empty tiles are indexed at -1. So any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
             if (tile.index > 0) {  
-                var wall = new Wall(this, tile.x, tile.y);
+                //console.log(tile.x);
+                //var wall = new Wall(this, tile.x, tile.y);
+                var wall = new Phaser.Geom.Point(tile.x,tile.y);
+                this.walls.push(wall);
             }
 
         });

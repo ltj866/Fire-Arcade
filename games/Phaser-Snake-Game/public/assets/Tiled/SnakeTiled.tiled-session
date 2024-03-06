@@ -46,8 +46,8 @@
             "scale": 0.63828125,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.876376988984,
-                "y": 347.8090575275397
+                "x": 368.95960832313335,
+                "y": 345.45899632802946
             }
         },
         "snakeMap.json#tileSheet": {
@@ -60,19 +60,22 @@
             "scale": 0.5891826923076923,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 410.73847409220724,
-                "y": 319.93472052223586
+                "x": 408.19257445940434,
+                "y": 318.23745410036724
             }
         },
         "snakeMap.tmj#tileSheet": {
+            "scaleInDock": 1
+        },
+        "snakeMap.tmj#tileSheetx24": {
             "scaleInDock": 1
         },
         "snakeMap.tmx": {
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 558,
-                "y": 871.3333333333333
+                "x": 247.3333333333333,
+                "y": 463.33333333333326
             }
         },
         "snakeMap.tmx#tileSheet": {
@@ -93,10 +96,10 @@
     ],
     "project": "SnakeTiled.tiled-project",
     "recentFiles": [
-        "snakeMap.tmx",
-        "snakeMap.json",
-        "snakeMap..tmx",
         "snakeMap.tmj",
+        "snakeMap.json",
+        "snakeMap.tmx",
+        "snakeMap..tmx",
         "SnakeTiledProject.json"
     ],
     "resizeMap.removeObjects": false,

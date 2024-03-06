@@ -75,7 +75,7 @@ var Food = new Phaser.Class({
             if (wall.x < SCREEN_WIDTH) {
                 // Hack to sanitize index undefined value
                 // Current Tiled input script adds additional X values.
-                testGrid[wall.x/GRID][wall.y/GRID] = false; 
+                testGrid[wall.x][wall.y] = false;
             }
         });
 
