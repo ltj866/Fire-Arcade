@@ -22,7 +22,7 @@ var Food = new Phaser.Class({
         });
         this.fruitTimerText.setOrigin(0,0);
 
-        this.setTexture('blocks', 2).setDepth(10);
+        this.setTexture('blocks', 8).setDepth(10);
         this.move(scene);
         this.setOrigin(0);
 

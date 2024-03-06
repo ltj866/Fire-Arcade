@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene
     preload ()
     {
         this.load.image('bg01', 'assets/sprites/background01.png');
-        this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
         // Tilemap
@@ -420,6 +420,7 @@ class InputScene extends Phaser.Scene
             case 87: // w
 
             if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 6);
                 snake.heading = UP; // Prevents backtracking to death
                 snake.move(gameScene);
                 this.turns += 1;
@@ -431,6 +432,7 @@ class InputScene extends Phaser.Scene
             case 65: // a
 
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
+                snake.head.setTexture('blocks', 4);
                 snake.heading = LEFT;
                 snake.move(gameScene);
                 this.turns += 1;
@@ -442,6 +444,7 @@ class InputScene extends Phaser.Scene
             case 83: // s
 
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 7);
                 snake.heading = DOWN;
                 snake.move(gameScene);
                 this.turns += 1;
@@ -453,6 +456,7 @@ class InputScene extends Phaser.Scene
             case 68: // d
 
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 5);
                 snake.heading = RIGHT;
                 snake.move(gameScene);
                 this.turns += 1;
@@ -464,6 +468,7 @@ class InputScene extends Phaser.Scene
             case 38: // UP
 
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
+                snake.head.setTexture('blocks', 6);
                 snake.heading = UP;
                 snake.move(gameScene);
                 this.turns += 1;
@@ -475,6 +480,7 @@ class InputScene extends Phaser.Scene
             case 37: // LEFT
 
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 4);
                 snake.heading = LEFT;
                 snake.move(gameScene);
                 this.turns += 1;
@@ -486,6 +492,7 @@ class InputScene extends Phaser.Scene
             case 40: // DOWN
 
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 7);
                 snake.heading = DOWN;
                 snake.move(gameScene);
                 this.turns += 1;
@@ -497,6 +504,7 @@ class InputScene extends Phaser.Scene
             case 39: // RIGHT
 
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 5);
                 snake.heading = RIGHT;
                 snake.move(gameScene);
                 this.turns += 1;
