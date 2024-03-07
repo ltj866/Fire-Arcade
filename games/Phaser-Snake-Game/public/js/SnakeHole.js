@@ -321,7 +321,7 @@ class GameScene extends Phaser.Scene
                     align: "center",
                 });
     
-                game.destroy();
+                this.scene.pause();
             }
        
             if (DEBUG) {
@@ -602,7 +602,9 @@ class UIScene extends Phaser.Scene
             // Reset Score for new game
             this.score = 0;
             this.scoreMulti = 0;
+            this.fruitCount = 0;
             currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+            fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                 delay: 10000,
