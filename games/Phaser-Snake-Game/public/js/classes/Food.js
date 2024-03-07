@@ -11,8 +11,7 @@ var Food = new Phaser.Class({
 
         Phaser.GameObjects.Image.call(this, scene)
 
-        if (DEBUG) {
-            // Add Timer Text under the fruit
+        if (DEBUG) { // Add Timer Text next to fruit
             const ourUI = scene.scene.get('UIScene');
             this.fruitTimerText = scene.add.text(this.x , this.y , 
                 ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
@@ -23,24 +22,21 @@ var Food = new Phaser.Class({
             });
             this.fruitTimerText.setOrigin(0,0);  
         }
-        
 
-
-        this.setTexture('blocks', 8).setDepth(10);
-        this.move(scene);
         this.setOrigin(0);
+        //this.startDecay(scene);
 
+        this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
-        // this.time.delayedCall(3000, this.onEvent, [], this); // delayedCall does not return anything and so can not be stopped.
-        this.startDecay(scene);
-        
-        /*this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
+        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
             this.setTexture('blocks', 9).setDepth(10);
-        }, callbackScope: this });
+        }, callbackScope: scene });
 
         this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
             this.setTexture('blocks', 10).setDepth(10);
-        }, callbackScope: this });*/
+        }, callbackScope: scene });
+
+        this.move(scene);
 
         scene.apples.push(this);
 
@@ -110,11 +106,6 @@ var Food = new Phaser.Class({
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
         }
-        
-        
-        // reset to Fresh Fruit
-        //this.setTexture('blocks', 8).setDepth(10); // Or maybe this.
-        //this.startDecay(scene);
     },
 
     startDecay: function(scene){
@@ -122,13 +113,16 @@ var Food = new Phaser.Class({
         
         this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
-        scene.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.setTexture('blocks', 9).setDepth(10);
-        }, callbackScope: this });
+        this.decayStage01.destroy(); // Destory Old Timers
+        this.decayStage02.destroy();
 
-        scene.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
+            this.setTexture('blocks', 9).setDepth(10);
+        }, callbackScope: scene });
+
+        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
             this.setTexture('blocks', 10).setDepth(10);
-        }, callbackScope: this });
+        }, callbackScope: scene });
 
     },
 

@@ -40,9 +40,7 @@ var SpawnArea = new Phaser.Class({
             if(portal.x === x && portal.y === y){
                 this.genPortalChords();
             }
-        }
-
-        )
+        });
         
         var cords = [x,y];
         return cords;
