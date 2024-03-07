@@ -166,13 +166,7 @@ class GameScene extends Phaser.Scene
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice(); 
-
-        // Initalize Screen Text Objects
         
-        this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
-                                            FRUITGOAL - this.fruitCount,
-                                            { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
-                                            fontSize: "32px"});
 
         
         this.lastMoveTime = 0; // The last time we called move()
@@ -314,7 +308,9 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
-            if (this.fruitCount >= FRUITGOAL) { // not winning instantly
+            const ourUI = this.scene.get('UIScene');
+            console.log(ourUI.fruitCount);
+            if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
@@ -325,7 +321,7 @@ class GameScene extends Phaser.Scene
                     align: "center",
                 });
     
-                game.destroy();
+                this.scene.pause();
             }
        
             if (DEBUG) {
@@ -516,9 +512,32 @@ class UIScene extends Phaser.Scene
     create()
     {
         const ourGame = this.scene.get('GameScene');
+
+        const style = {
+            //width: '220px',
+            //height: '22px',
+            color: 'lightyellow',
+            'font-size': '16px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            'padding': '2px 9px 2px 9px',
+            'font-weight': 'bold',
+            //'border-radius': '24px',
+            //outline: 'solid',
+            'text-align': 'right',
+        };
+   
+        const currentScore = this.add.dom(GRID * 1, GRID * 1, 'div', style);
+        currentScore.setOrigin(0,0);
+        currentScore.setText(`Score: ${this.score}`);
         
-        const currentScore = this.add.text(0.5*GRID, 1.5*GRID, 'Score: 0', { font: '18px Arial', fill: '#FFFFFF' });
-        const bestScore = this.add.text(5*GRID, 1.5*GRID, 'Best: 0', { font: '18px Arial', fill: '#FFFFFF' });
+        const bestScore = this.add.dom(GRID * 7, GRID * 1, 'div', style);
+        bestScore.setOrigin(0,0);
+        //currentScore.setText(`Best: ${this.score}`)
+
+        const fruitCount = this.add.dom(GRID * 28, GRID * 1, 'div', style);
+        fruitCount.setOrigin(0,0);
+        fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -537,8 +556,6 @@ class UIScene extends Phaser.Scene
             });
         }
         
-
-
         //  Event: addScore
         ourGame.events.on('addScore', function ()
         {
@@ -551,8 +568,11 @@ class UIScene extends Phaser.Scene
             }
 
             //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-
             currentScore.setText(`Score: ${this.score}`);
+            
+            this.fruitCount += 1;
+            fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            
 
              // Restart Score Timer
             this.scoreTimer = this.time.addEvent({
@@ -582,7 +602,9 @@ class UIScene extends Phaser.Scene
             // Reset Score for new game
             this.score = 0;
             this.scoreMulti = 0;
+            this.fruitCount = 0;
             currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+            fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                 delay: 10000,
@@ -608,7 +630,7 @@ class UIScene extends Phaser.Scene
 }
 
 var config = {
-    type: Phaser.WEBGL,
+    type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 768,
     height: 720,
     parent: 'phaser-example',
@@ -624,8 +646,11 @@ var config = {
             quality: 0.1
         }
     },
+    dom: {
+        createContainer: true
+    },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, GameScene, UIScene, InputScene]
+    scene: [ StartScene, UIScene, GameScene, InputScene]
 };
 
 // Screen Settings
