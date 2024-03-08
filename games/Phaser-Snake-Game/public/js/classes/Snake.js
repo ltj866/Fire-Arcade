@@ -92,7 +92,16 @@ var Snake = new Phaser.Class({
             //console.log("FRUITEND", fruit.x, fruit.y);
             
             this.grow(scene);
-            fruit.move(scene);
+            
+            // Avoid double fruit getting while in transition
+            fruit.x = 0;
+            fruit.y = 0;
+            fruit.visible = false;
+            
+            scene.time.delayedCall(500, function () {
+                fruit.move(scene);
+                fruit.visible = true;
+            }, [], this);
             
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
