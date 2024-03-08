@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 4; //24 //............................. Win Condition
+export const FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -437,7 +437,7 @@ class WinScene extends Phaser.Scene
         TURNS: ${ourInputScene.turns}
 
         ................RUN STATS..................
-        RESPAWNS: ${ourUI.lives}
+        Lives: ${ourUI.lives}
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
         `);
 
