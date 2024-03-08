@@ -80,10 +80,10 @@ class StartScene extends Phaser.Scene
         
         this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'});
         
-        var card = this.add.image(5*GRID, 6*GRID, 'howToCard').setDepth(10);
+        var card = this.add.image(7*GRID, 5.5*GRID, 'howToCard').setDepth(10).setOrigin(0,0);
         card.setOrigin(0,0);
 
-        card.setScale(0.7);
+        card.setScale(0.55);
 
         
         var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*10, GRID*25, 'PRESS TO CONTINUE',{"fontSize":'48px'});
@@ -160,11 +160,11 @@ class GameScene extends Phaser.Scene
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
-        
-        this.add.image(0, 0, 'tileSheetx24').setDepth(0).setOrigin(0,0);
+    
 
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
+        this.add.image(0, 0, 'tileSheetx24').setDepth(0).setOrigin(0,0);
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
