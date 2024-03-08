@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 24; //24 //............................. Win Condition
+export const FRUITGOAL = 5; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -70,7 +70,6 @@ class StartScene extends Phaser.Scene
     {
         super({key: 'StartScene', active: true});
     }
-
     preload()
     {
         this.load.image('howToCard', 'assets/howToCard.webp');
@@ -123,6 +122,14 @@ class GameScene extends Phaser.Scene
         super({key: 'GameScene', active: false});
     }
     
+    
+    init()
+    {
+        //snake = new Snake();
+        snake = new Snake(this, 11, 6);
+    }
+    
+    
     preload ()
     {
         this.load.image('bg01', 'assets/sprites/background01.png');
@@ -154,6 +161,8 @@ class GameScene extends Phaser.Scene
 
         this.layer = this.map.createLayer('Wall', this.tileset);
         
+        this.add.image(0, 0, 'tileSheetx24').setDepth(0).setOrigin(0,0);
+
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
@@ -204,8 +213,6 @@ class GameScene extends Phaser.Scene
             var p1 = new Portal(scene, color, to, from);
             var p2 = new Portal(scene, color, from, to)
         }
-
-        snake = new Snake(this, 11, 6);
         
         // width 25 grid
         // width 19
@@ -330,6 +337,7 @@ class GameScene extends Phaser.Scene
                     align: "center",
                 });*/
     
+                this.events.emit('saveScore');
                 this.scene.pause();
                 this.scene.start('WinScene');
             }
@@ -443,17 +451,19 @@ class WinScene extends Phaser.Scene
               });
             
             this.input.keyboard.on('keydown', e => {
-                ourUI.fruitCount = -1; // Ghost fruit is counted somewhere *shrug*
-                ourUI.score = 0;
-                ourUI.bestScore = 0;
-                ourUI.globalFruitCount = -1;
+                //ourUI.fruitCount = -1; // Ghost fruit is counted somewhere *shrug*
+                //ourUI.score = 0;
+                //ourUI.bestScore = 0;
+                //ourUI.globalFruitCount = -1;
     
                 ourInputScene.turns = 0;
                 ourInputScene.inputSet = [];
+                console.log(snake);
             
-                this.scene.start('GameScene');
+                //ourUI.screstart();
                 this.scene.start('UIScene');
-                this.scene.stop()
+                this.scene.start('GameScene');
+                this.scene.stop();
             });
         }, [], this);
 
@@ -474,13 +484,17 @@ class UIScene extends Phaser.Scene
     constructor ()
     {
         super({ key: 'UIScene', active: false });
-
+    }
+    
+    init()
+    {
         this.score = 0;
         this.bestScore = 0;
         this.fruitCount = 0;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
+
     }
 
     create()
@@ -531,9 +545,11 @@ class UIScene extends Phaser.Scene
         }
         
         //  Event: addScore
+        console.log("HEYYO DEFINING ADDSCORE NOW");
         ourGame.events.on('addScore', function (fruit)
         {
 
+            console.log("I AM THE EVENT FOR ADDING SCORE");
             const scoreStyle = {
                 //width: '220px',
                 //height: '22px',
