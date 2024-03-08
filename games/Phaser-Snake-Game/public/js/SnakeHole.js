@@ -137,7 +137,7 @@ class GameScene extends Phaser.Scene
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
         // Tilemap
-        this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
+        this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
         // Audio
@@ -164,7 +164,6 @@ class GameScene extends Phaser.Scene
 
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
-        this.add.image(0, 0, 'tileSheetx24').setDepth(0).setOrigin(0,0);
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
@@ -213,7 +212,7 @@ class GameScene extends Phaser.Scene
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
             var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to)
+            var p2 = new Portal(scene, color, from, to);
         }
         
         // width 25 grid
@@ -416,7 +415,7 @@ class WinScene extends Phaser.Scene
         }
         ///////
         
-        this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'});
+        this.add.text(SCREEN_WIDTH/2 - GRID, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
@@ -432,7 +431,7 @@ class WinScene extends Phaser.Scene
         SCORE: ${ourUI.score}
         TURNS: ${ourInputScene.turns}
 
-        ................RUN STATS...................
+        ................RUN STATS..................
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
         RESPAWNS: 
         `);
@@ -441,7 +440,7 @@ class WinScene extends Phaser.Scene
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, event => {
-            var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*11, GRID*25, '[REFRESH TO RESTART]',{"fontSize":'48px'});
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[REFRESH TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
 
             this.tweens.add({
                 targets: continueText,
@@ -460,12 +459,12 @@ class WinScene extends Phaser.Scene
     
                 ourInputScene.turns = 0;
                 ourInputScene.inputSet = [];
-                console.log(snake);
+                //console.log(snake);
             
                 //ourUI.screstart();
                 //this.scene.start('UIScene');
                 //this.scene.start('GameScene');
-                this.scene.stop();
+                //this.scene.pause();
             });
         }, [], this);
 
