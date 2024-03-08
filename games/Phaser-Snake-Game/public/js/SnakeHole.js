@@ -639,7 +639,6 @@ class UIScene extends Phaser.Scene
             this.score = 0;
             this.scoreMulti = 0;
             this.fruitCount = 0;
-            fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                 delay: 10000,
