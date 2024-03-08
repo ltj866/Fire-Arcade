@@ -105,7 +105,8 @@ var Snake = new Phaser.Class({
 
             //  Scene.crunch01.play();
             //  Dispatch a Scene event
-               
+
+            scene.events.emit('addScore'); // Sends to UI Listener    
 
             //debugger
             scene.apples.forEach(fruit => {

@@ -795,6 +795,7 @@ var config = {
     },
     //scene: [ StartScene, InputScene]
     scene: [ StartScene, UIScene, GameScene, InputScene, WinScene]
+
 };
 
 // Screen Settings
