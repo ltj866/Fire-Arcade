@@ -78,15 +78,15 @@ class StartScene extends Phaser.Scene
     create()
     {
         
-        this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'});
+        this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        var card = this.add.image(7*GRID, 5.5*GRID, 'howToCard').setDepth(10).setOrigin(0,0);
-        card.setOrigin(0,0);
+        var card = this.add.image(SCREEN_WIDTH/2, 5.5*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
+        //card.setOrigin(0,0);
 
         card.setScale(0.55);
 
         
-        var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*10, GRID*25, 'PRESS TO CONTINUE',{"fontSize":'48px'});
+        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         this.tweens.add({
             targets: continueText,
