@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 24; //24 //............................. Win Condition
+export const FRUITGOAL = 4; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -272,10 +272,16 @@ class GameScene extends Phaser.Scene
     // console.log("update -- time=" + time + " delta=" + delta);
         if (!snake.alive)
             {
+                
                 // game.scene.scene.restart(); // This doesn't work correctly
                 if (DEBUG) { console.log("DEAD"); }
                 
                 this.events.emit('saveScore');
+                currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+                
+                ourUI = this.scene.get('UIScene');
+                ourUI.lives += 1;
+                ourUI.livesUI.setText(ourUI.lives);
                 //game.destroy();
                 this.scene.restart();
                 return;
@@ -428,12 +434,12 @@ class WinScene extends Phaser.Scene
         scoreScreen.setText(
         ` 
         /************ WINNING SCORE **************/
-        SCORE: ${ourUI.score}
+        SCORE: ${ourUI.bestScore}
         TURNS: ${ourInputScene.turns}
 
         ................RUN STATS..................
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
-        RESPAWNS: 
+        RESPAWNS: ${ourUI.lives} 
         `);
 
         //card.setScale(0.7);
@@ -457,8 +463,9 @@ class WinScene extends Phaser.Scene
                 //ourUI.bestScore = 0;
                 //ourUI.globalFruitCount = -1;
     
-                ourInputScene.turns = 0;
-                ourInputScene.inputSet = [];
+                //ourInputScene.turns = 0;
+                //ourInputScene.inputSet = [];
+
                 //console.log(snake);
             
                 //ourUI.screstart();
@@ -495,7 +502,7 @@ class UIScene extends Phaser.Scene
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
-
+        this.lives = 1;
     }
 
     create()
@@ -524,6 +531,10 @@ class UIScene extends Phaser.Scene
         bestScore.setOrigin(0,0);
         //currentScore.setText(`Best: ${this.score}`)
 
+        this.livesUI = this.add.dom(SCREEN_WIDTH/2, GRID * .5, 'div', UIStyle);
+        this.livesUI.setOrigin(0.5,0);
+        this.livesUI.setText(`${this.lives}`)
+
         const fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
         fruitCountUI.setOrigin(0,0);
         fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
@@ -546,11 +557,9 @@ class UIScene extends Phaser.Scene
         }
         
         //  Event: addScore
-        console.log("HEYYO DEFINING ADDSCORE NOW");
         ourGame.events.on('addScore', function (fruit)
         {
 
-            console.log("I AM THE EVENT FOR ADDING SCORE");
             const scoreStyle = {
                 //width: '220px',
                 //height: '22px',
@@ -631,7 +640,6 @@ class UIScene extends Phaser.Scene
             this.score = 0;
             this.scoreMulti = 0;
             this.fruitCount = 0;
-            currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
             fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
