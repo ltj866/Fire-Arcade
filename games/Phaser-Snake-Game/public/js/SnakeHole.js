@@ -277,7 +277,6 @@ class GameScene extends Phaser.Scene
                 if (DEBUG) { console.log("DEAD"); }
                 
                 this.events.emit('saveScore');
-                currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
                 
                 ourUI = this.scene.get('UIScene');
                 ourUI.lives += 1;
@@ -438,8 +437,8 @@ class WinScene extends Phaser.Scene
         TURNS: ${ourInputScene.turns}
 
         ................RUN STATS..................
+        RESPAWNS: ${ourUI.lives}
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
-        RESPAWNS: ${ourUI.lives} 
         `);
 
         //card.setScale(0.7);
