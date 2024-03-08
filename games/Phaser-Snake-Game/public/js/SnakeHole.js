@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 24; //24 //............................. Win Condition
+export const FRUITGOAL = 4; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -79,14 +79,24 @@ class StartScene extends Phaser.Scene
     create()
     {
         
-        this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*2, 'SNAKEHOLE',{"fontSize":'48px'});
+        this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'});
         
-        var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
+        var card = this.add.image(5*GRID, 6*GRID, 'howToCard').setDepth(10);
         card.setOrigin(0,0);
 
         card.setScale(0.7);
 
-        this.add.text(SCREEN_WIDTH/2 - GRID*10, GRID*24, 'PRESS TO CONTINUE',{"fontSize":'48px'});
+        
+        var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*10, GRID*25, 'PRESS TO CONTINUE',{"fontSize":'48px'});
+        
+        this.tweens.add({
+            targets: continueText,
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: -1,
+            yoyo: true
+          });
 
         this.input.keyboard.on('keydown', e => {
             this.scene.start('GameScene');
@@ -312,16 +322,19 @@ class GameScene extends Phaser.Scene
             console.log(ourUI.fruitCount);
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
+                console.log(snake.turns);
     
-                this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
+                
+                /*this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
                 ["YOU WIN YAY!"
                 ],
                 { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
                     fontSize: "32px",
                     align: "center",
-                });
+                });*/
     
                 this.scene.pause();
+                this.scene.start('WinScene');
             }
        
             if (DEBUG) {
@@ -364,6 +377,271 @@ class GameScene extends Phaser.Scene
     }
 }
 
+class WinScene extends Phaser.Scene
+{
+    constructor ()
+    {
+        super({key: 'WinScene', active: false});
+    }
+
+    preload()
+    {
+        //this.load.image('howToCard', 'assets/howToCard.webp');
+    }
+
+    create()
+    {
+        
+        const ourUI = this.scene.get('UIScene');
+        const ourInputScene = this.scene.get('InputScene');
+
+        const scoreScreenStyle = {
+            width: '440px',
+            //height: '22px',
+            color: 'white',
+            'font-size': '16px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            'padding': '2px 0px 2px 12px',
+            'font-weight': 'bold',
+            //'border-radius': '24px',
+            outline: 'solid',
+        }
+        ///////
+        
+        this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'});
+        
+        //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
+        //card.setOrigin(0,0);
+        
+        var scoreScreen = this.add.dom(GRID*7, GRID * 7.5, 'div', scoreScreenStyle);
+        scoreScreen.setOrigin(0,0);
+
+        
+        
+        scoreScreen.setText(
+        ` 
+        /************* WINNING RUN ***************/
+        SCORE: ${ourUI.score}
+        TURNS: ${ourInputScene.turns}
+
+        ..............RUNWIDE STATS.................
+        TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
+        RESPAWNS: 
+        `);
+
+        //card.setScale(0.7);
+
+        // Give a few seconds before a player can hit continue
+        this.time.delayedCall(900, event => {
+            var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*11, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'});
+
+            this.tweens.add({
+                targets: continueText,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: -1,
+                yoyo: true
+              });
+            
+            this.input.keyboard.on('keydown', e => {
+                ourUI.fruitCount = -1; // Ghost fruit is counted somewhere *shrug*
+                ourUI.score = 0;
+                ourUI.bestScore = 0;
+                ourUI.globalFruitCount = -1;
+    
+                ourInputScene.turns = 0;
+                ourInputScene.inputSet = [];
+            
+                this.scene.start('GameScene');
+                this.scene.start('UIScene');
+                this.scene.stop()
+            });
+        }, [], this);
+
+        
+
+
+    }
+
+    end()
+    {
+
+    }
+
+}
+
+class UIScene extends Phaser.Scene
+{
+    constructor ()
+    {
+        super({ key: 'UIScene', active: false });
+
+        this.score = 0;
+        this.bestScore = 0;
+        this.fruitCount = 0;
+
+        this.scoreMulti = 0;
+        this.globalFruitCount = 0;
+    }
+
+    create()
+    {
+        const ourGame = this.scene.get('GameScene');
+
+        const UIStyle = {
+            //width: '220px',
+            //height: '22px',
+            color: 'lightyellow',
+            'font-size': '16px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            'padding': '2px 9px 2px 9px',
+            'font-weight': 'bold',
+            //'border-radius': '24px',
+            //outline: 'solid',
+            'text-align': 'right',
+        };
+   
+        const currentScore = this.add.dom(GRID * 1, GRID * 1, 'div', UIStyle);
+        currentScore.setOrigin(0,0);
+        currentScore.setText(`Score: ${this.score}`);
+        
+        const bestScore = this.add.dom(GRID * 7, GRID * 1, 'div', UIStyle);
+        bestScore.setOrigin(0,0);
+        //currentScore.setText(`Best: ${this.score}`)
+
+        const fruitCountUI = this.add.dom(GRID * 28, GRID * 1, 'div', UIStyle);
+        fruitCountUI.setOrigin(0,0);
+        fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+
+        // Start Fruit Score Timer
+        if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+
+        this.scoreTimer = this.time.addEvent({
+            delay: 10000,
+            paused: false
+         });
+        
+        if (DEBUG) {
+            this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
+            this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+            { font: '30px Arial', 
+              fill: '#FFFFFF',
+              fontSize: "32px"
+            });
+        }
+        
+        //  Event: addScore
+        ourGame.events.on('addScore', function (fruit)
+        {
+
+            const scoreStyle = {
+                //width: '220px',
+                //height: '22px',
+                color: 'lightyellow',
+                'font-size': '13px',
+                'font-family': ["Sono", 'sans-serif'],
+                'font-weight': '400',
+                'padding': '2px 9px 2px 9px',
+                'font-weight': 'bold',
+                //'border-radius': '24px',
+                //outline: 'solid',
+                'text-align': 'right',
+            };
+
+            var scoreText = this.add.dom(fruit.x -10, fruit.y - GRID, 'div', scoreStyle);
+            scoreText.setOrigin(0,0);
+            
+            // Remove score text after a time period.
+            this.time.delayedCall(1000, event => {
+                scoreText.removeElement();
+            }, [], this);
+
+            this.tweens.add({
+                targets: scoreText,
+                alpha: { from: 1, to: 0.1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+            //debugger
+            
+            
+            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+            if (timeLeft > SCORE_FLOOR) {
+                this.score += timeLeft;
+                scoreText.setText(`+${timeLeft}`);
+            } else {
+                this.score += SCORE_FLOOR;
+                scoreText.setText(`+${SCORE_FLOOR}`);
+            }
+
+            //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            currentScore.setText(`Score: ${this.score}`);
+            
+            this.fruitCount += 1;
+            this.globalFruitCount += 1; // Run Wide Counter
+
+            fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            
+
+             // Restart Score Timer
+            this.scoreTimer = this.time.addEvent({
+            delay: 10000,
+            paused: false
+            });
+
+            var multiScore = Math.sqrt(this.scoreMulti);
+            
+            console.log(
+                //ourGame.fruitCount + 1,
+                timeLeft,
+                this.score, 
+                multiScore.toFixed(2), 
+                (this.score * multiScore).toFixed(2));
+            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
+        }, this);
+
+        //  Event: saveScore
+        ourGame.events.on('saveScore', function ()
+        {
+            if (this.score > this.bestScore) {
+                this.bestScore = this.score;
+                bestScore.setText(`Best: ${this.bestScore}`);
+            }
+            
+            // Reset Score for new game
+            this.score = 0;
+            this.scoreMulti = 0;
+            this.fruitCount = 0;
+            currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+            fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+
+            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                delay: 10000,
+                paused: false
+             });
+
+        }, this);
+        
+    }
+    update()
+    {
+        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        
+        if (DEBUG) {
+            if (timeTick < SCORE_FLOOR) {
+            
+            } else {
+                this.timerText.setText(timeTick);
+            }  
+        }
+    }
+    
+}
 
 class InputScene extends Phaser.Scene
 {
@@ -495,140 +773,6 @@ class InputScene extends Phaser.Scene
     }
 }
 
-
-class UIScene extends Phaser.Scene
-{
-    constructor ()
-    {
-        super({ key: 'UIScene', active: false });
-
-        this.score = 0;
-        this.bestScore = 0;
-        this.fruitCount = 0;
-
-        this.scoreMulti = 0;
-    }
-
-    create()
-    {
-        const ourGame = this.scene.get('GameScene');
-
-        const style = {
-            //width: '220px',
-            //height: '22px',
-            color: 'lightyellow',
-            'font-size': '16px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
-            'padding': '2px 9px 2px 9px',
-            'font-weight': 'bold',
-            //'border-radius': '24px',
-            //outline: 'solid',
-            'text-align': 'right',
-        };
-   
-        const currentScore = this.add.dom(GRID * 1, GRID * 1, 'div', style);
-        currentScore.setOrigin(0,0);
-        currentScore.setText(`Score: ${this.score}`);
-        
-        const bestScore = this.add.dom(GRID * 7, GRID * 1, 'div', style);
-        bestScore.setOrigin(0,0);
-        //currentScore.setText(`Best: ${this.score}`)
-
-        const fruitCount = this.add.dom(GRID * 28, GRID * 1, 'div', style);
-        fruitCount.setOrigin(0,0);
-        fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
-
-        // Start Fruit Score Timer
-        if (DEBUG) { console.log("STARTING SCORE TIMER"); }
-
-        this.scoreTimer = this.time.addEvent({
-            delay: 10000,
-            paused: false
-         });
-        
-        if (DEBUG) {
-            this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
-            this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-            { font: '30px Arial', 
-              fill: '#FFFFFF',
-              fontSize: "32px"
-            });
-        }
-        
-        //  Event: addScore
-        ourGame.events.on('addScore', function ()
-        {
-
-            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
-            if (timeLeft > 10) {
-                this.score += timeLeft;
-            } else {
-                this.score += 10;
-            }
-
-            //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            currentScore.setText(`Score: ${this.score}`);
-            
-            this.fruitCount += 1;
-            fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
-            
-
-             // Restart Score Timer
-            this.scoreTimer = this.time.addEvent({
-            delay: 10000,
-            paused: false
-            });
-
-            var multiScore = Math.sqrt(this.scoreMulti);
-            
-            console.log(
-                ourGame.fruitCount + 1,
-                timeLeft,
-                this.score, 
-                multiScore.toFixed(2), 
-                (this.score * multiScore).toFixed(2));
-            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
-        }, this);
-
-        //  Event: saveScore
-        ourGame.events.on('saveScore', function ()
-        {
-            if (this.score > this.bestScore) {
-                this.bestScore = this.score;
-                bestScore.setText(`Best: ${this.bestScore}`);
-            }
-            
-            // Reset Score for new game
-            this.score = 0;
-            this.scoreMulti = 0;
-            this.fruitCount = 0;
-            currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
-            fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
-
-            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                delay: 10000,
-                paused: false
-             });
-
-        }, this);
-        
-    }
-    update()
-    {
-        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
-        
-        if (DEBUG) {
-            if (timeTick < SCORE_FLOOR) {
-            
-            } else {
-                this.timerText.setText(timeTick);
-            }  
-        }
-    }
-    
-}
-
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 768,
@@ -650,7 +794,8 @@ var config = {
         createContainer: true
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, UIScene, GameScene, InputScene]
+    scene: [ StartScene, UIScene, GameScene, InputScene, WinScene]
+
 };
 
 // Screen Settings
