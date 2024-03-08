@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 4; //24 //............................. Win Condition
+export const FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -155,7 +155,7 @@ class GameScene extends Phaser.Scene
         this.layer = this.map.createLayer('Wall', this.tileset);
         
         // add background
-        this.add.image(286, 286, 'bg01').setDepth(-1);
+        this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
@@ -214,7 +214,6 @@ class GameScene extends Phaser.Scene
             // Empty tiles are indexed at -1. So any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
             if (tile.index > 0) {  
-                //console.log(tile.x);
                 var wall = new Phaser.Geom.Point(tile.x,tile.y);
                 this.walls.push(wall);
             }
@@ -319,10 +318,8 @@ class GameScene extends Phaser.Scene
                 });
             };
             const ourUI = this.scene.get('UIScene');
-            console.log(ourUI.fruitCount);
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
-                console.log(snake.turns);
     
                 
                 /*this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
@@ -421,11 +418,11 @@ class WinScene extends Phaser.Scene
         
         scoreScreen.setText(
         ` 
-        /************* WINNING RUN ***************/
+        /************ WINNING SCORE **************/
         SCORE: ${ourUI.score}
         TURNS: ${ourInputScene.turns}
 
-        ..............RUNWIDE STATS.................
+        ................RUN STATS...................
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
         RESPAWNS: 
         `);
