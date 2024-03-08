@@ -517,15 +517,15 @@ class UIScene extends Phaser.Scene
             'text-align': 'right',
         };
    
-        const currentScore = this.add.dom(GRID * 1, GRID * 1, 'div', UIStyle);
+        const currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
         currentScore.setOrigin(0,0);
         currentScore.setText(`Score: ${this.score}`);
         
-        const bestScore = this.add.dom(GRID * 7, GRID * 1, 'div', UIStyle);
+        const bestScore = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
         bestScore.setOrigin(0,0);
         //currentScore.setText(`Best: ${this.score}`)
 
-        const fruitCountUI = this.add.dom(GRID * 28, GRID * 1, 'div', UIStyle);
+        const fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
         fruitCountUI.setOrigin(0,0);
         fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
