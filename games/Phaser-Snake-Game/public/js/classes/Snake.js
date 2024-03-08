@@ -87,9 +87,21 @@ var Snake = new Phaser.Class({
 
     scene.apples.forEach(fruit => {  // Check collision for all Fruits
         if(this.head.x === fruit.x && this.head.y === fruit.y){
-            //console.log("HIT");
+            //console.log("FRUIT AT", fruit.x, fruit.y);
+            scene.events.emit('addScore', fruit); // Sends to UI Listener 
+            //console.log("FRUITEND", fruit.x, fruit.y);
+            
             this.grow(scene);
-            fruit.move(scene);
+            
+            // Avoid double fruit getting while in transition
+            fruit.x = 0;
+            fruit.y = 0;
+            fruit.visible = false;
+            
+            scene.time.delayedCall(500, function () {
+                fruit.move(scene);
+                fruit.visible = true;
+            }, [], this);
             
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
@@ -103,10 +115,11 @@ var Snake = new Phaser.Class({
 
             //  Scene.crunch01.play();
             //  Dispatch a Scene event
-            scene.events.emit('addScore'); // Sends to UI Listener
-            scene.fruitCount++;
-            
-            scene.fruitCountText.setText(FRUITGOAL - scene.fruitCount);
+
+            //debugger
+            scene.apples.forEach(fruit => {
+                fruit.startDecay(scene);
+            });
             
             if (DEBUG) {console.log(                         
                 "FRUITCOUNT=", scene.fruitCount,
