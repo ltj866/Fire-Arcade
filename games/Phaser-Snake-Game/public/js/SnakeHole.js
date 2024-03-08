@@ -155,7 +155,7 @@ class GameScene extends Phaser.Scene
         this.layer = this.map.createLayer('Wall', this.tileset);
         
         // add background
-        this.add.image(286, 286, 'bg01').setDepth(-1);
+        this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
