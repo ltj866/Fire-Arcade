@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 5; //24 //............................. Win Condition
+export const FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -126,7 +126,7 @@ class GameScene extends Phaser.Scene
     init()
     {
         //snake = new Snake();
-        snake = new Snake(this, 11, 6);
+        //snake = new Snake(this, 11, 6);
     }
     
     
@@ -187,6 +187,8 @@ class GameScene extends Phaser.Scene
         this.portalColors = PORTAL_COLORS.slice(); 
         
 
+        snake = new Snake(this, 11, 6);
+        
         
         this.lastMoveTime = 0; // The last time we called move()
 
@@ -439,7 +441,7 @@ class WinScene extends Phaser.Scene
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, event => {
-            var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*11, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'});
+            var continueText = this.add.text(SCREEN_WIDTH/2 - GRID*11, GRID*25, '[REFRESH TO RESTART]',{"fontSize":'48px'});
 
             this.tweens.add({
                 targets: continueText,
@@ -461,8 +463,8 @@ class WinScene extends Phaser.Scene
                 console.log(snake);
             
                 //ourUI.screstart();
-                this.scene.start('UIScene');
-                this.scene.start('GameScene');
+                //this.scene.start('UIScene');
+                //this.scene.start('GameScene');
                 this.scene.stop();
             });
         }, [], this);
