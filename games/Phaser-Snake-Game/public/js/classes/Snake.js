@@ -27,6 +27,7 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
+        console.log(this.tail.x, this.tail.y); // Why is this always at 11,6 DEBUG
         this.body.push(newPart);
 
         newPart.setOrigin(0,0);

@@ -330,18 +330,11 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
+            
             const ourUI = this.scene.get('UIScene');
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
-    
                 
-                /*this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
-                ["YOU WIN YAY!"
-                ],
-                { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
-                    fontSize: "32px",
-                    align: "center",
-                });*/
                 ourUI.currentScore.setText(`Score: ${ourUI.score}`);
                 
                 this.events.emit('saveScore');
