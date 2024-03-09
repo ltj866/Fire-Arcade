@@ -40,6 +40,7 @@ export const UP = 2;
 export const DOWN = 3;
 const START_SPRINT = 4;
 const STOP_SPRINT = 5;
+const STOP = 10;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -128,7 +129,8 @@ class GameScene extends Phaser.Scene
     
     init()
     {
-        this.snake = new Snake(this, 11, 6);
+        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
+        this.snake.heading = STOP;
         
         // Arrays for collision detection
         this.apples = [];
@@ -456,8 +458,11 @@ class WinScene extends Phaser.Scene
             this.input.keyboard.on('keydown', function() {
 
                 // Event listeners need to be removed manually
+                // Better if possible to do this as part of UIScene clean up
+                // As the event is defined there
                 ourGame.events.off('addScore');
                 ourGame.events.off('saveScore');
+            
                 
                 ourInputScene.scene.restart();
                 ourUI.scene.restart();
@@ -521,12 +526,12 @@ class UIScene extends Phaser.Scene
         gameVersionUI.setText(`${GAME_VERSION} Phaser:${Phaser.VERSION}`).setOrigin(1,1);
         // gameVersionUI.postFX.addShine(.2, 1, 10);
         
+        // UI TEXT DOM ELEMENTS
         this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
         this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
         
         const bestScore = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
         bestScore.setOrigin(0,0);
-        //currentScore.setText(`Best: ${this.score}`)
 
         this.livesUI = this.add.dom(SCREEN_WIDTH/2, GRID * .5, 'div', UIStyle);
         this.livesUI.setText(`${this.lives}`).setOrigin(0.5,0);
@@ -657,7 +662,7 @@ class UIScene extends Phaser.Scene
         }
     }
     
-    shutdown()
+    end()
     {
 
     }
