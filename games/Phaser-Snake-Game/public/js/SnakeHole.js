@@ -334,7 +334,7 @@ class GameScene extends Phaser.Scene
             const ourUI = this.scene.get('UIScene');
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
-                
+
                 ourUI.currentScore.setText(`Score: ${ourUI.score}`);
                 
                 this.events.emit('saveScore');
@@ -415,13 +415,13 @@ class WinScene extends Phaser.Scene
         }
         ///////
         
-        this.add.text(SCREEN_WIDTH/2 - GRID, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
+        this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        var scoreScreen = this.add.dom(GRID*7, GRID * 7.5, 'div', scoreScreenStyle);
-        scoreScreen.setOrigin(0,0);
+        var scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 7.5, 'div', scoreScreenStyle);
+        scoreScreen.setOrigin(0.5,0);
 
         
         
@@ -441,7 +441,8 @@ class WinScene extends Phaser.Scene
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25,'', {"fontSize":'48px'});
+            continueText.setText('[PRESS TO CONTINUE]').setOrigin(0.5,0);
 
             this.tweens.add({
                 targets: continueText,
@@ -511,13 +512,14 @@ class UIScene extends Phaser.Scene
             'text-align': 'right',
         };
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT - GRID, 'div', 
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*3, SCREEN_HEIGHT - GRID, 'div', 
         {
             color: 'white',
             'font-size': '12px',
             'font-family': ["Sono", 'sans-serif'],
         });
-        gameVersionUI.setText(GAME_VERSION).setOrigin(1,1);
+        gameVersionUI.setText(`${GAME_VERSION} Phaser:${Phaser.VERSION}`).setOrigin(1,1);
+        // gameVersionUI.postFX.addShine(.2, 1, 10);
         
         this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
         this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
