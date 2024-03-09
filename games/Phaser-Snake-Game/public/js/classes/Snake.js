@@ -31,6 +31,7 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'blocks', 1);
+
         this.body.push(newPart);
 
         newPart.setOrigin(0,0);
