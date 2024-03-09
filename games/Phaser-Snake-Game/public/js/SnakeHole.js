@@ -26,7 +26,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
-var snake;
+
 var crunchSounds = [];
 
 // Tilemap variables
@@ -127,7 +127,7 @@ class GameScene extends Phaser.Scene
     init()
     {
         //snake = new Snake();
-        //snake = new Snake(this, 11, 6);
+        this.snake = new Snake(this, 11, 6);
     }
     
     
@@ -187,7 +187,7 @@ class GameScene extends Phaser.Scene
         this.portalColors = PORTAL_COLORS.slice(); 
         
 
-        snake = new Snake(this, 11, 6);
+        //this.snake = new Snake(this, 11, 6);
         
         
         this.lastMoveTime = 0; // The last time we called move()
@@ -271,7 +271,7 @@ class GameScene extends Phaser.Scene
     update (time, delta) 
     {
     // console.log("update -- time=" + time + " delta=" + delta);
-        if (!snake.alive)
+        if (!this.snake.alive)
             {
                 
                 // game.scene.scene.restart(); // This doesn't work correctly
@@ -303,11 +303,11 @@ class GameScene extends Phaser.Scene
             
             // Distance on an x y grid
 
-            var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+            var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                                 closestPortal.x/GRID, closestPortal.y/GRID);
 
             this.portals.forEach( portal => {
-                var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+                var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                     portal.x/GRID, portal.y/GRID);
 
                 if (dist < closestPortalDist) { // Compare and choose closer portals
@@ -368,7 +368,7 @@ class GameScene extends Phaser.Scene
             } 
             
             // Move at last second
-            snake.move(this);
+            this.snake.move(this);
         }
         
         // Boost and Boot Multi Code
@@ -685,6 +685,10 @@ class InputScene extends Phaser.Scene
         super({key: 'InputScene', active: true});
     }
 
+    init()
+    {
+    }
+    
     preload()
     {
 
@@ -706,96 +710,96 @@ class InputScene extends Phaser.Scene
         switch (event.keyCode) {
             case 87: // w
 
-            if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 6);
-                snake.heading = UP; // Prevents backtracking to death
-                snake.move(gameScene);
+            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.heading = UP; // Prevents backtracking to death
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
 
             case 65: // a
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
-                snake.head.setTexture('blocks', 4);
-                snake.heading = LEFT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) {
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.heading = LEFT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 83: // s
 
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 7);
-                snake.heading = DOWN;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.heading = DOWN;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 68: // d
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 5);
-                snake.heading = RIGHT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.heading = RIGHT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 38: // UP
 
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
-                snake.head.setTexture('blocks', 6);
-                snake.heading = UP;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) {
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.heading = UP;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 37: // LEFT
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 4);
-                snake.heading = LEFT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.heading = LEFT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 40: // DOWN
 
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 7);
-                snake.heading = DOWN;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.heading = DOWN;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 39: // RIGHT
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 5);
-                snake.heading = RIGHT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.heading = RIGHT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
