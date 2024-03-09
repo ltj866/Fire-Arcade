@@ -281,6 +281,10 @@ class GameScene extends Phaser.Scene
                 ourUI = this.scene.get('UIScene');
                 ourUI.lives += 1;
                 ourUI.livesUI.setText(ourUI.lives);
+
+                ourUI.fruitCount = 0;
+                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${FRUITGOAL}`);
+
                 //game.destroy();
                 this.scene.restart();
                 return;
@@ -342,7 +346,8 @@ class GameScene extends Phaser.Scene
                     fontSize: "32px",
                     align: "center",
                 });*/
-    
+                ourUI.currentScore.setText(`Score: ${ourUI.score}`);
+                
                 this.events.emit('saveScore');
                 this.scene.pause();
                 this.scene.start('WinScene');
@@ -438,6 +443,7 @@ class WinScene extends Phaser.Scene
 
         ................RUN STATS..................
         Lives: ${ourUI.lives}
+        TOTAL TIME: ${Math.round(ourInputScene.time.now/1000)} Seconds
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
         `);
 
@@ -522,9 +528,9 @@ class UIScene extends Phaser.Scene
             'text-align': 'right',
         };
    
-        const currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
-        currentScore.setOrigin(0,0);
-        currentScore.setText(`Score: ${this.score}`);
+        this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
+        this.currentScore.setOrigin(0,0);
+        this.currentScore.setText(`Score: ${this.score}`);
         
         const bestScore = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
         bestScore.setOrigin(0,0);
@@ -534,9 +540,9 @@ class UIScene extends Phaser.Scene
         this.livesUI.setOrigin(0.5,0);
         this.livesUI.setText(`${this.lives}`)
 
-        const fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
-        fruitCountUI.setOrigin(0,0);
-        fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+        this.fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
+        this.fruitCountUI.setOrigin(0,0);
+        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -602,12 +608,12 @@ class UIScene extends Phaser.Scene
             }
 
             //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            currentScore.setText(`Score: ${this.score}`);
+            this.currentScore.setText(`Score: ${this.score}`);
             
             this.fruitCount += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
             
 
              // Restart Score Timer
