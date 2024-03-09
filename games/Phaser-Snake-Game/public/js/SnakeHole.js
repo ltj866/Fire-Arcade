@@ -135,7 +135,14 @@ class GameScene extends Phaser.Scene
         this.walls = [];
         this.portals = [];
 
-        this.crunchSounds = crunchSounds.slice();
+        this.lastMoveTime = 0; // The last time we called move()
+
+        // Sounds
+        this.crunchSounds = [];
+
+        // Make a copy of Portal Colors.
+        // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
+        this.portalColors = PORTAL_COLORS.slice(); 
 
     }
     
@@ -161,17 +168,15 @@ class GameScene extends Phaser.Scene
 
     create ()
     {
-        //RESET
-        //this.crunchSounds = [];
-        //crunchSounds = this.crunchSounds; // Still don't know why this works, but still do it.
-
+        var ourInputScene = this.scene.get('InputScene');
+        /////////////////////////////////////////////////
+        
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
     
-
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
@@ -180,28 +185,14 @@ class GameScene extends Phaser.Scene
             {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
-
-
-        //this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
-
-
-
-        // Make a copy of Portal Colors.
-        // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
-        this.portalColors = PORTAL_COLORS.slice(); 
+            
         
-
-        //this.snake = new Snake(this, 11, 6);
-        
-        
-        this.lastMoveTime = 0; // The last time we called move()
-
-        // define keys       
+            // Define keys       
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
-        var ourInputScene = this.scene.get('InputScene');
+        // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             ourInputScene.updateDirection(this, e);
         })
@@ -219,12 +210,11 @@ class GameScene extends Phaser.Scene
             var p1 = new Portal(scene, color, to, from);
             var p2 = new Portal(scene, color, from, to);
         }
-        
-        // width 25 grid
-        // width 19
 
+        // Add all tiles to walls for collision
         this.map.forEachTile( tile => {
-            // Empty tiles are indexed at -1. So any tilemap object that is not empty will be considered a wall
+            // Empty tiles are indexed at -1. 
+            // Any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
             if (tile.index > 0) {  
                 var wall = new Phaser.Geom.Point(tile.x,tile.y);
@@ -233,6 +223,7 @@ class GameScene extends Phaser.Scene
 
         });
 
+        // Make Fruit
         for (let index = 0; index < FRUIT; index++) {
             var food = new Food(this);
         }
