@@ -7,9 +7,10 @@ import { Snake } from './classes/Snake.js';
 // GameSettings           SnakeHole
 //******************************************************************** */
 
+const GAME_VERSION = 'snakehole.v0.1.03.08.002';
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 4; //24 //............................. Win Condition
+export const FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -25,7 +26,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
-var snake;
+
 var crunchSounds = [];
 
 // Tilemap variables
@@ -39,6 +40,7 @@ export const UP = 2;
 export const DOWN = 3;
 const START_SPRINT = 4;
 const STOP_SPRINT = 5;
+const STOP = 10;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -70,6 +72,7 @@ class StartScene extends Phaser.Scene
     {
         super({key: 'StartScene', active: true});
     }
+    
     preload()
     {
         this.load.image('howToCard', 'assets/howToCard.webp');
@@ -99,6 +102,7 @@ class StartScene extends Phaser.Scene
 
         this.input.keyboard.on('keydown', e => {
             this.scene.start('GameScene');
+            var ourGameScene = this.scene.get("GameScene");
             this.scene.start('UIScene');
             //console.log(e)
             this.scene.stop()
@@ -125,8 +129,21 @@ class GameScene extends Phaser.Scene
     
     init()
     {
-        //snake = new Snake();
-        //snake = new Snake(this, 11, 6);
+        
+        // Arrays for collision detection
+        this.apples = [];
+        this.walls = [];
+        this.portals = [];
+
+        this.lastMoveTime = 0; // The last time we called move()
+
+        // Sounds
+        this.crunchSounds = [];
+
+        // Make a copy of Portal Colors.
+        // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
+        this.portalColors = PORTAL_COLORS.slice(); 
+
     }
     
     
@@ -151,17 +168,20 @@ class GameScene extends Phaser.Scene
 
     create ()
     {
-        //RESET
-        this.crunchSounds = [];
-        crunchSounds = this.crunchSounds; // Still don't know why this works, but still do it.
-
+        var ourInputScene = this.scene.get('InputScene');
+        /////////////////////////////////////////////////
+        
+        // Snake needs to render immediately 
+        // Create the snake the  first time so it renders immediately
+        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
+        this.snake.heading = STOP;
+        
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
     
-
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
@@ -170,33 +190,14 @@ class GameScene extends Phaser.Scene
             {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
-
-
-        this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
-
-        // Arrays for collision detection
-        this.apples = [];
-        this.walls = [];
-        this.portals = [];
-
-        this.fruitCount = 0;
-
-        // Make a copy of Portal Colors.
-        // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
-        this.portalColors = PORTAL_COLORS.slice(); 
+            
         
-
-        snake = new Snake(this, 11, 6);
-        
-        
-        this.lastMoveTime = 0; // The last time we called move()
-
-        // define keys       
+            // Define keys       
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
-        var ourInputScene = this.scene.get('InputScene');
+        // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             ourInputScene.updateDirection(this, e);
         })
@@ -214,12 +215,11 @@ class GameScene extends Phaser.Scene
             var p1 = new Portal(scene, color, to, from);
             var p2 = new Portal(scene, color, from, to);
         }
-        
-        // width 25 grid
-        // width 19
 
+        // Add all tiles to walls for collision
         this.map.forEachTile( tile => {
-            // Empty tiles are indexed at -1. So any tilemap object that is not empty will be considered a wall
+            // Empty tiles are indexed at -1. 
+            // Any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
             if (tile.index > 0) {  
                 var wall = new Phaser.Geom.Point(tile.x,tile.y);
@@ -228,6 +228,7 @@ class GameScene extends Phaser.Scene
 
         });
 
+        // Make Fruit
         for (let index = 0; index < FRUIT; index++) {
             var food = new Food(this);
         }
@@ -270,7 +271,7 @@ class GameScene extends Phaser.Scene
     update (time, delta) 
     {
     // console.log("update -- time=" + time + " delta=" + delta);
-        if (!snake.alive)
+        if (!this.snake.alive)
             {
                 
                 // game.scene.scene.restart(); // This doesn't work correctly
@@ -281,6 +282,10 @@ class GameScene extends Phaser.Scene
                 ourUI = this.scene.get('UIScene');
                 ourUI.lives += 1;
                 ourUI.livesUI.setText(ourUI.lives);
+
+                ourUI.fruitCount = 0;
+                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${FRUITGOAL}`);
+
                 //game.destroy();
                 this.scene.restart();
                 return;
@@ -298,11 +303,11 @@ class GameScene extends Phaser.Scene
             
             // Distance on an x y grid
 
-            var closestPortalDist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+            var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                                 closestPortal.x/GRID, closestPortal.y/GRID);
 
             this.portals.forEach( portal => {
-                var dist = Phaser.Math.Distance.Between(snake.head.x/GRID, snake.head.y/GRID, 
+                var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                     portal.x/GRID, portal.y/GRID);
 
                 if (dist < closestPortalDist) { // Compare and choose closer portals
@@ -330,19 +335,13 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
+            
             const ourUI = this.scene.get('UIScene');
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
-    
+
+                ourUI.currentScore.setText(`Score: ${ourUI.score}`);
                 
-                /*this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
-                ["YOU WIN YAY!"
-                ],
-                { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
-                    fontSize: "32px",
-                    align: "center",
-                });*/
-    
                 this.events.emit('saveScore');
                 this.scene.pause();
                 this.scene.start('WinScene');
@@ -362,7 +361,7 @@ class GameScene extends Phaser.Scene
             } 
             
             // Move at last second
-            snake.move(this);
+            this.snake.move(this);
         }
         
         // Boost and Boot Multi Code
@@ -397,7 +396,6 @@ class WinScene extends Phaser.Scene
 
     preload()
     {
-        //this.load.image('howToCard', 'assets/howToCard.webp');
     }
 
     create()
@@ -405,6 +403,8 @@ class WinScene extends Phaser.Scene
         
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
+        const ourWinScene = this.scene.get('WinScene');
+        const ourGame = this.scene.get("GameScene");
 
         const scoreScreenStyle = {
             width: '440px',
@@ -420,13 +420,13 @@ class WinScene extends Phaser.Scene
         }
         ///////
         
-        this.add.text(SCREEN_WIDTH/2 - GRID, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
+        this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        var scoreScreen = this.add.dom(GRID*7, GRID * 7.5, 'div', scoreScreenStyle);
-        scoreScreen.setOrigin(0,0);
+        var scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 7.5, 'div', scoreScreenStyle);
+        scoreScreen.setOrigin(0.5,0);
 
         
         
@@ -437,15 +437,17 @@ class WinScene extends Phaser.Scene
         TURNS: ${ourInputScene.turns}
 
         ................RUN STATS..................
-        RESPAWNS: ${ourUI.lives}
+        Lives: ${ourUI.lives}
+        TOTAL TIME: ${Math.round(ourInputScene.time.now/1000)} Seconds
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
         `);
 
         //card.setScale(0.7);
 
         // Give a few seconds before a player can hit continue
-        this.time.delayedCall(900, event => {
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[REFRESH TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
+        this.time.delayedCall(900, function() {
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25,'', {"fontSize":'48px'});
+            continueText.setText('[PRESS TO CONTINUE]').setOrigin(0.5,0);
 
             this.tweens.add({
                 targets: continueText,
@@ -456,27 +458,23 @@ class WinScene extends Phaser.Scene
                 yoyo: true
               });
             
-            this.input.keyboard.on('keydown', e => {
-                //ourUI.fruitCount = -1; // Ghost fruit is counted somewhere *shrug*
-                //ourUI.score = 0;
-                //ourUI.bestScore = 0;
-                //ourUI.globalFruitCount = -1;
-    
-                //ourInputScene.turns = 0;
-                //ourInputScene.inputSet = [];
+            this.input.keyboard.on('keydown', function() {
 
-                //console.log(snake);
+                // Event listeners need to be removed manually
+                // Better if possible to do this as part of UIScene clean up
+                // As the event is defined there
+                ourGame.events.off('addScore');
+                ourGame.events.off('saveScore');
             
-                //ourUI.screstart();
-                //this.scene.start('UIScene');
-                //this.scene.start('GameScene');
-                //this.scene.pause();
+                
+                ourInputScene.scene.restart();
+                ourUI.scene.restart();
+                ourGame.scene.restart();
+
+                ourWinScene.scene.switch('GameScene');
+
             });
         }, [], this);
-
-        
-
-
     }
 
     end()
@@ -522,21 +520,27 @@ class UIScene extends Phaser.Scene
             'text-align': 'right',
         };
    
-        const currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
-        currentScore.setOrigin(0,0);
-        currentScore.setText(`Score: ${this.score}`);
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*3, SCREEN_HEIGHT - GRID, 'div', 
+        {
+            color: 'white',
+            'font-size': '12px',
+            'font-family': ["Sono", 'sans-serif'],
+        });
+        gameVersionUI.setText(`${GAME_VERSION} Phaser:${Phaser.VERSION}`).setOrigin(1,1);
+        // gameVersionUI.postFX.addShine(.2, 1, 10);
+        
+        // UI TEXT DOM ELEMENTS
+        this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
+        this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
         
         const bestScore = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
         bestScore.setOrigin(0,0);
-        //currentScore.setText(`Best: ${this.score}`)
 
         this.livesUI = this.add.dom(SCREEN_WIDTH/2, GRID * .5, 'div', UIStyle);
-        this.livesUI.setOrigin(0.5,0);
-        this.livesUI.setText(`${this.lives}`)
+        this.livesUI.setText(`${this.lives}`).setOrigin(0.5,0);
 
-        const fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
-        fruitCountUI.setOrigin(0,0);
-        fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+        this.fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
+        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`).setOrigin(0,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -602,12 +606,12 @@ class UIScene extends Phaser.Scene
             }
 
             //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            currentScore.setText(`Score: ${this.score}`);
+            this.currentScore.setText(`Score: ${this.score}`);
             
             this.fruitCount += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
             
 
              // Restart Score Timer
@@ -639,7 +643,6 @@ class UIScene extends Phaser.Scene
             this.score = 0;
             this.scoreMulti = 0;
             this.fruitCount = 0;
-            fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                 delay: 10000,
@@ -662,6 +665,11 @@ class UIScene extends Phaser.Scene
         }
     }
     
+    end()
+    {
+
+    }
+    
 }
 
 class InputScene extends Phaser.Scene
@@ -671,14 +679,19 @@ class InputScene extends Phaser.Scene
         super({key: 'InputScene', active: true});
     }
 
+    init()
+    {
+        this.inputSet = [];
+        this.turns = 0;
+    }
+    
     preload()
     {
 
     }
     create()
     {
-        this.inputSet = [];
-        this.turns = 0;
+
     }
     update()
     {
@@ -692,96 +705,96 @@ class InputScene extends Phaser.Scene
         switch (event.keyCode) {
             case 87: // w
 
-            if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 6);
-                snake.heading = UP; // Prevents backtracking to death
-                snake.move(gameScene);
+            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.heading = UP; // Prevents backtracking to death
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
 
             case 65: // a
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
-                snake.head.setTexture('blocks', 4);
-                snake.heading = LEFT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) {
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.heading = LEFT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 83: // s
 
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 7);
-                snake.heading = DOWN;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.heading = DOWN;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 68: // d
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 5);
-                snake.heading = RIGHT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.heading = RIGHT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 38: // UP
 
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
-                snake.head.setTexture('blocks', 6);
-                snake.heading = UP;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) {
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.heading = UP;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 37: // LEFT
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 4);
-                snake.heading = LEFT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.heading = LEFT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 40: // DOWN
 
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 7);
-                snake.heading = DOWN;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.heading = DOWN;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 39: // RIGHT
 
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.head.setTexture('blocks', 5);
-                snake.heading = RIGHT;
-                snake.move(gameScene);
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.heading = RIGHT;
+                gameScene.snake.move(gameScene);
                 this.turns += 1;
-                this.inputSet.push([snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now;
             }
             break;

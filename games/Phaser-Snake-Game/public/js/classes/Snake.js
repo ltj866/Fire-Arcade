@@ -10,23 +10,28 @@ var Snake = new Phaser.Class({
     {
         this.alive = true;
         this.body = []
+
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-        this.head.setOrigin(0);
+        this.head.setOrigin(0,0);
         
         this.body.push(this.head);
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
         
-        this.heading = LEFT;
     },
     
     grow: function (scene)
     {
+        
+        // Current Tail of the snake
+        this.tail = this.body.slice(-1);
+        
         // Add a new part at the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
-        var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
+        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'blocks', 1);
+
         this.body.push(newPart);
 
         newPart.setOrigin(0,0);
@@ -78,6 +83,8 @@ var Snake = new Phaser.Class({
     {
         y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
     }
+    
+    // Move all Snake Segments
     Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
     // Check if dead by map
@@ -85,11 +92,10 @@ var Snake = new Phaser.Class({
         this.alive = false;
     }
 
-    scene.apples.forEach(fruit => {  // Check collision for all Fruits
+    // Check collision for all Fruits
+    scene.apples.forEach(fruit => {  
         if(this.head.x === fruit.x && this.head.y === fruit.y){
-            //console.log("FRUIT AT", fruit.x, fruit.y);
             scene.events.emit('addScore', fruit); // Sends to UI Listener 
-            //console.log("FRUITEND", fruit.x, fruit.y);
             
             this.grow(scene);
             
