@@ -129,8 +129,9 @@ class GameScene extends Phaser.Scene
     
     init()
     {
-        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
-        this.snake.heading = STOP;
+
+        // Resets the snake on scene.restart()
+        //this.snake = null;
         
         // Arrays for collision detection
         this.apples = [];
@@ -172,6 +173,11 @@ class GameScene extends Phaser.Scene
     {
         var ourInputScene = this.scene.get('InputScene');
         /////////////////////////////////////////////////
+        
+        // Snake needs to render immediately 
+        // Create the snake the  first time so it renders immediately
+        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
+        this.snake.heading = STOP;
         
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });

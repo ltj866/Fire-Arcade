@@ -10,15 +10,15 @@ var Snake = new Phaser.Class({
     {
         this.alive = true;
         this.body = []
+
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-        this.head.setOrigin(0);
+        this.head.setOrigin(0,0);
         
         this.body.push(this.head);
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
         
-        this.heading = LEFT;
     },
     
     grow: function (scene)
