@@ -71,6 +71,7 @@ class StartScene extends Phaser.Scene
     {
         super({key: 'StartScene', active: true});
     }
+    
     preload()
     {
         this.load.image('howToCard', 'assets/howToCard.webp');
@@ -100,6 +101,7 @@ class StartScene extends Phaser.Scene
 
         this.input.keyboard.on('keydown', e => {
             this.scene.start('GameScene');
+            var ourGameScene = this.scene.get("GameScene");
             this.scene.start('UIScene');
             //console.log(e)
             this.scene.stop()
@@ -126,8 +128,15 @@ class GameScene extends Phaser.Scene
     
     init()
     {
-        //snake = new Snake();
         this.snake = new Snake(this, 11, 6);
+        
+        // Arrays for collision detection
+        this.apples = [];
+        this.walls = [];
+        this.portals = [];
+
+        this.crunchSounds = crunchSounds.slice();
+
     }
     
     
@@ -153,8 +162,8 @@ class GameScene extends Phaser.Scene
     create ()
     {
         //RESET
-        this.crunchSounds = [];
-        crunchSounds = this.crunchSounds; // Still don't know why this works, but still do it.
+        //this.crunchSounds = [];
+        //crunchSounds = this.crunchSounds; // Still don't know why this works, but still do it.
 
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
@@ -173,14 +182,9 @@ class GameScene extends Phaser.Scene
             });
 
 
-        this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
+        //this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
 
-        // Arrays for collision detection
-        this.apples = [];
-        this.walls = [];
-        this.portals = [];
 
-        this.fruitCount = 0;
 
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
