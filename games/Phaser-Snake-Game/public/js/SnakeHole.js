@@ -129,9 +129,6 @@ class GameScene extends Phaser.Scene
     
     init()
     {
-
-        // Resets the snake on scene.restart()
-        //this.snake = null;
         
         // Arrays for collision detection
         this.apples = [];
