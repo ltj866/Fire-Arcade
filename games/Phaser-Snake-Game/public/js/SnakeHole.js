@@ -7,6 +7,7 @@ import { Snake } from './classes/Snake.js';
 // GameSettings           SnakeHole
 //******************************************************************** */
 
+const GAME_VERSION = 'snakehole.v0.1.03.08.002';
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 export const FRUITGOAL = 24; //24 //............................. Win Condition
@@ -528,6 +529,14 @@ class UIScene extends Phaser.Scene
             'text-align': 'right',
         };
    
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT - GRID, 'div', 
+        {
+            color: 'white',
+            'font-size': '12px',
+            'font-family': ["Sono", 'sans-serif'],
+        });
+        gameVersionUI.setText(GAME_VERSION).setOrigin(1,1);
+        
         this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
         this.currentScore.setOrigin(0,0);
         this.currentScore.setText(`Score: ${this.score}`);
