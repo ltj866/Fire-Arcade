@@ -10,7 +10,7 @@ import { Snake } from './classes/Snake.js';
 const GAME_VERSION = 'snakehole.v0.1.03.08.002';
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 24; //24 //............................. Win Condition
+export const FRUITGOAL = 3; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -398,7 +398,6 @@ class WinScene extends Phaser.Scene
 
     preload()
     {
-        //this.load.image('howToCard', 'assets/howToCard.webp');
     }
 
     create()
@@ -406,6 +405,8 @@ class WinScene extends Phaser.Scene
         
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
+        const ourWinScene = this.scene.get('WinScene');
+        const ourGame = this.scene.get("GameScene");
 
         const scoreScreenStyle = {
             width: '440px',
@@ -446,8 +447,8 @@ class WinScene extends Phaser.Scene
         //card.setScale(0.7);
 
         // Give a few seconds before a player can hit continue
-        this.time.delayedCall(900, event => {
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[REFRESH TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
+        this.time.delayedCall(900, function() {
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
 
             this.tweens.add({
                 targets: continueText,
@@ -458,27 +459,20 @@ class WinScene extends Phaser.Scene
                 yoyo: true
               });
             
-            this.input.keyboard.on('keydown', e => {
-                //ourUI.fruitCount = -1; // Ghost fruit is counted somewhere *shrug*
-                //ourUI.score = 0;
-                //ourUI.bestScore = 0;
-                //ourUI.globalFruitCount = -1;
-    
-                //ourInputScene.turns = 0;
-                //ourInputScene.inputSet = [];
+            this.input.keyboard.on('keydown', function() {
 
-                //console.log(snake);
-            
-                //ourUI.screstart();
-                //this.scene.start('UIScene');
-                //this.scene.start('GameScene');
-                //this.scene.pause();
+                // Event listeners need to be removed manually
+                ourGame.events.off('addScore');
+                ourGame.events.off('saveScore');
+                
+                ourInputScene.scene.restart();
+                ourUI.scene.restart();
+                ourGame.scene.restart();
+
+                ourWinScene.scene.switch('GameScene');
+
             });
         }, [], this);
-
-        
-
-
     }
 
     end()
@@ -533,20 +527,17 @@ class UIScene extends Phaser.Scene
         gameVersionUI.setText(GAME_VERSION).setOrigin(1,1);
         
         this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
-        this.currentScore.setOrigin(0,0);
-        this.currentScore.setText(`Score: ${this.score}`);
+        this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
         
         const bestScore = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
         bestScore.setOrigin(0,0);
         //currentScore.setText(`Best: ${this.score}`)
 
         this.livesUI = this.add.dom(SCREEN_WIDTH/2, GRID * .5, 'div', UIStyle);
-        this.livesUI.setOrigin(0.5,0);
-        this.livesUI.setText(`${this.lives}`)
+        this.livesUI.setText(`${this.lives}`).setOrigin(0.5,0);
 
         this.fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
-        this.fruitCountUI.setOrigin(0,0);
-        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`).setOrigin(0,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -671,6 +662,11 @@ class UIScene extends Phaser.Scene
         }
     }
     
+    shutdown()
+    {
+
+    }
+    
 }
 
 class InputScene extends Phaser.Scene
@@ -682,6 +678,8 @@ class InputScene extends Phaser.Scene
 
     init()
     {
+        this.inputSet = [];
+        this.turns = 0;
     }
     
     preload()
@@ -690,8 +688,7 @@ class InputScene extends Phaser.Scene
     }
     create()
     {
-        this.inputSet = [];
-        this.turns = 0;
+
     }
     update()
     {
