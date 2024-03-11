@@ -13,6 +13,7 @@ export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
 export const FRUITGOAL = 32; //24 //32?................... Win Condition
 
+
 // 83.33 - 99.996
 var SPEEDWALK = 99; // 96 In milliseconds  
 
@@ -106,6 +107,7 @@ class StartScene extends Phaser.Scene
 
         this.input.keyboard.on('keydown', e => {
             this.scene.start('GameScene');
+            var ourGameScene = this.scene.get("GameScene");
             this.scene.start('UIScene');
             //console.log(e)
             this.scene.stop()
@@ -173,6 +175,7 @@ class GameScene extends Phaser.Scene
     {
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
+
         /////////////////////////////////////////////////
         
         // Snake needs to render immediately 
@@ -195,8 +198,8 @@ class GameScene extends Phaser.Scene
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
 
-
         // Define keys       
+
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -219,7 +222,7 @@ class GameScene extends Phaser.Scene
             var p1 = new Portal(scene, color, to, from);
             var p2 = new Portal(scene, color, from, to);
         }
-        
+
         // Add all tiles to walls for collision
         this.map.forEachTile( tile => {
             // Empty tiles are indexed at -1. 
@@ -278,6 +281,7 @@ class GameScene extends Phaser.Scene
         var ourInputScene = this.scene.get('InputScene');
 
         // console.log("update -- time=" + time + " delta=" + delta);
+
         if (!this.snake.alive)
             {
                 
@@ -344,13 +348,13 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
-
             const ourUI = this.scene.get('UIScene');
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 ourUI.currentScore.setText(`Score: ${ourUI.score}`);
                 ourUI.bestScoreUI.setText(`Best: ${ourUI.score}`);
+
 
                 this.scene.pause();
 
@@ -412,7 +416,6 @@ class WinScene extends Phaser.Scene
 
     preload()
     {
-        //this.load.image('howToCard', 'assets/howToCard.webp');
     }
 
     create()
@@ -422,6 +425,7 @@ class WinScene extends Phaser.Scene
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourWinScene = this.scene.get('WinScene');
+
 
         const scoreScreenStyle = {
             width: '450px',
@@ -444,6 +448,7 @@ class WinScene extends Phaser.Scene
         //card.setOrigin(0,0);
         
         var scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
+
         scoreScreen.setOrigin(0.5,0);
 
         
@@ -455,6 +460,7 @@ class WinScene extends Phaser.Scene
         FRUIT SCORE AVERAGE: ${Math.round(ourUI.bestScore / FRUITGOAL)}
         
         TURNS: ${ourInputScene.turns}
+
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
         
         BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
@@ -462,6 +468,7 @@ class WinScene extends Phaser.Scene
         
         BETA: ${GAME_VERSION}
         ................RUN STATS.................
+
         Lives: ${ourUI.lives}
         TOTAL TIME: ${Math.round(ourInputScene.time.now/1000)} Seconds
         TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
@@ -491,6 +498,7 @@ class WinScene extends Phaser.Scene
             var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25,'', {"fontSize":'48px'});
             continueText.setText('[SPACE TO CONTINUE]').setOrigin(0.5,0);
 
+
             this.tweens.add({
                 targets: continueText,
                 alpha: { from: 0, to: 1 },
@@ -500,7 +508,9 @@ class WinScene extends Phaser.Scene
                 yoyo: true
               });
             
-              this.input.keyboard.on('keydown-SPACE', function() {
+
+                this.input.keyboard.on('keydown-SPACE', function() {
+
 
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
@@ -565,11 +575,13 @@ class UIScene extends Phaser.Scene
         };
    
         const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT - GRID, 'div', 
+
         {
             color: 'white',
             'font-size': '12px',
             'font-family': ["Sono", 'sans-serif'],
         });
+      
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
         
         this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
@@ -654,6 +666,7 @@ class UIScene extends Phaser.Scene
             }
 
             // Update UI
+
             this.currentScore.setText(`Score: ${this.score}`);
             
             this.fruitCount += 1;
@@ -716,7 +729,9 @@ class UIScene extends Phaser.Scene
         }
     }
     
+
 end()
+
     {
 
     }
@@ -766,6 +781,7 @@ class InputScene extends Phaser.Scene
                 
                 gameScene.snake.head.setTexture('blocks', 6);
                 gameScene.snake.heading = UP; // Prevents backtracking to death
+
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
@@ -779,6 +795,7 @@ class InputScene extends Phaser.Scene
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
+
 
                 gameScene.snake.head.setTexture('blocks', 4);
                 gameScene.snake.heading = LEFT;
@@ -795,6 +812,7 @@ class InputScene extends Phaser.Scene
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
+
 
                 gameScene.snake.head.setTexture('blocks', 7);
                 gameScene.snake.heading = DOWN;
