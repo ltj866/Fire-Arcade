@@ -456,11 +456,10 @@ class WinScene extends Phaser.Scene
         scoreScreen.setText(
         ` 
         /************ WINNING SCORE *************/
-        SCORE: ${ourUI.bestScore}
-        FRUIT SCORE AVERAGE: ${Math.round(ourUI.bestScore / FRUITGOAL)}
+        SCORE: ${ourUI.score}
+        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / FRUITGOAL)}
         
         TURNS: ${ourInputScene.turns}
-
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
         
         BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
