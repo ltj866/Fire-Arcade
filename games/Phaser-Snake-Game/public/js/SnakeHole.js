@@ -8,12 +8,13 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'snakehole.v0.2.03.15.004';
+const GAME_VERSION = 'snakehole.v0.2.03.15.001';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
 export const FRUITGOAL = 32; //24 //32?................... Win Condition
 
 
+// 1 frame is 16.666 
 // 83.33 - 99.996
 var SPEEDWALK = 99; // 96 In milliseconds  
 
