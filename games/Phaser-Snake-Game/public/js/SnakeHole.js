@@ -11,7 +11,7 @@ import { Snake } from './classes/Snake.js';
 const GAME_VERSION = 'v0.2.03.15.005';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const FRUITGOAL = 4; //24 //32?................... Win Condition
+export const FRUITGOAL = 32; //24 //32?................... Win Condition
 
 
 // 1 frame is 16.666 
