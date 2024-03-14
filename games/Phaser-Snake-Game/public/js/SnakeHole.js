@@ -8,7 +8,7 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'snakehole.v0.2.03.15.001';
+const GAME_VERSION = 'v0.2.03.15.003';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
 export const FRUITGOAL = 32; //24 //32?................... Win Condition
@@ -201,19 +201,20 @@ class GameScene extends Phaser.Scene
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
-        //Boost Meter -- will probably move to a separate UI class - Holden
+        // BOOST METER
+        
         //const shape = this.add.rectangle(200, 0, 300, 200,'#ffffff');
-        this.energyAmount = 0;
+        this.energyAmount = 0; // What is this scale?
 
         //var boostMeter = this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(9);
-        this.add.image(GRID * 16,GRID*1,'boostMeterFrame').setDepth(10);
+        this.add.image(SCREEN_HEIGHT/2 ,GRID*.25,'boostMeterFrame').setDepth(10).setOrigin(0.5,0);
 
         this.mask = this.make.image({
-            x: GRID * 16,
-            y: GRID*1,
+            x: SCREEN_HEIGHT/2,
+            y: GRID*.25,
             key: 'mask',
             add: false
-        });
+        }).setOrigin(0.5,0);
         
 
         // Animation set
@@ -225,7 +226,7 @@ class GameScene extends Phaser.Scene
         });
 
         const keys = [ 'increasing' ];
-        const energyBar = this.add.sprite(16 * GRID,1 * GRID)
+        const energyBar = this.add.sprite(SCREEN_HEIGHT/2, GRID*.25).setOrigin(0.5,0);
         energyBar.play('increasing');
 
         energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
@@ -352,7 +353,7 @@ class GameScene extends Phaser.Scene
                 
                 ourUI = this.scene.get('UIScene');
                 ourUI.lives += 1;
-                ourUI.livesUI.setText(ourUI.lives);
+                ourUI.livesUI.setText(`Lives:${ourUI.lives}`);
 
                 ourUI.fruitCount = 0;
                 ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${FRUITGOAL}`);
@@ -637,33 +638,32 @@ class UIScene extends Phaser.Scene
             'font-size': '16px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
-            'padding': '2px 9px 2px 9px',
+            'padding': '0px 0px 0px 0px',
             'font-weight': 'bold',
             //'border-radius': '24px',
             //outline: 'solid',
             'text-align': 'right',
         };
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT - GRID, 'div', 
-
-        {
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT, 'div', {
             color: 'white',
-            'font-size': '12px',
+            'font-size': '10px',
             'font-family': ["Sono", 'sans-serif'],
-        });
+        }).setOrigin(0,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
         
-        this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
+        this.currentScore = this.add.dom(GRID*.5 , GRID*1.25, 'div', UIStyle);
         this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
         
-        this.bestScoreUI = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
+        this.bestScoreUI = this.add.dom(GRID * 21, GRID*1.25 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
+        this.bestScoreUI.setText("Best: 0000");
         
-        this.livesUI = this.add.dom(SCREEN_WIDTH/2, GRID * .5, 'div', UIStyle);
-        this.livesUI.setText(`${this.lives}`).setOrigin(0.5,0);
+        this.livesUI = this.add.dom(GRID*8, GRID*1.25, 'div', UIStyle);
+        this.livesUI.setText(`Lives:${this.lives}`).setOrigin(1,0);
 
-        this.fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
+        this.fruitCountUI = this.add.dom(GRID * 28, GRID*1.25, 'div', UIStyle);
         this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`).setOrigin(0,0);
 
         // Start Fruit Score Timer
