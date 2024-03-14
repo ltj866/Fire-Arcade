@@ -8,10 +8,10 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'v0.2.03.15.004';
+const GAME_VERSION = 'v0.2.03.15.005';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const FRUITGOAL = 32; //24 //32?................... Win Condition
+export const FRUITGOAL = 4; //24 //32?................... Win Condition
 
 
 // 1 frame is 16.666 
@@ -436,7 +436,7 @@ class GameScene extends Phaser.Scene
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
     
-                ourUI.currentScore.setText(`Score: ${ourUI.score}`);
+                ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
                 ourUI.bestScoreUI.setText(`Best: ${ourUI.score}`);
 
 
@@ -681,8 +681,8 @@ class UIScene extends Phaser.Scene
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
         
-        this.currentScore = this.add.dom(GRID*.5 , GRID*1.25, 'div', UIStyle);
-        this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
+        this.scoreUI = this.add.dom(GRID*.5 , GRID*1.25, 'div', UIStyle);
+        this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
         
         this.bestScoreUI = this.add.dom(GRID * 21, GRID*1.25 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
@@ -765,7 +765,7 @@ class UIScene extends Phaser.Scene
 
             // Update UI
 
-            this.currentScore.setText(`Score: ${this.score}`);
+            this.scoreUI.setText(`Score: ${this.score}`);
             
             this.fruitCount += 1;
             this.globalFruitCount += 1; // Run Wide Counter
@@ -805,6 +805,8 @@ class UIScene extends Phaser.Scene
             this.scoreMulti = 0;
             this.fruitCount = 0;
             this.scoreHistory = [];
+
+            this.scoreUI.setText(`Score: ${this.score}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                 delay: 10000,
