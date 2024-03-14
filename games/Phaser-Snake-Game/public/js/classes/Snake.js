@@ -62,6 +62,9 @@ var Snake = new Phaser.Class({
 
             x = portal.target.x*GRID;
             y = portal.target.y*GRID;
+
+            var portalSound = scene.portalSounds[0]
+            portalSound.play();
             
             return 'valid';  //Don't know why this is here but I left it -James
         }

@@ -34,6 +34,7 @@ export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appea
 // Game Objects
 
 var crunchSounds = [];
+var portalSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -67,6 +68,10 @@ var SOUND_CRUNCH = [
     ['crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]],
     ['crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]]
 ];
+
+var SOUND_PORTAL = [
+    ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
+]
 
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
@@ -145,6 +150,7 @@ class GameScene extends Phaser.Scene
 
         // Sounds
         this.crunchSounds = [];
+        this.portalSounds = [];
 
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
@@ -175,6 +181,11 @@ class GameScene extends Phaser.Scene
         this.load.setPath('assets/audio');
 
         SOUND_CRUNCH.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        
+        SOUND_PORTAL.forEach(soundID =>
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
@@ -260,6 +271,9 @@ class GameScene extends Phaser.Scene
             {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
+        SOUND_PORTAL.forEach(soundID =>{
+            this.portalSounds.push(this.sound.add(soundID[0]));
+        });
 
         // Define keys       
 
