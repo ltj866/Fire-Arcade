@@ -549,9 +549,9 @@ class WinScene extends Phaser.Scene
         BETA: ${GAME_VERSION}
         ................RUN STATS.................
 
-        Lives: ${ourUI.lives}
-        TOTAL TIME: ${Math.round(ourInputScene.time.now/1000)} Seconds
-        TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
+        ATTEMPTS: ${ourUI.lives}
+        TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
+        FRUIT COLLECTED OVER ALL ATTEMPTS:  ${ourUI.globalFruitCount}
         `);
 
         const logScreenStyle = {
