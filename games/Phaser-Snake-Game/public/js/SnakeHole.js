@@ -238,7 +238,9 @@ class GameScene extends Phaser.Scene
             repeat: -1
         });
 
-        /*const startingArrowsAnimN = this.add.sprite(16.5 * GRID, 5.333 * GRID).setDepth(5)
+        var startingArrowState = true;
+
+        const startingArrowsAnimN = this.add.sprite(16.5 * GRID, 5.333 * GRID).setDepth(5)
         const startingArrowsAnimS = this.add.sprite(16.5 * GRID, 7.666 * GRID).setDepth(5)
         const startingArrowsAnimE = this.add.sprite(17.666 * GRID, 6.5 * GRID).setDepth(5)
         const startingArrowsAnimW = this.add.sprite(15.333 * GRID, 6.5 * GRID).setDepth(5)
@@ -248,7 +250,7 @@ class GameScene extends Phaser.Scene
         startingArrowsAnimN.play('idle');
         startingArrowsAnimS.play('idle');
         startingArrowsAnimE.play('idle');
-        startingArrowsAnimW.play('idle');*/
+        startingArrowsAnimW.play('idle');
         //this.mask = shape.createBitmapMask();
         //boostMeter.setMask(this.mask); // image.mask = mask;
         //boostMeter.mask.invertAlpha = true;
@@ -268,6 +270,13 @@ class GameScene extends Phaser.Scene
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             ourInputScene.updateDirection(this, e);
+            if (startingArrowState == true){
+                startingArrowState = false;
+                startingArrowsAnimN.setVisible(false)
+                startingArrowsAnimS.setVisible(false)
+                startingArrowsAnimE.setVisible(false)
+                startingArrowsAnimW.setVisible(false)
+            }
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
