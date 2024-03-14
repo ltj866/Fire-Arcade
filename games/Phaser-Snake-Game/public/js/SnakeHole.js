@@ -461,7 +461,12 @@ class GameScene extends Phaser.Scene
         }
             //setDisplaySize}
         else{
-            this.moveInterval = SPEEDSPRINT; // Sprinting now 
+            if(this.energyAmount > 1){
+                this.moveInterval = SPEEDSPRINT; // Sprinting now 
+            }
+            else{
+                this.moveInterval = SPEEDWALK;
+            }
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount -= 1;
             if (timeLeft >= BOOST_BONUS_FLOOR ) { 
