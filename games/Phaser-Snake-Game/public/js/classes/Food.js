@@ -102,7 +102,7 @@ var Food = new Phaser.Class({
         var pos = Phaser.Math.RND.pick(validLocations)
 
         this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
-        
+
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
         }

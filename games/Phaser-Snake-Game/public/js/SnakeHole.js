@@ -176,7 +176,7 @@ class GameScene extends Phaser.Scene
         this.load.image("mask", "assets/sprites/boostMask.png");
 
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
-        
+        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 });
         // Audio
         this.load.setPath('assets/audio');
 
@@ -198,9 +198,9 @@ class GameScene extends Phaser.Scene
 
         /////////////////////////////////////////////////
         // UI BLOCKS
-        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0);
-        this.add.image(GRID * 26.5, GRID * 1, 'blocks', 1).setOrigin(0,0);
-        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 3).setOrigin(1,0);
+        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(10);
+        this.add.image(GRID * 26.5, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(10);
+        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(10);
 
 
         ////////////////////////////////////////////
@@ -256,6 +256,7 @@ class GameScene extends Phaser.Scene
             repeat: -1
         });
 
+
         var startingArrowState = true;
 
         const startingArrowsAnimN = this.add.sprite(16.5 * GRID, 5.333 * GRID).setDepth(5)
@@ -273,6 +274,14 @@ class GameScene extends Phaser.Scene
         //boostMeter.setMask(this.mask); // image.mask = mask;
         //boostMeter.mask.invertAlpha = true;
 
+        this.anims.create({
+            key: 'spawn',
+            frames: this.anims.generateFrameNumbers('fruitAppearSmokeAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }),
+            frameRate: 16,
+            repeat: 0
+        });
+        var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
+        //var smokePoofAnim = smokePoof.play("spawn")
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
             {
