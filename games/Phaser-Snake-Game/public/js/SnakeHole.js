@@ -14,7 +14,7 @@ var FRUIT = 5;           //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
 
 
-// 1 frame is 16.666 
+// 1 frame is 16.666 milliseconds
 // 83.33 - 99.996
 var SPEEDWALK = 99; // 96 In milliseconds  
 
@@ -197,6 +197,13 @@ class GameScene extends Phaser.Scene
         var ourGameScene = this.scene.get('GameScene');
 
         /////////////////////////////////////////////////
+        // UI BLOCKS
+        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0);
+        this.add.image(GRID * 26.5, GRID * 1, 'blocks', 1).setOrigin(0,0);
+        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 3).setOrigin(1,0);
+
+
+        ////////////////////////////////////////////
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
@@ -656,7 +663,7 @@ class UIScene extends Phaser.Scene
     }
 
     preload () {
-        this.load.spritesheet('ui', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
+        //this.load.spritesheet('ui', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
     }
     
     create() {
@@ -695,15 +702,15 @@ class UIScene extends Phaser.Scene
         //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
         
         // Lives
-        this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
+        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
         this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UIStyle);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
-        this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
+        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.fruitCountUI = this.add.dom(GRID * 27.5, GRID * 2 + 2, 'div', UIStyle);
         this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`).setOrigin(0,1);
-        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
+        //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
