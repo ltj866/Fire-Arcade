@@ -198,8 +198,8 @@ class GameScene extends Phaser.Scene
 
         /////////////////////////////////////////////////
         // UI BLOCKS
-        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(10);
-        this.add.image(GRID * 26.5, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(10);
+        this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(10);
+        this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(10);
         this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(10);
 
 
@@ -220,15 +220,12 @@ class GameScene extends Phaser.Scene
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
         // BOOST METER
-        
-        //const shape = this.add.rectangle(200, 0, 300, 200,'#ffffff');
-        this.energyAmount = 0; // What is this scale?
+        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
 
-        //var boostMeter = this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(9);
-        this.add.image(SCREEN_HEIGHT/2 ,GRID*.25,'boostMeterFrame').setDepth(10).setOrigin(0.5,0);
+        this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(10).setOrigin(0.5,0);
 
         this.mask = this.make.image({
-            x: SCREEN_HEIGHT/2,
+            x: GRID * 16,
             y: GRID*.25,
             key: 'mask',
             add: false
@@ -244,7 +241,7 @@ class GameScene extends Phaser.Scene
         });
 
         const keys = [ 'increasing' ];
-        const energyBar = this.add.sprite(SCREEN_HEIGHT/2, GRID*.25).setOrigin(0.5,0);
+        const energyBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
         energyBar.play('increasing');
 
         energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
@@ -712,12 +709,12 @@ class UIScene extends Phaser.Scene
         
         // Lives
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UIStyle);
+        this.livesUI = this.add.dom(GRID * 23.5, GRID * 2 + 2, 'div', UIStyle);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.fruitCountUI = this.add.dom(GRID * 27.5, GRID * 2 + 2, 'div', UIStyle);
+        this.fruitCountUI = this.add.dom(GRID * 28, GRID * 2 + 2, 'div', UIStyle);
         this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`).setOrigin(0,1);
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
