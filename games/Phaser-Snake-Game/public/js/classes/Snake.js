@@ -52,7 +52,9 @@ var Snake = new Phaser.Class({
         tail.some(
             pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
     ){
-        this.alive = false;
+        if (scene.started) {
+            this.alive = false;
+        }
     }
 
     
