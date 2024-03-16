@@ -447,7 +447,8 @@ class GameScene extends Phaser.Scene
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             
-            this.events.emit('saveScore');
+            // DO THIS ON REAL RESET DEATH
+            //this.events.emit('saveScore');
             
             ourUI = this.scene.get('UIScene');
             ourUI.lives += 1;
