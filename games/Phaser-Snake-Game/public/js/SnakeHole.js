@@ -8,12 +8,13 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'snakehole.v0.2.03.15.004';
+const GAME_VERSION = 'v0.2.03.15.006';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const FRUITGOAL = 32; //24 //32?................... Win Condition
+export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
 
 
+// 1 frame is 16.666 milliseconds
 // 83.33 - 99.996
 var SPEEDWALK = 99; // 96 In milliseconds  
 
@@ -33,6 +34,7 @@ export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appea
 // Game Objects
 
 var crunchSounds = [];
+var portalSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -66,6 +68,10 @@ var SOUND_CRUNCH = [
     ['crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]],
     ['crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]]
 ];
+
+var SOUND_PORTAL = [
+    ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
+]
 
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
@@ -144,6 +150,7 @@ class GameScene extends Phaser.Scene
 
         // Sounds
         this.crunchSounds = [];
+        this.portalSounds = [];
 
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
@@ -162,10 +169,23 @@ class GameScene extends Phaser.Scene
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
+        // GameUI
+        //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
+        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.image("mask", "assets/sprites/boostMask.png");
+
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
+        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 });
         // Audio
         this.load.setPath('assets/audio');
 
         SOUND_CRUNCH.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        
+        SOUND_PORTAL.forEach(soundID =>
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
@@ -177,12 +197,19 @@ class GameScene extends Phaser.Scene
         var ourGameScene = this.scene.get('GameScene');
 
         /////////////////////////////////////////////////
+        // UI BLOCKS
+        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0); // head
+        this.add.image(GRID * 26.5, GRID * 1, 'blocks', 1).setOrigin(0,0); // body
+        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 3).setOrigin(1,0); // Flag?
+
+
+        ////////////////////////////////////////////
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
         this.snake.heading = STOP;
-
+        
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -192,11 +219,74 @@ class GameScene extends Phaser.Scene
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
+        // BOOST METER
+        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
+
+        this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(10).setOrigin(0.5,0);
+
+        this.mask = this.make.image({
+            x: GRID * 16,
+            y: GRID*.25,
+            key: 'mask',
+            add: false
+        }).setOrigin(0.5,0);
+        
+
+        // Animation set
+        this.anims.create({
+            key: 'increasing',
+            frames: this.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        const keys = [ 'increasing' ];
+        const energyBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+        energyBar.play('increasing');
+
+        energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+            frameRate: 16,
+            repeat: -1
+        });
+
+
+        var startingArrowState = true;
+
+        const startingArrowsAnimN = this.add.sprite(16.5 * GRID, 5.333 * GRID).setDepth(5)
+        const startingArrowsAnimS = this.add.sprite(16.5 * GRID, 7.666 * GRID).setDepth(5)
+        const startingArrowsAnimE = this.add.sprite(17.666 * GRID, 6.5 * GRID).setDepth(5)
+        const startingArrowsAnimW = this.add.sprite(15.333 * GRID, 6.5 * GRID).setDepth(5)
+        startingArrowsAnimS.flipY=true;
+        startingArrowsAnimE.angle = 90;
+        startingArrowsAnimW.angle = 270;
+        startingArrowsAnimN.play('idle');
+        startingArrowsAnimS.play('idle');
+        startingArrowsAnimE.play('idle');
+        startingArrowsAnimW.play('idle');
+        //this.mask = shape.createBitmapMask();
+        //boostMeter.setMask(this.mask); // image.mask = mask;
+        //boostMeter.mask.invertAlpha = true;
+
+        this.anims.create({
+            key: 'spawn',
+            frames: this.anims.generateFrameNumbers('fruitAppearSmokeAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }),
+            frameRate: 16,
+            repeat: 0
+        });
+        var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
+        //var smokePoofAnim = smokePoof.play("spawn")
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
             {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
+        SOUND_PORTAL.forEach(soundID =>{
+            this.portalSounds.push(this.sound.add(soundID[0]));
+        });
 
         // Define keys       
 
@@ -207,6 +297,13 @@ class GameScene extends Phaser.Scene
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             ourInputScene.updateDirection(this, e);
+            if (startingArrowState == true){
+                startingArrowState = false;
+                startingArrowsAnimN.setVisible(false)
+                startingArrowsAnimS.setVisible(false)
+                startingArrowsAnimE.setVisible(false)
+                startingArrowsAnimW.setVisible(false)
+            }
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
@@ -292,10 +389,10 @@ class GameScene extends Phaser.Scene
                 
                 ourUI = this.scene.get('UIScene');
                 ourUI.lives += 1;
-                ourUI.livesUI.setText(ourUI.lives);
+                ourUI.livesUI.setText(`x ${ourUI.lives}`);
 
-                ourUI.fruitCount = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${FRUITGOAL}`);
+                ourUI.length = 0;
+                ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
 
                 //game.destroy();
                 this.scene.restart();
@@ -349,11 +446,11 @@ class GameScene extends Phaser.Scene
                 });
             };
             const ourUI = this.scene.get('UIScene');
-            if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
+            if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
                 console.log("YOU WIN");
     
-                ourUI.currentScore.setText(`Score: ${ourUI.score}`);
-                ourUI.bestScoreUI.setText(`Best: ${ourUI.score}`);
+                ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
+                ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
 
 
                 this.scene.pause();
@@ -380,15 +477,25 @@ class GameScene extends Phaser.Scene
             this.snake.move(this);
         }
         
-        // Boost and Boot Multi Code
-
+        // Boost and Boost Multi Code
 
         var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
         if (!this.spaceBar.isDown){
-            this.moveInterval = SPEEDWALK;} // Less is Faster
+            this.moveInterval = SPEEDWALK; // Less is Faster
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount += .25;
+        }
+            //setDisplaySize}
         else{
-            this.moveInterval = SPEEDSPRINT; // Sprinting now 
+            if(this.energyAmount > 1){
+                this.moveInterval = SPEEDSPRINT; // Sprinting now 
+            }
+            else{
+                this.moveInterval = SPEEDWALK;
+            }
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount -= 1;
             if (timeLeft >= BOOST_BONUS_FLOOR ) { 
                 // Don't add boost multi after 20 seconds
                 ourInputScene.boostBonusTime += 1;
@@ -404,6 +511,12 @@ class GameScene extends Phaser.Scene
             //ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
             //console.log(ourUI.scoreMulti);
         }
+        if (this.energyAmount >= 100){
+            this.energyAmount = 100;}
+        else if(this.energyAmount <= 0){
+            this.energyAmount = 0;
+        }
+        //console.log(this.energyAmount)
     }
 }
 
@@ -435,7 +548,7 @@ class WinScene extends Phaser.Scene
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             'padding': '2px 0px 2px 12px',
-            'font-weight': 'bold',
+            //'font-weight': 'bold',
             'word-wrap': 'break-word',
             //'border-radius': '24px',
             outline: 'solid',
@@ -447,7 +560,7 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        var scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
 
         scoreScreen.setOrigin(0.5,0);
 
@@ -457,7 +570,7 @@ class WinScene extends Phaser.Scene
         ` 
         /************ WINNING SCORE *************/
         SCORE: ${ourUI.score}
-        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / FRUITGOAL)}
+        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
         
         TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
@@ -468,9 +581,9 @@ class WinScene extends Phaser.Scene
         BETA: ${GAME_VERSION}
         ................RUN STATS.................
 
-        Lives: ${ourUI.lives}
-        TOTAL TIME: ${Math.round(ourInputScene.time.now/1000)} Seconds
-        TOTAL FRUIT COLLECTED:  ${ourUI.globalFruitCount}
+        ATTEMPTS: ${ourUI.lives}
+        TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
+        FRUIT COLLECTED OVER ALL ATTEMPTS:  ${ourUI.globalFruitCount}
         `);
 
         const logScreenStyle = {
@@ -481,14 +594,14 @@ class WinScene extends Phaser.Scene
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '200',
             'padding': '2px 12px 2px 12px',
-            'font-weight': 'bold',
+            //'font-weight': 'bold',
             'word-wrap': 'break-word',
             //'border-radius': '24px',
             //outline: 'solid',
         }
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2, GRID * 20.5, 'div', logScreenStyle);
-        fruitLog.setText(`[${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,0);
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2, GRID * 22, 'div', logScreenStyle);
+        fruitLog.setText(`[${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);
 
         //card.setScale(0.7);
 
@@ -546,7 +659,7 @@ class UIScene extends Phaser.Scene
     {
         this.score = 0;
         this.bestScore = 0;
-        this.fruitCount = 0;
+        this.length = 0;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
@@ -555,8 +668,11 @@ class UIScene extends Phaser.Scene
         this.scoreHistory = [];
     }
 
-    create()
-    {
+    preload () {
+        //this.load.spritesheet('ui', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
+    }
+    
+    create() {
         const ourGame = this.scene.get('GameScene');
 
         const UIStyle = {
@@ -566,34 +682,41 @@ class UIScene extends Phaser.Scene
             'font-size': '16px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
-            'padding': '2px 9px 2px 9px',
-            'font-weight': 'bold',
+            'padding': '0px 0px 0px 12px',
+            //'font-weight': 'bold',
             //'border-radius': '24px',
             //outline: 'solid',
             'text-align': 'right',
         };
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT - GRID, 'div', 
-
-        {
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT, 'div', {
             color: 'white',
-            'font-size': '12px',
+            'font-size': '10px',
             'font-family': ["Sono", 'sans-serif'],
-        });
+        }).setOrigin(0,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
         
-        this.currentScore = this.add.dom(GRID * 1, GRID * .5, 'div', UIStyle);
-        this.currentScore.setText(`Score: ${this.score}`).setOrigin(0,0);
+        // Score Text
+        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UIStyle);
+        this.scoreUI.setText(`Score: 0`).setOrigin(0,1);
+        //this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
         
-        this.bestScoreUI = this.add.dom(GRID * 7, GRID * .5, 'div', UIStyle);
+        // Best Score
+        this.bestScoreUI = this.add.dom(0, 12 - 2 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
+        //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
         
-        this.livesUI = this.add.dom(SCREEN_WIDTH/2, GRID * .5, 'div', UIStyle);
-        this.livesUI.setText(`${this.lives}`).setOrigin(0.5,0);
+        // Lives
+        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
+        this.livesUI = this.add.dom(GRID * 23.5, GRID * 2 + 2, 'div', UIStyle);
+        this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
 
-        this.fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
-        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`).setOrigin(0,0);
+        // Goal UI
+        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
+        this.fruitCountUI = this.add.dom(GRID * 28, GRID * 2 + 2, 'div', UIStyle);
+        this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`).setOrigin(0,1);
+        //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -666,12 +789,12 @@ class UIScene extends Phaser.Scene
 
             // Update UI
 
-            this.currentScore.setText(`Score: ${this.score}`);
+            this.scoreUI.setText(`Score: ${this.score}`);
             
-            this.fruitCount += 1;
+            this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`);
             
 
              // Restart Score Timer
@@ -698,7 +821,7 @@ class UIScene extends Phaser.Scene
         {
             if (this.score > this.bestScore) {
                 this.bestScore = this.score;
-                this.bestScoreUI.setText(`Best: ${this.bestScore}`);
+                this.bestScoreUI.setText(`Best : ${this.bestScore}`);
             }
             
             // Reset Score for new game
@@ -706,6 +829,8 @@ class UIScene extends Phaser.Scene
             this.scoreMulti = 0;
             this.fruitCount = 0;
             this.scoreHistory = [];
+
+            this.scoreUI.setText(`Score: ${this.score}`);
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                 delay: 10000,
@@ -780,6 +905,7 @@ class InputScene extends Phaser.Scene
                 
                 gameScene.snake.head.setTexture('blocks', 6);
                 gameScene.snake.heading = UP; // Prevents backtracking to death
+                gameScene.snake.move(gameScene);
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);

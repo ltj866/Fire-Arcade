@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
     LEFT, RIGHT, UP, DOWN, DEBUG,
-    FRUITGOAL
+    LENGTH_GOAL
 } from "../SnakeHole.js";
 
 var Snake = new Phaser.Class({
@@ -62,6 +62,9 @@ var Snake = new Phaser.Class({
 
             x = portal.target.x*GRID;
             y = portal.target.y*GRID;
+
+            var portalSound = scene.portalSounds[0]
+            portalSound.play();
             
             return 'valid';  //Don't know why this is here but I left it -James
         }
@@ -108,7 +111,6 @@ var Snake = new Phaser.Class({
                 fruit.move(scene);
                 fruit.visible = true;
             }, [], this);
-            
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
