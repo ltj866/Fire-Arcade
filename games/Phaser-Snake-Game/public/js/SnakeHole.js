@@ -198,9 +198,9 @@ class GameScene extends Phaser.Scene
 
         /////////////////////////////////////////////////
         // UI BLOCKS
-        this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(10);
-        this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(10);
-        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(10);
+        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0); // head
+        this.add.image(GRID * 26.5, GRID * 1, 'blocks', 1).setOrigin(0,0); // body
+        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 3).setOrigin(1,0); // Flag?
 
 
         ////////////////////////////////////////////
