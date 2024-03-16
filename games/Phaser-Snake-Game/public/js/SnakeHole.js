@@ -154,7 +154,11 @@ class GameScene extends Phaser.Scene
 
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
-        this.portalColors = PORTAL_COLORS.slice(); 
+        this.portalColors = PORTAL_COLORS.slice();
+
+        this.move_pause = false;
+        this.started = false;
+    
 
     }
     
@@ -379,7 +383,7 @@ class GameScene extends Phaser.Scene
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
-        if (!this.snake.alive)
+        if (!this.snake.alive && !this.snake.regrouping)
             {
                 
                 // game.scene.scene.restart(); // This doesn't work correctly
@@ -395,13 +399,52 @@ class GameScene extends Phaser.Scene
                 ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
 
                 //game.destroy();
-                this.scene.restart();
-                return;
+                //this.scene.restart();
+                
+
+                if (DEBUG) {
+                    const graphics = this.add.graphics();
+    
+                    graphics.lineStyle(2, 0x00ff00, 1);
+            
+                    this.snake.body.forEach( part => {
+                    graphics.beginPath();
+                    graphics.moveTo(part.x, part.y);
+                    graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                    graphics.closePath();
+                    graphics.strokePath();
+                    });
+                }
+    
+                this.snake.regrouping = true;
+                this.move_pause = true;
+                
+                var tween = this.tweens.add({
+                    targets: this.snake.body, // Start removing the tail.
+                    x: SCREEN_WIDTH/2,
+                    y: SCREEN_HEIGHT/2,
+                    yoyo: false,
+                    duration: 350,
+                    ease: 'Sine.easeOutIn',
+                    repeat: 0,
+                    delay: this.tweens.stagger(75)
+                });
+    
+                tween.on('complete', test => {
+                    //debugger
+                    //this.snake.body.reverse() // Head back at front
+                    this.snake.regrouping = false;
+                    this.snake.alive = true;
+                    this.started = false;
+                    this.snake.heading = 0;
+                    //this.scene.restart();
+                    //this.fruitCount = 0; // ON FOR TESTING
+                });
             }
 
         
         // Only Calculate things when snake is moved.
-        if(time >= this.lastMoveTime + this.moveInterval){
+        if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive){
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
