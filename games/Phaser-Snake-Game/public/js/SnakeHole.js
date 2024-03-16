@@ -905,6 +905,7 @@ class InputScene extends Phaser.Scene
                 
                 gameScene.snake.head.setTexture('blocks', 6);
                 gameScene.snake.heading = UP; // Prevents backtracking to death
+                gameScene.snake.move(gameScene);
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
