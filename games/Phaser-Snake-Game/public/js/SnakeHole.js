@@ -205,13 +205,11 @@ class GameScene extends Phaser.Scene
         this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(10);
         this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(10);
         this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(10);
-
-
         ////////////////////////////////////////////
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
-        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
+        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, SCREEN_HEIGHT/GRID/2);
         this.snake.heading = STOP;
         
         // Tilemap
@@ -260,10 +258,13 @@ class GameScene extends Phaser.Scene
 
         var startingArrowState = true;
 
-        const startingArrowsAnimN = this.add.sprite(16.5 * GRID, 5.333 * GRID).setDepth(5)
-        const startingArrowsAnimS = this.add.sprite(16.5 * GRID, 7.666 * GRID).setDepth(5)
-        const startingArrowsAnimE = this.add.sprite(17.666 * GRID, 6.5 * GRID).setDepth(5)
-        const startingArrowsAnimW = this.add.sprite(15.333 * GRID, 6.5 * GRID).setDepth(5)
+        let _x = this.snake.head.x;
+        let _y = this.snake.head.y;
+        
+        const startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(5).setOrigin(0.5,0.5);
+        const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(5).setOrigin(0.5,0.5);
+        const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(5).setOrigin(0.5,0.5);
+        const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(5).setOrigin(0.5,0.5);
         startingArrowsAnimS.flipY=true;
         startingArrowsAnimE.angle = 90;
         startingArrowsAnimW.angle = 270;
@@ -300,6 +301,7 @@ class GameScene extends Phaser.Scene
         
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
+            this.started = true;
             ourInputScene.updateDirection(this, e);
             if (startingArrowState == true){
                 startingArrowState = false;
