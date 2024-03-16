@@ -339,9 +339,11 @@ class GameScene extends Phaser.Scene
         });
 
         // Make Fruit
-        for (let index = 0; index < FRUIT; index++) {
-            var food = new Food(this);
-        }
+        //for (let index = 0; index < FRUIT; index++) {
+        //    var food = new Food(this);
+        //}
+        
+        
         // Define Spawn Areas
         
         var areaAA = new SpawnArea(this, 1,5,6,4, 0x6666ff);
@@ -366,25 +368,26 @@ class GameScene extends Phaser.Scene
         ]
 
 
-        var cordsP1 = areaAA.genChords(this);
+        var cordsP1 = areaBA.genChords(this);
         areaAA.portalCords = cordsP1;
         
-        var cordsP2 = areaAD.genChords(this);
+        var cordsP2 = areaBD.genChords(this);
         areaAD.portalCords = cordsP2;
 
         var nextArea = [
-            [areaBA, areaBB, areaBC, areaBD],
+            [areaAA, areaAB, areaAC, areaAD],
             [areaCA, areaCB, areaCC, areaCD],
         ];
 
         // Choose a Random Lane
-        var lane3 = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        var nextLane = Phaser.Utils.Array.RemoveRandomElement(nextArea);
         
-        var areaP3 = Phaser.Math.RND.pick(lane3);
+        // Choose random area from that lane and get chords
+        var areaP3 = Phaser.Math.RND.pick(nextLane);
         var cordsP3 = areaP3.genChords(this);
         areaP3.portalCords = cordsP3;
 
-        // Other Portal goes to the other Lane
+        // Other Lane gets the second portal
         var areaP4 = Phaser.Math.RND.pick(nextArea[0]);
         var cordsP4 = areaP4.genChords(this);
         areaP4.portalCords = cordsP4
@@ -405,10 +408,14 @@ class GameScene extends Phaser.Scene
         //makePair(this, J1, I1);
 
         // Fair Fruit Spawn (5x)
-        this.setFruit(this, [areaAB, areaAC]);
-        // Middle Row
-        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
-        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
+        
+        // Top Row
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        
+        // Middle Row        
+        this.setFruit(this, [areaBB, areaBC]);
+
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
