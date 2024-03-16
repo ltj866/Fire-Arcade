@@ -441,66 +441,80 @@ class GameScene extends Phaser.Scene
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
-        if (!this.snake.alive && !this.snake.regrouping)
-            {
+        // Lose State
+        if (!this.snake.alive && !this.snake.regrouping) {
                 
-                // game.scene.scene.restart(); // This doesn't work correctly
-                if (DEBUG) { console.log("DEAD"); }
-                
-                this.events.emit('saveScore');
-                
-                ourUI = this.scene.get('UIScene');
-                ourUI.lives += 1;
-                ourUI.livesUI.setText(`x ${ourUI.lives}`);
-
-                ourUI.length = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
-
-                //game.destroy();
-                //this.scene.restart();
-                
-
-                if (DEBUG) {
-                    const graphics = this.add.graphics();
-    
-                    graphics.lineStyle(2, 0x00ff00, 1);
+            // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
             
-                    this.snake.body.forEach( part => {
-                    graphics.beginPath();
-                    graphics.moveTo(part.x, part.y);
-                    graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-                    graphics.closePath();
-                    graphics.strokePath();
-                    });
-                }
-    
-                this.snake.regrouping = true;
-                this.move_pause = true;
-                
-                var tween = this.tweens.add({
-                    targets: this.snake.body, // Start removing the tail.
-                    x: SCREEN_WIDTH/2,
-                    y: SCREEN_HEIGHT/2,
-                    yoyo: false,
-                    duration: 350,
-                    ease: 'Sine.easeOutIn',
-                    repeat: 0,
-                    delay: this.tweens.stagger(75)
-                });
-    
-                tween.on('complete', test => {
-                    //debugger
-                    //this.snake.body.reverse() // Head back at front
-                    this.snake.regrouping = false;
-                    this.snake.alive = true;
-                    this.started = false;
-                    this.snake.heading = 0;
-                    //this.scene.restart();
-                    //this.fruitCount = 0; // ON FOR TESTING
+            this.events.emit('saveScore');
+            
+            ourUI = this.scene.get('UIScene');
+            ourUI.lives += 1;
+            ourUI.livesUI.setText(`x ${ourUI.lives}`);
+
+            //ourUI.length = 0;
+            ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
+
+            //game.destroy();
+            //this.scene.restart();
+            
+
+            if (DEBUG) {
+                const graphics = this.add.graphics();
+
+                graphics.lineStyle(2, 0x00ff00, 1);
+        
+                this.snake.body.forEach( part => {
+                graphics.beginPath();
+                graphics.moveTo(part.x, part.y);
+                graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                graphics.closePath();
+                graphics.strokePath();
                 });
             }
+    
+            this.snake.regrouping = true;
+            this.move_pause = true;
+            
+            var tween = this.tweens.add({
+                targets: this.snake.body, // Start removing the tail.
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT/2,
+                yoyo: false,
+                duration: 350,
+                ease: 'Sine.easeOutIn',
+                repeat: 0,
+                delay: this.tweens.stagger(75)
+            });
 
+            tween.on('complete', test => {
+                //debugger
+                //this.snake.body.reverse() // Head back at front
+                this.snake.regrouping = false;
+                this.snake.alive = true;
+                this.started = false;
+                this.snake.heading = 0;
+                //this.scene.restart();
+                //this.fruitCount = 0; // ON FOR TESTING
+            });
+        }
         
+        // Win State
+        if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
+            console.log("YOU WIN");
+
+            ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
+            ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
+
+
+            this.scene.pause();
+
+
+            this.scene.start('WinScene');
+            //this.events.emit('saveScore');
+        }
+
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive){
             this.lastMoveTime = time;
@@ -547,19 +561,6 @@ class GameScene extends Phaser.Scene
                 });
             };
             const ourUI = this.scene.get('UIScene');
-            if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
-                console.log("YOU WIN");
-    
-                ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
-                ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-
-
-                this.scene.pause();
-
-
-                this.scene.start('WinScene');
-                //this.events.emit('saveScore');
-            }
        
             if (DEBUG) {
                 const ourUI = this.scene.get('UIScene');
@@ -582,42 +583,41 @@ class GameScene extends Phaser.Scene
 
         var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
-        if (!this.spaceBar.isDown){
+        // Boost Logic
+        if (!this.spaceBar.isDown){ // Base Speed
             this.moveInterval = SPEEDWALK; // Less is Faster
             this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount += .25;
+            this.energyAmount += .25; // Recharge Boost Slowly
         }
-            //setDisplaySize}
         else{
+            // Has Boost Logic
             if(this.energyAmount > 1){
-                this.moveInterval = SPEEDSPRINT; // Sprinting now 
+                this.moveInterval = SPEEDSPRINT;
             }
             else{
                 this.moveInterval = SPEEDWALK;
             }
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount -= 1;
+            
+            // Boost Stats
             if (timeLeft >= BOOST_BONUS_FLOOR ) { 
-                // Don't add boost multi after 20 seconds
+                // Don't add boost time after 20 seconds
                 ourInputScene.boostBonusTime += 1;
                 ourInputScene.boostTime += 1;
-                //ourUI.scoreMulti += SCORE_MULTI_GROWTH;
-                //console.log(Math.sqrt(ourUI.scoreMulti));
             } else {
                 ourInputScene.boostTime += 1;
             }
         }
         if (timeLeft <= BOOST_BONUS_FLOOR && timeLeft >= SCORE_FLOOR) {
-            // Boost meter slowly drains after boost floor and before score floor
-            //ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
-            //console.log(ourUI.scoreMulti);
         }
+        
+        // Reset Energy if out of bounds.
         if (this.energyAmount >= 100){
             this.energyAmount = 100;}
         else if(this.energyAmount <= 0){
             this.energyAmount = 0;
         }
-        //console.log(this.energyAmount)
     }
 }
 
@@ -903,18 +903,7 @@ class UIScene extends Phaser.Scene
             delay: 10000,
             paused: false
             });
-
-
             
-            var multiScore = Math.sqrt(this.scoreMulti);
-            
-            console.log(
-                //ourGame.fruitCount + 1,
-                timeLeft,
-                this.score, 
-                multiScore.toFixed(2), 
-                (this.score * multiScore).toFixed(2));
-            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
         }, this);
 
         //  Event: saveScore
@@ -926,10 +915,10 @@ class UIScene extends Phaser.Scene
             }
             
             // Reset Score for new game
-            this.score = 0;
-            this.scoreMulti = 0;
-            this.fruitCount = 0;
-            this.scoreHistory = [];
+            //this.score = 0;
+            //this.scoreMulti = 0;
+            //this.fruitCount = 0;
+            //this.scoreHistory = [];
 
             this.scoreUI.setText(`Score: ${this.score}`);
 
