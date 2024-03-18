@@ -793,7 +793,6 @@ class WinScene extends Phaser.Scene
 
         ATTEMPTS: ${ourUI.lives}
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
-        FRUIT COLLECTED OVER ALL ATTEMPTS:  ${ourUI.globalFruitCount}
         `);
 
         const logScreenStyle = {
@@ -832,7 +831,6 @@ class WinScene extends Phaser.Scene
             
 
                 this.input.keyboard.on('keydown-SPACE', function() {
-
 
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
