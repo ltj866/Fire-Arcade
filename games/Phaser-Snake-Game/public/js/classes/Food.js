@@ -6,9 +6,7 @@ var Food = new Phaser.Class({
 
     initialize:
 
-    function Food (scene)
-    {
-
+    function Food (scene) {
         Phaser.GameObjects.Image.call(this, scene)
 
         if (DEBUG) { // Add Timer Text next to fruit
@@ -43,8 +41,7 @@ var Food = new Phaser.Class({
         scene.children.add(this); // Shows on screen
     },
     
-    move: function (scene)
-    {
+    move: function (scene) {
         //let x;
         //let y;
 

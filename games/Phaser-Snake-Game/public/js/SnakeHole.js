@@ -8,7 +8,7 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'v0.2.03.22.001';
+const GAME_VERSION = 'v0.2.03.22.002';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
@@ -77,20 +77,16 @@ var SOUND_PORTAL = [
 // DO this dynamically later based on the number of portal areas.
 
 
-class StartScene extends Phaser.Scene
-{
-    constructor ()
-    {
+class StartScene extends Phaser.Scene {
+    constructor () {
         super({key: 'StartScene', active: true});
     }
 
-    preload()
-    {
+    preload() {
         this.load.image('howToCard', 'assets/howToCard.webp');
     }
 
-    create()
-    {
+    create() {
         
         this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
@@ -120,8 +116,7 @@ class StartScene extends Phaser.Scene
         })
     }
 
-    end()
-    {
+    end() {
 
     }
 
@@ -129,17 +124,14 @@ class StartScene extends Phaser.Scene
 }
 
 
-class GameScene extends Phaser.Scene
-{
+class GameScene extends Phaser.Scene {
 
-    constructor ()
-    {
+    constructor () {
         super({key: 'GameScene', active: false});
     }
     
     
-    init()
-    {
+    init() {
         
         // Arrays for collision detection
         this.apples = [];
@@ -163,8 +155,7 @@ class GameScene extends Phaser.Scene
     }
     
     
-    preload ()
-    {
+    preload () {
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
@@ -195,8 +186,7 @@ class GameScene extends Phaser.Scene
             });
     }
 
-    create ()
-    {
+    create () {
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
 
@@ -285,11 +275,10 @@ class GameScene extends Phaser.Scene
         var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
         //var smokePoofAnim = smokePoof.play("spawn")
         // Audio
-        SOUND_CRUNCH.forEach(soundID =>
-            {
+        SOUND_CRUNCH.forEach(soundID => {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
-        SOUND_PORTAL.forEach(soundID =>{
+        SOUND_PORTAL.forEach(soundID => {
             this.portalSounds.push(this.sound.add(soundID[0]));
         });
 
@@ -380,7 +369,7 @@ class GameScene extends Phaser.Scene
         */
         
         
-        var makePair = function (scene, to, from){
+        var makePair = function (scene, to, from) {
             
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
@@ -456,14 +445,6 @@ class GameScene extends Phaser.Scene
 
         var pair4 = this.chooseAreaPair(this, groups);
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
-
-        
-
-
-        //var J1 = areaBC.genChords(this);
-
-        
-        //var I1 = areaCC.genChords(this);
         
 
         // Fair Fruit Spawn (5x)
@@ -520,7 +501,7 @@ class GameScene extends Phaser.Scene
     
     
     chooseAreaFromLane (scene, lane) {
-        
+
         var area = Phaser.Utils.Array.RemoveRandomElement(lane);
 
         if (area.hasPortal()) {
@@ -542,8 +523,7 @@ class GameScene extends Phaser.Scene
 
     }
 
-    update (time, delta) 
-    {
+    update (time, delta) {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
 
@@ -610,7 +590,7 @@ class GameScene extends Phaser.Scene
         }
         
         // Win State
-        if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
+        if (ourUI.length >= LENGTH_GOAL) {
             console.log("YOU WIN");
 
             ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
@@ -625,7 +605,7 @@ class GameScene extends Phaser.Scene
         }
 
         // Only Calculate things when snake is moved.
-        if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive){
+        if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
@@ -693,12 +673,12 @@ class GameScene extends Phaser.Scene
         var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
         // Boost Logic
-        if (!this.spaceBar.isDown){ // Base Speed
+        if (!this.spaceBar.isDown) { // Base Speed
             this.moveInterval = SPEEDWALK; // Less is Faster
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount += .25; // Recharge Boost Slowly
         }
-        else{
+        else {
             // Has Boost Logic
             if(this.energyAmount > 1){
                 this.moveInterval = SPEEDSPRINT;
@@ -722,9 +702,9 @@ class GameScene extends Phaser.Scene
         }
         
         // Reset Energy if out of bounds.
-        if (this.energyAmount >= 100){
+        if (this.energyAmount >= 100) {
             this.energyAmount = 100;}
-        else if(this.energyAmount <= 0){
+        else if(this.energyAmount <= 0) {
             this.energyAmount = 0;
         }
     }
@@ -732,17 +712,14 @@ class GameScene extends Phaser.Scene
 
 class WinScene extends Phaser.Scene
 {
-    constructor ()
-    {
+    constructor () {
         super({key: 'WinScene', active: false});
     }
 
-    preload()
-    {
+    preload() {
     }
 
-    create()
-    {
+    create() {
         
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
@@ -849,22 +826,18 @@ class WinScene extends Phaser.Scene
         }, [], this);
     }
 
-    end()
-    {
+    end() {
 
     }
 
 }
 
-class UIScene extends Phaser.Scene
-{
-    constructor ()
-    {
+class UIScene extends Phaser.Scene {
+    constructor () {
         super({ key: 'UIScene', active: false });
     }
     
-    init()
-    {
+    init() {
         this.score = 0;
         this.bestScore = 0;
         this.length = 0;
@@ -944,8 +917,7 @@ class UIScene extends Phaser.Scene
         }
         
         //  Event: addScore
-        ourGame.events.on('addScore', function (fruit)
-        {
+        ourGame.events.on('addScore', function (fruit) {
 
             const scoreStyle = {
                 //width: '220px',
@@ -1014,8 +986,7 @@ class UIScene extends Phaser.Scene
         }, this);
 
         //  Event: saveScore
-        ourGame.events.on('saveScore', function ()
-        {
+        ourGame.events.on('saveScore', function () {
             if (this.score > this.bestScore) {
                 this.bestScore = this.score;
                 this.bestScoreUI.setText(`Best : ${this.bestScore}`);
@@ -1037,8 +1008,7 @@ class UIScene extends Phaser.Scene
         }, this);
         
     }
-    update()
-    {
+    update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         
         if (DEBUG) {
@@ -1051,23 +1021,18 @@ class UIScene extends Phaser.Scene
     }
     
 
-end()
-
-    {
+end() {
 
     }
     
 }
 
-class InputScene extends Phaser.Scene
-{
-    constructor ()
-    {
+class InputScene extends Phaser.Scene {
+    constructor () {
         super({key: 'InputScene', active: true});
     }
 
-    init()
-    {
+    init() {
         this.inputSet = [];
         this.turns = 0; // Total turns per live.
         this.boostTime = 0; // Sum of all boost pressed
@@ -1075,18 +1040,14 @@ class InputScene extends Phaser.Scene
         this.cornerTime = 0; // Frames saved when cornering before the next Move Time.
     }
 
-    preload()
-    {
+    preload() {
 
     }
-    create()
-    {
+    create() {
     }
-    update()
-    {
+    update() {
     }
-    updateDirection(gameScene, event) 
-    {
+    updateDirection(gameScene, event) {
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
