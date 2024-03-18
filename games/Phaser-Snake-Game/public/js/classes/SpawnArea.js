@@ -54,7 +54,7 @@ const SpawnArea = new Phaser.Class({
         scene.apples.forEach( fruit => {
             if(fruit.x === x && fruit.y === y){
                 console.log("HELP THIS SPACE IS OCUPADO",fruit.x, fruit.y);
-                cords = this.genPortalChords();b
+                cords = this.genPortalChords();
             }
         });
 

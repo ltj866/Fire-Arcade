@@ -413,52 +413,45 @@ class GameScene extends Phaser.Scene
         ]
 
 
-        var cordsP1 = areaBA.genChords(this);
-
-        areaBA.portalCords = cordsP1;
-        
-        var cordsP2 = areaBD.genChords(this);
-        areaBD.portalCords = cordsP2;
-
-        console.log(areaBA.name, areaBA.hasPortal());
-        console.log(areaBD.name, areaBD.hasPortal());
-
-
+        // Outside Lanes
         var nextArea = [
             [areaAA, areaAB, areaAC, areaAD],
             [areaCA, areaCB, areaCC, areaCD],
         ];
 
-
-        // Choose a Random Lane
-        var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        // The first two pairs have some consistency to make sure we never have a disjointed map.
         
-        // Choose random area from that lane and get chords
-        var areaP3 = Phaser.Math.RND.pick(nextGroup);
-        var cordsP3 = areaP3.genChords(this);
-        areaP3.portalCords = cordsP3;
+        // First Portal Cords
+        var cordsPA_1 = areaBA.genChords(this);
+        areaBA.portalCords = cordsPA_1;
 
+        // Choose a Random Lane (Either top or bottom)
+        var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+
+        // Choose random area from that lane and get chords
+        var areaPA_2 = Phaser.Math.RND.pick(nextGroup);
+        var cordsPA_2 = areaPA_2.genChords(this);
+        areaPA_2.portalCords = cordsPA_2;
+
+        makePair(this, cordsPA_1, cordsPA_2);
+
+
+
+        // Second Portal Pair
+        var cordsPB_1 = areaBD.genChords(this);
+        areaBD.portalCords = cordsPB_1;
 
         // Other Lane gets the second portal
-        var areaP4 = Phaser.Math.RND.pick(nextArea[0]);
-        var cordsP4 = areaP4.genChords(this);
-        areaP4.portalCords = cordsP4
+        var otherGroup = Phaser.Math.RND.pick(nextArea);
+        var areaPB_2 = Phaser.Math.RND.pick(otherGroup);
+        var cordsPB_2 = areaPB_2.genChords(this);
+        areaPB_2.portalCords = cordsPB_2
+
+        makePair(this, cordsPB_1, cordsPB_2);
 
 
-        // Choose a Random Lane
-        var nextLane = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        /*
         
-        // Choose random area from that lane and get chords
-        var areaP3 = Phaser.Math.RND.pick(nextLane);
-        var cordsP3 = areaP3.genChords(this);
-        areaP3.portalCords = cordsP3;
-
-
-        // Make first 2 portals
-        makePair(this, cordsP1, cordsP3);
-        makePair(this, cordsP2, cordsP4);
-
-
         // Generate next to portals
         var pair3 = this.chooseAreaPair(this, groups);
         makePair(this, pair3[0].genChords(this), pair3[1].genChords(this));
@@ -466,9 +459,14 @@ class GameScene extends Phaser.Scene
         var pair4 = this.chooseAreaPair(this, groups);
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
 
+        */
 
-        var J1 = areaBC.genChords(this);
-        var I1 = areaCC.genChords(this);
+
+        //var J1 = areaBC.genChords(this);
+
+        
+        //var I1 = areaCC.genChords(this);
+        
 
         // Fair Fruit Spawn (5x)
         
@@ -482,6 +480,29 @@ class GameScene extends Phaser.Scene
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+        console.log(this.portals);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        
         
     }
     
@@ -493,17 +514,6 @@ class GameScene extends Phaser.Scene
         var area2 = scene.chooseAreaFromLane(scene, groupPair[1]);
         
         return [area1, area2]
-    }
-    
-    chooseAreaFromLane (scene, lane) {
-        
-        var area = Phaser.Utils.Array.RemoveRandomElement(lane);
-
-        if (area.hasPortal()) {
-            area = scene.chooseAreaFromLane(scene, lane);
-        }
-
-        return area;
     }
     
     chooseSpawnableLanes (scene, _areas, limit=3) {
@@ -519,9 +529,10 @@ class GameScene extends Phaser.Scene
         lane1.forEach(area => {
             if (area.portalChords) {
                 _i += 1;
+                console.log(_areas, "Portal Count=", _i);
             }
             if (_i >= 3) { // Don't let any lane have more than 3 portals
-                console.log("ONE LAYER DEEPER");
+                console.log("This lane Is Full");
                 lane1 = Phaser.Utils.Array.RemoveRandomElement(_areas);
             }
         });
@@ -531,6 +542,18 @@ class GameScene extends Phaser.Scene
         lanes = [lane1,lane2];
 
         return lanes;
+    }
+    
+    
+    chooseAreaFromLane (scene, lane) {
+        
+        var area = Phaser.Utils.Array.RemoveRandomElement(lane);
+
+        if (area.hasPortal()) {
+            area = scene.chooseAreaFromLane(scene, lane);
+        }
+
+        return area;
     }
     
     setFruit (scene, groups) {
