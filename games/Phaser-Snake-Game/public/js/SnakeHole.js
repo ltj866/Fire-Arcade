@@ -317,15 +317,6 @@ class GameScene extends Phaser.Scene
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
         }) 
 
-        var makePair = function (scene, to, from){
-            
-            var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
-            var color = new Phaser.Display.Color.HexStringToColor(colorHex);
-            
-            var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
-        }
-
         // Add all tiles to walls for collision
         this.map.forEachTile( tile => {
             // Empty tiles are indexed at -1. 
@@ -389,6 +380,15 @@ class GameScene extends Phaser.Scene
         */
         
         
+        var makePair = function (scene, to, from){
+            
+            var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
+            var color = new Phaser.Display.Color.HexStringToColor(colorHex);
+            
+            var p1 = new Portal(scene, color, to, from);
+            var p2 = new Portal(scene, color, from, to);
+        }
+        
         // AREA NAME is [GROUP][ID]
         var areaAA = new SpawnArea(this, 1,5,6,4, "AA", 0x6666ff);
         var areaAB = new SpawnArea(this, 9,5,6,4, "AB", 0x6666ff);
@@ -449,8 +449,6 @@ class GameScene extends Phaser.Scene
 
         makePair(this, cordsPB_1, cordsPB_2);
 
-
-        /*
         
         // Generate next to portals
         var pair3 = this.chooseAreaPair(this, groups);
@@ -459,7 +457,7 @@ class GameScene extends Phaser.Scene
         var pair4 = this.chooseAreaPair(this, groups);
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
 
-        */
+        
 
 
         //var J1 = areaBC.genChords(this);
@@ -479,31 +477,7 @@ class GameScene extends Phaser.Scene
 
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-
-        console.log(this.portals);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        
-        
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);  
     }
     
     chooseAreaPair (scene, groups) {
@@ -617,10 +591,10 @@ class GameScene extends Phaser.Scene
                 x: SCREEN_WIDTH/2,
                 y: SCREEN_HEIGHT/2,
                 yoyo: false,
-                duration: 350,
+                duration: 720,
                 ease: 'Sine.easeOutIn',
                 repeat: 0,
-                delay: this.tweens.stagger(75)
+                delay: this.tweens.stagger(0)
             });
 
             tween.on('complete', test => {
