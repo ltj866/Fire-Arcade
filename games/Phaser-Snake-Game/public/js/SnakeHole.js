@@ -791,7 +791,7 @@ class WinScene extends Phaser.Scene
         BETA: ${GAME_VERSION}
         ................RUN STATS.................
 
-        ATTEMPTS: ${ourUI.lives}
+        BONK RESETS: ${ourUI.lives - 1}
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
         `);
 
