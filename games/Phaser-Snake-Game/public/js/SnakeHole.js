@@ -603,7 +603,7 @@ class GameScene extends Phaser.Scene {
                 duration: 720,
                 ease: 'Sine.easeOutIn',
                 repeat: 0,
-                delay: this.tweens.stagger(0)
+                delay: 500
             });
 
             tween.on('complete', test => {
