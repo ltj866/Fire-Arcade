@@ -1024,10 +1024,12 @@ class UIScene extends Phaser.Scene {
             
 
              // Restart Score Timer
-            this.scoreTimer = this.time.addEvent({
-            delay: 10000,
-            paused: false
-            });
+            if (this.length < LENGTH_GOAL) {
+                this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                    delay: 10000,
+                    paused: false
+                 });   
+            }
             
         }, this);
 
@@ -1046,10 +1048,8 @@ class UIScene extends Phaser.Scene {
 
             this.scoreUI.setText(`Score: ${this.score}`);
 
-            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                delay: 10000,
-                paused: false
-             });
+            
+            
 
         }, this);
         
@@ -1058,15 +1058,20 @@ class UIScene extends Phaser.Scene {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         
         
-
-        if (timeTick < SCORE_FLOOR) {
-            this.countDown.setText(this.score + SCORE_FLOOR);
-        } else {
-            this.countDown.setText(this.score + (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10));
+        if (this.length < LENGTH_GOAL) {
+        
+            if (timeTick < SCORE_FLOOR ) {
+                this.countDown.setText(this.score + SCORE_FLOOR);
+            } else {
+                this.countDown.setText(this.score + (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10));
+            }
+        }
+        else {
+            this.countDown.setText(this.score);
         } 
         
         if (DEBUG) {
-            if (timeTick < SCORE_FLOOR) {
+            if (timeTick < SCORE_FLOOR ) {
             
             } else {
                 this.timerText.setText(timeTick);
