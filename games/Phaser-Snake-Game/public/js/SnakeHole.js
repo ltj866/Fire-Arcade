@@ -8,7 +8,8 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'v0.2.03.22.003';
+const GAME_VERSION = 'v0.2.03.22.004';
+
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
@@ -622,14 +623,14 @@ class GameScene extends Phaser.Scene {
             console.log("YOU WIN");
 
             ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
-            ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-
+            //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
+            this.events.emit('saveScore');
 
             this.scene.pause();
 
 
             this.scene.start('WinScene');
-            //this.events.emit('saveScore');
+            
         }
 
         // Only Calculate things when snake is moved.
@@ -753,21 +754,6 @@ class WinScene extends Phaser.Scene
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourWinScene = this.scene.get('WinScene');
-
-
-        const scoreScreenStyle = {
-            width: '450px',
-            //height: '22px',
-            color: 'white',
-            'font-size': '16px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
-            'padding': '2px 0px 2px 12px',
-            //'font-weight': 'bold',
-            'word-wrap': 'break-word',
-            //'border-radius': '24px',
-            outline: 'solid',
-        }
         ///////
         
         this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
@@ -775,17 +761,42 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
-        scoreScreen.setOrigin(0.5,0);
+        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 7.5, 'div', {
+            "fontSize":'32px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            color: 'white',
+            'text-align': 'right',
 
-
+        });
+        highScore.setText(
+            `Score: ${ourUI.score}
+            HighScore: ${ourUI.bestScore}
+            ---------------
+            `
+        
+        ).setOrigin(1, 0);
 
         
+        const scoreScreenStyle = {
+            width: '270px',
+            //height: '22px',
+            color: 'white',
+            'font-size': '14px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            'padding': '12px 0px 12px 12px',
+            //'font-weight': 'bold',
+            'word-wrap': 'break-word',
+            //'border-radius': '24px',
+            outline: 'solid',
+        }
+        
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 7, 'div', scoreScreenStyle);
+        scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        ` 
-        /************ WINNING SCORE *************/
-        SCORE: ${ourUI.score}
+        `SCORE: ${ourUI.score}
         FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
         
         TURNS: ${ourInputScene.turns}
@@ -795,14 +806,13 @@ class WinScene extends Phaser.Scene
         BOOST TIME: ${ourInputScene.boostTime} FRAMES
         
         BETA: ${GAME_VERSION}
-        ................RUN STATS.................
 
         BONK RESETS: ${ourUI.lives - 1}
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
         `);
 
         const logScreenStyle = {
-            width: '432px',
+            width: '141px',
             //height: '22px',
             color: 'white',
             'font-size': '12px',
@@ -815,8 +825,28 @@ class WinScene extends Phaser.Scene
             //outline: 'solid',
         }
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2, GRID * 22, 'div', logScreenStyle);
-        fruitLog.setText(`[${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);
+        var bestLogText = JSON.parse(localStorage.getItem('bestFruitLog'));
+
+        if (bestLogText) {
+            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12, 'div', logScreenStyle);
+            bestLog.setText(
+                `Best
+                ------------------
+                [${bestLogText}]`
+            ).setOrigin(1,0);    
+        }
+        
+
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12, 'div', logScreenStyle);
+        fruitLog.setText(
+            `Current
+            ------------------ 
+            [${ourUI.scoreHistory.sort().reverse()}]`
+        ).setOrigin(1,0);
+
+        // [${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);    
+        
+            
 
         //card.setScale(0.7);
 
@@ -870,7 +900,15 @@ class UIScene extends Phaser.Scene {
     
     init() {
         this.score = 0;
-        this.bestScore = 0;
+
+        
+        var bestLocal = JSON.parse(localStorage.getItem('best'))
+        if (bestLocal) {
+            this.bestScore = Number(bestLocal);
+        }
+        else {
+            this.bestScore = 0;
+        }
         this.length = 0;
 
         this.scoreMulti = 0;
@@ -908,8 +946,14 @@ class UIScene extends Phaser.Scene {
         }).setOrigin(0,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
-            
-        
+
+        // Store the Current Version in Cookies
+        localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
+
+        var bestLocal = JSON.parse(localStorage.getItem('best'))
+        if (bestLocal) {
+            this.bestScore = Number(bestLocal);
+        }
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UIStyle);
@@ -919,6 +963,7 @@ class UIScene extends Phaser.Scene {
         // Best Score
         this.bestScoreUI = this.add.dom(0, 12 - 2 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
+        this.bestScoreUI.setText(`Best : ${this.bestScore}`);
         //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
         
         // Lives
@@ -1038,7 +1083,12 @@ class UIScene extends Phaser.Scene {
             if (this.score > this.bestScore) {
                 this.bestScore = this.score;
                 this.bestScoreUI.setText(`Best : ${this.bestScore}`);
+
+                var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
+                localStorage.setItem('bestFruitLog', bestScoreHistory);
             }
+
+            localStorage.setItem('best', this.bestScore);
             
             // Reset Score for new game
             //this.score = 0;
@@ -1046,7 +1096,7 @@ class UIScene extends Phaser.Scene {
             //this.fruitCount = 0;
             //this.scoreHistory = [];
 
-            this.scoreUI.setText(`Score: ${this.score}`);
+            //this.scoreUI.setText(`Score: ${this.score}`);
 
             
             
