@@ -826,11 +826,12 @@ class WinScene extends Phaser.Scene
         }
 
         var bestLogText = JSON.parse(localStorage.getItem('bestFruitLog'));
+        var bestScoreAve = JSON.parse(localStorage.getItem('bestScoreAve'))
 
         if (bestLogText) {
             var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12, 'div', logScreenStyle);
             bestLog.setText(
-                `Best
+                `Best - ave(${bestScoreAve})
                 ------------------
                 [${bestLogText}]`
             ).setOrigin(1,0);    
@@ -839,7 +840,7 @@ class WinScene extends Phaser.Scene
 
         var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12, 'div', logScreenStyle);
         fruitLog.setText(
-            `Current
+            `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
             ------------------ 
             [${ourUI.scoreHistory.sort().reverse()}]`
         ).setOrigin(1,0);
@@ -1086,6 +1087,8 @@ class UIScene extends Phaser.Scene {
 
                 var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
                 localStorage.setItem('bestFruitLog', bestScoreHistory);
+
+                localStorage.setItem('bestScoreAve', Math.round(this.score / LENGTH_GOAL));
             }
 
             localStorage.setItem('best', this.bestScore);
