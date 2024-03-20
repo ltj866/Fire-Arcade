@@ -141,7 +141,7 @@ class StageManagerScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = "Stage-01";
+        this.stage = "Stage-02";
 
     }
 
@@ -346,14 +346,15 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        const dreamWallSkip = [0,1,2,11,20,29];
+        //const dreamWallSkip = [0,1,2,11,20,29];
+        const dreamWallSkip = [0,1,2];
 
         for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
             if (!dreamWallSkip.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(-1).setOrigin(0,0);
                 wallShimmerRight.play('shimmer');
                 
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(-1).setOrigin(0,0);
                 wallShimmerLeft.play('shimmer');
                 wallShimmerLeft.flipX = true;
             }
@@ -822,7 +823,7 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 7.5, 'div', {
+        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
             "fontSize":'32px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
@@ -831,7 +832,8 @@ class WinScene extends Phaser.Scene
 
         });
         highScore.setText(
-            `Score: ${ourUI.score}
+            `${ourStageManager.stage}
+            Score: ${ourUI.score}
             HighScore: ${ourUI.bestScore}
             ---------------
             `
@@ -843,7 +845,7 @@ class WinScene extends Phaser.Scene
             width: '270px',
             //height: '22px',
             color: 'white',
-            'font-size': '14px',
+            'font-size': '12px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             'padding': '12px 0px 12px 12px',
@@ -857,7 +859,9 @@ class WinScene extends Phaser.Scene
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        `SCORE: ${ourUI.score}
+        `STAGE STATS - ${ourStageManager.stage}
+        ----------------------
+        SCORE: ${ourUI.score}
         FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
         
         TURNS: ${ourInputScene.turns}
@@ -890,7 +894,7 @@ class WinScene extends Phaser.Scene
         var bestScoreAve = JSON.parse(localStorage.getItem(`${ourStageManager.stage}-bestScoreAve`))
 
         if (bestLogText) {
-            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12, 'div', logScreenStyle);
+            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12.5, 'div', logScreenStyle);
             bestLog.setText(
                 `Best - ave(${bestScoreAve})
                 ------------------
@@ -899,7 +903,7 @@ class WinScene extends Phaser.Scene
         }
         
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12, 'div', logScreenStyle);
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12.5, 'div', logScreenStyle);
         fruitLog.setText(
             `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
             ------------------ 
