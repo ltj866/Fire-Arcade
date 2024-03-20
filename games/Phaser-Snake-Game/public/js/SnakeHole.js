@@ -235,7 +235,7 @@ class GameScene extends Phaser.Scene {
         this.anims.create({
             key: 'atom01idle',
             frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
-            frameRate: 8,
+            frameRate: 12,
             repeat: -1
         })
         this.anims.create({
@@ -244,12 +244,24 @@ class GameScene extends Phaser.Scene {
             frameRate: 8,
             repeat: -1
         })
+        this.anims.create({
+            key: 'atom03idle',
+            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
+            frameRate: 6,
+            repeat: -1
+        })
 
         this.anims.create({
             key: 'electronIdle',
             frames: this.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
             frameRate: 16,
             repeat: -1
+        })
+        this.anims.create({
+            key: 'electronDispersion01',
+            frames: this.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
+            frameRate: 16,
+            repeat: 0
         })
         
         this.anims.create({
