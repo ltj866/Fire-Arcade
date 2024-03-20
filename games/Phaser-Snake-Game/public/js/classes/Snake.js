@@ -86,7 +86,7 @@ var Snake = new Phaser.Class({
     }
     else if (this.heading === DOWN)
     {
-        y = Phaser.Math.Wrap(y + GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+        y = Phaser.Math.Wrap(y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 2);
     }
     
     // Move all Snake Segments

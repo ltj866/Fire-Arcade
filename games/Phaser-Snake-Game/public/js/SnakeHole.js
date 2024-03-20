@@ -131,7 +131,7 @@ class StageManagerScene extends Phaser.Scene {
 
     init() {
 
-        //this.stage = "Stage-02";
+        // This.stage = "Stage-02";
 
     }
 
