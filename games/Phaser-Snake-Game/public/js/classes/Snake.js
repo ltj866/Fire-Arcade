@@ -2,6 +2,7 @@ import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
     LEFT, RIGHT, UP, DOWN, DEBUG,
     LENGTH_GOAL
 } from "../SnakeHole.js";
+import { Food } from "./Food.js";
 
 var Snake = new Phaser.Class({
     initialize:
@@ -23,7 +24,6 @@ var Snake = new Phaser.Class({
     
     grow: function (scene)
     {
-        
         // Current Tail of the snake
         this.tail = this.body.slice(-1);
         
@@ -97,22 +97,24 @@ var Snake = new Phaser.Class({
         this.alive = false;
     }
 
-    // Check collision for all Fruits
-    scene.apples.forEach(fruit => {  
-        if(this.head.x === fruit.x && this.head.y === fruit.y){
-            scene.events.emit('addScore', fruit); // Sends to UI Listener 
-            
+    // Check collision for all atoms
+    scene.atoms.forEach(_atom => {  
+        if(this.head.x === _atom.x && this.head.y === _atom.y){
+            if(_atom.absorable == true){
+                scene.energyAmount += 10;
+            }
+            scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
-            
-            // Avoid double fruit getting while in transition
-            fruit.x = 0;
-            fruit.y = 0;
-            fruit.visible = false;
-            
-            scene.time.delayedCall(500, function () {
-                fruit.move(scene);
-                fruit.visible = true;
-            }, [], this);
+            // Avoid double _atom getting while in transition
+            _atom.x = 0;
+            _atom.y = 0;
+            _atom.visible = false;
+            //_atom.electrons.visible = false;
+            //_atom.electrons.stop();
+            _atom.electrons.setPosition(0, 0);
+            _atom.electrons.visible = false;
+        
+
             
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
@@ -123,13 +125,34 @@ var Snake = new Phaser.Class({
             var soundRandom = scene.crunchSounds[index];
             
             soundRandom.play();
+            
+            // Moves the eaten atom after a delay including the electron.
+            scene.time.delayedCall(500, function () {
+                _atom.move(scene);
+                _atom.play("atom01idle", true);
+                _atom.visible = true;
+                _atom.electrons.visible = true;
+                _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.
+            }, [], this);
 
-            //  Scene.crunch01.play();
-            //  Dispatch a Scene event
 
-            //debugger
-            scene.apples.forEach(fruit => {
-                fruit.startDecay(scene);
+            // Refresh decay on all atoms.
+            scene.atoms.forEach(__atom => {
+                if (__atom.x === 0 && __atom.y === 0) {
+                    // Start decay timer for the eaten Apple now. 
+                    _atom.startDecay(scene);
+                    // The rest is called after the delay.
+                    
+                } 
+                else {
+                // For every other atom do everything now
+                __atom.play("atom01idle", true);
+                __atom.electrons.setVisible(true);
+                //this.electrons.anims.restart();
+                __atom.absorable = true;
+                __atom.startDecay(scene);
+                }
+
             });
             
             if (DEBUG) {console.log(                         
