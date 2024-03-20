@@ -141,7 +141,7 @@ class StageManagerScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = "Stage-02";
+        this.stage = "Stage-01";
 
     }
 
@@ -349,6 +349,7 @@ class GameScene extends Phaser.Scene {
         //const dreamWallSkip = [0,1,2,11,20,29];
         const dreamWallSkip = [0,1,2];
 
+        // Dream walls for Horizontal Wrap
         for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
             if (!dreamWallSkip.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(-1).setOrigin(0,0);
@@ -358,6 +359,18 @@ class GameScene extends Phaser.Scene {
                 wallShimmerLeft.play('shimmer');
                 wallShimmerLeft.flipX = true;
             }
+        }
+
+        // Dream walls for Vertical Wrap
+        for (let index = 0; index <= SCREEN_WIDTH/GRID; index++) {
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(-1).setOrigin(0,0);
+            wallShimmerTop.play('shimmer');
+            wallShimmerTop.angle = 90;
+                
+            var wallShimmerBottom = this.add.sprite(GRID * index, SCREEN_HEIGHT).setDepth(-1).setOrigin(0,0);
+            wallShimmerBottom.play('shimmer');
+            wallShimmerBottom.angle = 270
+        
         }
         
         // Audio
