@@ -116,21 +116,11 @@ var Food = new Phaser.Class({
 
     startDecay: function(scene){
 
-        
-        /*scene.time.delayedCall(500, function () { //Turn off animation timer
-            this.play("atom01idle", true);
-            this.electrons.setVisible(true);
-            //this.electrons.anims.restart();
-            this.absorable = true;
-        }, [], this);*/
-
         this.decayStage01.destroy(); // Destory Old Timers
         this.decayStage02.destroy();
 
         this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
             this.electrons.setVisible(false);
-            this.absorable = false;
-            //console.log(scene.atoms.absorable)
             this.play("atom02idle");
         }, callbackScope: scene });
 

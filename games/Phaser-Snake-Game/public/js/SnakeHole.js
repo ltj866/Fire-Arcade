@@ -24,7 +24,7 @@ var SPEEDSPRINT = 33; // 24
 
 
 var SCORE_FLOOR = 24; // Floor of Fruit score as it counts down.
-var BOOST_BONUS_FLOOR = 80;
+var BOOST_ADD_FLOOR = 80;
 var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
@@ -744,7 +744,7 @@ class GameScene extends Phaser.Scene {
             this.energyAmount -= 1;
             
             // Boost Stats
-            if (timeLeft >= BOOST_BONUS_FLOOR ) { 
+            if (timeLeft >= BOOST_ADD_FLOOR ) { 
                 // Don't add boost time after 20 seconds
                 ourInputScene.boostBonusTime += 1;
                 ourInputScene.boostTime += 1;
@@ -752,7 +752,7 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.boostTime += 1;
             }
         }
-        if (timeLeft <= BOOST_BONUS_FLOOR && timeLeft >= SCORE_FLOOR) {
+        if (timeLeft <= BOOST_ADD_FLOOR && timeLeft >= SCORE_FLOOR) {
         }
         
         // Reset Energy if out of bounds.
@@ -1069,7 +1069,13 @@ class UIScene extends Phaser.Scene {
             //debugger
             
             
+            
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+            
+            if (timeLeft > BOOST_ADD_FLOOR) {
+                ourGame.energyAmount += 10;
+            }
+            
             if (timeLeft > SCORE_FLOOR) {
                 this.score += timeLeft;
                 scoreText.setText(`+${timeLeft}`);
@@ -1083,6 +1089,7 @@ class UIScene extends Phaser.Scene {
                 // Record Score for Stats
                 this.scoreHistory.push(SCORE_FLOOR);
             }
+
 
             // Update UI
 

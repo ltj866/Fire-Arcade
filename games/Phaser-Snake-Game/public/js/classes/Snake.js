@@ -93,16 +93,14 @@ var Snake = new Phaser.Class({
     Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
     // Check if dead by map
-    if (scene.map.getTileAtWorldXY(this.head.x, this.head.y )) {
+    if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
         this.alive = false;
     }
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
-            if(_atom.absorable == true){
-                scene.energyAmount += 10;
-            }
+
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
