@@ -8,7 +8,7 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'v0.2.03.22.004';
+const GAME_VERSION = 'v0.2.03.22.005';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
