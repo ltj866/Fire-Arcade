@@ -131,14 +131,17 @@ var Snake = new Phaser.Class({
                 _atom.visible = true;
                 _atom.electrons.visible = true;
                 _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.
+
             }, [], this);
 
-
+            //this.electrons.play("electronIdle");
+             // Setting electron framerate here to reset it after slowing in delay 2
+            
             // Refresh decay on all atoms.
             scene.atoms.forEach(__atom => {
                 if (__atom.x === 0 && __atom.y === 0) {
                     // Start decay timer for the eaten Apple now. 
-                    _atom.startDecay(scene);
+                    __atom.startDecay(scene);
                     // The rest is called after the delay.
                     
                 } 
@@ -149,6 +152,9 @@ var Snake = new Phaser.Class({
                 //this.electrons.anims.restart();
                 __atom.absorable = true;
                 __atom.startDecay(scene);
+
+                __atom.electrons.play("electronIdle", true);
+                __atom.electrons.anims.msPerFrame = 66
                 }
 
             });

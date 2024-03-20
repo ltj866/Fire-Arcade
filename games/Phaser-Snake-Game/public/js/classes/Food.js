@@ -27,6 +27,7 @@ var Food = new Phaser.Class({
         this.play("atom01idle");
         this.electrons = scene.add.sprite().setOrigin(.2,.175).setDepth(10);
         this.electrons.play("electronIdle");
+        this.electrons.anims.msPerFrame = 66;
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
         this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000
@@ -118,15 +119,15 @@ var Food = new Phaser.Class({
     },
 
     startDecay: function(scene){
-        this.electrons.play("electronIdle");
-        this.electrons.anims.msPerFrame = 66; // Setting electron framerate here to reset it after slowing in delay 2
+        //this.electrons.play("electronIdle");
+        //this.electrons.anims.msPerFrame = 66; // Setting electron framerate here to reset it after slowing in delay 2
         this.decayStage01.destroy(); // Destory Old Timers
         this.decayStage02.destroy();
 
         this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => {
             //this.electrons.setVisible(false);
-            this.electrons.frameRate = 1;
             this.play("atom02idle");
+            this.electrons.anims.msPerFrame = 112;
         }, callbackScope: scene });
 
         this.decayStage02 = scene.time.addEvent({ delay:2000, callback: fruit => {
