@@ -12,7 +12,7 @@ const GAME_VERSION = 'v0.2.03.22.005';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 3; //24 //32?................... Win Condition
+export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -234,9 +234,9 @@ class GameScene extends Phaser.Scene {
 
         /////////////////////////////////////////////////
         // UI BLOCKS
-        this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(10);
-        this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(10);
-        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(10);
+        this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(50);
+        this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(50);
+        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(50);
         ////////////////////////////////////////////
         
         // Snake needs to render immediately 
@@ -249,6 +249,7 @@ class GameScene extends Phaser.Scene {
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
+        this.layer.setDepth(25);
     
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
@@ -256,7 +257,7 @@ class GameScene extends Phaser.Scene {
         // BOOST METER
         this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
 
-        this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(10).setOrigin(0.5,0);
+        this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
 
         this.mask = this.make.image({
             x: GRID * 16,
@@ -295,10 +296,11 @@ class GameScene extends Phaser.Scene {
         });
 
         const keys = [ 'increasing' ];
-        const energyBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
-        energyBar.play('increasing');
+        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+        boostBar.setDepth(50);
+        boostBar.play('increasing');
 
-        energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
         this.anims.create({
             key: 'idle',
@@ -313,10 +315,10 @@ class GameScene extends Phaser.Scene {
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
-        const startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(5).setOrigin(0.5,0.5);
-        const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(5).setOrigin(0.5,0.5);
-        const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(5).setOrigin(0.5,0.5);
-        const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(5).setOrigin(0.5,0.5);
+        const startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
+        const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
+        const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
         
         startingArrowsAnimS.flipY = true;
         startingArrowsAnimE.angle = 90;
@@ -352,10 +354,10 @@ class GameScene extends Phaser.Scene {
         // Dream walls for Horizontal Wrap
         for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
             if (!dreamWallSkip.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(-1).setOrigin(0,0);
+                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerRight.play('shimmer');
                 
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(-1).setOrigin(0,0);
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerLeft.play('shimmer');
                 wallShimmerLeft.flipX = true;
             }
@@ -363,11 +365,11 @@ class GameScene extends Phaser.Scene {
 
         // Dream walls for Vertical Wrap
         for (let index = 0; index <= SCREEN_WIDTH/GRID; index++) {
-            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(-1).setOrigin(0,0);
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
             wallShimmerTop.play('shimmer');
             wallShimmerTop.angle = 90;
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, SCREEN_HEIGHT).setDepth(-1).setOrigin(0,0);
+            var wallShimmerBottom = this.add.sprite(GRID * index, SCREEN_HEIGHT).setDepth(10).setOrigin(0,0);
             wallShimmerBottom.play('shimmer');
             wallShimmerBottom.angle = 270
         

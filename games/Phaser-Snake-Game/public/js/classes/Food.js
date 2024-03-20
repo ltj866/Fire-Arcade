@@ -1,4 +1,4 @@
-import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID} from "../SnakeHole.js";
+import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
@@ -86,6 +86,15 @@ var Food = new Phaser.Class({
         scene.portals.forEach(portal => {
             testGrid[portal.x/GRID][portal.y/GRID] = false;
         });
+
+        // Don't put fruit on the bottom or top rows.
+        for (let index = 0; index < SCREEN_WIDTH/GRID; index++) {
+            //const element = array[index];
+            testGrid[index][SCREEN_HEIGHT/GRID] = false;
+            testGrid[index][2] = false;
+            console.log(index, 2 , index, SCREEN_HEIGHT/GRID);
+            
+        }
 
         
         var validLocations = [];
