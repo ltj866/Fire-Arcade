@@ -181,6 +181,8 @@ class GameScene extends Phaser.Scene {
         
         // Audio
         this.load.setPath('assets/audio');
+        //LEFT OFF HERE
+        this.load.audio('atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3'])
 
         SOUND_CRUNCH.forEach(soundID =>
             {
