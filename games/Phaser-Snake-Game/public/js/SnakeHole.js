@@ -48,7 +48,7 @@ export const UP = 2;
 export const DOWN = 3;
 const START_SPRINT = 4;
 const STOP_SPRINT = 5;
-const STOP = 10;
+export const STOP = 10;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -340,7 +340,6 @@ class GameScene extends Phaser.Scene {
         
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
-            this.started = true;
             if (!this.snake.pause_movement) {
                 ourInputScene.updateDirection(this, e);
                 
@@ -589,6 +588,7 @@ class GameScene extends Phaser.Scene {
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
                 
+            
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             
@@ -637,8 +637,9 @@ class GameScene extends Phaser.Scene {
             tween.on('complete', test => {
                 this.snake.regrouping = false;
                 this.snake.alive = true;
-                this.started = false;
-                this.snake.heading = 0;
+                
+                //this.snake.heading = 0;
+                this.hold_move = false;
             });
         }
         
@@ -1200,133 +1201,155 @@ class InputScene extends Phaser.Scene {
         switch (event.keyCode) {
             case 87: // w
 
-            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
+            if (gameScene.snake.heading === LEFT  || gameScene.snake.heading  === RIGHT || // Prevents backtracking to death
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
-                
+                // At anytime you can update the direction of the snake.
                 gameScene.snake.head.setTexture('blocks', 6);
-                gameScene.snake.heading = UP; // Prevents backtracking to death
-                gameScene.snake.move(gameScene);
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                gameScene.snake.heading = UP;
                 
+                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.turns += 1; 
+                    
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                }
             }
             break;
 
             case 65: // a
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) {
+            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) {
                 
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
-
-
                 gameScene.snake.head.setTexture('blocks', 4);
                 gameScene.snake.heading = LEFT;
-                gameScene.snake.move(gameScene);
+
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                }
             }
             break;
 
             case 83: // s
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
+            if (gameScene.snake.heading  === LEFT  || gameScene.snake.heading  === RIGHT || 
+                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
-
 
                 gameScene.snake.head.setTexture('blocks', 7);
                 gameScene.snake.heading = DOWN;
-                gameScene.snake.move(gameScene);
+
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+
+                if (!gameScene.snake.hold_move) {  
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                }
             }
             break;
 
             case 68: // d
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
-                
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
+            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
                 gameScene.snake.head.setTexture('blocks', 5);
                 gameScene.snake.heading = RIGHT;
-                gameScene.snake.move(gameScene);
+
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+ 
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                    }
             }
             break;
 
             case 38: // UP
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) {
-                
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || 
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) {
 
                 gameScene.snake.head.setTexture('blocks', 6);
                 gameScene.snake.heading = UP;
-                gameScene.snake.move(gameScene);
+
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                    }
             }
             break;
 
             case 37: // LEFT
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
+            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
-
                 gameScene.snake.head.setTexture('blocks', 4);
                 gameScene.snake.heading = LEFT;
-                gameScene.snake.move(gameScene);
+
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                    }
             }
             break;
 
             case 40: // DOWN
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
-                
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666);
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || 
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
 
                 gameScene.snake.head.setTexture('blocks', 7);
                 gameScene.snake.heading = DOWN;
-                gameScene.snake.move(gameScene);
+                
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+                
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                    }
             }
             break;
 
             case 39: // RIGHT
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
-                
-                // Calculate Corner Time
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666);
+            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
+                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
 
                 gameScene.snake.head.setTexture('blocks', 5);
                 gameScene.snake.heading = RIGHT;
-                gameScene.snake.move(gameScene);
+                
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
-                gameScene.lastMoveTime = gameScene.time.now;
+                
+                if (!gameScene.snake.hold_move) {
+                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                    gameScene.snake.move(gameScene);
+                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                    }
             }
             break;
 
