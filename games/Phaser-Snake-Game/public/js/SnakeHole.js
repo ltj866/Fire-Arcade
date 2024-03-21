@@ -340,7 +340,6 @@ class GameScene extends Phaser.Scene {
         
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
-            this.started = true;
             if (!this.snake.pause_movement) {
                 ourInputScene.updateDirection(this, e);
                 
@@ -589,6 +588,7 @@ class GameScene extends Phaser.Scene {
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
                 
+            
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             
@@ -638,7 +638,6 @@ class GameScene extends Phaser.Scene {
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
-                this.started = false;
                 //this.snake.heading = 0;
                 this.hold_move = false;
             });

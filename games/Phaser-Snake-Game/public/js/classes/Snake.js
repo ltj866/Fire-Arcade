@@ -46,6 +46,8 @@ var Snake = new Phaser.Class({
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
+
+    console.log(scene.started, this.heading, "alive=", this.alive);
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
@@ -94,7 +96,7 @@ var Snake = new Phaser.Class({
                 pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
         ){
             if (scene.started) {
-                this.death();
+                this.death(scene);
             }
         }
 
@@ -123,7 +125,7 @@ var Snake = new Phaser.Class({
 
     // Check if dead by map
     if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
-        this.death();
+        this.death(scene);
     }
 
     // Check collision for all atoms
@@ -190,11 +192,12 @@ var Snake = new Phaser.Class({
         }
     });
     },
-    death: function () {
+    death: function (gameScene) {
         this.alive = false;
         this.hold_move = true;
 
         this.heading = STOP;
+        gameScene.started = false;
     }
 });
 
