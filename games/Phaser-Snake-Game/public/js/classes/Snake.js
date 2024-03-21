@@ -11,7 +11,7 @@ var Snake = new Phaser.Class({
     {
         this.alive = true;
         this.body = [];
-        this.pause_movement = false;
+        this.hold_move = false;
         this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
@@ -42,29 +42,16 @@ var Snake = new Phaser.Class({
     },
     
     
-    move: function (scene)
-    {
+    move: function (scene) {
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
-
-    // Death by eating itself
-    let tail = this.body.slice(1);
-
-    // if any tailpos == headpos
-    if(
-        tail.some(
-            pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-    ){
-        if (scene.started) {
-            this.alive = false;
-        }
-    }
-
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
             this.portal_buffer_on = false;
+            this.hold_move = true; // Moved this to earlier to avoid moving while in a portal wrap.
+
             if (DEBUG) { console.log("PORTAL"); }
 
             var _x = portal.target.x*GRID;
@@ -73,8 +60,8 @@ var Snake = new Phaser.Class({
             var portalSound = scene.portalSounds[0]
             portalSound.play();
 
-            this.pause_movement = false;
-            scene.lastMoveTime += SPEEDWALK * 2 + 1;
+            //this.pause_movement = false;
+            scene.lastMoveTime += SPEEDWALK * 2;
             var _tween = scene.tweens.add({
                 targets: this.head, 
                 x: _x,
@@ -90,12 +77,27 @@ var Snake = new Phaser.Class({
                 
                 console.log("YOU CAN PORTAL AGAIN.");
                 this.portal_buffer_on = true;
+                this.hold_move = false;
                 
             }, [], scene);
                                 
             return ;  //Don't know why this is here but I left it -James
         }
     });
+
+        // Death by eating itself
+        let tail = this.body.slice(1);
+
+        // if any tailpos == headpos
+        if(
+            tail.some(
+                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
+        ){
+            if (scene.started) {
+                this.alive = false;
+                this.hold_move = true;
+            }
+        }
 
     //if () {
         
@@ -123,6 +125,7 @@ var Snake = new Phaser.Class({
     // Check if dead by map
     if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
         this.alive = false;
+        this.hold_move = true;
     }
 
     // Check collision for all atoms
@@ -189,6 +192,9 @@ var Snake = new Phaser.Class({
         }
     });
     },
+    death: function () {
+
+    }
 });
 
 export { Snake };
