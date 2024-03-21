@@ -12,7 +12,7 @@ const GAME_VERSION = 'v0.2.03.22.005';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
+export const LENGTH_GOAL = 100; //28 //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -169,6 +169,7 @@ class GameScene extends Phaser.Scene {
         this.atoms = [];
         this.walls = [];
         this.portals = [];
+        this.dreamWalls = [];
 
         this.lastMoveTime = 0; // The last time we called move()
 
@@ -379,22 +380,16 @@ class GameScene extends Phaser.Scene {
             frameRate: 16,
             repeat: -1
         })
-        const wrapBlock = this.add.sprite(GRID, SCREEN_HEIGHT/2).setDepth(15).setOrigin(0,0);
-        const wrapBlock02 = this.add.sprite(GRID * 2, SCREEN_HEIGHT/2).setDepth(15).setOrigin(0,0);
-        const wrapBlock03 = this.add.sprite(GRID * 3, SCREEN_HEIGHT/2).setDepth(15).setOrigin(0,0);
-        const wrapBlock04 = this.add.sprite(GRID, SCREEN_HEIGHT/2 + GRID).setDepth(15).setOrigin(0,0);
-        const wrapBlock05 = this.add.sprite(GRID *3, SCREEN_HEIGHT/2 + GRID).setDepth(15).setOrigin(0,0);
-        const wrapBlock06 = this.add.sprite(GRID, SCREEN_HEIGHT/2 + GRID *2).setDepth(15).setOrigin(0,0);
-        const wrapBlock07 = this.add.sprite(GRID *2, SCREEN_HEIGHT/2 + GRID *2).setDepth(15).setOrigin(0,0);
-        const wrapBlock08 = this.add.sprite(GRID *3, SCREEN_HEIGHT/2 + GRID *2).setDepth(15).setOrigin(0,0);
-        wrapBlock.play("wrapBlock01")
-        wrapBlock02.play("wrapBlock02")
-        wrapBlock03.play("wrapBlock03")
-        wrapBlock04.play("wrapBlock04")
-        wrapBlock05.play("wrapBlock05")
-        wrapBlock06.play("wrapBlock06")
-        wrapBlock07.play("wrapBlock07")
-        wrapBlock08.play("wrapBlock08")
+        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
+        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y).play("wrapBlock06").setOrigin(0,0).setDepth(15);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+        
+    
+
+        //wrapBlock03.play("wrapBlock03")
+        //wrapBlock06.play("wrapBlock06")
+        //wrapBlock08.play("wrapBlock08")
         //this.mask = shape.createBitmapMask();
         //boostMeter.setMask(this.mask); // image.mask = mask;
         //boostMeter.mask.invertAlpha = true;
@@ -409,37 +404,35 @@ class GameScene extends Phaser.Scene {
         //var smokePoofAnim = smokePoof.play("spawn")
 
         // Dream Wall Shimmer
-        this.anims.create({
-            key: 'shimmer',
-            frames: this.anims.generateFrameNumbers('dreamWallAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}),
-            frameRate: 16,
-            repeat: -1
-        });
+
 
         //const dreamWallSkip = [0,1,2,11,20,29];
         const dreamWallSkip = [0,1,2];
 
+        // Dream wall corners 
+        
         // Dream walls for Horizontal Wrap
-        for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
+        for (let index = 2; index < END_Y; index++) {
             if (!dreamWallSkip.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
-                wallShimmerRight.play('shimmer');
+                wallShimmerRight.play('wrapBlock05');
+                this.dreamWalls.push(wallShimmerRight);
                 
                 var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
-                wallShimmerLeft.play('shimmer');
-                wallShimmerLeft.flipX = true;
+                wallShimmerLeft.play('wrapBlock04');
+                this.dreamWalls.push(wallShimmerLeft);
             }
         }
 
         // Dream walls for Vertical Wrap
-        for (let index = 0; index <= SCREEN_WIDTH/GRID; index++) {
+        for (let index = 1; index < END_X; index++) {
             var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
-            wallShimmerTop.play('shimmer');
-            wallShimmerTop.angle = 90;
+            wallShimmerTop.play('wrapBlock02');
+            this.dreamWalls.push(wallShimmerTop);
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, SCREEN_HEIGHT).setDepth(10).setOrigin(0,0);
-            wallShimmerBottom.play('shimmer');
-            wallShimmerBottom.angle = 270
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y).setDepth(10).setOrigin(0,0);
+            wallShimmerBottom.play('wrapBlock07');
+            this.dreamWalls.push(wallShimmerBottom);
         
         }
         
@@ -629,7 +622,28 @@ class GameScene extends Phaser.Scene {
 
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);  
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]); 
     }
     
     chooseAreaPair (scene, groups) {
@@ -1496,8 +1510,8 @@ export const SCREEN_WIDTH = config.width;
 export const SCREEN_HEIGHT = config.height; 
 
 // Edge locations for X and Y
-export const END_X = SCREEN_WIDTH/GRID -1;
-export const END_Y = SCREEN_HEIGHT/GRID -1;
+export const END_X = SCREEN_WIDTH/GRID - 1;
+export const END_Y = SCREEN_HEIGHT/GRID - 1;
 
 // Collision only works if GRID is whole divisor of HEIGHT and WIDTH
 if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {

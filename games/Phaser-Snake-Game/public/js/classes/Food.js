@@ -59,8 +59,7 @@ var Food = new Phaser.Class({
 
         // Start with all safe points as true. This is important because Javascript treats 
         // non initallized values as undefined and so any comparison or look up throws an error.
-        for (var x1 = 0; x1 <= END_X; x1++)
-        {
+        for (var x1 = 0; x1 <= END_X; x1++) {
             testGrid[x1] = {};
     
             for (var y1 = 0; y1 <= END_Y; y1++)
@@ -79,22 +78,26 @@ var Food = new Phaser.Class({
             }
         });
 
-        scene.atoms.forEach(fruit => {
-            testGrid[fruit.x/GRID][fruit.y/GRID] = false;
+        scene.atoms.forEach(_fruit => {
+            testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
         });
 
-        scene.portals.forEach(portal => {
-            testGrid[portal.x/GRID][portal.y/GRID] = false;
+        scene.portals.forEach(_portal => {
+            testGrid[_portal.x/GRID][_portal.y/GRID] = false;
         });
 
-        // Don't put fruit on the bottom or top rows.
-        for (let index = 0; index < SCREEN_WIDTH/GRID; index++) {
-            //const element = array[index];
-            testGrid[index][SCREEN_HEIGHT/GRID] = false;
-            testGrid[index][2] = false;
-            console.log(index, 2 , index, SCREEN_HEIGHT/GRID);
-            
-        }
+        scene.dreamWalls.forEach( _dreamWall => {
+            testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+            console.log(_dreamWall.x/GRID,_dreamWall.y/GRID, "x,y=",testGrid[_dreamWall.x/GRID][_dreamWall.x/GRID]);
+        });
+
+        console.log("END X AND Y", END_X, END_Y);
+        // Don't let fruit spawn on dreamwall blocks
+        //scene.dreamWalls.forEach(_dreamWall => {
+        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        //});
+
+
 
         
         var validLocations = [];
@@ -114,9 +117,7 @@ var Food = new Phaser.Class({
         var pos = Phaser.Math.RND.pick(validLocations)
 
         this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
-        console.log(this.x,this.y)
         this.electrons.setPosition(pos.x * GRID, pos.y * GRID);
-        console.log(this.electrons.x,this.electrons.y)
 
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
