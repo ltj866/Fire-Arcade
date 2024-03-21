@@ -210,10 +210,12 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
-        //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
-        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
+        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
 
-        
+        //WRAP BLOCKS:
+        this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
+
         // Audio
         this.load.setPath('assets/audio');
 
@@ -327,6 +329,72 @@ class GameScene extends Phaser.Scene {
         startingArrowsAnimS.play('idle');
         startingArrowsAnimE.play('idle');
         startingArrowsAnimW.play('idle');
+
+        //WRAP_BLOCK_ANIMS
+        this.anims.create({
+            key: 'wrapBlock01',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock02',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 2, 3]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock03',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 4, 5]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock04',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 6, 7]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock05',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 8, 9]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock06',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 10, 11]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock07',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12, 13]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'wrapBlock08',
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 14, 15]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        const wrapBlock = this.add.sprite(GRID, SCREEN_HEIGHT/2).setDepth(15).setOrigin(0,0);
+        const wrapBlock02 = this.add.sprite(GRID * 2, SCREEN_HEIGHT/2).setDepth(15).setOrigin(0,0);
+        const wrapBlock03 = this.add.sprite(GRID * 3, SCREEN_HEIGHT/2).setDepth(15).setOrigin(0,0);
+        const wrapBlock04 = this.add.sprite(GRID, SCREEN_HEIGHT/2 + GRID).setDepth(15).setOrigin(0,0);
+        const wrapBlock05 = this.add.sprite(GRID *3, SCREEN_HEIGHT/2 + GRID).setDepth(15).setOrigin(0,0);
+        const wrapBlock06 = this.add.sprite(GRID, SCREEN_HEIGHT/2 + GRID *2).setDepth(15).setOrigin(0,0);
+        const wrapBlock07 = this.add.sprite(GRID *2, SCREEN_HEIGHT/2 + GRID *2).setDepth(15).setOrigin(0,0);
+        const wrapBlock08 = this.add.sprite(GRID *3, SCREEN_HEIGHT/2 + GRID *2).setDepth(15).setOrigin(0,0);
+        wrapBlock.play("wrapBlock01")
+        wrapBlock02.play("wrapBlock02")
+        wrapBlock03.play("wrapBlock03")
+        wrapBlock04.play("wrapBlock04")
+        wrapBlock05.play("wrapBlock05")
+        wrapBlock06.play("wrapBlock06")
+        wrapBlock07.play("wrapBlock07")
+        wrapBlock08.play("wrapBlock08")
         //this.mask = shape.createBitmapMask();
         //boostMeter.setMask(this.mask); // image.mask = mask;
         //boostMeter.mask.invertAlpha = true;
