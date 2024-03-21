@@ -48,7 +48,7 @@ export const UP = 2;
 export const DOWN = 3;
 const START_SPRINT = 4;
 const STOP_SPRINT = 5;
-const STOP = 10;
+export const STOP = 10;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -639,7 +639,7 @@ class GameScene extends Phaser.Scene {
                 this.snake.alive = true;
                 
                 this.started = false;
-                this.snake.heading = 0;
+                //this.snake.heading = 0;
                 this.hold_move = false;
             });
         }

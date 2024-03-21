@@ -1,5 +1,5 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, DEBUG,
+    LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
     LENGTH_GOAL, SPEEDWALK
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
@@ -94,8 +94,7 @@ var Snake = new Phaser.Class({
                 pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
         ){
             if (scene.started) {
-                this.alive = false;
-                this.hold_move = true;
+                this.death();
             }
         }
 
@@ -124,8 +123,7 @@ var Snake = new Phaser.Class({
 
     // Check if dead by map
     if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
-        this.alive = false;
-        this.hold_move = true;
+        this.death();
     }
 
     // Check collision for all atoms
@@ -193,7 +191,10 @@ var Snake = new Phaser.Class({
     });
     },
     death: function () {
+        this.alive = false;
+        this.hold_move = true;
 
+        this.heading = STOP;
     }
 });
 
