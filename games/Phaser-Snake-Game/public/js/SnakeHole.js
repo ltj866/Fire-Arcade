@@ -250,6 +250,12 @@ class GameScene extends Phaser.Scene {
             frameRate: 6,
             repeat: -1
         })
+        this.anims.create({
+            key: 'atom04idle',
+            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
+            frameRate: 4,
+            repeat: -1
+        })
 
         this.anims.create({
             key: 'electronIdle',

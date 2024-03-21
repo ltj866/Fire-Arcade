@@ -43,6 +43,11 @@ var Food = new Phaser.Class({
             //this.setTexture('blocks', 10).setDepth(10);
         }, callbackScope: scene });
 
+        this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+            this.play("atom04idle");
+        }, callbackScope: scene });
+
+
         this.move(scene);
 
         scene.atoms.push(this);
@@ -133,9 +138,9 @@ var Food = new Phaser.Class({
         this.decayStage02 = scene.time.addEvent({ delay:2000, callback: fruit => {
             this.play("atom03idle");
             this.electrons.play("electronDispersion01");
-            //this.electrons.setVisible(false);
-            //console.log("stop")
-            //this.stop();
+        this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+            this.play("atom04idle");
+        }, callbackScope: scene });
         }, callbackScope: scene });
 
     },
