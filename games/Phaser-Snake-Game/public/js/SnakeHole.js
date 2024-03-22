@@ -334,50 +334,50 @@ class GameScene extends Phaser.Scene {
         //WRAP_BLOCK_ANIMS
         this.anims.create({
             key: 'wrapBlock01',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1, 2, 1]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock02',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 2, 3]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 3, 4, 5, 4]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock03',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 4, 5]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 6, 7, 8, 7]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock04',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 6, 7]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 9, 10, 11, 9]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock05',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 8, 9]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12, 13, 14, 13]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock06',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 10, 11]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 15, 16, 17, 16]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock07',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12, 13]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 18, 19, 20, 19]}),
+            frameRate: 6,
             repeat: -1
         })
         this.anims.create({
             key: 'wrapBlock08',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 14, 15]}),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 21, 22, 23, 22]}),
+            frameRate: 6,
             repeat: -1
         })
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
