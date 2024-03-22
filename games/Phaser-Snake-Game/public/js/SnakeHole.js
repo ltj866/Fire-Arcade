@@ -34,7 +34,7 @@ export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appea
 
 // Game Objects
 
-var crunchSounds = [];
+var atomSounds = [];
 var portalSounds = [];
 
 // Tilemap variables
@@ -59,15 +59,15 @@ var PORTAL_COLORS = [
     //'#AABBCC'
 ];
 
-var SOUND_CRUNCH = [
-    ['crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]],
-    ['crunch02', [ 'crunch02.ogg', 'crunch02.mp3' ]],
-    ['crunch03', [ 'crunch03.ogg', 'crunch03.mp3' ]],
-    ['crunch04', [ 'crunch04.ogg', 'crunch04.mp3' ]],
-    ['crunch05', [ 'crunch05.ogg', 'crunch05.mp3' ]],
-    ['crunch06', [ 'crunch06.ogg', 'crunch06.mp3' ]],
-    ['crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]],
-    ['crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]]
+var SOUND_ATOM = [
+    ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]],
+    ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]],
+    ['atomAbsorb03', [ 'atomAbsorb03.ogg', 'atomAbsorb03.mp3' ]],
+    ['atomAbsorb04', [ 'atomAbsorb04.ogg', 'atomAbsorb04.mp3' ]],
+    ['atomAbsorb05', [ 'atomAbsorb05.ogg', 'atomAbsorb05.mp3' ]],
+    ['atomAbsorb06', [ 'atomAbsorb06.ogg', 'atomAbsorb06.mp3' ]],
+    ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]], //will make 07 and 08 here if we continue with this sound profile
+    ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]]
 ];
 
 var SOUND_PORTAL = [
@@ -142,7 +142,7 @@ class GameScene extends Phaser.Scene {
         this.lastMoveTime = 0; // The last time we called move()
 
         // Sounds
-        this.crunchSounds = [];
+        this.atomSounds = [];
         this.portalSounds = [];
 
         // Make a copy of Portal Colors.
@@ -181,10 +181,11 @@ class GameScene extends Phaser.Scene {
         
         // Audio
         this.load.setPath('assets/audio');
-        //LEFT OFF HERE
-        this.load.audio('atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3'])
 
-        SOUND_CRUNCH.forEach(soundID =>
+        //this.load.audio('atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3'])
+        this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3'])
+
+        SOUND_ATOM.forEach(soundID =>
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
@@ -310,18 +311,6 @@ class GameScene extends Phaser.Scene {
         startingArrowsAnimS.play('idle');
         startingArrowsAnimE.play('idle');
         startingArrowsAnimW.play('idle');
-        //this.mask = shape.createBitmapMask();
-        //boostMeter.setMask(this.mask); // image.mask = mask;
-        //boostMeter.mask.invertAlpha = true;
-
-        /*this.anims.create({ // will mostlikely remove later -Holden
-            key: 'spawn',
-            frames: this.anims.generateFrameNumbers('fruitAppearSmokeAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }),
-            frameRate: 16,
-            repeat: 0
-        });*/
-        var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
-        //var smokePoofAnim = smokePoof.play("spawn")
 
         // Dream Wall Shimmer
         this.anims.create({
@@ -345,8 +334,12 @@ class GameScene extends Phaser.Scene {
         }
         
         // Audio
-        SOUND_CRUNCH.forEach(soundID => {
-                this.crunchSounds.push(this.sound.add(soundID[0]));
+        //this.atomAbsorb = this.sound.add('atomAbsorb01');
+        this.snakeCrash = this.sound.add('snakeCrash');
+        //this.atomAbsorb.play();
+
+        SOUND_ATOM.forEach(soundID => {
+                this.atomSounds.push(this.sound.add(soundID[0]));
             });
         SOUND_PORTAL.forEach(soundID => {
             this.portalSounds.push(this.sound.add(soundID[0]));
@@ -605,7 +598,7 @@ class GameScene extends Phaser.Scene {
 
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
-                
+            this.snakeCrash.play();    
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             

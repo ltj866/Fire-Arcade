@@ -114,16 +114,16 @@ var Snake = new Phaser.Class({
         
 
             
-            // Play crunch sound
-            var index = Math.round(Math.random() * scene.crunchSounds.length); 
+            // Play atom sound
+            var index = Math.round(Math.random() * scene.atomSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
                 index = 7;
             }
             //console.log(index);
-            var soundRandom = scene.crunchSounds[index];
+            var soundRandom = scene.atomSounds[index];
             
             soundRandom.play();
-            
+            //scene.atomAbsorb.play();
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);
