@@ -84,7 +84,7 @@ class StartScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('howToCard', 'assets/howToCard.webp');
+        this.load.image('howToCard', 'assets/howToCardNew.png');
     }
 
     create() {
@@ -94,7 +94,7 @@ class StartScene extends Phaser.Scene {
         var card = this.add.image(SCREEN_WIDTH/2, 5.5*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
 
-        card.setScale(0.55);
+        //card.setScale(1);
 
         
         var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
