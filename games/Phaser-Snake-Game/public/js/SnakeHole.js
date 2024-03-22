@@ -255,7 +255,7 @@ class GameScene extends Phaser.Scene {
         this.layer.setDepth(25);
     
         // add background
-        this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
+        this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
 
         // BOOST METER
         this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
@@ -1113,7 +1113,7 @@ class UIScene extends Phaser.Scene {
             'text-align': 'right',
         };
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID*2, SCREEN_HEIGHT, 'div', {
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 1, GRID * .5, 'div', {
             color: 'white',
             'font-size': '10px',
             'font-family': ["Sono", 'sans-serif'],
