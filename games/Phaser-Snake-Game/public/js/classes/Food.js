@@ -88,6 +88,20 @@ var Food = new Phaser.Class({
         });
 
         
+        
+        scene.snake.body.forEach(_part => {
+            //testGrid[_part.x/GRID][_part.y/GRID] = false;
+            //debugger
+            if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
+                // This goes nan sometimes. Ignore if that happens.
+                // Round maths for the case when adding a fruit while the head interpolates across the screen
+                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+            }
+            
+        });
+        
+
+        
         var validLocations = [];
     
         for (var x2 = 0; x2 <= END_X; x2++)
@@ -105,9 +119,9 @@ var Food = new Phaser.Class({
         var pos = Phaser.Math.RND.pick(validLocations)
 
         this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
-        console.log(this.x,this.y)
+        //console.log(this.x,this.y)
         this.electrons.setPosition(pos.x * GRID, pos.y * GRID);
-        console.log(this.electrons.x,this.electrons.y)
+        //console.log(this.electrons.x,this.electrons.y)
 
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice

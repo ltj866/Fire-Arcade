@@ -513,6 +513,7 @@ class GameScene extends Phaser.Scene {
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);  
+  
     }
     
     chooseAreaPair (scene, groups) {

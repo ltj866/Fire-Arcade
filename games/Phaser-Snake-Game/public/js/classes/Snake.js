@@ -69,7 +69,7 @@ var Snake = new Phaser.Class({
                 y: _y,
                 yoyo: false,
                 duration: SPEEDWALK * 2,
-                ease: 'linear',
+                ease: 'Linear',
                 repeat: 0,
                 //delay: 500
             });
