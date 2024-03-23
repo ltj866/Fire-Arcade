@@ -1,7 +1,8 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, DEBUG,
-    LENGTH_GOAL
+    LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
+    LENGTH_GOAL, SPEEDWALK
 } from "../SnakeHole.js";
+import { Food } from "./Food.js";
 
 var Snake = new Phaser.Class({
     initialize:
@@ -9,10 +10,12 @@ var Snake = new Phaser.Class({
     function Snake (scene, x, y)
     {
         this.alive = true;
-        this.body = []
+        this.body = [];
+        this.hold_move = false;
+        this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-        this.head.setOrigin(0,0);
+        this.head.setOrigin(0,0).setDepth(10);
         
         this.body.push(this.head);
 
@@ -23,7 +26,6 @@ var Snake = new Phaser.Class({
     
     grow: function (scene)
     {
-        
         // Current Tail of the snake
         this.tail = this.body.slice(-1);
         
@@ -31,86 +33,117 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'blocks', 1);
+        newPart.setOrigin(0,0).setDepth(9);
 
         this.body.push(newPart);
 
-        newPart.setOrigin(0,0);
+        
+        
     },
     
     
-    move: function (scene)
-    {
+    move: function (scene) {
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
 
-    // Death by eating itself
-    let tail = this.body.slice(1);
-
-    // if any tailpos == headpos
-    if(
-        tail.some(
-            pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-    ){
-        this.alive = false;
-    }
-
     
     scene.portals.forEach(portal => { 
-        if(this.head.x === portal.x && this.head.y === portal.y){
+        if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
+            this.portal_buffer_on = false;
+            this.hold_move = true; // Moved this to earlier to avoid moving while in a portal wrap.
+
             if (DEBUG) { console.log("PORTAL"); }
 
-            x = portal.target.x*GRID;
-            y = portal.target.y*GRID;
+            var _x = portal.target.x*GRID;
+            var _y = portal.target.y*GRID;
 
             var portalSound = scene.portalSounds[0]
             portalSound.play();
+
+            //this.pause_movement = false;
+            scene.lastMoveTime += SPEEDWALK * 2;
+            var _tween = scene.tweens.add({
+                targets: this.head, 
+                x: _x,
+                y: _y,
+                yoyo: false,
+                duration: SPEEDWALK * 2,
+                ease: 'Linear',
+                repeat: 0,
+                //delay: 500
+            });
             
-            return 'valid';  //Don't know why this is here but I left it -James
+            scene.time.delayedCall(SPEEDWALK * 4, event => {
+                
+                console.log("YOU CAN PORTAL AGAIN.");
+                this.portal_buffer_on = true;
+                this.hold_move = false;
+                
+            }, [], scene);
+                                
+            return ;  //Don't know why this is here but I left it -James
         }
     });
 
-    if (this.heading === LEFT)
-    {
-        x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
-    }
-    else if (this.heading === RIGHT)
-    {
-        x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
-    }
-    else if (this.heading === UP)
-    {
-        y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
-    }
-    else if (this.heading === DOWN)
-    {
-        y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
-    }
+        // Death by eating itself
+        let tail = this.body.slice(1);
+
+        // if any tailpos == headpos
+        if(
+            tail.some(
+                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
+        ){
+            if (scene.started) {
+                this.death(scene);
+            }
+        }
+
+    //if () {
+        
+        if (this.heading === LEFT)
+        {
+            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
+        }
+        else if (this.heading === RIGHT)
+        {
+            x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+        }
+        else if (this.heading === UP)
+        {
+            y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
+        }
+        else if (this.heading === DOWN)
+        {
+            y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
+        }
+    //}
     
     // Move all Snake Segments
     Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
     // Check if dead by map
-    if (scene.map.getTileAtWorldXY(this.head.x, this.head.y )) {
-        this.alive = false;
+    if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
+        this.death(scene);
     }
 
-    // Check collision for all Fruits
-    scene.apples.forEach(fruit => {  
-        if(this.head.x === fruit.x && this.head.y === fruit.y){
-            scene.events.emit('addScore', fruit); // Sends to UI Listener 
-            
+    // Check collision for all atoms
+    scene.atoms.forEach(_atom => {  
+        if(this.head.x === _atom.x && this.head.y === _atom.y){
+
+            scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
+            // Avoid double _atom getting while in transition
+            _atom.x = 0;
+            _atom.y = 0;
+            _atom.visible = false;
+            //_atom.electrons.visible = false;
+            //_atom.electrons.stop();
+            _atom.electrons.setPosition(0, 0);
+            _atom.electrons.visible = false;
+        
+
             
-            // Avoid double fruit getting while in transition
-            fruit.x = 0;
-            fruit.y = 0;
-            fruit.visible = false;
-            
-            scene.time.delayedCall(500, function () {
-                fruit.move(scene);
-                fruit.visible = true;
-            }, [], this);
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
@@ -120,13 +153,34 @@ var Snake = new Phaser.Class({
             var soundRandom = scene.crunchSounds[index];
             
             soundRandom.play();
+            
+            // Moves the eaten atom after a delay including the electron.
+            scene.time.delayedCall(500, function () {
+                _atom.move(scene);
+                _atom.play("atom01idle", true);
+                _atom.visible = true;
+                _atom.electrons.visible = true;
+                _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.
+            }, [], this);
 
-            //  Scene.crunch01.play();
-            //  Dispatch a Scene event
 
-            //debugger
-            scene.apples.forEach(fruit => {
-                fruit.startDecay(scene);
+            // Refresh decay on all atoms.
+            scene.atoms.forEach(__atom => {
+                if (__atom.x === 0 && __atom.y === 0) {
+                    // Start decay timer for the eaten Apple now. 
+                    _atom.startDecay(scene);
+                    // The rest is called after the delay.
+                    
+                } 
+                else {
+                // For every other atom do everything now
+                __atom.play("atom01idle", true);
+                __atom.electrons.setVisible(true);
+                //this.electrons.anims.restart();
+                __atom.absorable = true;
+                __atom.startDecay(scene);
+                }
+
             });
             
             if (DEBUG) {console.log(                         
@@ -137,6 +191,13 @@ var Snake = new Phaser.Class({
         }
     });
     },
+    death: function (gameScene) {
+        this.alive = false;
+        this.hold_move = true;
+
+        this.heading = STOP;
+        gameScene.started = false;
+    }
 });
 
 export { Snake };

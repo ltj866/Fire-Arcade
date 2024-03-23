@@ -2,14 +2,12 @@ import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
-    Extends: Phaser.GameObjects.Image,
+    Extends: Phaser.GameObjects.Sprite,
 
     initialize:
 
-    function Food (scene)
-    {
-
-        Phaser.GameObjects.Image.call(this, scene)
+    function Food (scene) {
+        Phaser.GameObjects.Sprite.call(this, scene)
 
         if (DEBUG) { // Add Timer Text next to fruit
             const ourUI = scene.scene.get('UIScene');
@@ -25,26 +23,31 @@ var Food = new Phaser.Class({
 
         this.setOrigin(0);
         //this.startDecay(scene);
-
-        this.setTexture('blocks', 8).setDepth(10); // Fresh now!
+        this.setDepth(100);
+        this.play("atom01idle");
+        this.electrons = scene.add.sprite().setOrigin(.2,.175).setDepth(10);
+        this.electrons.play("electronIdle");
+        //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
         this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.setTexture('blocks', 9).setDepth(10);
+            this.play("atom02idle");
+            this.electrons.setVisible(false);
         }, callbackScope: scene });
 
         this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            this.setTexture('blocks', 10).setDepth(10);
+            this.stop();
+            //this.setTexture('blocks', 10).setDepth(10);
         }, callbackScope: scene });
 
         this.move(scene);
 
-        scene.apples.push(this);
+        scene.atoms.push(this);
 
         scene.children.add(this); // Shows on screen
     },
     
-    move: function (scene)
-    {
+    move: function (scene) {
+        //this.electrons = scene.add.sprite(0, 0).setOrigin(.25,.125).setDepth(10);
         //let x;
         //let y;
 
@@ -76,13 +79,27 @@ var Food = new Phaser.Class({
             }
         });
 
-        scene.apples.forEach(fruit => {
+        scene.atoms.forEach(fruit => {
             testGrid[fruit.x/GRID][fruit.y/GRID] = false;
         });
 
         scene.portals.forEach(portal => {
             testGrid[portal.x/GRID][portal.y/GRID] = false;
         });
+
+        
+        
+        scene.snake.body.forEach(_part => {
+            //testGrid[_part.x/GRID][_part.y/GRID] = false;
+            //debugger
+            if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
+                // This goes nan sometimes. Ignore if that happens.
+                // Round maths for the case when adding a fruit while the head interpolates across the screen
+                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+            }
+            
+        });
+        
 
         
         var validLocations = [];
@@ -102,6 +119,9 @@ var Food = new Phaser.Class({
         var pos = Phaser.Math.RND.pick(validLocations)
 
         this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
+        //console.log(this.x,this.y)
+        this.electrons.setPosition(pos.x * GRID, pos.y * GRID);
+        //console.log(this.electrons.x,this.electrons.y)
 
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
@@ -109,19 +129,18 @@ var Food = new Phaser.Class({
     },
 
     startDecay: function(scene){
-        
-        
-        this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
         this.decayStage01.destroy(); // Destory Old Timers
         this.decayStage02.destroy();
 
         this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.setTexture('blocks', 9).setDepth(10);
+            this.electrons.setVisible(false);
+            this.play("atom02idle");
         }, callbackScope: scene });
 
         this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            this.setTexture('blocks', 10).setDepth(10);
+            console.log("stop")
+            this.stop();
         }, callbackScope: scene });
 
     },
