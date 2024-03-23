@@ -144,16 +144,16 @@ var Snake = new Phaser.Class({
         
 
             
-            // Play crunch sound
-            var index = Math.round(Math.random() * scene.crunchSounds.length); 
+            // Play atom sound
+            var index = Math.round(Math.random() * scene.atomSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
                 index = 7;
             }
             //console.log(index);
-            var soundRandom = scene.crunchSounds[index];
+            var soundRandom = scene.atomSounds[index];
             
             soundRandom.play();
-            
+            //scene.atomAbsorb.play();
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);
@@ -161,14 +161,17 @@ var Snake = new Phaser.Class({
                 _atom.visible = true;
                 _atom.electrons.visible = true;
                 _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.
+
             }, [], this);
 
-
+            //this.electrons.play("electronIdle");
+             // Setting electron framerate here to reset it after slowing in delay 2
+            
             // Refresh decay on all atoms.
             scene.atoms.forEach(__atom => {
                 if (__atom.x === 0 && __atom.y === 0) {
                     // Start decay timer for the eaten Apple now. 
-                    _atom.startDecay(scene);
+                    __atom.startDecay(scene);
                     // The rest is called after the delay.
                     
                 } 
@@ -179,6 +182,9 @@ var Snake = new Phaser.Class({
                 //this.electrons.anims.restart();
                 __atom.absorable = true;
                 __atom.startDecay(scene);
+
+                __atom.electrons.play("electronIdle", true);
+                __atom.electrons.anims.msPerFrame = 66
                 }
 
             });

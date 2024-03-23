@@ -27,17 +27,26 @@ var Food = new Phaser.Class({
         this.play("atom01idle");
         this.electrons = scene.add.sprite().setOrigin(.2,.175).setDepth(10);
         this.electrons.play("electronIdle");
+        this.electrons.anims.msPerFrame = 66;
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
+        this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000
+            this.electrons.anims.msPerFrame = 112;
             this.play("atom02idle");
-            this.electrons.setVisible(false);
         }, callbackScope: scene });
 
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            this.stop();
+        this.decayStage02 = scene.time.addEvent({ delay: 2000, callback: fruit => { //was 7600
+            this.play("atom03idle");
+            this.electrons.play("electronDispersion01");
+            //this.electrons.setVisible(false);
+            //this.stop();
             //this.setTexture('blocks', 10).setDepth(10);
         }, callbackScope: scene });
+
+        this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+            this.play("atom04idle");
+        }, callbackScope: scene });
+
 
         this.move(scene);
 
@@ -141,18 +150,23 @@ var Food = new Phaser.Class({
     },
 
     startDecay: function(scene){
-
+        //this.electrons.play("electronIdle");
+        //this.electrons.anims.msPerFrame = 66; // Setting electron framerate here to reset it after slowing in delay 2
         this.decayStage01.destroy(); // Destory Old Timers
         this.decayStage02.destroy();
 
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.electrons.setVisible(false);
+        this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => {
+            //this.electrons.setVisible(false);
             this.play("atom02idle");
+            this.electrons.anims.msPerFrame = 112;
         }, callbackScope: scene });
 
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            console.log("stop")
-            this.stop();
+        this.decayStage02 = scene.time.addEvent({ delay:2000, callback: fruit => {
+            this.play("atom03idle");
+            this.electrons.play("electronDispersion01");
+        this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+            this.play("atom04idle");
+        }, callbackScope: scene });
         }, callbackScope: scene });
 
     },
