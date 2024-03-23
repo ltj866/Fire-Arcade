@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, DEBUG,
-    LENGTH_GOAL
+    LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
+    LENGTH_GOAL, SPEEDWALK
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 
@@ -10,10 +10,12 @@ var Snake = new Phaser.Class({
     function Snake (scene, x, y)
     {
         this.alive = true;
-        this.body = []
+        this.body = [];
+        this.hold_move = false;
+        this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-        this.head.setOrigin(0,0);
+        this.head.setOrigin(0,0).setDepth(10);
         
         this.body.push(this.head);
 
@@ -31,78 +33,104 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'blocks', 1);
+        newPart.setOrigin(0,0).setDepth(9);
 
         this.body.push(newPart);
 
-        newPart.setOrigin(0,0);
+        
+        
     },
     
     
-    move: function (scene)
-    {
+    move: function (scene) {
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
 
-    // Death by eating itself
-    let tail = this.body.slice(1);
-
-    // if any tailpos == headpos
-    if(
-        tail.some(
-            pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-    ){
-        if (scene.started) {
-            this.alive = false;
-        }
-    }
-
     
     scene.portals.forEach(portal => { 
-        if(this.head.x === portal.x && this.head.y === portal.y){
+        if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
+            this.portal_buffer_on = false;
+            this.hold_move = true; // Moved this to earlier to avoid moving while in a portal wrap.
+
             if (DEBUG) { console.log("PORTAL"); }
 
-            x = portal.target.x*GRID;
-            y = portal.target.y*GRID;
+            var _x = portal.target.x*GRID;
+            var _y = portal.target.y*GRID;
 
             var portalSound = scene.portalSounds[0]
             portalSound.play();
+
+            //this.pause_movement = false;
+            scene.lastMoveTime += SPEEDWALK * 2;
+            var _tween = scene.tweens.add({
+                targets: this.head, 
+                x: _x,
+                y: _y,
+                yoyo: false,
+                duration: SPEEDWALK * 2,
+                ease: 'Linear',
+                repeat: 0,
+                //delay: 500
+            });
             
-            return 'valid';  //Don't know why this is here but I left it -James
+            scene.time.delayedCall(SPEEDWALK * 4, event => {
+                
+                console.log("YOU CAN PORTAL AGAIN.");
+                this.portal_buffer_on = true;
+                this.hold_move = false;
+                
+            }, [], scene);
+                                
+            return ;  //Don't know why this is here but I left it -James
         }
     });
 
-    if (this.heading === LEFT)
-    {
-        x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
-    }
-    else if (this.heading === RIGHT)
-    {
-        x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
-    }
-    else if (this.heading === UP)
-    {
-        y = Phaser.Math.Wrap(y - GRID, GRID * 2, SCREEN_HEIGHT);
-    }
-    else if (this.heading === DOWN)
-    {
-        y = Phaser.Math.Wrap(y + GRID, GRID * 1, SCREEN_HEIGHT - GRID );
-    }
+        // Death by eating itself
+        let tail = this.body.slice(1);
+
+        // if any tailpos == headpos
+        if(
+            tail.some(
+                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
+        ){
+            if (scene.started) {
+                this.death(scene);
+            }
+        }
+
+    //if () {
+        
+        if (this.heading === LEFT)
+        {
+            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
+        }
+        else if (this.heading === RIGHT)
+        {
+            x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+        }
+        else if (this.heading === UP)
+        {
+            y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
+        }
+        else if (this.heading === DOWN)
+        {
+            y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
+        }
+    //}
     
     // Move all Snake Segments
     Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
     // Check if dead by map
-    if (scene.map.getTileAtWorldXY(this.head.x, this.head.y )) {
-        this.alive = false;
+    if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
+        this.death(scene);
     }
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
-            if(_atom.absorable == true){
-                scene.energyAmount += 10;
-            }
+
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
@@ -163,6 +191,13 @@ var Snake = new Phaser.Class({
         }
     });
     },
+    death: function (gameScene) {
+        this.alive = false;
+        this.hold_move = true;
+
+        this.heading = STOP;
+        gameScene.started = false;
+    }
 });
 
 export { Snake };
