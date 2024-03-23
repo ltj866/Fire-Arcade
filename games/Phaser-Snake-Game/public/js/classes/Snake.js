@@ -111,11 +111,11 @@ var Snake = new Phaser.Class({
         }
         else if (this.heading === UP)
         {
-            y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
+            y = Phaser.Math.Wrap(y - GRID, GRID * 2, SCREEN_HEIGHT);
         }
         else if (this.heading === DOWN)
         {
-            y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
+            y = Phaser.Math.Wrap(y + GRID, GRID * 1, SCREEN_HEIGHT - GRID );
         }
     //}
     

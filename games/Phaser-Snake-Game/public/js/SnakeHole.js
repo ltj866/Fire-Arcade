@@ -12,7 +12,7 @@ const GAME_VERSION = 'v0.2.03.22.007';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 100; //28 //32?................... Win Condition
+export const LENGTH_GOAL = 32; //28 //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -588,7 +588,7 @@ class GameScene extends Phaser.Scene {
         var cordsPA_2 = areaPA_2.genChords(this);
         areaPA_2.portalCords = cordsPA_2;
 
-        makePair(this, cordsPA_1, cordsPA_2);
+        //makePair(this, cordsPA_1, cordsPA_2);
 
 
 
@@ -602,7 +602,7 @@ class GameScene extends Phaser.Scene {
         var cordsPB_2 = areaPB_2.genChords(this);
         areaPB_2.portalCords = cordsPB_2
 
-        makePair(this, cordsPB_1, cordsPB_2);
+        //makePair(this, cordsPB_1, cordsPB_2);
 
         
         // Generate next to portals
@@ -624,8 +624,8 @@ class GameScene extends Phaser.Scene {
 
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);  
-  
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        
     }
     
     chooseAreaPair (scene, groups) {
