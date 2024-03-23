@@ -71,7 +71,7 @@ var Food = new Phaser.Class({
         for (var x1 = 0; x1 <= END_X; x1++) {
             testGrid[x1] = {};
     
-            for (var y1 = 0; y1 <= END_Y; y1++)
+            for (var y1 = 2; y1 < END_Y; y1++)
             {
                 testGrid[x1][y1] = true;
             }
@@ -97,10 +97,8 @@ var Food = new Phaser.Class({
 
         scene.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-            console.log(_dreamWall.x/GRID,_dreamWall.y/GRID, "x,y=",testGrid[_dreamWall.x/GRID][_dreamWall.x/GRID]);
         });
 
-        console.log("END X AND Y", END_X, END_Y);
         // Don't let fruit spawn on dreamwall blocks
         //scene.dreamWalls.forEach(_dreamWall => {
         //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;

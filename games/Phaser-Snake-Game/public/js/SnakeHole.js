@@ -30,7 +30,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
@@ -141,7 +141,7 @@ class StageManagerScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = "Stage-01";
+        this.stage = "Stage-03";
 
     }
 
@@ -240,14 +240,15 @@ class GameScene extends Phaser.Scene {
 
         /////////////////////////////////////////////////
         // UI BLOCKS
-        this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(50);
-        this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(50);
-        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(50);
+        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+        this.add.image(GRID * 25.5, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
+        this.add.image(GRID * 29.5 - 4, GRID * 1, 'blocks', 12).setOrigin(0,0).setDepth(50); // Tried to center flag
         ////////////////////////////////////////////
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
-        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, SCREEN_HEIGHT/GRID/2);
+        this.snake = new Snake(this, 15, 15);
+        //debugger
         this.snake.heading = STOP;
         
         // Tilemap
@@ -266,7 +267,7 @@ class GameScene extends Phaser.Scene {
         this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
 
         this.mask = this.make.image({
-            x: GRID * 16,
+            x: SCREEN_WIDTH/2,
             y: GRID*.25,
             key: 'mask',
             add: false
@@ -403,8 +404,8 @@ class GameScene extends Phaser.Scene {
         })
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y).play("wrapBlock06").setOrigin(0,0).setDepth(15);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
         
     
 
@@ -433,9 +434,9 @@ class GameScene extends Phaser.Scene {
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
-        for (let index = 2; index < END_Y; index++) {
+        for (let index = 2; index < END_Y - 1; index++) {
             if (!dreamWallSkip.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
                 this.dreamWalls.push(wallShimmerRight);
                 
@@ -451,7 +452,7 @@ class GameScene extends Phaser.Scene {
             wallShimmerTop.play('wrapBlock02');
             this.dreamWalls.push(wallShimmerTop);
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y).setDepth(10).setOrigin(0,0);
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(10).setOrigin(0,0);
             wallShimmerBottom.play('wrapBlock07');
             this.dreamWalls.push(wallShimmerBottom);
         
@@ -570,20 +571,20 @@ class GameScene extends Phaser.Scene {
         }
         
         // AREA NAME is [GROUP][ID]
-        var areaAA = new SpawnArea(this, 1,5,6,4, "AA", 0x6666ff);
+        var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
         var areaAB = new SpawnArea(this, 9,5,6,4, "AB", 0x6666ff);
-        var areaAC = new SpawnArea(this, 17,5,6,4, "AC", 0x6666ff);
-        var areaAD = new SpawnArea(this, 25,5,6,4, "AD", 0x6666ff);
+        var areaAC = new SpawnArea(this, 16,5,6,4, "AC", 0x6666ff);
+        var areaAD = new SpawnArea(this, 23,5,6,4, "AD", 0x6666ff);
 
-        var areaBA = new SpawnArea(this, 1,14,6,4, "BA", 0x6666ff);
+        var areaBA = new SpawnArea(this, 2,14,6,4, "BA", 0x6666ff);
         var areaBB = new SpawnArea(this, 9,14,6,4, "BB", 0x6666ff);
-        var areaBC = new SpawnArea(this, 17,14,6,4, "BC", 0x6666ff);
-        var areaBD = new SpawnArea(this, 25,14,6,4, "BD", 0x6666ff);
+        var areaBC = new SpawnArea(this, 16,14,6,4, "BC", 0x6666ff);
+        var areaBD = new SpawnArea(this, 23,14,6,4, "BD", 0x6666ff);
 
-        var areaCA = new SpawnArea(this, 1,23,6,4, "CA", 0x6666ff);
+        var areaCA = new SpawnArea(this, 2,23,6,4, "CA", 0x6666ff);
         var areaCB = new SpawnArea(this, 9,23,6,4, "CB", 0x6666ff);
-        var areaCC = new SpawnArea(this, 17,23,6,4, "CC", 0x6666ff);
-        var areaCD = new SpawnArea(this, 25,23,6,4, "CD", 0x6666ff);
+        var areaCC = new SpawnArea(this, 16,23,6,4, "CC", 0x6666ff);
+        var areaCD = new SpawnArea(this, 23,23,6,4, "CD", 0x6666ff);
 
         const groups = [
 
@@ -736,7 +737,7 @@ class GameScene extends Phaser.Scene {
             ourUI.livesUI.setText(`x ${ourUI.lives}`);
 
             //ourUI.length = 0;
-            ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
+            ourUI.lengthGoalUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
 
 
             //game.destroy();
@@ -751,7 +752,7 @@ class GameScene extends Phaser.Scene {
                 this.snake.body.forEach( part => {
                 graphics.beginPath();
                 graphics.moveTo(part.x, part.y);
-                graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                graphics.lineTo(GRID * 15, GRID * 15);
                 graphics.closePath();
                 graphics.strokePath();
                 });
@@ -762,8 +763,8 @@ class GameScene extends Phaser.Scene {
             
             var tween = this.tweens.add({
                 targets: this.snake.body, 
-                x: SCREEN_WIDTH/2,
-                y: SCREEN_HEIGHT/2,
+                x: GRID * 15,
+                y: GRID * 15,
                 yoyo: false,
                 duration: 720,
                 ease: 'Sine.easeOutIn',
@@ -1115,14 +1116,14 @@ class UIScene extends Phaser.Scene {
             //'font-weight': 'bold',
             //'border-radius': '24px',
             //outline: 'solid',
-            'text-align': 'right',
+            //'text-align': 'right',
         };
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 1, GRID * .5, 'div', {
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', {
             color: 'white',
             'font-size': '10px',
             'font-family': ["Sono", 'sans-serif'],
-        }).setOrigin(0,1);
+        }).setOrigin(1,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
 
@@ -1147,13 +1148,13 @@ class UIScene extends Phaser.Scene {
         
         // Lives
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 23.5, GRID * 2 + 2, 'div', UIStyle);
+        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UIStyle);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.fruitCountUI = this.add.dom(GRID * 28, GRID * 2 + 2, 'div', UIStyle);
-        this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`).setOrigin(0,1);
+        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', UIStyle);
+        this.lengthGoalUI.setText(`${String.prototype.padStart(2, this.length)}/${LENGTH_GOAL}`).setOrigin(0,1);
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
@@ -1166,7 +1167,7 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9.5, 16, 'div', {
+        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', {
             color: 'white',
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
@@ -1251,7 +1252,7 @@ class UIScene extends Phaser.Scene {
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`);
+            this.lengthGoalUI.setText(`${String.prototype.padStart(2, this.length)}/${LENGTH_GOAL}`);
             
 
              // Restart Score Timer
@@ -1515,8 +1516,8 @@ class InputScene extends Phaser.Scene {
 
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
-    width: 768,
-    height: 720,
+    width: 744,
+    height: 744,
     //seed: 1,
     parent: 'phaser-example',
     physics: {
