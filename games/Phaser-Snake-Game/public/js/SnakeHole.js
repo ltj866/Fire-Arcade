@@ -12,7 +12,7 @@ const GAME_VERSION = 'v0.2.03.22.007';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 32; //28 //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28 //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -30,7 +30,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
@@ -141,7 +141,7 @@ class StageManagerScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = "Stage-03";
+        this.stage = "Stage-01";
 
     }
 
@@ -614,7 +614,7 @@ class GameScene extends Phaser.Scene {
         var cordsPA_2 = areaPA_2.genChords(this);
         areaPA_2.portalCords = cordsPA_2;
 
-        //makePair(this, cordsPA_1, cordsPA_2);
+        makePair(this, cordsPA_1, cordsPA_2);
 
 
 
@@ -628,7 +628,7 @@ class GameScene extends Phaser.Scene {
         var cordsPB_2 = areaPB_2.genChords(this);
         areaPB_2.portalCords = cordsPB_2
 
-        //makePair(this, cordsPB_1, cordsPB_2);
+        makePair(this, cordsPB_1, cordsPB_2);
 
         
         // Generate next to portals
@@ -1154,7 +1154,10 @@ class UIScene extends Phaser.Scene {
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', UIStyle);
-        this.lengthGoalUI.setText(`${String.prototype.padStart(2, this.length)}/${LENGTH_GOAL}`).setOrigin(0,1);
+        
+        
+        var length = `${this.length}`;
+        this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`).setOrigin(0,1);
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
@@ -1252,7 +1255,9 @@ class UIScene extends Phaser.Scene {
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.lengthGoalUI.setText(`${String.prototype.padStart(2, this.length)}/${LENGTH_GOAL}`);
+            var length = `${this.length}`;
+            
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
             
 
              // Restart Score Timer
