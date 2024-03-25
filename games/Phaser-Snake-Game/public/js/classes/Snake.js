@@ -43,10 +43,10 @@ var Snake = new Phaser.Class({
     
     
     move: function (scene) {
+        
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
-
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
@@ -127,10 +127,12 @@ var Snake = new Phaser.Class({
         this.death(scene);
     }
 
+    var pointSounds = scene.pointSounds[scene.comboCounter]
+
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
-
+            pointSounds.play()
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
@@ -142,18 +144,15 @@ var Snake = new Phaser.Class({
             //_atom.electrons.setPosition(0, 0);
             _atom.electrons.visible = false;
         
-
-            
             // Play atom sound
             var index = Math.round(Math.random() * scene.atomSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
                 index = 7;
             }
             //console.log(index);
-            var soundRandom = scene.atomSounds[index];
+            var soundRandom = scene.atomSounds[index]; //Will come back to this later - Holden
             
-            soundRandom.play();
-            //scene.atomAbsorb.play();
+            //soundRandom.play();
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);
@@ -173,14 +172,15 @@ var Snake = new Phaser.Class({
                     // Start decay timer for the eaten Apple now. 
                     __atom.startDecay(scene);
                     // The rest is called after the delay.
-                    
+                    scene.comboCounter +=1;
+                    //console.log(scene.comboCounter)
                 } 
                 else {
                 // For every other atom do everything now
                 __atom.play("atom01idle", true);
                 __atom.electrons.setVisible(true);
                 //this.electrons.anims.restart();
-                __atom.absorable = true;
+                //__atom.absorbable = true;
                 __atom.startDecay(scene);
 
                 __atom.electrons.play("electronIdle", true);

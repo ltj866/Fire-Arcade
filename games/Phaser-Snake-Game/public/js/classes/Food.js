@@ -48,7 +48,7 @@ var Food = new Phaser.Class({
         }, callbackScope: scene });
 
 
-        this.move(scene);
+        this.move(scene); //Do we need this still?
 
         scene.atoms.push(this);
 
@@ -97,10 +97,10 @@ var Food = new Phaser.Class({
 
         scene.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-            console.log(_dreamWall.x/GRID,_dreamWall.y/GRID, "x,y=",testGrid[_dreamWall.x/GRID][_dreamWall.x/GRID]);
+            //console.log(_dreamWall.x/GRID,_dreamWall.y/GRID, "x,y=",testGrid[_dreamWall.x/GRID][_dreamWall.x/GRID]);
         });
 
-        console.log("END X AND Y", END_X, END_Y);
+        //console.log("END X AND Y", END_X, END_Y);
         // Don't let fruit spawn on dreamwall blocks
         //scene.dreamWalls.forEach(_dreamWall => {
         //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
