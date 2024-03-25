@@ -138,8 +138,8 @@ var Snake = new Phaser.Class({
             _atom.y = 0;
             _atom.visible = false;
             //_atom.electrons.visible = false;
-            //_atom.electrons.stop();
-            _atom.electrons.setPosition(0, 0);
+            _atom.electrons.play("electronIdle");
+            //_atom.electrons.setPosition(0, 0);
             _atom.electrons.visible = false;
         
 
