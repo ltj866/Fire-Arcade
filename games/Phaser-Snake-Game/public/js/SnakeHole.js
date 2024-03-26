@@ -77,7 +77,7 @@ var SOUND_PORTAL = [
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
 
-var STAGES_NEXT = {
+const STAGES_NEXT = {
     'Stage-01': ['Stage-02a','Stage-02b'],
     'Stage-02a': ['Stage-03'],
     'Stage-02b': ['Stage-03'],
@@ -1056,7 +1056,8 @@ class WinScene extends Phaser.Scene
             
                 
                 ourInputScene.scene.restart();
-                ourUI.scene.restart();
+                console.log(ourUI.score);
+                ourUI.scene.restart( { score: ourUI.score } );
                 
                 var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
                 console.log("Next Stages", STAGES_NEXT[ourGame.stage]);
@@ -1087,9 +1088,9 @@ class UIScene extends Phaser.Scene {
         super({ key: 'UIScene', active: false });
     }
     
-    init() {
+    init(props) {
         const ourStageManager = this.scene.get('StageManagerScene');
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourStageManager.stage}-best`))
+        var bestLocal = JSON.parse(localStorage.getItem(`${this.scene}-best`))
         if (bestLocal) {
             this.bestScore = Number(bestLocal);
         }
@@ -1097,7 +1098,10 @@ class UIScene extends Phaser.Scene {
             this.bestScore = 0;
         }
 
-        this.score = 0;
+        //this.score = 0;
+        const { score = 0 } = props
+        this.score = score;
+        
 
         this.length = 0;
 
