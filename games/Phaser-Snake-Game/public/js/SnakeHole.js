@@ -200,7 +200,6 @@ class GameScene extends Phaser.Scene {
     
     
     preload () {
-        const ourStageManager = this.scene.get('StageManagerScene');
         
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
@@ -926,19 +925,34 @@ class WinScene extends Phaser.Scene
     create() {
         
         const ourUI = this.scene.get('UIScene');
-        const ourStageManager = this.scene.get('StageManagerScene');
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourWinScene = this.scene.get('WinScene');
         ///////
-        
+
+        // Pre Calculate needed values
+        var stage_score = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+
+
+        ///////
         this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
+
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*6, 'div', {
+            "fontSize":'34px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '600',
+            color: 'white',
+            'text-decoration': 'underline'
+        });
         
-        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
-            "fontSize":'32px',
+        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0.5);
+
+        
+        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 7.5, 'div', {
+            "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             color: 'white',
@@ -947,7 +961,7 @@ class WinScene extends Phaser.Scene
         });
         highScore.setText(
             `${ourGame.stage}
-            Score: ${ourUI.score}
+            Stage Score: ${stage_score}
             HighScore: ${ourUI.bestScore}
             ---------------
             `
@@ -969,7 +983,7 @@ class WinScene extends Phaser.Scene
             outline: 'solid',
         }
         
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 7, 'div', scoreScreenStyle);
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 8, 'div', scoreScreenStyle);
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
@@ -1004,11 +1018,11 @@ class WinScene extends Phaser.Scene
             //outline: 'solid',
         }
 
-        var bestLogText = JSON.parse(localStorage.getItem(`${ourStageManager.stage}-bestFruitLog`));
-        var bestScoreAve = JSON.parse(localStorage.getItem(`${ourStageManager.stage}-bestScoreAve`))
+        var bestLogText = JSON.parse(localStorage.getItem(`${ourGame.stage}-bestFruitLog`));
+        var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stage}-bestScoreAve`))
 
         if (bestLogText) {
-            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12.5, 'div', logScreenStyle);
+            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 13, 'div', logScreenStyle);
             bestLog.setText(
                 `Best - ave(${bestScoreAve})
                 ------------------
@@ -1017,7 +1031,7 @@ class WinScene extends Phaser.Scene
         }
         
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12.5, 'div', logScreenStyle);
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
         fruitLog.setText(
             `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
             ------------------ 
@@ -1089,7 +1103,6 @@ class UIScene extends Phaser.Scene {
     }
     
     init(props) {
-        const ourStageManager = this.scene.get('StageManagerScene');
         var bestLocal = JSON.parse(localStorage.getItem(`${this.scene}-best`))
         if (bestLocal) {
             this.bestScore = Number(bestLocal);
@@ -1118,10 +1131,9 @@ class UIScene extends Phaser.Scene {
     
     create() {
         const ourGame = this.scene.get('GameScene');
-        const ourStageManager = this.scene.get('StageManagerScene');
 
 
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourStageManager.stage}-best`))
+        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stage}-best`))
         if (bestLocal) {
             this.bestScore = Number(bestLocal);
         }
@@ -1154,7 +1166,7 @@ class UIScene extends Phaser.Scene {
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourStageManager.stage}-best`))
+        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stage}-best`))
         if (bestLocal) {
             this.bestScore = Number(bestLocal);
         }
@@ -1301,12 +1313,12 @@ class UIScene extends Phaser.Scene {
                 this.bestScoreUI.setText(`Best : ${this.bestScore}`);
 
                 var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
-                localStorage.setItem(`${ourStageManager.stage}-bestFruitLog`, bestScoreHistory);
+                localStorage.setItem(`${ourGame.stage}-bestFruitLog`, bestScoreHistory);
 
-                localStorage.setItem(`${ourStageManager.stage}-bestScoreAve`, Math.round(this.score / LENGTH_GOAL));
+                localStorage.setItem(`${ourGame.stage}-bestScoreAve`, Math.round(this.score / LENGTH_GOAL));
             }
 
-            localStorage.setItem(`${ourStageManager.stage}-best`, this.bestScore);
+            localStorage.setItem(`${ourGame.stage}-best`, this.bestScore);
             
             // Reset Score for new game
             //this.score = 0;
