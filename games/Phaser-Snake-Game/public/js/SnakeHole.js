@@ -3,6 +3,8 @@ import { Portal } from './classes/Portal.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
+import {PORTAL_COLORS} from './const.js';
+
 //******************************************************************** */
 //                              SnakeHole
 //******************************************************************** */
@@ -50,14 +52,7 @@ const START_SPRINT = 4;
 const STOP_SPRINT = 5;
 export const STOP = 10;
 
-var PORTAL_COLORS = [
-    // This color order will be respected. TODO add Slice
-    '#fc0303',
-    '#06f202',
-    '#e2f202',
-    '#fc03f8',
-    //'#AABBCC'
-];
+
 
 var SOUND_ATOM = [
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]],
