@@ -81,9 +81,11 @@ const STAGES_NEXT = {
     'Stage-01': ['Stage-02a','Stage-02b'],
     'Stage-02a': ['Stage-03'],
     'Stage-02b': ['Stage-03'],
-    'Stage-03': ['Stage-01'], 
+    'Stage-03': [], 
 }
 
+const START_STAGE = 'Stage-01';
+const END_STAGE = 'Stage-03';
 
 class StartScene extends Phaser.Scene {
     constructor () {
@@ -940,18 +942,18 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*6, 'div', {
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*18.5, 'div', {
             "fontSize":'34px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '600',
             color: 'white',
-            'text-decoration': 'underline'
+            //'text-decoration': 'underline'
         });
         
-        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0.5);
+        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0);
 
         
-        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 7.5, 'div', {
+        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
             "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
@@ -983,7 +985,7 @@ class WinScene extends Phaser.Scene
             outline: 'solid',
         }
         
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 8, 'div', scoreScreenStyle);
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 7, 'div', scoreScreenStyle);
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
@@ -1046,8 +1048,14 @@ class WinScene extends Phaser.Scene
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
+            var continue_text = '[SPACE TO CONTINUE]';
+
+            if (ourGame.stage === END_STAGE) {
+                continue_text = '[SPACE TO RESTART]';
+            }
+            
             var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25,'', {"fontSize":'48px'});
-            continueText.setText('[SPACE TO CONTINUE]').setOrigin(0.5,0);
+            continueText.setText(continue_text).setOrigin(0.5,0);
 
 
             this.tweens.add({
@@ -1060,29 +1068,30 @@ class WinScene extends Phaser.Scene
               });
             
 
-                this.input.keyboard.on('keydown-SPACE', function() {
-
+            this.input.keyboard.on('keydown-SPACE', function() {
+                    
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there
                 ourGame.events.off('addScore');
                 ourGame.events.off('saveScore');
-            
-                
+
                 ourInputScene.scene.restart();
-                console.log(ourUI.score);
-                ourUI.scene.restart( { score: ourUI.score } );
+
+                console.log(ourGame.stage, END_STAGE);
+                if (ourGame.stage != END_STAGE) {
                 
-                var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
-                console.log("Next Stages", STAGES_NEXT[ourGame.stage]);
-                console.log("NEXT", next_stage);
-                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
-                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
-                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
-                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
-                ourGame.scene.restart( { stage: next_stage } );
-
-
+                    ourUI.scene.restart( { score: ourUI.score } );
+                
+                    var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
+                    ourGame.scene.restart( { stage: next_stage } );
+                }
+                else {
+                    // Start From The beginning. Must force reset values or it won't reset.
+                    ourUI.scene.restart( { score: 0 });
+                    ourGame.scene.restart({ stage: START_STAGE });
+                }
+                
                 ourWinScene.scene.switch('GameScene');
 
             });
