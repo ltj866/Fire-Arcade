@@ -77,9 +77,11 @@ var SOUND_PORTAL = [
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
 
-var STAGES = {
-    'Stage-01': 'Stage-03', 
-    'Stage-03': 'Stage-01', 
+var STAGES_NEXT = {
+    'Stage-01': ['Stage-02a','Stage-02b'],
+    'Stage-02a': ['Stage-03'],
+    'Stage-02b': ['Stage-03'],
+    'Stage-03': ['Stage-01'], 
 }
 
 
@@ -1055,7 +1057,15 @@ class WinScene extends Phaser.Scene
                 
                 ourInputScene.scene.restart();
                 ourUI.scene.restart();
-                ourGame.scene.restart( {stage: STAGES[ourGame.stage]} );
+                
+                var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
+                console.log("Next Stages", STAGES_NEXT[ourGame.stage]);
+                console.log("NEXT", next_stage);
+                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
+                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
+                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
+                console.log("RANDOM", Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]));
+                ourGame.scene.restart( { stage: next_stage } );
 
 
                 ourWinScene.scene.switch('GameScene');
