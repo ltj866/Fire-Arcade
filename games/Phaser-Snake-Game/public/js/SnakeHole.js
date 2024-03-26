@@ -63,6 +63,10 @@ var PORTAL_COLORS = [
 ];
 
 var SOUND_ATOM = [
+    ['bubbleBop01', [ 'bubbleBop01.ogg', 'bubbleBop01.mp3' ]]
+]
+
+/*var SOUND_ATOM = [
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]],
     ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]],
     ['atomAbsorb03', [ 'atomAbsorb03.ogg', 'atomAbsorb03.mp3' ]],
@@ -71,7 +75,7 @@ var SOUND_ATOM = [
     ['atomAbsorb06', [ 'atomAbsorb06.ogg', 'atomAbsorb06.mp3' ]],
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]], //will make 07 and 08 here if we continue with this sound profile
     ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]]
-];
+];*/
 
 var SOUND_POINT_COLLECT = [
     ['pointCollect01', [ 'pointCollect01.ogg', 'pointCollect01.mp3' ]],
