@@ -63,7 +63,9 @@ var PORTAL_COLORS = [
 ];
 
 var SOUND_ATOM = [
-    ['bubbleBop01', [ 'bubbleBop01.ogg', 'bubbleBop01.mp3' ]]
+    ['bubbleBop01', [ 'bubbleBop01.ogg', 'bubbleBop01.mp3' ]],
+    ['bubbleBopHigh01', [ 'bubbleBopHigh01.ogg', 'bubbleBopHigh01.mp3' ]],
+    ['bubbleBopLow01', [ 'bubbleBopLow01.ogg', 'bubbleBopLow01.mp3' ]]
 ]
 
 /*var SOUND_ATOM = [

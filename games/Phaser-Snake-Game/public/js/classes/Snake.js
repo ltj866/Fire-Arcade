@@ -126,15 +126,20 @@ var Snake = new Phaser.Class({
     if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
         this.death(scene);
     }
-
+    var i
     var pointSounds = scene.pointSounds[scene.comboCounter -1]
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
             if(scene.comboCounter > 0){
-            pointSounds.play()
-            }
+                i = 0
+                pointSounds.play()}
+            else if(scene.comboCounter > 2){
+                i = 1
+                pointSounds.play()}
+            else{
+                i = 2}
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
@@ -147,14 +152,13 @@ var Snake = new Phaser.Class({
             _atom.electrons.visible = false;
         
             // Play atom sound
-            var index = Math.round(Math.random() * scene.atomSounds.length); 
+            /*var index = Math.round(Math.random() * scene.atomSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
                 index = 7;
-            }
+            }*/
             //console.log(index);
-            var soundRandom = scene.atomSounds[0]; //Use "index" here instead of "0" if we want randomness back
+            scene.atomSounds[i].play();//Use "index" here instead of "i" if we want randomness back
             
-            soundRandom.play();
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);
