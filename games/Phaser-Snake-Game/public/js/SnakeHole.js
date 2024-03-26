@@ -12,7 +12,7 @@ const GAME_VERSION = 'v0.2.03.22.007';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28 //32?................... Win Condition
+export const LENGTH_GOAL = 2; //28 //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -76,6 +76,11 @@ var SOUND_PORTAL = [
 
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
+
+var STAGES = {
+    'Stage-01': 'Stage-03', 
+    'Stage-03': 'Stage-01', 
+}
 
 
 class StartScene extends Phaser.Scene {
@@ -163,7 +168,7 @@ class GameScene extends Phaser.Scene {
     }
     
     
-    init() {
+    init(props) {
         
         // Arrays for collision detection
         this.atoms = [];
@@ -183,6 +188,10 @@ class GameScene extends Phaser.Scene {
 
         this.move_pause = false;
         this.started = false;
+
+        const { stage = 'Stage-01' } = props
+        this.stage = stage;
+        console.log("FIRST INIT", this.stage);
     
 
     }
@@ -197,8 +206,8 @@ class GameScene extends Phaser.Scene {
 
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
-        console.log(ourStageManager.stage);
-        this.load.tilemapTiledJSON('map', `assets/Tiled/${ourStageManager.stage}.json`);
+        
+        this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
         //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
 
         // GameUI
@@ -252,7 +261,7 @@ class GameScene extends Phaser.Scene {
         this.snake.heading = STOP;
         
         // Tilemap
-        this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
+        this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
@@ -935,7 +944,7 @@ class WinScene extends Phaser.Scene
 
         });
         highScore.setText(
-            `${ourStageManager.stage}
+            `${ourGame.stage}
             Score: ${ourUI.score}
             HighScore: ${ourUI.bestScore}
             ---------------
@@ -962,7 +971,7 @@ class WinScene extends Phaser.Scene
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        `STAGE STATS - ${ourStageManager.stage}
+        `STAGE STATS - ${ourGame.stage}
         ----------------------
         SCORE: ${ourUI.score}
         FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
@@ -1046,7 +1055,8 @@ class WinScene extends Phaser.Scene
                 
                 ourInputScene.scene.restart();
                 ourUI.scene.restart();
-                ourGame.scene.restart();
+                ourGame.scene.restart( {stage: STAGES[ourGame.stage]} );
+
 
                 ourWinScene.scene.switch('GameScene');
 
