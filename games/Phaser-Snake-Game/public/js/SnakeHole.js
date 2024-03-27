@@ -29,6 +29,8 @@ var SCORE_FLOOR = 24; // Floor of Fruit score as it counts down.
 var BOOST_ADD_FLOOR = 80;
 var SCORE_MULTI_GROWTH = 0.01;
 
+var comboCounter = 0;
+
 // DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -38,6 +40,7 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 
 var atomSounds = [];
 var portalSounds = [];
+var pointSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -55,6 +58,12 @@ export const STOP = 10;
 
 
 var SOUND_ATOM = [
+    ['bubbleBop01', [ 'bubbleBop01.ogg', 'bubbleBop01.mp3' ]],
+    ['bubbleBopHigh01', [ 'bubbleBopHigh01.ogg', 'bubbleBopHigh01.mp3' ]],
+    ['bubbleBopLow01', [ 'bubbleBopLow01.ogg', 'bubbleBopLow01.mp3' ]]
+]
+
+/*var SOUND_ATOM = [
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]],
     ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]],
     ['atomAbsorb03', [ 'atomAbsorb03.ogg', 'atomAbsorb03.mp3' ]],
@@ -63,7 +72,16 @@ var SOUND_ATOM = [
     ['atomAbsorb06', [ 'atomAbsorb06.ogg', 'atomAbsorb06.mp3' ]],
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]], //will make 07 and 08 here if we continue with this sound profile
     ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]]
-];
+];*/
+
+var SOUND_POINT_COLLECT = [
+    ['pointCollect01', [ 'pointCollect01.ogg', 'pointCollect01.mp3' ]],
+    ['pointCollect02', [ 'pointCollect02.ogg', 'pointCollect02.mp3' ]],
+    ['pointCollect03', [ 'pointCollect03.ogg', 'pointCollect03.mp3' ]],
+    ['pointCollect04', [ 'pointCollect04.ogg', 'pointCollect04.mp3' ]],
+    ['pointCollect05', [ 'pointCollect05.ogg', 'pointCollect05.mp3' ]],
+    ['pointCollect06', [ 'pointCollect06.ogg', 'pointCollect06.mp3' ]]
+]
 
 var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
@@ -153,9 +171,12 @@ class GameScene extends Phaser.Scene {
 
         this.lastMoveTime = 0; // The last time we called move()
 
+        this.comboCounter = comboCounter;
+
         // Sounds
         this.atomSounds = [];
         this.portalSounds = [];
+        this.pointSounds = [];
 
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
@@ -204,7 +225,6 @@ class GameScene extends Phaser.Scene {
         // Audio
         this.load.setPath('assets/audio');
 
-        //this.load.audio('atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3'])
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3'])
 
         SOUND_ATOM.forEach(soundID =>
@@ -213,6 +233,11 @@ class GameScene extends Phaser.Scene {
             });
         
         SOUND_PORTAL.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+
+        SOUND_POINT_COLLECT.forEach(soundID =>
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
@@ -446,16 +471,20 @@ class GameScene extends Phaser.Scene {
         }
         
         // Audio
-        //this.atomAbsorb = this.sound.add('atomAbsorb01');
         this.snakeCrash = this.sound.add('snakeCrash');
-        //this.atomAbsorb.play();
+
+        //this.pointCollect = this.sound.add('pointCollect01');
+        //this.pointCollect.play();
 
         SOUND_ATOM.forEach(soundID => {
-                this.atomSounds.push(this.sound.add(soundID[0]));
+            this.atomSounds.push(this.sound.add(soundID[0]));
             });
         SOUND_PORTAL.forEach(soundID => {
             this.portalSounds.push(this.sound.add(soundID[0]));
-        });
+            });
+        SOUND_POINT_COLLECT.forEach(soundID => {
+            this.pointSounds.push(this.sound.add(soundID[0]));
+            });
 
         // Define keys       
 
@@ -889,7 +918,8 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.boostTime += 1;
             }
         }
-        if (timeLeft <= BOOST_ADD_FLOOR && timeLeft >= SCORE_FLOOR) {
+        if (timeLeft <= BOOST_ADD_FLOOR + 10 && timeLeft >= SCORE_FLOOR) {
+            this.comboCounter = 0;
         }
         
         // Reset Energy if out of bounds.

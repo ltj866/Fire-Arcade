@@ -48,7 +48,7 @@ var Food = new Phaser.Class({
         }, callbackScope: scene });
 
 
-        this.move(scene);
+        this.move(scene); //Do we need this still?
 
         scene.atoms.push(this);
 

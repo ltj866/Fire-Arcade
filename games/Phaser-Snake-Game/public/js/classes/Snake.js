@@ -43,10 +43,10 @@ var Snake = new Phaser.Class({
     
     
     move: function (scene) {
+        
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
-
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
@@ -126,11 +126,20 @@ var Snake = new Phaser.Class({
     if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
         this.death(scene);
     }
+    var i
+    var pointSounds = scene.pointSounds[scene.comboCounter -1]
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
-
+            if(scene.comboCounter > 0){
+                i = 0
+                pointSounds.play()}
+            else if(scene.comboCounter > 2){
+                i = 1
+                pointSounds.play()}
+            else{
+                i = 2}
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
@@ -138,22 +147,18 @@ var Snake = new Phaser.Class({
             _atom.y = 0;
             _atom.visible = false;
             //_atom.electrons.visible = false;
-            //_atom.electrons.stop();
-            _atom.electrons.setPosition(0, 0);
+            _atom.electrons.play("electronIdle");
+            //_atom.electrons.setPosition(0, 0);
             _atom.electrons.visible = false;
         
-
-            
             // Play atom sound
-            var index = Math.round(Math.random() * scene.atomSounds.length); 
+            /*var index = Math.round(Math.random() * scene.atomSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length
                 index = 7;
-            }
+            }*/
             //console.log(index);
-            var soundRandom = scene.atomSounds[index];
+            scene.atomSounds[i].play();//Use "index" here instead of "i" if we want randomness back
             
-            soundRandom.play();
-            //scene.atomAbsorb.play();
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);
@@ -173,14 +178,16 @@ var Snake = new Phaser.Class({
                     // Start decay timer for the eaten Apple now. 
                     __atom.startDecay(scene);
                     // The rest is called after the delay.
-                    
+                    if (scene.comboCounter <= 4){
+                        scene.comboCounter +=1;
+                    }
                 } 
                 else {
                 // For every other atom do everything now
                 __atom.play("atom01idle", true);
                 __atom.electrons.setVisible(true);
                 //this.electrons.anims.restart();
-                __atom.absorable = true;
+                //__atom.absorbable = true;
                 __atom.startDecay(scene);
 
                 __atom.electrons.play("electronIdle", true);
