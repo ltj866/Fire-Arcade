@@ -86,5 +86,6 @@
  "tilewidth":24,
  "type":"map",
  "version":"1.10",
- "width":32
+ "width":32,
+ "uuid": "8f268a1b-1afc-43fd-b825-011db04a72e8"
 }
