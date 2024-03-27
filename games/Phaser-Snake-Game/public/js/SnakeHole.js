@@ -206,6 +206,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
+        this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
         //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
 
         // GameUI
@@ -242,6 +243,10 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        
+        var data = this.cache.json.get(`${this.stage}-json`)["uuid"];
+        console.log("DATA", data);
+        debugger
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
 
