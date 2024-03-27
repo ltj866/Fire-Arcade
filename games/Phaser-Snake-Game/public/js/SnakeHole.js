@@ -87,6 +87,7 @@ var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
 
+const DREAMWALLSKIP = [0,1,2];
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
 
@@ -117,15 +118,15 @@ class StartScene extends Phaser.Scene {
 
     create() {
         
-        this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        var card = this.add.image(SCREEN_WIDTH/2, 5.5*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
+        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
 
         //card.setScale(1);
 
         
-        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
+        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         this.tweens.add({
             targets: continueText,
@@ -250,12 +251,7 @@ class GameScene extends Phaser.Scene {
         
         this.stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
 
-        /////////////////////////////////////////////////
-        // UI BLOCKS
-        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
-        this.add.image(GRID * 25.5, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
-        this.add.image(GRID * 29.5 - 4, GRID * 1, 'blocks', 12).setOrigin(0,0).setDepth(50); // Tried to center flag
-        ////////////////////////////////////////////
+
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
@@ -331,6 +327,7 @@ class GameScene extends Phaser.Scene {
             frameRate: 8,
             repeat: -1
         });
+        
 
         const keys = [ 'increasing' ];
         const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
@@ -440,14 +437,14 @@ class GameScene extends Phaser.Scene {
         // Dream Wall Shimmer
 
 
-        //const dreamWallSkip = [0,1,2,11,20,29];
-        const dreamWallSkip = [0,1,2];
+        
+        
 
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
         for (let index = 2; index < END_Y - 1; index++) {
-            if (!dreamWallSkip.includes(index)) {
+            if (!DREAMWALLSKIP.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
                 this.dreamWalls.push(wallShimmerRight);
@@ -668,7 +665,8 @@ class GameScene extends Phaser.Scene {
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         
-        ////////////end
+        //////////// Add things to the UI that are loaded by the game scene.
+        // This makes sure it is created in the correct order
         const ourUI = this.scene.get('UIScene'); 
         ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
         ourUI.bestScoreUI.setOrigin(0,0);
@@ -677,6 +675,10 @@ class GameScene extends Phaser.Scene {
 
 
         ourUI.bestScoreUI.setText(`Best : ${bestScore}`);
+        /////////////////////////////////////////////////
+        // UI BLOCKS
+
+        ////////////////////////////////////////////
 
     }
     
@@ -952,8 +954,52 @@ class WinScene extends Phaser.Scene
         var stage_score = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
 
 
+        //////////////////////////////////////
+        // Later on we could have the score screen float transparently above the end scene. 
+        // For now we emulate the first level
+
+        // Tilemap
+        this.map = this.make.tilemap({ key: "Stage-01", tileWidth: GRID, tileHeight: GRID });
+        this.tileset = this.map.addTilesetImage('tileSheetx24');
+
+        this.layer = this.map.createLayer('Wall', this.tileset);
+        this.layer.setDepth(25);
+
+        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
+        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+        
+        // Dream walls for Horizontal Wrap
+        for (let index = 2; index < END_Y - 1; index++) {
+            if (!DREAMWALLSKIP.includes(index)) {
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
+                wallShimmerRight.play('wrapBlock05');
+                //this.dreamWalls.push(wallShimmerRight);
+                
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
+                wallShimmerLeft.play('wrapBlock04');
+                //this.dreamWalls.push(wallShimmerLeft);
+            }
+        }
+
+        // Dream walls for Vertical Wrap
+        for (let index = 1; index < END_X; index++) {
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
+            wallShimmerTop.play('wrapBlock02');
+            //this.dreamWalls.push(wallShimmerTop);
+                
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(10).setOrigin(0,0);
+            wallShimmerBottom.play('wrapBlock07');
+            //this.dreamWalls.push(wallShimmerBottom);
+        
+        }
+        //////////////////////////////////////
+
+
+
         ///////
-        this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
+        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
@@ -1085,7 +1131,7 @@ class WinScene extends Phaser.Scene
                 continue_text = '[SPACE TO RESTART]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25,'', {"fontSize":'48px'});
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
             continueText.setText(continue_text).setOrigin(0.5,0);
 
 
@@ -1171,10 +1217,16 @@ class UIScene extends Phaser.Scene {
     preload () {
         const ourGame = this.scene.get('GameScene');
         this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
+
+        this.load.spritesheet('ui-blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
     }
     
     create() {
         const ourGame = this.scene.get('GameScene');
+
+       this.add.sprite(GRID * 21.5, GRID * 1, 'ui-blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+       this.add.sprite(GRID * 25.5, GRID * 1, 'ui-blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
+       this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 12).setOrigin(0,0).setDepth(50); // Tried to center flag
 
 
         
