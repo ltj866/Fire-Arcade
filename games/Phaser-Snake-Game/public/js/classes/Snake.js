@@ -134,12 +134,17 @@ var Snake = new Phaser.Class({
         if(this.head.x === _atom.x && this.head.y === _atom.y){
             if(scene.comboCounter > 0){
                 i = 0
-                pointSounds.play()}
+                pointSounds.play()
+                console.log(scene.comboCounter)}
             else if(scene.comboCounter > 2){
                 i = 1
                 pointSounds.play()}
             else{
                 i = 2}
+            if (scene.comboCounter <= 7){
+                scene.comboCounter +=1;
+            }
+
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
@@ -178,9 +183,6 @@ var Snake = new Phaser.Class({
                     // Start decay timer for the eaten Apple now. 
                     __atom.startDecay(scene);
                     // The rest is called after the delay.
-                    if (scene.comboCounter <= 4){
-                        scene.comboCounter +=1;
-                    }
                 } 
                 else {
                 // For every other atom do everything now

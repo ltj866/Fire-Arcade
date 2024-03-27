@@ -80,7 +80,9 @@ var SOUND_POINT_COLLECT = [
     ['pointCollect03', [ 'pointCollect03.ogg', 'pointCollect03.mp3' ]],
     ['pointCollect04', [ 'pointCollect04.ogg', 'pointCollect04.mp3' ]],
     ['pointCollect05', [ 'pointCollect05.ogg', 'pointCollect05.mp3' ]],
-    ['pointCollect06', [ 'pointCollect06.ogg', 'pointCollect06.mp3' ]]
+    ['pointCollect06', [ 'pointCollect06.ogg', 'pointCollect06.mp3' ]],
+    ['pointCollect07', [ 'pointCollect07.ogg', 'pointCollect07.mp3' ]],
+    ['pointCollect08', [ 'pointCollect08.ogg', 'pointCollect08.mp3' ]],
 ]
 
 var SOUND_PORTAL = [
@@ -660,6 +662,23 @@ class GameScene extends Phaser.Scene {
         // Top Row
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        //TEMP SPAWNS BELOW
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        //DELETE ABOVE
         
         // Middle Row        
         this.setFruit(this, [areaBB, areaBC]);
