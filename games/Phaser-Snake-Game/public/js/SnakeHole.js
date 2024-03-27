@@ -780,7 +780,7 @@ class GameScene extends Phaser.Scene {
         if (ourUI.length >= LENGTH_GOAL) {
             console.log("YOU WIN");
 
-            ourUI.scoreUI.setText(`Score: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
             //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
             this.events.emit('saveScore');
 
