@@ -10,11 +10,11 @@ import {PORTAL_COLORS} from './const.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'v0.2.03.22.007';
+const GAME_VERSION = 'v0.3.03.29.001';
 
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28 //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28 //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -968,7 +968,17 @@ class WinScene extends Phaser.Scene
         
         currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0);
 
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`));
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*20.5, 'div', {
+            "fontSize":'34px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '600',
+            color: 'white',
+            //'text-decoration': 'underline'
+        });
+        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+        bestRunUI.setText(`Best Score: ${bestrun}`).setOrigin(0.5,0);
+
+        
         
 
         const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
@@ -979,7 +989,7 @@ class WinScene extends Phaser.Scene
             'text-align': 'right',
 
         });
-
+        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`));
         highScore.setText(
             `${ourGame.stage}
             Stage Score: ${stage_score}
@@ -1109,6 +1119,10 @@ class WinScene extends Phaser.Scene
                 }
                 else {
                     // Start From The beginning. Must force reset values or it won't reset.
+                    
+                    
+                    localStorage.setItem('BestFinalScore', ourUI.score);
+                    
                     console.log("END STAGE", ourGame.stage, END_STAGE);
                     ourUI.scene.restart( { score: 0 });
                     ourGame.scene.restart({ stage: START_STAGE });
@@ -1186,6 +1200,7 @@ class UIScene extends Phaser.Scene {
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UISTYLE);
         this.scoreUI.setText(`Stage: 0`).setOrigin(0,1);
+
         //this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
         
         // Best Score
