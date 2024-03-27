@@ -1,13 +1,6 @@
 
 
 
-
-
-
-
-
-
-
 export const PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
     //'#AABBCC',

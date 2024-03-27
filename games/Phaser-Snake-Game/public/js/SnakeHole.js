@@ -12,9 +12,9 @@ import {PORTAL_COLORS} from './const.js';
 
 const GAME_VERSION = 'v0.3.03.29.001';
 
-export const GRID = 24;  //.................... Size of Sprites and GRID
-var FRUIT = 5;           //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28 //32?................... Win Condition
+export const GRID = 24;        //.................... Size of Sprites and GRID
+var FRUIT = 5;                 //.................... Number of fruit to spawn
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -95,7 +95,7 @@ const STAGES_NEXT = {
     'Stage-01': ['Stage-02a','Stage-02b'],
     'Stage-02a': ['Stage-03'],
     'Stage-02b': ['Stage-03'],
-    'Stage-03': [], 
+    'Stage-03': []
 }
 
 const START_STAGE = 'Stage-01';
@@ -282,7 +282,8 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5,0);
         
 
-        // Animation set
+        // #region Animations
+        // Animation set 
         this.anims.create({
             key: 'atom01idle',
             frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
@@ -327,40 +328,6 @@ class GameScene extends Phaser.Scene {
             frameRate: 8,
             repeat: -1
         });
-        
-
-        const keys = [ 'increasing' ];
-        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
-        boostBar.setDepth(50);
-        boostBar.play('increasing');
-
-        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
-
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
-            frameRate: 16,
-            repeat: -1
-        });
-
-
-        var startingArrowState = true;
-
-        let _x = this.snake.head.x;
-        let _y = this.snake.head.y;
-        
-        const startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
-        const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
-        const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
-        const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
-        
-        startingArrowsAnimS.flipY = true;
-        startingArrowsAnimE.angle = 90;
-        startingArrowsAnimW.angle = 270;
-        startingArrowsAnimN.play('idle');
-        startingArrowsAnimS.play('idle');
-        startingArrowsAnimE.play('idle');
-        startingArrowsAnimW.play('idle');
 
         //WRAP_BLOCK_ANIMS
         this.anims.create({
@@ -411,6 +378,42 @@ class GameScene extends Phaser.Scene {
             frameRate: 4,
             repeat: -1
         })
+        // #endregion
+
+        const keys = [ 'increasing' ];
+        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+        boostBar.setDepth(50);
+        boostBar.play('increasing');
+
+        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+            frameRate: 16,
+            repeat: -1
+        });
+
+
+        var startingArrowState = true;
+
+        let _x = this.snake.head.x;
+        let _y = this.snake.head.y;
+        
+        const startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
+        const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
+        const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        
+        startingArrowsAnimS.flipY = true;
+        startingArrowsAnimE.angle = 90;
+        startingArrowsAnimW.angle = 270;
+        startingArrowsAnimN.play('idle');
+        startingArrowsAnimS.play('idle');
+        startingArrowsAnimE.play('idle');
+        startingArrowsAnimW.play('idle');
+
+
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
@@ -1196,9 +1199,6 @@ class UIScene extends Phaser.Scene {
     init(props) {
         
         const ourGame = this.scene.get('GameScene');
-        //var stageUUID = ourGame.cache.json.get(`${ourGame.stage}-json`)["uuid"];
-        
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stage}-best`))
 
         //this.score = 0;
         const { score = 0 } = props
