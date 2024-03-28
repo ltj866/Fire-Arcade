@@ -42,7 +42,7 @@ var Snake = new Phaser.Class({
     },
     
     
-    move: function (scene) {
+    move: function (scene, timeSinceFruit) {
         
     // start with current head position
     let x = this.head.x;
@@ -126,8 +126,8 @@ var Snake = new Phaser.Class({
     if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
         this.death(scene);
     }
-    var i
-    var pointSounds = scene.pointSounds[scene.comboCounter -1]
+    var i;
+    var pointSounds = scene.pointSounds[scene.comboCounter -1];
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  

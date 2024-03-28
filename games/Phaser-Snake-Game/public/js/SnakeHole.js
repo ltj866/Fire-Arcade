@@ -494,6 +494,7 @@ class GameScene extends Phaser.Scene {
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
+        
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             if (!this.snake.pause_movement) {
@@ -513,6 +514,7 @@ class GameScene extends Phaser.Scene {
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
         }) 
+        
 
         // Add all tiles to walls for collision
         this.map.forEachTile( tile => {
@@ -846,6 +848,7 @@ class GameScene extends Phaser.Scene {
 
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
+            
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
@@ -909,7 +912,7 @@ class GameScene extends Phaser.Scene {
             
             
             // Move at last second
-            this.snake.move(this);
+            this.snake.move(this, timeTick);
         }
         
         // Boost and Boost Multi Code
@@ -1241,7 +1244,7 @@ class UIScene extends Phaser.Scene {
     }
     
     create() {
-        const ourGame = this.scene.get('GameScene');
+       const ourGame = this.scene.get('GameScene');
 
        this.add.sprite(GRID * 21.5, GRID * 1, 'ui-blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
        this.add.sprite(GRID * 25.5, GRID * 1, 'ui-blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
@@ -1483,6 +1486,32 @@ class InputScene extends Phaser.Scene {
 
     }
     create() {
+    /*
+    const ourGame = this.scene.get('GameScene');
+
+    // Keyboard Inputs
+    this.input.keyboard.on('keydown', e => {
+        if (!ourGame.snake.pause_movement) {
+            this.updateDirection(ourGame, e);
+            
+        }
+        /*
+        if (startingArrowState == true){
+            startingArrowState = false;
+            startingArrowsAnimN.setVisible(false)
+            startingArrowsAnimS.setVisible(false)
+            startingArrowsAnimE.setVisible(false)
+            startingArrowsAnimW.setVisible(false)
+        }
+    })
+
+    this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+        if (DEBUG) { console.log(e.code+" unPress", this.time.now); }
+       this.inputSet.push([STOP_SPRINT, this.time.now]);
+    
+    }) 
+    */
+    
     }
     update() {
     }
