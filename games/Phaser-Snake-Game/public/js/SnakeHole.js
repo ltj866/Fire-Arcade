@@ -912,7 +912,7 @@ class GameScene extends Phaser.Scene {
             
             
             // Move at last second
-            this.snake.move(this, timeTick);
+            this.snake.move(this);
         }
         
         // Boost and Boost Multi Code

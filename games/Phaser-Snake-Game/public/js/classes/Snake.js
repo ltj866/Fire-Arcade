@@ -42,9 +42,9 @@ var Snake = new Phaser.Class({
     },
     
     
-    move: function (scene, timeSinceFruit) {
-        
-    // start with current head position
+    move: function (scene) {
+    
+    // Alias x and y to the current head position
     let x = this.head.x;
     let y = this.head.y;
     
@@ -132,6 +132,11 @@ var Snake = new Phaser.Class({
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
+            const ourUI = scene.scene.get('UIScene');
+            var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            console.log("time since last fruit:", timeSinceFruit);
+            
+
             if(scene.comboCounter > 0){
                 i = 0
                 pointSounds.play()
