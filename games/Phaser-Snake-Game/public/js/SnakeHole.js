@@ -199,6 +199,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
@@ -483,7 +484,7 @@ class GameScene extends Phaser.Scene {
             this.portalSounds.push(this.sound.add(soundID[0]));
             });
         SOUND_POINT_COLLECT.forEach(soundID => {
-            this.pointSounds.push(this.sound.add(soundID[0]));
+            this.pointSounds.push(this.sound.add(soundID[0], {volume: 0.5}));
             });
 
         // Define keys       
@@ -1218,15 +1219,15 @@ class UIScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
         this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
 
-        this.load.spritesheet('ui-blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('ui-blocks', 'assets/sprites/hudIconsSheet.png', { frameWidth: GRID, frameHeight: GRID });
     }
     
     create() {
         const ourGame = this.scene.get('GameScene');
 
-       this.add.sprite(GRID * 21.5, GRID * 1, 'ui-blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
-       this.add.sprite(GRID * 25.5, GRID * 1, 'ui-blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
-       this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 12).setOrigin(0,0).setDepth(50); // Tried to center flag
+       this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+       this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
+       this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 3).setOrigin(0,0).setDepth(50); // Tried to center flag
 
 
         
@@ -1480,7 +1481,7 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
                 // At anytime you can update the direction of the snake.
-                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.head.setTexture('snakeDefault', 6);
                 gameScene.snake.heading = UP;
                 
                 this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
@@ -1499,7 +1500,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) {
                 
-                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.head.setTexture('snakeDefault', 4);
                 gameScene.snake.heading = LEFT;
 
                 this.turns += 1;
@@ -1519,7 +1520,7 @@ class InputScene extends Phaser.Scene {
                  gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
 
-                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.head.setTexture('snakeDefault', 7);
                 gameScene.snake.heading = DOWN;
 
                 this.turns += 1;
@@ -1538,7 +1539,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
-                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.head.setTexture('snakeDefault', 5);
                 gameScene.snake.heading = RIGHT;
 
                 this.turns += 1;
@@ -1557,7 +1558,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || 
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) {
 
-                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.head.setTexture('snakeDefault', 6);
                 gameScene.snake.heading = UP;
 
                 this.turns += 1;
@@ -1576,7 +1577,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
                 
-                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.head.setTexture('snakeDefault', 4);
                 gameScene.snake.heading = LEFT;
 
                 this.turns += 1;
@@ -1595,7 +1596,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || 
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
 
-                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.head.setTexture('snakeDefault', 7);
                 gameScene.snake.heading = DOWN;
                 
                 this.turns += 1;
@@ -1614,7 +1615,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
 
-                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.head.setTexture('snakeDefault', 5);
                 gameScene.snake.heading = RIGHT;
                 
                 this.turns += 1;
