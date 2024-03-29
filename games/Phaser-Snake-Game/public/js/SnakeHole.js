@@ -14,7 +14,7 @@ const GAME_VERSION = 'v0.3.03.29.001';
 
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 2; //28.. //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -95,12 +95,12 @@ const STAGES_NEXT = {
     'Stage-01': ['Stage-02a','Stage-02b'],
     'Stage-02a': ['Stage-03'],
     'Stage-02b': ['Stage-03b'],
-    'Stage-03': [],
-    'Stage-03b': []
+    'Stage-03': ['Stage-04'],
+    'Stage-03b': ['Stage-04']
 }
 
 const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-03';
+const END_STAGE = 'Stage-04';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
