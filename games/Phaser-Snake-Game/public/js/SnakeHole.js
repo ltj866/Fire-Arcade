@@ -94,8 +94,9 @@ const DREAMWALLSKIP = [0,1,2];
 const STAGES_NEXT = {
     'Stage-01': ['Stage-02a','Stage-02b'],
     'Stage-02a': ['Stage-03'],
-    'Stage-02b': ['Stage-03'],
-    'Stage-03': []
+    'Stage-02b': ['Stage-03b'],
+    'Stage-03': [],
+    'Stage-03b': []
 }
 
 const START_STAGE = 'Stage-01';
