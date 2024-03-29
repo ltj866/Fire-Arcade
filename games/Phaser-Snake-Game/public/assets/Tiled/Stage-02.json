@@ -47,6 +47,12 @@
  "nextlayerid":2,
  "nextobjectid":1,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"UUID",
+         "type":"string",
+         "value":"3c3bffb0-ebce-11ee-a951-0242ac120002"
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
  "tileheight":24,
