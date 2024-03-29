@@ -100,8 +100,8 @@ const STAGES_NEXT = {
     'Stage-03': []
 }
 
-const START_STAGE = 'Stage-x1';
-const END_STAGE = 'Stage-x1';
+const START_STAGE = 'Bonus-Stage-x1';
+const END_STAGE = 'Bonus-Stage-x1';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
