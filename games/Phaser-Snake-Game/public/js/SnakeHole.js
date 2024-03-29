@@ -81,7 +81,9 @@ var SOUND_POINT_COLLECT = [
     ['pointCollect03', [ 'pointCollect03.ogg', 'pointCollect03.mp3' ]],
     ['pointCollect04', [ 'pointCollect04.ogg', 'pointCollect04.mp3' ]],
     ['pointCollect05', [ 'pointCollect05.ogg', 'pointCollect05.mp3' ]],
-    ['pointCollect06', [ 'pointCollect06.ogg', 'pointCollect06.mp3' ]]
+    ['pointCollect06', [ 'pointCollect06.ogg', 'pointCollect06.mp3' ]],
+    ['pointCollect07', [ 'pointCollect07.ogg', 'pointCollect07.mp3' ]],
+    ['pointCollect08', [ 'pointCollect08.ogg', 'pointCollect08.mp3' ]],
 ]
 
 var SOUND_PORTAL = [
@@ -394,6 +396,7 @@ class GameScene extends Phaser.Scene {
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
+        
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             // Separate if statements so the first will 
@@ -458,6 +461,7 @@ class GameScene extends Phaser.Scene {
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
         }) 
+        
 
         // Add all tiles to walls for collision
         this.map.forEachTile( tile => {
@@ -607,6 +611,23 @@ class GameScene extends Phaser.Scene {
         // Top Row
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        //TEMP SPAWNS BELOW
+        /*this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        //DELETE ABOVE*/
         
         // Middle Row        
         this.setFruit(this, [areaBB, areaBC]);
@@ -784,6 +805,7 @@ class GameScene extends Phaser.Scene {
 
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
+            
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
@@ -1190,7 +1212,7 @@ class UIScene extends Phaser.Scene {
     }
     
     create() {
-        const ourGame = this.scene.get('GameScene');
+       const ourGame = this.scene.get('GameScene');
 
        this.add.sprite(GRID * 21.5, GRID * 1, 'ui-blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
        this.add.sprite(GRID * 25.5, GRID * 1, 'ui-blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
@@ -1463,6 +1485,32 @@ class InputScene extends Phaser.Scene {
 
     }
     create() {
+    /*
+    const ourGame = this.scene.get('GameScene');
+
+    // Keyboard Inputs
+    this.input.keyboard.on('keydown', e => {
+        if (!ourGame.snake.pause_movement) {
+            this.updateDirection(ourGame, e);
+            
+        }
+        /*
+        if (startingArrowState == true){
+            startingArrowState = false;
+            startingArrowsAnimN.setVisible(false)
+            startingArrowsAnimS.setVisible(false)
+            startingArrowsAnimE.setVisible(false)
+            startingArrowsAnimW.setVisible(false)
+        }
+    })
+
+    this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+        if (DEBUG) { console.log(e.code+" unPress", this.time.now); }
+       this.inputSet.push([STOP_SPRINT, this.time.now]);
+    
+    }) 
+    */
+    
     }
     update() {
     }
@@ -1608,6 +1656,7 @@ class InputScene extends Phaser.Scene {
                 
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 this.turns += 1; 
+                gameScene.snake.move(gameScene);
                     
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
                 gameScene.snake.move(gameScene);

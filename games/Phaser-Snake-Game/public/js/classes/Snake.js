@@ -45,8 +45,8 @@ var Snake = new Phaser.Class({
     
     
     move: function (scene) {
-        
-    // start with current head position
+    
+    // Alias x and y to the current head position
     let x = this.head.x;
     let y = this.head.y;
 
@@ -157,14 +157,24 @@ var Snake = new Phaser.Class({
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
+            const ourUI = scene.scene.get('UIScene');
+            var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            console.log("time since last fruit:", timeSinceFruit);
+            
+
             if(scene.comboCounter > 0){
                 i = 0
-                pointSounds.play()}
+                pointSounds.play()
+                console.log(scene.comboCounter)}
             else if(scene.comboCounter > 2){
                 i = 1
                 pointSounds.play()}
             else{
                 i = 2}
+            if (scene.comboCounter <= 7){
+                scene.comboCounter +=1;
+            }
+
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition
@@ -203,9 +213,6 @@ var Snake = new Phaser.Class({
                     // Start decay timer for the eaten Apple now. 
                     __atom.startDecay(scene);
                     // The rest is called after the delay.
-                    if (scene.comboCounter <= 4){
-                        scene.comboCounter +=1;
-                    }
                 } 
                 else {
                 // For every other atom do everything now
