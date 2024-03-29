@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 256; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 0; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -25,7 +25,7 @@ export const SPEEDWALK = 99; // 99 In milliseconds
 var SPEEDSPRINT = 33; // 24
 
 
-var SCORE_FLOOR = 24; // Floor of Fruit score as it counts down.
+var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 const COMBO_ADD_FLOOR = 87;
 var SCORE_MULTI_GROWTH = 0.01;
@@ -98,8 +98,8 @@ const STAGES_NEXT = {
     'Stage-03': []
 }
 
-const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-03';
+const START_STAGE = 'Stage-x1';
+const END_STAGE = 'Stage-x1';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -717,7 +717,13 @@ class GameScene extends Phaser.Scene {
             //ourUI.livesUI.setText(`x ${ourUI.bonks}`);
 
             //ourUI.length = 0;
-            ourUI.lengthGoalUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
+            if (ourUI.lengthGoal != 0) {
+                ourUI.lengthGoalUI.setText(`${ourUI.length}/${LENGTH_GOAL}`); 
+            }
+            else {
+                ourUI.lengthGoalUI.setText(`${ourUI.length}`);
+            }
+            
 
 
             //game.destroy();
@@ -762,7 +768,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // Win State
-        if (ourUI.length >= LENGTH_GOAL) {
+        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0) {
             console.log("YOU WIN");
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
@@ -823,11 +829,14 @@ class GameScene extends Phaser.Scene {
                 });
             };
             const ourUI = this.scene.get('UIScene');
+
+
        
             if (DEBUG) {
                 const ourUI = this.scene.get('UIScene');
-                var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+                
                 if (timeTick < SCORE_FLOOR ) {
+
                     
                 } else {
                     this.atoms.forEach( fruit => {
@@ -1056,12 +1065,12 @@ class WinScene extends Phaser.Scene
         
         //var stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
         var bestLogText = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
-        var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestScoreAve`))
+        //var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestScoreAve`))
 
         if (bestLogText) {
             var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 13, 'div', logScreenStyle);
             bestLog.setText(
-                `Best - ave(${bestScoreAve})
+                `Best - ave( )
                 ------------------
                 [${bestLogText}]`
             ).setOrigin(1,0);    
@@ -1230,7 +1239,14 @@ class UIScene extends Phaser.Scene {
         
         
         var length = `${this.length}`;
-        this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`).setOrigin(0,1);
+        if (LENGTH_GOAL != 0) {
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`).setOrigin(0,1);
+        }
+        else {
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,1);
+            this.lengthGoalUI.x = GRID * 27
+        }
+        
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
@@ -1321,6 +1337,7 @@ class UIScene extends Phaser.Scene {
             }
 
 
+
             // Update UI
 
             this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
@@ -1330,11 +1347,18 @@ class UIScene extends Phaser.Scene {
 
             var length = `${this.length}`;
             
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
+            if (LENGTH_GOAL != 0) {
+                this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
+            }
+            else {
+                this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+            }
+            
+            
             
 
              // Restart Score Timer
-            if (this.length < LENGTH_GOAL) {
+            if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                     delay: 10000,
                     paused: false
@@ -1376,9 +1400,26 @@ class UIScene extends Phaser.Scene {
     }
     update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+
+                    // #region Custom Code for a Bonuse Level
+        console.log(timeTick);
+        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
+                // Temp Code for bonus level
+                console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
+
+               this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+                //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
+                this.events.emit('saveScore');
+    
+                this.scene.pause();
+    
+                this.scene.start('WinScene');
+            }
+            // #endregion
+
         
         
-        if (this.length < LENGTH_GOAL) {
+        if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
             if (timeTick < SCORE_FLOOR ) {
                 this.countDown.setText(this.score + SCORE_FLOOR);
