@@ -1402,7 +1402,6 @@ class UIScene extends Phaser.Scene {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
 
                     // #region Custom Code for a Bonuse Level
-        console.log(timeTick);
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
                 // Temp Code for bonus level
                 console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
