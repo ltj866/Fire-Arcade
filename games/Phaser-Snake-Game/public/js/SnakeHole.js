@@ -1056,6 +1056,7 @@ class WinScene extends Phaser.Scene
         `STAGE STATS - ${ourGame.stage}
         ----------------------
         SCORE: ${ourUI.score}
+        LENGTH: ${ourUI.length}
         FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
         
         TURNS: ${ourInputScene.turns}
