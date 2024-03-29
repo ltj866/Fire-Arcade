@@ -45,6 +45,7 @@ var pointSounds = [];
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
 var tileset;
+var tileset2;
 
 //  Direction consts
 export const LEFT = 0;
@@ -198,12 +199,14 @@ class GameScene extends Phaser.Scene {
     preload () {
         
         this.load.image('bg01', 'assets/sprites/background01.png');
-        this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('blocks', ['assets/Tiled/tileSheet02x24.png'], { frameWidth: GRID, frameHeight: GRID });
+        //this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
+        this.load.image('tileSheet02x24', 'assets/Tiled/tileSheet02x24.png');
         
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
         this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
@@ -264,8 +267,9 @@ class GameScene extends Phaser.Scene {
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
+        this.tileset2 = this.map.addTilesetImage('tileSheet02x24');
 
-        this.layer = this.map.createLayer('Wall', this.tileset);
+        this.layer = this.map.createLayer('Wall', [this.tileset,this.tileset2]);
         this.layer.setDepth(25);
     
         // add background
@@ -966,6 +970,7 @@ class WinScene extends Phaser.Scene
         // Tilemap
         this.map = this.make.tilemap({ key: "Stage-01", tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
+        this.tileset2 = this.map.addTilesetImage('tileSheet02x24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
         this.layer.setDepth(25);
