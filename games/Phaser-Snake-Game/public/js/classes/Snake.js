@@ -19,6 +19,8 @@ var Snake = new Phaser.Class({
         
         this.body.push(this.head);
 
+        this.bonked = false;
+
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
         
@@ -47,6 +49,7 @@ var Snake = new Phaser.Class({
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
+
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
@@ -61,7 +64,6 @@ var Snake = new Phaser.Class({
             var portalSound = scene.portalSounds[0]
             portalSound.play();
 
-            //this.pause_movement = false;
             scene.lastMoveTime += SPEEDWALK * 2;
             var _tween = scene.tweens.add({
                 targets: this.head, 
@@ -86,46 +88,69 @@ var Snake = new Phaser.Class({
         }
     });
 
-        // Death by eating itself
-        let tail = this.body.slice(1);
+    // Look ahead for bonks
 
-        // if any tailpos == headpos
-        if(
-            tail.some(
-                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-        ){
-            if (scene.started) {
-                this.death(scene);
-            }
-        }
+    var xN = this.head.x;
+    var yN = this.head.y;
 
-    //if () {
         
-        if (this.heading === LEFT)
+        if (this.direction === LEFT)
         {
-            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
         }
-        else if (this.heading === RIGHT)
+        else if (this.direction === RIGHT)
         {
-            x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+            xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
         }
-        else if (this.heading === UP)
+        else if (this.direction === UP)
         {
-            y = Phaser.Math.Wrap(y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+            yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
         }
-        else if (this.heading === DOWN)
+        else if (this.direction === DOWN)
         {
-            y = Phaser.Math.Wrap(y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
+            yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
         }
-    //}
+        
+        // Bonk Wall
+        if (scene.map.getTileAtWorldXY( xN, yN )) {
+            console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
+            this.direction = STOP;
+            this.bonked = true;
+            
+            this.death(scene);
+        }
+
+        // Bonk Self
+        var tail = this.body.slice(1);
     
-    // Move all Snake Segments
-    Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
+        //var checkbody = (pos) => {pos.x === this.head.x && pos.y === this.head.y};
+        tail.some(part => {
+            if (part.x === xN && part.y === yN) {
+                
+                if (!scene.started) {
+                    this.direction = STOP;
+                    this.bonked = true;
+                    this.death(scene);
+                }
+            }
+        })
+
+    
+    // Actually Move the Snake Head
+    
+    
+    
+    if (this.alive) {
+        if (!this.bonked) {
+            Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+        }
+    }
+    
+    
+    
 
     // Check if dead by map
-    if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
-        this.death(scene);
-    }
+
     var i
     var pointSounds = scene.pointSounds[scene.comboCounter -1]
 
@@ -208,7 +233,7 @@ var Snake = new Phaser.Class({
         this.alive = false;
         this.hold_move = true;
 
-        this.heading = STOP;
+        this.direction = STOP;
         gameScene.started = false;
     }
 });
