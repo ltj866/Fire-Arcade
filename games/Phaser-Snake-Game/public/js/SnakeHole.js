@@ -25,7 +25,7 @@ export const SPEEDWALK = 99; // 99 In milliseconds
 var SPEEDSPRINT = 33; // 24
 
 
-var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
+var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 const COMBO_ADD_FLOOR = 87;
 var SCORE_MULTI_GROWTH = 0.01;
