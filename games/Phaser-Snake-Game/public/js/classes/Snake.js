@@ -14,7 +14,7 @@ var Snake = new Phaser.Class({
         this.hold_move = false;
         this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
-        this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
+        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
         this.head.setOrigin(0,0).setDepth(10);
         
         this.body.push(this.head);
@@ -34,7 +34,7 @@ var Snake = new Phaser.Class({
         // Add a new part at the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
-        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'blocks', 1);
+        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 1);
         newPart.setOrigin(0,0).setDepth(9);
 
         this.body.push(newPart);
