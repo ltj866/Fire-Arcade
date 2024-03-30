@@ -268,6 +268,9 @@ class GameScene extends Phaser.Scene {
         
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
+        this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
+
+
         this.tileset = this.map.addTilesetImage('tileSheetx24');
         this.tileset2 = this.map.addTilesetImage('tileSheet02x24');
 
