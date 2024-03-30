@@ -253,6 +253,7 @@ class GameScene extends Phaser.Scene {
         const ourInputScene = this.scene.get('InputScene');
         
         this.stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
+        
 
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
@@ -998,20 +999,28 @@ class WinScene extends Phaser.Scene
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '600',
             color: 'white',
+            'background-color': "#607d8b",
+            padding: "4px 14px",
+            'border-top-right-radius': '16px',
+            'border-top-left-radius': '16px',
+            
             //'text-decoration': 'underline'
         });
         
-        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0);
+        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0).setDepth(60);
 
         const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*20.5, 'div', {
             "fontSize":'34px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '600',
             color: 'white',
+            'background-color': "#607d8b",
+            padding: "4px 14px",
+            'border-radius': '16px',
             //'text-decoration': 'underline'
         });
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
-        bestRunUI.setText(`Best Score: ${bestrun}`).setOrigin(0.5,0);
+        bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
         
         
@@ -1088,6 +1097,7 @@ class WinScene extends Phaser.Scene
         
         //var stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
         var bestLogText = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+        
         //var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestScoreAve`))
 
         if (bestLogText) {
@@ -1397,9 +1407,9 @@ class UIScene extends Phaser.Scene {
             
             var bestScore = Number(JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`)));
             
-          
             
             if (stage_score > bestScore) {
+
                 
                 bestScore = stage_score;
                 this.bestScoreUI.setText(`Best : ${bestScore}`);
@@ -1424,20 +1434,20 @@ class UIScene extends Phaser.Scene {
     update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
 
-                    // #region Custom Code for a Bonuse Level
+        // #region Custom Code for a Bonuse Level
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
-                // Temp Code for bonus level
-                console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
+            // Temp Code for bonus level
+            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
 
-               this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-                //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-                this.events.emit('saveScore');
-    
-                this.scene.pause();
-    
-                this.scene.start('WinScene');
-            }
-            // #endregion
+            this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.bestScoreUI.setText(`Best :  ${this.score}`);
+            this.scene.get("GameScene").events.emit('saveScore');
+
+            this.scene.pause();
+
+            this.scene.start('WinScene');
+        }
+        // #endregion
 
         
         
