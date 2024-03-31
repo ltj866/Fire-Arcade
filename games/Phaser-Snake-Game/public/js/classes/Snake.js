@@ -50,9 +50,12 @@ var Snake = new Phaser.Class({
     let x = this.head.x;
     let y = this.head.y;
 
+    var onPortal = false;
+
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
+            onPortal = true;
             this.portal_buffer_on = false;
             this.hold_move = true; // Moved this to earlier to avoid moving while in a portal wrap.
 
@@ -112,7 +115,8 @@ var Snake = new Phaser.Class({
         }
         
         // Bonk Wall
-        if (scene.map.getTileAtWorldXY( xN, yN )) {
+        if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal) {
+            // Only count a wall hit ahead if not on a portal.
             console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
             this.direction = STOP;
             this.bonked = true;
