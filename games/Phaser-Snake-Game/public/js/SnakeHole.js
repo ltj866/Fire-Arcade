@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 0; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -99,10 +99,12 @@ const STAGES_NEXT = {
     'Stage-02a': ['Stage-03'],
     'Stage-02b': ['Stage-03b'],
     'Stage-03': ['Stage-04'],
-    'Stage-03b': ['Stage-04']
+    'Stage-03b': ['Stage-04'],
+    'Stage-04': [],
+    'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Bonus-Stage-x1';
+const START_STAGE = 'Stage-04';
 const END_STAGE = 'Bonus-Stage-x1';
 
 const UISTYLE = { color: 'lightyellow',
@@ -414,11 +416,16 @@ class GameScene extends Phaser.Scene {
             // for input responsiveness
             this.snake.bonked = false;
             if (!this.move_pause) {
+                console.log("pre-moveDirection", this.snake.direction);
                 ourInputScene.moveDirection(this, e);
+                console.log("post-moveDirection", this.snake.direction);
             }
 
             if (this.move_pause) {
+                console.log("pre-updateDirection", this.snake.direction);
                 ourInputScene.updateDirection(this, e);
+                console.log("post-updateDirection", this.snake.direction);
+                
             }
 
             if (startingArrowState == true){
@@ -1536,7 +1543,9 @@ class InputScene extends Phaser.Scene {
     update() {
     }
     updateDirection(gameScene, event) {
-
+        // Does not change the direction of the snake in code
+        // Changes where the snake is looking with the sprite.
+        
         
         switch (event.keyCode) {
             case 87: // w
@@ -1546,10 +1555,7 @@ class InputScene extends Phaser.Scene {
                 
                 // At anytime you can update the direction of the snake.
                 gameScene.snake.head.setTexture('snakeDefault', 6);
-                gameScene.snake.direction = UP;
-                
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-                this.turns += 1; 
+ 
                     
             }
             break;
@@ -1560,10 +1566,7 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
                 
                 gameScene.snake.head.setTexture('snakeDefault', 4);
-                gameScene.snake.direction = LEFT;
 
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
             }
             break;
@@ -1573,12 +1576,7 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
                  gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
-
                 gameScene.snake.head.setTexture('snakeDefault', 7);
-                gameScene.snake.direction = DOWN;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
             }
             break;
@@ -1589,10 +1587,6 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
                 gameScene.snake.head.setTexture('snakeDefault', 5);
-                gameScene.snake.direction = RIGHT;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
             }
             break;
@@ -1603,10 +1597,6 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
 
                 gameScene.snake.head.setTexture('snakeDefault', 6);
-                gameScene.snake.direction = UP;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
             }
             break;
@@ -1617,10 +1607,6 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
                 gameScene.snake.head.setTexture('snakeDefault', 4);
-                gameScene.snake.direction = LEFT;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
             }
             break;
@@ -1631,10 +1617,6 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
                 gameScene.snake.head.setTexture('snakeDefault', 7);
-                gameScene.snake.direction = DOWN;
-                
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
             }
             break;
@@ -1645,10 +1627,6 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
                 gameScene.snake.head.setTexture('snakeDefault', 5);
-                gameScene.snake.direction = RIGHT;
-                
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
             }
             break;
