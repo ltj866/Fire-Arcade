@@ -134,7 +134,6 @@ var Snake = new Phaser.Class({
             
             tail.some(part => {
                 if (part.x === xN && part.y === yN) {
-                    debugger
                     // Only colide if the snake has left the center square
                     this.direction = STOP;
                     this.bonked = true;
