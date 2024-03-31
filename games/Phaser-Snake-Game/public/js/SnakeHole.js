@@ -267,7 +267,7 @@ class GameScene extends Phaser.Scene {
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, 15, 15);
-        //debugger
+    
         this.snake.direction = STOP;
         
         // Tilemap
@@ -418,15 +418,16 @@ class GameScene extends Phaser.Scene {
             // for input responsiveness
             this.snake.bonked = false;
             if (!this.move_pause || !this.startMoving) {
-                console.log("pre-moveDirection", this.snake.direction);
+                this.startMoving = true;
+                this.move_pause = false;
                 ourInputScene.moveDirection(this, e);
-                console.log("post-moveDirection", this.snake.direction);
+                
             }
 
             if (this.move_pause) {
-                console.log("pre-updateDirection", this.snake.direction);
+               // debugger
                 ourInputScene.updateDirection(this, e);
-                console.log("post-updateDirection", this.snake.direction);
+                
                 
             }
 
@@ -746,6 +747,7 @@ class GameScene extends Phaser.Scene {
 
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
+            console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
@@ -755,14 +757,6 @@ class GameScene extends Phaser.Scene {
             
             ourUI.bonks += 1;
             //ourUI.livesUI.setText(`x ${ourUI.bonks}`);
-
-            //ourUI.length = 0;
-            if (ourUI.lengthGoal != 0) {
-                ourUI.lengthGoalUI.setText(`${ourUI.length}/${LENGTH_GOAL}`); 
-            }
-            else {
-                ourUI.lengthGoalUI.setText(`${ourUI.length}`);
-            }
             
 
 
@@ -799,11 +793,12 @@ class GameScene extends Phaser.Scene {
             });
 
             tween.on('complete', test => {
+                console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
                 //this.snake.direction = 0;
-                this.hold_move = false;
+                this.startMoving = false;
             });
         }
         
@@ -1252,7 +1247,7 @@ class UIScene extends Phaser.Scene {
         
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
         //stageUUID = this.cache.json.get(`${this.stage}-json`);
-        //debugger
+    
         
     
    

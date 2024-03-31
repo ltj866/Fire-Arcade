@@ -122,28 +122,34 @@ var Snake = new Phaser.Class({
             }
         }
 
-        // Bonk Self
-        var tail = this.body.slice(1);
+        
     
-        //var checkbody = (pos) => {pos.x === this.head.x && pos.y === this.head.y};
-        tail.some(part => {
-            if (part.x === xN && part.y === yN) {
-                
-                if (!scene.started) {
+        // #region Bonk Self
+        
+        
+        console.log("STARTMOVING=",scene.startMoving, "MOVE_PAUSE=", scene.move_pause);
+        if (scene.startMoving) {
+        // Game Has started. Snake head has left Starting Square
+            var tail = this.body.slice(1);
+            
+            tail.some(part => {
+                if (part.x === xN && part.y === yN) {
+                    debugger
+                    // Only colide if the snake has left the center square
                     this.direction = STOP;
                     this.bonked = true;
                     if(scene.recombinate) {
                         this.death(scene);
-                    }
+                    }  
                 }
-            }
-        })
+            })
+            
+        }
+        // #endregion
+        
 
     
     // Actually Move the Snake Head
-    
-    
-    
     if (this.alive) {
         if (!this.bonked) {
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
@@ -243,6 +249,7 @@ var Snake = new Phaser.Class({
     death: function (gameScene) {
         this.alive = false;
         this.hold_move = true;
+        gameScene.move_pause = true;
 
         this.direction = STOP;
         gameScene.started = false;
