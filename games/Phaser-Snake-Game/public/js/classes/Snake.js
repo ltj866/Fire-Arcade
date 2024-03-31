@@ -130,6 +130,11 @@ var Snake = new Phaser.Class({
         // Game Has started. Snake head has left Starting Square
             var tail = this.body.slice(1);
 
+
+            // Remove the Tail because the Tail will always move out of the way
+            // when the head moves forward.
+            tail.pop();
+
             
             tail.some(part => {
                 if (part.x === xN && part.y === yN) {
