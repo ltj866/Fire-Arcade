@@ -190,11 +190,13 @@ class GameScene extends Phaser.Scene {
         this.portalColors = PORTAL_COLORS.slice();
 
         this.move_pause = true;
-        this.started = false;
+        this.startMoving = false;
 
         const { stage = START_STAGE } = props
         this.stage = stage;
         console.log("FIRST INIT", this.stage);
+
+        this.recombinate = true;
     
 
     }
@@ -415,7 +417,7 @@ class GameScene extends Phaser.Scene {
             // run with as small of a delay as possible
             // for input responsiveness
             this.snake.bonked = false;
-            if (!this.move_pause) {
+            if (!this.move_pause || !this.startMoving) {
                 console.log("pre-moveDirection", this.snake.direction);
                 ourInputScene.moveDirection(this, e);
                 console.log("post-moveDirection", this.snake.direction);
