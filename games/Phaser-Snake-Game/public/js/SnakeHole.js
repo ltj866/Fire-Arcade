@@ -197,6 +197,7 @@ class GameScene extends Phaser.Scene {
         console.log("FIRST INIT", this.stage);
 
         this.recombinate = true;
+        this.startingArrowState = true;
     
 
     }
@@ -317,23 +318,21 @@ class GameScene extends Phaser.Scene {
         });
 
 
-        var startingArrowState = true;
-
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
-        const startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
-        const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
-        const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
-        const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
+        this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
+        this.startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
         
-        startingArrowsAnimS.flipY = true;
-        startingArrowsAnimE.angle = 90;
-        startingArrowsAnimW.angle = 270;
-        startingArrowsAnimN.play('idle');
-        startingArrowsAnimS.play('idle');
-        startingArrowsAnimE.play('idle');
-        startingArrowsAnimW.play('idle');
+        this.startingArrowsAnimS.flipY = true;
+        this.startingArrowsAnimE.angle = 90;
+        this.startingArrowsAnimW.angle = 270;
+        this.startingArrowsAnimN.play('idle');
+        this.startingArrowsAnimS.play('idle');
+        this.startingArrowsAnimE.play('idle');
+        this.startingArrowsAnimW.play('idle');
 
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
@@ -431,19 +430,6 @@ class GameScene extends Phaser.Scene {
                 
             }
 
-            if (startingArrowState == true){
-                
-                // turn off arrows and move snake.
-                startingArrowState = false;
-                startingArrowsAnimN.setVisible(false);
-                startingArrowsAnimS.setVisible(false);
-                startingArrowsAnimE.setVisible(false);
-                startingArrowsAnimW.setVisible(false);
-                this.move_pause = false;
-                
-                //this.move_pause = false;
-                //ourInputScene.moveDirection(this, e);
-            }
             if (this.snake.regrouping && e.keyCode === 32) {
                 
                 // On key down.
@@ -797,8 +783,16 @@ class GameScene extends Phaser.Scene {
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
-                //this.snake.direction = 0;
                 this.startMoving = false;
+
+                // Turn back on arrows
+                this.startingArrowState = true;
+                this.startingArrowsAnimN.setVisible(true);
+                this.startingArrowsAnimS.setVisible(true);
+                this.startingArrowsAnimE.setVisible(true);
+                this.startingArrowsAnimW.setVisible(true);
+
+                
             });
         }
         
@@ -1646,7 +1640,9 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
-                // At anytime you can update the direction of the snake.
+                this.snakeStart(gameScene);
+                
+                    // At anytime you can update the direction of the snake.
                 gameScene.snake.head.setTexture('snakeDefault', 6);
                 gameScene.snake.direction = UP;
                 
@@ -1665,6 +1661,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
                 
+                    this.snakeStart(gameScene);
+
                 gameScene.snake.head.setTexture('snakeDefault', 4);
                 gameScene.snake.direction = LEFT;
 
@@ -1684,7 +1682,8 @@ class InputScene extends Phaser.Scene {
                  gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
 
-                gameScene.snake.head.setTexture('snakeDefault', 7);
+                    this.snakeStart(gameScene);
+                    gameScene.snake.head.setTexture('snakeDefault', 7);
                 gameScene.snake.direction = DOWN;
 
                 this.turns += 1;
@@ -1701,7 +1700,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
-                gameScene.snake.head.setTexture('snakeDefault', 5);
+                    this.snakeStart(gameScene);
+                    gameScene.snake.head.setTexture('snakeDefault', 5);
                 gameScene.snake.direction = RIGHT;
 
                 this.turns += 1;
@@ -1718,7 +1718,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
 
-                gameScene.snake.head.setTexture('snakeDefault', 6);
+                    this.snakeStart(gameScene);
+                    gameScene.snake.head.setTexture('snakeDefault', 6);
                 gameScene.snake.direction = UP;
 
                 this.turns += 1;
@@ -1735,7 +1736,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
-                gameScene.snake.head.setTexture('snakeDefault', 4);
+                    this.snakeStart(gameScene);
+                    gameScene.snake.head.setTexture('snakeDefault', 4);
                 gameScene.snake.direction = LEFT;
 
                 this.turns += 1;
@@ -1752,7 +1754,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
-                gameScene.snake.head.setTexture('snakeDefault', 7);
+                    this.snakeStart(gameScene);
+                    gameScene.snake.head.setTexture('snakeDefault', 7);
                 gameScene.snake.direction = DOWN;
                 
                 this.turns += 1;
@@ -1769,7 +1772,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
-                gameScene.snake.head.setTexture('snakeDefault', 5);
+                    this.snakeStart(gameScene);
+                    gameScene.snake.head.setTexture('snakeDefault', 5);
                 gameScene.snake.direction = RIGHT;
                 
                 this.turns += 1;
@@ -1786,6 +1790,25 @@ class InputScene extends Phaser.Scene {
               this.inputSet.push([START_SPRINT, gameScene.time.now]);
               break;
         } 
+    }
+    snakeStart(gameScene) {
+        gameScene.startMoving = true;
+        gameScene.move_pause = false;
+
+        if (gameScene.startingArrowState == true){
+                
+            // turn off arrows and move snake.
+            gameScene.startingArrowState = false;
+            gameScene.startingArrowsAnimN.setVisible(false);
+            gameScene.startingArrowsAnimS.setVisible(false);
+            gameScene.startingArrowsAnimE.setVisible(false);
+            gameScene.startingArrowsAnimW.setVisible(false);
+            gameScene.move_pause = false;
+            
+            //this.move_pause = false;
+            //ourInputScene.moveDirection(this, e);
+        }
+
     }
 }
 

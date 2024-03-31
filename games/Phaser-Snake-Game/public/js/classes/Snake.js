@@ -126,11 +126,10 @@ var Snake = new Phaser.Class({
     
         // #region Bonk Self
         
-        
-        console.log("STARTMOVING=",scene.startMoving, "MOVE_PAUSE=", scene.move_pause);
         if (scene.startMoving) {
         // Game Has started. Snake head has left Starting Square
             var tail = this.body.slice(1);
+
             
             tail.some(part => {
                 if (part.x === xN && part.y === yN) {
