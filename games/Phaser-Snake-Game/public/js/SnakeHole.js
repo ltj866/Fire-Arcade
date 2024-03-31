@@ -105,7 +105,7 @@ const STAGES_NEXT = {
 }
 
 const START_STAGE = 'Stage-04';
-const END_STAGE = 'Bonus-Stage-x1';
+const END_STAGE = 'Stage-04';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -206,7 +206,7 @@ class GameScene extends Phaser.Scene {
     preload () {
         
         this.load.image('bg01', 'assets/sprites/background01.png');
-        this.load.spritesheet('blocks', ['assets/Tiled/tileSheet02x24.png'], { frameWidth: GRID, frameHeight: GRID });
+        //this.load.spritesheet('blocks', ['assets/Tiled/tileSheet02x24.png'], { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
@@ -216,7 +216,6 @@ class GameScene extends Phaser.Scene {
         this.load.image('tileSheet02x24', 'assets/Tiled/tileSheet02x24.png');
         
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
-        this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
         //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
 
         // GameUI
@@ -262,7 +261,6 @@ class GameScene extends Phaser.Scene {
     
         const ourInputScene = this.scene.get('InputScene');
         
-        this.stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
         
 
         // Snake needs to render immediately 
@@ -952,13 +950,6 @@ class WinScene extends Phaser.Scene
         // Later on we could have the score screen float transparently above the end scene. 
         // For now we emulate the first level
 
-        // Tilemap
-        this.map = this.make.tilemap({ key: START_STAGE, tileWidth: GRID, tileHeight: GRID });
-        this.tileset = this.map.addTilesetImage('tileSheetx24');
-        this.tileset2 = this.map.addTilesetImage('tileSheet02x24');
-
-        this.layer = this.map.createLayer('Wall', this.tileset);
-        this.layer.setDepth(5);
 
         this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, 0.75);
         this.scoreCardBackground.setOrigin(0,0).setDepth(8);
