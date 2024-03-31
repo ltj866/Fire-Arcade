@@ -1672,12 +1672,11 @@ class InputScene extends Phaser.Scene {
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
                 // At anytime you can update the direction of the snake.
-                gameScene.snake.head.setTexture('snakeDefault', 6);
-                gameScene.snake.heading = UP;
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.direction = UP;
                 
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 this.turns += 1; 
-                gameScene.snake.move(gameScene);
                     
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
                 gameScene.snake.move(gameScene);
@@ -1691,8 +1690,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
                 
-                gameScene.snake.head.setTexture('snakeDefault', 4);
-                gameScene.snake.heading = LEFT;
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.direction = LEFT;
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -1710,8 +1709,8 @@ class InputScene extends Phaser.Scene {
                  gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
 
-                gameScene.snake.head.setTexture('snakeDefault', 7);
-                gameScene.snake.heading = DOWN;
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.direction = DOWN;
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -1727,8 +1726,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
-                gameScene.snake.head.setTexture('snakeDefault', 5);
-                gameScene.snake.heading = RIGHT;
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.direction = RIGHT;
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -1744,8 +1743,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
 
-                gameScene.snake.head.setTexture('snakeDefault', 6);
-                gameScene.snake.heading = UP;
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.direction = UP;
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -1761,8 +1760,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
-                gameScene.snake.head.setTexture('snakeDefault', 4);
-                gameScene.snake.heading = LEFT;
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.direction = LEFT;
 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -1778,8 +1777,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
-                gameScene.snake.head.setTexture('snakeDefault', 7);
-                gameScene.snake.heading = DOWN;
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.direction = DOWN;
                 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -1795,8 +1794,8 @@ class InputScene extends Phaser.Scene {
             if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
-                gameScene.snake.head.setTexture('snakeDefault', 5);
-                gameScene.snake.heading = RIGHT;
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.direction = RIGHT;
                 
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
