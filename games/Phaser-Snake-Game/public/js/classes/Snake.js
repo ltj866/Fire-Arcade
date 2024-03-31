@@ -182,7 +182,7 @@ var Snake = new Phaser.Class({
             if(scene.comboCounter > 0){
                 i = 0
                 pointSounds.play()
-                console.log(scene.comboCounter)}
+                console.log("combo",scene.comboCounter)}
             else if(scene.comboCounter > 2){
                 i = 1
                 pointSounds.play()}
