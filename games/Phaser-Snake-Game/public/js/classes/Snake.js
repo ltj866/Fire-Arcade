@@ -193,11 +193,12 @@ var Snake = new Phaser.Class({
             console.log("time since last fruit:", timeSinceFruit);
             
             if(timeSinceFruit > COMBO_ADD_FLOOR){
-                var pointSounds = scene.pointSounds[this.lastPlayedCombo];
-                pointSounds.play();
-                console.log("combo",this.lastPlayedCombo)
+                 
+                //console.log("combo",this.lastPlayedCombo)
                 
-                if (this.lastPlayedCombo < 8) {
+                scene.pointSounds[this.lastPlayedCombo].play();
+                
+                if (this.lastPlayedCombo < 7) {
                     this.lastPlayedCombo += 1;
                 }
             }
@@ -219,12 +220,8 @@ var Snake = new Phaser.Class({
             _atom.electrons.visible = false;
         
             // Play atom sound
-            var _index = Math.round(Math.random() * scene.atomSounds.length); 
-            if (_index == 8){ //this is to ensure index isn't called outside of array length
-                _index = 7;
-            }
-            console.log(_index);
-            //scene.atomSounds[_index -1].play();//Use "index" here instead of "i" if we want randomness back
+            var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
+            scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
             
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {

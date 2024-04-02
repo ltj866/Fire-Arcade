@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 128; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -627,6 +627,16 @@ class GameScene extends Phaser.Scene {
 
         
         // Middle Row        
+        this.setFruit(this, [areaBB, areaBC]);
+
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
         this.setFruit(this, [areaBB, areaBC]);
 
         // Bottom Row
