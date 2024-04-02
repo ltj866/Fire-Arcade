@@ -175,15 +175,15 @@ class StartScene extends Phaser.Scene {
 
         // #region Preloading Events
         this.load.on('progress', function (value) {
-            console.log(value);
+            //console.log(value);
         });
                     
         this.load.on('fileprogress', function (file) {
-            console.log(file.src);
+            //console.log(file.src);
         });
         
         this.load.on('complete', function () {
-            console.log('complete');
+            console.log('start scene preload complete');
             
         });
         // #endregion
@@ -265,6 +265,8 @@ class GameScene extends Phaser.Scene {
 
         this.recombinate = true;
         this.startingArrowState = true;
+
+        this.moveInterval = SPEEDWALK;
     
 
     }
@@ -304,17 +306,9 @@ class GameScene extends Phaser.Scene {
         // add background
         this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
 
-        // BOOST METER
-        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
+    
 
-        this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
 
-        this.mask = this.make.image({
-            x: SCREEN_WIDTH/2,
-            y: GRID*.25,
-            key: 'mask',
-            add: false
-        }).setOrigin(0.5,0);
         
 
         // #region Animations
@@ -322,12 +316,6 @@ class GameScene extends Phaser.Scene {
         loadAnimations(this);
         // #endregion
 
-        const keys = [ 'increasing' ];
-        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
-        boostBar.setDepth(50);
-        boostBar.play('increasing');
-
-        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
         this.anims.create({
             key: 'idle',
@@ -426,7 +414,6 @@ class GameScene extends Phaser.Scene {
 
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
-        this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
         
         // Keyboard Inputs
@@ -822,6 +809,7 @@ class GameScene extends Phaser.Scene {
         // Only Calculate every move window
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
+
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
@@ -895,45 +883,15 @@ class GameScene extends Phaser.Scene {
         }
         
         // Boost and Boost Multi Code
-        var timeLeft = this.scene.get('UIScene').scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
+        //var timeLeft = this.scene.get('UIScene').scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
-        // Boost Logic
-        if (!this.spaceBar.isDown) { // Base Speed
-            this.moveInterval = SPEEDWALK; // Less is Faster
-            this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount += .25; // Recharge Boost Slowly
-        }
-        else {
-            // Has Boost Logic
-            if(this.energyAmount > 1){
-                this.moveInterval = SPEEDSPRINT;
-            }
-            else{
-                this.moveInterval = SPEEDWALK;
-            }
-            this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount -= 1;
-            
-            // Boost Stats
-            if (timeLeft >= BOOST_ADD_FLOOR ) { 
-                // Don't add boost time after 20 seconds
-                ourInputScene.boostBonusTime += 1;
-                ourInputScene.boostTime += 1;
-            } else {
-                ourInputScene.boostTime += 1;
-            }
-        }
+
         /*
         if (timeLeft <= COMBO_ADD_FLOOR && timeLeft >= SCORE_FLOOR) { // Ask about this line later.
             this.comboCounter = 0;
         }
         */
-        // Reset Energy if out of bounds.
-        if (this.energyAmount >= 100) {
-            this.energyAmount = 100;}
-        else if(this.energyAmount <= 0) {
-            this.energyAmount = 0;
-        }
+
         
     }
 }
@@ -1223,6 +1181,9 @@ class UIScene extends Phaser.Scene {
         this.lives = lives;
 
         this.scoreHistory = [];
+
+        // BOOST METER
+        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
     }
 
     preload () {
@@ -1239,6 +1200,25 @@ class UIScene extends Phaser.Scene {
        this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
        this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 3).setOrigin(0,0).setDepth(50); // Tried to center flag
 
+       // #region Boost Meter UI
+       this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
+
+       this.mask = this.make.image({
+           x: SCREEN_WIDTH/2,
+           y: GRID*.25,
+           key: 'mask',
+           add: false
+       }).setOrigin(0.5,0);
+
+       const keys = [ 'increasing' ];
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+       boostBar.setDepth(50);
+       boostBar.play('increasing');
+
+       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+
+       // #endregion
 
         
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
@@ -1445,6 +1425,7 @@ class UIScene extends Phaser.Scene {
     }
     update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        var ourInputScene = this.scene.get('InputScene');
 
         // #region Custom Code for a Bonus Level
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
@@ -1482,6 +1463,48 @@ class UIScene extends Phaser.Scene {
                 this.timerText.setText(timeTick);
             }  
         }
+
+        // #region Boost Logic
+        if (!ourInputScene.spaceBar.isDown) { // Base Speed
+            this.scene.get('GameScene').moveInterval = SPEEDWALK; // Less is Faster
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount += .25; // Recharge Boost Slowly
+        }
+        
+        // Is Trying to Boost
+        else {
+        
+            // Has Boost Logic
+            if(this.energyAmount > 1){
+                this.scene.get('GameScene').moveInterval = SPEEDSPRINT;
+            }
+            else{
+                this.scene.get('GameScene').moveInterval = SPEEDWALK;
+            }
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount -= 1;
+            
+            // Boost Stats
+            if (timeTick >= BOOST_ADD_FLOOR ) { 
+                // Don't add boost time after 20 seconds
+                ourInputScene.boostBonusTime += 1;
+                ourInputScene.boostTime += 1;
+            } else {
+                ourInputScene.boostTime += 1;
+            }
+        }
+
+        // Reset Energy if out of bounds.
+        if (this.energyAmount >= 100) {
+            this.energyAmount = 100;}
+        else if(this.energyAmount <= 0) {
+            this.energyAmount = 0;
+        }
+
+        //#endregion Boost Logic
+        
+
+
     }
     
 
@@ -1508,6 +1531,8 @@ class InputScene extends Phaser.Scene {
 
     }
     create() {
+
+    this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     /*
     const ourGame = this.scene.get('GameScene');
 
