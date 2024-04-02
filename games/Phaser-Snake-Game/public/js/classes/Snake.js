@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
     LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
-    LENGTH_GOAL, SPEEDWALK
+    LENGTH_GOAL, SPEEDWALK, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 
@@ -20,6 +20,7 @@ var Snake = new Phaser.Class({
         this.body.push(this.head);
 
         this.bonked = false;
+        this.lastPlayedCombo = 0;
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
@@ -180,8 +181,9 @@ var Snake = new Phaser.Class({
 
     // Check if dead by map
 
-    var i
-    var pointSounds = scene.pointSounds[scene.comboCounter -1]
+    
+    
+    
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
@@ -190,19 +192,19 @@ var Snake = new Phaser.Class({
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             console.log("time since last fruit:", timeSinceFruit);
             
-
-            if(scene.comboCounter > 0){
-                i = 0
+            if(timeSinceFruit > COMBO_ADD_FLOOR){
+                var pointSounds = scene.pointSounds[this.lastPlayedCombo]
                 pointSounds.play()
-                console.log("combo",scene.comboCounter)}
-            else if(scene.comboCounter > 2){
-                i = 1
-                pointSounds.play()}
-            else{
-                i = 2}
-            if (scene.comboCounter <= 7){
-                scene.comboCounter +=1;
+                console.log("combo",this.lastPlayedCombo)}
+                
+                if (this.lastPlayedCombo < 8) {
+                    this.lastPlayedCombo += 1;
+                }
+            else {
+                this.lastPlayedCombo = 0;
             }
+            
+
 
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
@@ -216,12 +218,12 @@ var Snake = new Phaser.Class({
             _atom.electrons.visible = false;
         
             // Play atom sound
-            /*var index = Math.round(Math.random() * scene.atomSounds.length); 
-            if (index == 8){ //this is to ensure index isn't called outside of array length
-                index = 7;
-            }*/
-            //console.log(index);
-            scene.atomSounds[i].play();//Use "index" here instead of "i" if we want randomness back
+            var _index = Math.round(Math.random() * scene.atomSounds.length); 
+            if (_index == 8){ //this is to ensure index isn't called outside of array length
+                _index = 7;
+            }
+            console.log(_index);
+            scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
             
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {

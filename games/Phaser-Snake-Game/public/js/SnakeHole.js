@@ -27,7 +27,7 @@ var SPEEDSPRINT = 33; // 24
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
-const COMBO_ADD_FLOOR = 88;
+export const COMBO_ADD_FLOOR = 88;
 var SCORE_MULTI_GROWTH = 0.01;
 
 var comboCounter = 0;
@@ -120,6 +120,73 @@ class StartScene extends Phaser.Scene {
 
     preload() {
         this.load.image('howToCard', 'assets/howToCardNew.png');
+
+        this.load.image('bg01', 'assets/sprites/background01.png');
+
+        this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
+
+        // Tilemap
+        this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
+
+
+
+
+                //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
+
+        // GameUI
+        //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
+        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.image("mask", "assets/sprites/boostMask.png");
+
+        // Animations
+        this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
+        this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
+        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
+        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
+
+
+        //WRAP BLOCKS:
+        this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
+
+        // Audio
+        this.load.setPath('assets/audio');
+
+        this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3'])
+
+        SOUND_ATOM.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        
+        SOUND_PORTAL.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+
+        SOUND_POINT_COLLECT.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+
+
+
+        // #region Preloading Events
+        this.load.on('progress', function (value) {
+            console.log(value);
+        });
+                    
+        this.load.on('fileprogress', function (file) {
+            console.log(file.src);
+        });
+        
+        this.load.on('complete', function () {
+            console.log('complete');
+            
+        });
+        // #endregion
     }
 
     create() {
@@ -129,9 +196,7 @@ class StartScene extends Phaser.Scene {
         var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
 
-        //card.setScale(1);
-
-        
+        //card.setScale(1)
         var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         this.tweens.add({
@@ -144,10 +209,11 @@ class StartScene extends Phaser.Scene {
           });
 
         this.input.keyboard.on('keydown', e => {
-            this.scene.start('GameScene');
-            var ourGameScene = this.scene.get("GameScene");
+            this.scene.launch('UIScene');
+            this.scene.launch('GameScene');
+            //var ourGameScene = this.scene.get("GameScene");
             //console.log(e)
-            this.scene.start('UIScene');
+            
             this.scene.stop();
         })
     }
@@ -206,55 +272,10 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         
-        this.load.image('bg01', 'assets/sprites/background01.png');
-        //this.load.spritesheet('blocks', ['assets/Tiled/tileSheet02x24.png'], { frameWidth: GRID, frameHeight: GRID });
-        //this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
-        this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
-        // Tilemap
-        this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
-        this.load.image('tileSheet02x24', 'assets/Tiled/tileSheet02x24.png');
         
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
-        //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
 
-        // GameUI
-        //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
-        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
-        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
-        this.load.image("mask", "assets/sprites/boostMask.png");
-
-        // Animations
-        this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
-        this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
-        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
-        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
-        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
-
-
-        //WRAP BLOCKS:
-        this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
-
-        // Audio
-        this.load.setPath('assets/audio');
-
-        this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3'])
-
-        SOUND_ATOM.forEach(soundID =>
-            {
-                this.load.audio(soundID[0], soundID[1]);
-            });
-        
-        SOUND_PORTAL.forEach(soundID =>
-            {
-                this.load.audio(soundID[0], soundID[1]);
-            });
-
-        SOUND_POINT_COLLECT.forEach(soundID =>
-            {
-                this.load.audio(soundID[0], soundID[1]);
-            });
     }
 
     create () {
@@ -276,7 +297,6 @@ class GameScene extends Phaser.Scene {
 
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
-        this.tileset2 = this.map.addTilesetImage('tileSheet02x24');
 
         this.layer = this.map.createLayer('Wall', [this.tileset,this.tileset2]);
         this.layer.setDepth(25);
@@ -632,6 +652,7 @@ class GameScene extends Phaser.Scene {
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
+        this.scene.launch('UIScene');
         const ourUI = this.scene.get('UIScene'); 
         ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
         ourUI.bestScoreUI.setOrigin(0,0);
@@ -641,7 +662,7 @@ class GameScene extends Phaser.Scene {
 
         ourUI.bestScoreUI.setText(`Best : ${bestScore}`);
         /////////////////////////////////////////////////
-        // UI BLOCKS
+        // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
 
@@ -874,8 +895,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // Boost and Boost Multi Code
-
-        var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
+        var timeLeft = this.scene.get('UIScene').scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
         // Boost Logic
         if (!this.spaceBar.isDown) { // Base Speed
@@ -903,16 +923,18 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.boostTime += 1;
             }
         }
+        /*
         if (timeLeft <= COMBO_ADD_FLOOR && timeLeft >= SCORE_FLOOR) { // Ask about this line later.
             this.comboCounter = 0;
         }
-        
+        */
         // Reset Energy if out of bounds.
         if (this.energyAmount >= 100) {
             this.energyAmount = 100;}
         else if(this.energyAmount <= 0) {
             this.energyAmount = 0;
         }
+        
     }
 }
 
@@ -1185,9 +1207,6 @@ class UIScene extends Phaser.Scene {
     }
     
     init(props) {
-        
-        const ourGame = this.scene.get('GameScene');
-
         //this.score = 0;
         var { score = 0 } = props
         this.score = score;
@@ -1207,8 +1226,8 @@ class UIScene extends Phaser.Scene {
     }
 
     preload () {
-        const ourGame = this.scene.get('GameScene');
-        this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
+        //const ourGame = this.scene.get('GameScene');
+        //this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
 
         this.load.spritesheet('ui-blocks', 'assets/sprites/hudIconsSheet.png', { frameWidth: GRID, frameHeight: GRID });
     }
@@ -1420,6 +1439,8 @@ class UIScene extends Phaser.Scene {
             
 
         }, this);
+
+        
         
     }
     update() {
