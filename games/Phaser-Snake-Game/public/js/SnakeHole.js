@@ -639,7 +639,6 @@ class GameScene extends Phaser.Scene {
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
-        this.scene.launch('UIScene');
         const ourUI = this.scene.get('UIScene'); 
         ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
         ourUI.bestScoreUI.setOrigin(0,0);
