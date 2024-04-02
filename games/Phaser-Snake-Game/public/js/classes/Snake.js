@@ -55,9 +55,10 @@ var Snake = new Phaser.Class({
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
-            onPortal = true;
-            this.portal_buffer_on = false;
-            this.hold_move = true; // Moved this to earlier to avoid moving while in a portal wrap.
+            onPortal = true; // Used to ignore certain collisions when you are on top of a portal.
+            this.portal_buffer_on = false; // Used to keep you from reportaling immediately
+            
+            this.hold_move = true; // Keep the head from moving while recombinating.
 
             if (DEBUG) { console.log("PORTAL"); }
 

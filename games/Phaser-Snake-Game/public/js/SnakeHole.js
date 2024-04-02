@@ -191,6 +191,7 @@ class GameScene extends Phaser.Scene {
 
         this.move_pause = true;
         this.startMoving = false;
+        this.winnedYet = false;
 
         const { stage = START_STAGE } = props
         this.stage = stage;
@@ -780,21 +781,24 @@ class GameScene extends Phaser.Scene {
         }
         
         // Win State
-        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0) {
+        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
             console.log("YOU WIN");
+            this.winnedYet = true; // stops update loop from moving snake.
+            this.move_pause = true; // Keeps snake from turning
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
             //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
             this.events.emit('saveScore');
+            
 
-            this.scene.pause();
+            ourUI.scene.pause();
+            
 
-
-            this.scene.start('WinScene');
+            ourUI.scene.start('WinScene');
             
         }
 
-        // Only Calculate things when snake is moved.
+        // Only Calculate every move window
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
             this.lastMoveTime = time;
@@ -863,7 +867,10 @@ class GameScene extends Phaser.Scene {
             
             
             // Move at last second
-            this.snake.move(this);
+            if (!this.winnedYet) {
+                this.snake.move(this);
+            }
+            
         }
         
         // Boost and Boost Multi Code
@@ -896,7 +903,7 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.boostTime += 1;
             }
         }
-        if (timeLeft <= COMBO_ADD_FLOOR && timeLeft >= SCORE_FLOOR) { // Ask holden about this line later.
+        if (timeLeft <= COMBO_ADD_FLOOR && timeLeft >= SCORE_FLOOR) { // Ask about this line later.
             this.comboCounter = 0;
         }
         
@@ -1418,7 +1425,7 @@ class UIScene extends Phaser.Scene {
     update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
 
-        // #region Custom Code for a Bonuse Level
+        // #region Custom Code for a Bonus Level
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
