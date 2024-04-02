@@ -629,23 +629,11 @@ class GameScene extends Phaser.Scene {
         // Middle Row        
         this.setFruit(this, [areaBB, areaBC]);
 
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
 
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
 
-        var atom = new Food(this);
-        atom.setPosition(this.snake.head.x - GRID, this.snake.head.y);
-        atom.electrons.setPosition(this.snake.head.x - GRID, this.snake.head.y);
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
