@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -27,7 +27,7 @@ var SPEEDSPRINT = 33; // 24
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
-const COMBO_ADD_FLOOR = 87;
+const COMBO_ADD_FLOOR = 88;
 var SCORE_MULTI_GROWTH = 0.01;
 
 var comboCounter = 0;
@@ -539,6 +539,9 @@ class GameScene extends Phaser.Scene {
             
             var p1 = new Portal(scene, color, to, from);
             var p2 = new Portal(scene, color, from, to);
+
+            p1.targetObject = p2;
+            p2.targetObject = p1;
         }
         
         // AREA NAME is [GROUP][ID]
@@ -587,8 +590,6 @@ class GameScene extends Phaser.Scene {
 
         makePair(this, cordsPA_1, cordsPA_2);
 
-
-
         // Second Portal Pair
         var cordsPB_1 = areaBD.genChords(this);
         areaBD.portalCords = cordsPB_1;
@@ -615,23 +616,7 @@ class GameScene extends Phaser.Scene {
         // Top Row
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        //TEMP SPAWNS BELOW
-        /*this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        //DELETE ABOVE*/
+
         
         // Middle Row        
         this.setFruit(this, [areaBB, areaBC]);

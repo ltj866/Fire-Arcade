@@ -129,9 +129,10 @@ var Snake = new Phaser.Class({
         
     
         // #region Bonk Self
-        
-        if (scene.startMoving) {
+        if (scene.startMoving && !onPortal) {
         // Game Has started. Snake head has left Starting Square
+            
+
             var tail = this.body.slice(1);
 
 
@@ -142,11 +143,21 @@ var Snake = new Phaser.Class({
             
             tail.some(part => {
                 if (part.x === xN && part.y === yN) {
-                    // Only colide if the snake has left the center square
-                    this.direction = STOP;
-                    this.bonked = true;
-                    if(scene.recombinate) {
-                        this.death(scene);
+                    var portalSafe = false; // Assume not on portal
+                    scene.portals.forEach(portal => { 
+                        if(xN === portal.x && yN === portal.y && this.portal_buffer_on === true){
+                            portalSafe = true; // Mark on portal
+                        }
+                    });
+                    
+                    
+                    if (!portalSafe) {
+                        this.direction = STOP;
+                        this.bonked = true;
+                        if(scene.recombinate) {
+                            this.death(scene);
+                        }
+                        // Only colide if the snake has left the center square    
                     }  
                 }
             })

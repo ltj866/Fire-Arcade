@@ -15,6 +15,7 @@ var Portal = new Phaser.Class({
         this.setDepth(5);
 
         this.target = { x: to[0], y: to[1]};
+        this.targetObject = {};
 
         scene.portals.push(this);
         
