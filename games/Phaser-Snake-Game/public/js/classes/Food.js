@@ -1,4 +1,4 @@
-import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID} from "../SnakeHole.js";
+import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
@@ -27,19 +27,28 @@ var Food = new Phaser.Class({
         this.play("atom01idle");
         this.electrons = scene.add.sprite().setOrigin(.2,.175).setDepth(10);
         this.electrons.play("electronIdle");
+        this.electrons.anims.msPerFrame = 66;
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
+        this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000
+            this.electrons.anims.msPerFrame = 112;
             this.play("atom02idle");
-            this.electrons.setVisible(false);
         }, callbackScope: scene });
 
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            this.stop();
+        this.decayStage02 = scene.time.addEvent({ delay: 2000, callback: fruit => { //was 7600
+            this.play("atom03idle");
+            this.electrons.play("electronDispersion01");
+            //this.electrons.setVisible(false);
+            //this.stop();
             //this.setTexture('blocks', 10).setDepth(10);
         }, callbackScope: scene });
 
-        this.move(scene);
+        this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+            this.play("atom04idle");
+        }, callbackScope: scene });
+
+
+        this.move(scene); //Do we need this still?
 
         scene.atoms.push(this);
 
@@ -59,11 +68,10 @@ var Food = new Phaser.Class({
 
         // Start with all safe points as true. This is important because Javascript treats 
         // non initallized values as undefined and so any comparison or look up throws an error.
-        for (var x1 = 0; x1 <= END_X; x1++)
-        {
+        for (var x1 = 0; x1 <= END_X; x1++) {
             testGrid[x1] = {};
     
-            for (var y1 = 0; y1 <= END_Y; y1++)
+            for (var y1 = 2; y1 < END_Y; y1++)
             {
                 testGrid[x1][y1] = true;
             }
@@ -79,13 +87,24 @@ var Food = new Phaser.Class({
             }
         });
 
-        scene.atoms.forEach(fruit => {
-            testGrid[fruit.x/GRID][fruit.y/GRID] = false;
+        scene.atoms.forEach(_fruit => {
+            testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
         });
 
-        scene.portals.forEach(portal => {
-            testGrid[portal.x/GRID][portal.y/GRID] = false;
+        scene.portals.forEach(_portal => {
+            testGrid[_portal.x/GRID][_portal.y/GRID] = false;
         });
+
+        scene.dreamWalls.forEach( _dreamWall => {
+            testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        });
+
+        // Don't let fruit spawn on dreamwall blocks
+        //scene.dreamWalls.forEach(_dreamWall => {
+        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        //});
+
+
 
         
         
@@ -129,18 +148,23 @@ var Food = new Phaser.Class({
     },
 
     startDecay: function(scene){
-
+        //this.electrons.play("electronIdle");
+        //this.electrons.anims.msPerFrame = 66; // Setting electron framerate here to reset it after slowing in delay 2
         this.decayStage01.destroy(); // Destory Old Timers
         this.decayStage02.destroy();
 
-        this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
-            this.electrons.setVisible(false);
+        this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => {
+            //this.electrons.setVisible(false);
             this.play("atom02idle");
+            this.electrons.anims.msPerFrame = 112;
         }, callbackScope: scene });
 
-        this.decayStage02 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            console.log("stop")
-            this.stop();
+        this.decayStage02 = scene.time.addEvent({ delay:2000, callback: fruit => {
+            this.play("atom03idle");
+            this.electrons.play("electronDispersion01");
+        this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
+            this.play("atom04idle");
+        }, callbackScope: scene });
         }, callbackScope: scene });
 
     },
