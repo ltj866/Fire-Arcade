@@ -193,6 +193,16 @@ class StartScene extends Phaser.Scene {
 
     create() {
         
+        // Load all animations once.
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+            frameRate: 16,
+            repeat: -1
+        }); 
+        loadAnimations(this);
+
+
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
         var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
@@ -318,17 +328,7 @@ class GameScene extends Phaser.Scene {
         
 
         // #region Animations
-        // Animation set 
-        loadAnimations(this);
-        // #endregion
 
-
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
-            frameRate: 16,
-            repeat: -1
-        });
 
 
         let _x = this.snake.head.x;
