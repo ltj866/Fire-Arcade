@@ -10,11 +10,13 @@ import {PORTAL_COLORS} from './const.js';
 //******************************************************************** */
 // GameSettings 
 
+
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
+
 
 
 // 1 frame is 16.666 milliseconds
@@ -281,6 +283,10 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+
+        var ourInputScene = this.scene.get('InputScene');
+        var ourGameScene = this.scene.get('GameScene');
+
         
     
         const ourInputScene = this.scene.get('InputScene');
