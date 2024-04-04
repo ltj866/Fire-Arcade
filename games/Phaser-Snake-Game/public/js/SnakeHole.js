@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 3; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -1028,7 +1028,7 @@ class WinScene extends Phaser.Scene
             //'text-decoration': 'underline'
         });
         
-        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0).setDepth(60);
+        currentScoreUI.setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
 
         const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*20.5, 'div', {
             "fontSize":'34px',
@@ -1186,7 +1186,7 @@ class WinScene extends Phaser.Scene
                 
                 if (ourGame.stage != END_STAGE) {
                 
-                    ourUI.scene.restart( { score: ourUI.score, lives: ourUI.lives } );
+                    ourUI.scene.restart( { score: stageScore + speedBonus, lives: ourUI.lives } );
                 
                     var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
                     ourGame.scene.restart( { stage: next_stage } );
