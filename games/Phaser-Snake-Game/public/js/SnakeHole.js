@@ -1156,7 +1156,7 @@ class ScoreScene extends Phaser.Scene
             var continue_text = '[SPACE TO CONTINUE]';
 
             if (ourGame.stage === END_STAGE) {
-                continue_text = '[SPACE TO RESTART]';
+                continue_text = '[SPACE TO WIN]';
             }
             
             var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
@@ -1200,6 +1200,7 @@ class ScoreScene extends Phaser.Scene
                         localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
                     }
                     
+                    ourGame.scene.stop();
                     ourScoreScene.scene.switch('WinScene');
                     
                     // do in Win Screen After the very end.
