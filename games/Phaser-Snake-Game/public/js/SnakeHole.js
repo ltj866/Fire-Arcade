@@ -112,7 +112,7 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-04';
 
 const UISTYLE = { color: 'lightyellow',
@@ -650,11 +650,21 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene'); 
         ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
         ourUI.bestScoreUI.setOrigin(0,0);
+
+        // Calculate this locally
+        var bestLog = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestFruitLog`));
+
+        if (bestLog) {
+            // is false if best log has never existed
+            var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+        }
+        else {
+            var bestLocal = 0;
+        }
         
-        var bestScore = Number(JSON.parse(localStorage.getItem(`${this.stageUUID}-best`))); // Number resolves null to 0
 
 
-        ourUI.bestScoreUI.setText(`Best : ${bestScore}`);
+        ourUI.bestScoreUI.setText(`Best : ${bestLocal}`);
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
 
@@ -1058,7 +1068,7 @@ class WinScene extends Phaser.Scene
             `Base: ${stageScore}
             Speed Bonus: +${speedBonus}
             Stage Score: ${stageScore+speedBonus}
-            HighScore: ${bestBonus}
+            HighScore: ${bestLocal + bestBonus}
             `
         
         ).setOrigin(1, 0);
@@ -1123,7 +1133,7 @@ class WinScene extends Phaser.Scene
             bestLogUI.setText(
                 `Best - ave(${bestAve.toFixed(1)})
                 ---------------------
-                [${bestLog}]`
+                [${bestLog.sort().reverse()}]`
             ).setOrigin(1,0);    
         }
         
@@ -1243,6 +1253,7 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
+       // UI Icons
        this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
        this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
        this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 3).setOrigin(0,0).setDepth(50); // Tried to center flag
@@ -1263,16 +1274,11 @@ class UIScene extends Phaser.Scene {
        boostBar.play('increasing');
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
-
-
        // #endregion
 
         
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
         //stageUUID = this.cache.json.get(`${this.stage}-json`);
-    
-        
-    
    
         const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', {
             color: 'white',
@@ -1290,15 +1296,8 @@ class UIScene extends Phaser.Scene {
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UISTYLE);
         this.scoreUI.setText(`Stage: 0`).setOrigin(0,1);
+        
 
-        //this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
-        
-        // Best Score
-        
-        
-        //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
-        
-        // bonks
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
         this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UISTYLE);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
@@ -1417,6 +1416,7 @@ class UIScene extends Phaser.Scene {
 
             var length = `${this.length}`;
             
+            // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
                 this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
             }
@@ -1441,25 +1441,27 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('saveScore', function () {
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
-            
-            var bestScore = Number(JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`)));
-            
-            
-            if (stage_score > bestScore) {
 
-                
-                bestScore = stage_score;
-                this.bestScoreUI.setText(`Best : ${bestScore}`);
+            // Calculate this locally
+            var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
 
-                var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
-                
-                
-                localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, bestScoreHistory);
-
-                localStorage.setItem(`${ourGame.stageUUID}-bestScoreAve`, Math.round(this.score / LENGTH_GOAL));
+            if (bestLog) {
+                // is false if best log has never existed
+                var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+            }
+            else {
+                var bestLocal = 0;
             }
 
-            localStorage.setItem(`${ourGame.stageUUID}-best`, bestScore);
+            if (stage_score > bestLocal) {
+
+                
+                
+                bestLocal = stage_score;
+                this.bestScoreUI.setText(`Best : ${bestLocal}`);
+                
+                localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
+            }
             
 
             
