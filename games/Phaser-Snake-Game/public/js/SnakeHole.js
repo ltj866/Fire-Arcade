@@ -835,7 +835,7 @@ class GameScene extends Phaser.Scene {
             ourUI.scene.pause();
             
 
-            ourUI.scene.start('WinScene');
+            ourUI.scene.start('ScoreScene');
             
         }
 
@@ -930,10 +930,10 @@ class GameScene extends Phaser.Scene {
 }
 
 
-class WinScene extends Phaser.Scene
+class ScoreScene extends Phaser.Scene
 {
     constructor () {
-        super({key: 'WinScene', active: false});
+        super({key: 'ScoreScene', active: false});
     }
 
     preload() {
@@ -944,7 +944,7 @@ class WinScene extends Phaser.Scene
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
-        const ourWinScene = this.scene.get('WinScene');
+        const ourScoreScene = this.scene.get('ScoreScene');
         /////////
 
         // Pre Calculate needed values
@@ -1202,7 +1202,7 @@ class WinScene extends Phaser.Scene
                     ourGame.scene.restart({ stage: START_STAGE });
                 }
                 
-                ourWinScene.scene.switch('GameScene');
+                ourScoreScene.scene.switch('GameScene');
 
             });
         }, [], this);
@@ -1487,7 +1487,7 @@ class UIScene extends Phaser.Scene {
 
             this.scene.pause();
 
-            this.scene.start('WinScene');
+            this.scene.start('ScoreScene');
         }
         // #endregion
 
@@ -2011,7 +2011,7 @@ var config = {
         createContainer: true
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, GameScene, UIScene, InputScene, WinScene]
+    scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene]
 
 };
 
