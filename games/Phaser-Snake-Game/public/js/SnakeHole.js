@@ -30,7 +30,7 @@ var SPEEDSPRINT = 33; // 24
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 export const COMBO_ADD_FLOOR = 88;
-var SCORE_MULTI_GROWTH = 0.01;
+const RESET_WAIT_TIME = 240; // Amount of time space needs to be held to reset during recombinating.
 
 var comboCounter = 0;
 
@@ -106,7 +106,7 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 const END_STAGE = 'Stage-04';
 
 const UISTYLE = { color: 'lightyellow',
@@ -279,6 +279,8 @@ class GameScene extends Phaser.Scene {
         this.startingArrowState = true;
 
         this.moveInterval = SPEEDWALK;
+
+        this.spaceWhileReGrouping = false;
     
 
     }
@@ -297,9 +299,11 @@ class GameScene extends Phaser.Scene {
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
 
+        this.spaceKey = this.input.keyboard.addKey("Space");
+
         
     
-        const ourInputScene = this.scene.get('InputScene');
+        //const ourInputScene = this.scene.get('InputScene');
         
         
 
@@ -321,13 +325,6 @@ class GameScene extends Phaser.Scene {
     
         // add background
         this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
-
-    
-
-
-        
-
-        // #region Animations
 
 
 
@@ -437,47 +434,20 @@ class GameScene extends Phaser.Scene {
 
             if (this.move_pause) {
                // debugger
-                ourInputScene.updateDirection(this, e);
-                
-                
+                ourInputScene.updateDirection(this, e);  
             }
 
-            if (this.snake.regrouping && e.keyCode === 32) {
-                
-                // On key down.
-                // If you hold space into the regrouping animation this code is safe.
-                // You must press down SPACE after starting regrouping.
-                console.log("regrouping now respawn");
-                var pressTime = this.time.now;
-                console.log("PRESSTIME", pressTime);
-
-                /*
-                this.input.once('keyup', e => { // Capture for releasing sprint
-                    console.log(e.keyCode);
-                    var unPressTime = this.time.now;
-                    console.log(unPressTime - pressTime);
-                    
-                    //if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
-                    //ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
-                })
-
-                /*/
-                this.events.off('addScore');
-                this.events.off('saveScore');
-
-                const ourUI = this.scene.get('UIScene');
- 
-                ourUI.lives -= 1;
-                ourUI.scene.restart( { score: ourUI.stageStartScore, lives: ourUI.lives });
-                ourUI.scene.restart(  );
-                //ourUIScene.scene.restart();
-                this.scene.restart();
+            if (this.snake.regrouping) {
+                this.spaceWhileReGrouping = true;
             }
+
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
+
+            this.spaceWhileReGrouping = false;
         }) 
         
 
@@ -725,6 +695,22 @@ class GameScene extends Phaser.Scene {
         const ourInputScene = this.scene.get('InputScene');
 
         // console.log("update -- time=" + time + " delta=" + delta);
+
+        if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
+                console.log("SPACE LONG ENOUGH BRO");
+ 
+                this.events.off('addScore');
+                this.events.off('saveScore');
+
+                const ourUI = this.scene.get('UIScene');
+ 
+                ourUI.lives -= 1;
+                ourUI.scene.restart( { score: ourUI.stageStartScore, lives: ourUI.lives });
+                //ourUIScene.scene.restart();
+                this.scene.restart();
+        }
+
+        
 
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
