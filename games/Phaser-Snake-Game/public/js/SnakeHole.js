@@ -112,7 +112,7 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-03';
 const END_STAGE = 'Stage-04';
 
 const UISTYLE = { color: 'lightyellow',
@@ -1190,19 +1190,25 @@ class ScoreScene extends Phaser.Scene
                 
                     var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
                     ourGame.scene.restart( { stage: next_stage } );
+
+                    ourScoreScene.scene.switch('GameScene');
                 }
                 else {
                     // Start From The beginning. Must force reset values or it won't reset.
                     
+                    if (bestrun < ourUI.score + speedBonus) {
+                        localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
+                    }
                     
-                    localStorage.setItem('BestFinalScore', ourUI.score);
+                    ourScoreScene.scene.switch('WinScene');
                     
-                    console.log("END STAGE", ourGame.stage, END_STAGE);
-                    ourUI.scene.restart( { score: 0 });
-                    ourGame.scene.restart({ stage: START_STAGE });
+                    // do in Win Screen After the very end.
+                    //console.log("END STAGE", ourGame.stage, END_STAGE);
+                    //ourUI.scene.restart( { score: 0 });
+                    //ourGame.scene.restart({ stage: START_STAGE });
                 }
                 
-                ourScoreScene.scene.switch('GameScene');
+                
 
             });
         }, [], this);
@@ -1212,6 +1218,26 @@ class ScoreScene extends Phaser.Scene
 
     }
 
+}
+
+class WinScene extends Phaser.Scene{
+    constructor () {
+        super({ key: 'WinScene', active: false });
+    }
+
+    init () {
+
+    }
+    preload () {
+
+    }
+    create() {
+        console.log("WINSCREEN UP");
+
+    }
+    update() {
+
+    }
 }
 
 
@@ -2011,7 +2037,7 @@ var config = {
         createContainer: true
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene]
+    scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene, WinScene]
 
 };
 
