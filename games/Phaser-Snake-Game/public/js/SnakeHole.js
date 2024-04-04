@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 2; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -44,6 +44,12 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 //var atomSounds = [];
 //var portalSounds = [];
 //var pointSounds = [];
+
+// Speed Multiplier Stats
+const a = 1400; // Global Average Good Score (Ranked?)
+const lm = 28; // Minimum score
+const lM = 2800; // Theoretical max score.
+
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -301,14 +307,42 @@ class GameScene extends Phaser.Scene {
 
         this.spaceKey = this.input.keyboard.addKey("Space");
 
+
+
+
+
+        
+
+
+
+        
+        // a = Global average best score + minScore 
+        //For a=1400, min=1, max=100, goal=28
+        // Floor(score bonus)
+        //
+        // Bonus Values
+        // 28 + 0
+        // 100 + 37.77  = 137
+        // 500 + 287.30 = 787
+        // 1000 + 756   = 1756
+        // **1400 + 1372** the "mid"point where x=y on the bonus curve = 2772
+        // 1500 + 1585.231
+        // 2000 + 3451
+        // 2250 + 5656
+        // 2500 + 11_536
+
+
+
+
+
+
         
     
-        //const ourInputScene = this.scene.get('InputScene');
+        
         
         
 
-        // Snake needs to render immediately 
-        // Create the snake the  first time so it renders immediately
+        // Create the snake so it is addressable immediately 
         this.snake = new Snake(this, 15, 15);
     
         this.snake.direction = STOP;
@@ -901,20 +935,36 @@ class WinScene extends Phaser.Scene
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourWinScene = this.scene.get('WinScene');
-        ///////
+        /////////
 
         // Pre Calculate needed values
-        var stage_score = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageAve = stageScore/ourUI.scoreHistory.length;
+
+        var x = stageScore - lm;
+        var speedBonus = Math.floor(-1* (x / ((1/a) * (x - (lM - lm)))));
+
+        var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+        var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+        var bestAve = bestLocal/bestLog.length;
 
 
-        //////////////////////////////////////
-        // Later on we could have the score screen float transparently above the end scene. 
-        // For now we emulate the first level
+        var bestBonus = Math.floor(-1* ((bestLocal-lm) / ((1/a) * ((bestLocal-lm) - (lM - lm)))));
+
+        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+
+        //var stageAverage = stageScore();
 
 
-        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, 0.75);
+        console.log(stageScore, speedBonus, stageScore + speedBonus);
+        /////////
+
+
+
+        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
         this.scoreCardBackground.setOrigin(0,0).setDepth(8);
 
+        
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
@@ -945,6 +995,7 @@ class WinScene extends Phaser.Scene
         
         }
         //////////////////////////////////////
+        
 
 
 
@@ -979,26 +1030,35 @@ class WinScene extends Phaser.Scene
             'border-radius': '16px',
             //'text-decoration': 'underline'
         });
-        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+
+
         bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
-        
-        
-
-        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
-            "fontSize":'28px',
+        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
+            "fontSize":'26px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             color: 'white',
             'text-align': 'right',
 
         });
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`));
-        highScore.setText(
-            `${ourGame.stage}
-            Stage Score: ${stage_score}
-            HighScore: ${bestLocal}
-            ---------------
+        stageUI.setText(ourGame.stage).setOrigin(1,0);
+
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', {
+            "fontSize":'20px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            color: 'white',
+            'text-align': 'right',
+
+        });
+        
+        
+        stageScoreUI.setText(
+            `Base: ${stageScore}
+            Speed Bonus: +${speedBonus}
+            Stage Score: ${stageScore+speedBonus}
+            HighScore: ${bestBonus}
             `
         
         ).setOrigin(1, 0);
@@ -1026,7 +1086,7 @@ class WinScene extends Phaser.Scene
         ----------------------
         SCORE: ${ourUI.score}
         LENGTH: ${ourUI.length}
-        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
+        FRUIT SCORE AVERAGE: ${stageAve}
         
         TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
@@ -1041,7 +1101,7 @@ class WinScene extends Phaser.Scene
         `);
 
         const logScreenStyle = {
-            width: '141px',
+            width: '156px',
             //height: '22px',
             color: 'white',
             'font-size': '12px',
@@ -1055,25 +1115,23 @@ class WinScene extends Phaser.Scene
         }
 
         
-        //var stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
-        var bestLogText = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
         
-        //var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestScoreAve`))
+        
 
-        if (bestLogText) {
-            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 13, 'div', logScreenStyle);
-            bestLog.setText(
-                `Best - ave( )
-                ------------------
-                [${bestLogText}]`
+        if (bestLog) {
+            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID*.5, GRID * 13, 'div', logScreenStyle);
+            bestLogUI.setText(
+                `Best - ave(${bestAve.toFixed(1)})
+                ---------------------
+                [${bestLog}]`
             ).setOrigin(1,0);    
         }
         
 
         var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
         fruitLog.setText(
-            `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
-            ------------------ 
+            `Current - ave(${stageAve.toFixed(1)})
+            --------------------- 
             [${ourUI.scoreHistory.sort().reverse()}]`
         ).setOrigin(1,0);
 
