@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 3; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -1250,6 +1250,19 @@ var StageData = new Phaser.Class({
     
     toString(){
         return `${this.stage}`
+    },
+
+    calcScore() {
+        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+        var bonusScore = calcBonus(stageScore);
+
+        return stageScore + bonusScore;
+    },
+
+    calcBase() {
+        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+
+        return stageScore;
     }
     
 });
@@ -1274,11 +1287,101 @@ class TimeAttackScene extends Phaser.Scene{
         // Sets first time as an empty list. After this it will not be set again
         // Remember to reset manually on full game restart.
 
-        
-
 
         console.log("Time Attack Stage Manager is Live");
         console.log(this.stageHistory);
+
+        // First Entry Y Coordinate
+        var stageY = GRID *3;
+
+        
+
+        if (this.stageHistory) {
+            this.stageHistory.forEach(_stageData => {
+                console.log(_stageData.stage,
+                    "Base:", _stageData.calcBase(), 
+                    "Score:", _stageData.calcScore() ,
+                    "Food:", _stageData.foodLog
+                );
+
+                var baseScore = _stageData.calcBase()
+                var realScore = _stageData.calcScore()
+
+                //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+                //var bestScore;
+
+                //////
+
+
+
+                
+                
+            
+            
+                var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
+                    color: 'white',
+                    'font-size': '28px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                levelUI.setText(_stageData.stage).setOrigin(1,0);
+
+
+                // Run Stats
+                var scoreUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
+                    color: 'white',
+                    'font-size': '14px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                scoreUI.setText(`Base Score: ${baseScore} Score: ${realScore}`).setOrigin(0,0);
+
+                // food Log
+                var foodLogUI = this.add.dom( GRID * 10, stageY + GRID , 'div', {
+                    color: 'white',
+                    'font-size': '12px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+
+                foodLogUI.setText(_stageData.foodLog).setOrigin(0,0);
+
+
+                stageY += GRID * 2;
+
+                });
+
+                // Run Score
+
+                var runScore = 0;
+
+                if (this.stageHistory) {
+                    this.stageHistory.forEach(_stageData => {
+                    
+                        runScore += _stageData.calcScore();
+
+                    });
+
+                };
+                
+                console.log(runScore);
+
+                var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
+                    color: 'white',
+                    'font-size': '28px',
+                    'font-family': ["Sono", 'sans-serif'],
+                    'text-decoration': 'overline dashed',
+
+                });
+
+                runScoreUI.setText(`Run Score ${runScore}`).setOrigin(0,0);
+
+
+
+
+
+        }
+
+        
+        
+
 
     }
     update() {
@@ -1516,11 +1619,10 @@ class UIScene extends Phaser.Scene {
             var _stageData = new StageData(ourGame.stage, this.scoreHistory);
             
             ourWin.stageHistory.push(_stageData);
-            console.log(ourWin.stageHistory);
+            console.log(ourWin.stageHistory, _stageData.calcScore());
             
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
-
             // Calculate this locally
             var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
 
