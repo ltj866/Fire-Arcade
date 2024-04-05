@@ -1304,18 +1304,17 @@ class TimeAttackScene extends Phaser.Scene{
                     "Food:", _stageData.foodLog
                 );
 
-                var baseScore = _stageData.calcBase()
-                var realScore = _stageData.calcScore()
+                var baseScore = _stageData.calcBase();
+                var realScore = _stageData.calcScore();
+                var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
+
+
+                var logWrapLenth = 8;
 
                 //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
                 //var bestScore;
 
                 //////
-
-
-
-                
-                
             
             
                 var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
@@ -1335,14 +1334,19 @@ class TimeAttackScene extends Phaser.Scene{
                 scoreUI.setText(`Base Score: ${baseScore} Score: ${realScore}`).setOrigin(0,0);
 
                 // food Log
-                var foodLogUI = this.add.dom( GRID * 10, stageY + GRID , 'div', {
-                    color: 'white',
+                var foodLogUITop = this.add.dom( scoreUI.x + scoreUI.width +  14, stageY + 4 , 'div', {
+                    color: 'darkslategrey',
                     'font-size': '12px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
+                foodLogUITop.setText(foodLogOrdered.slice(0,logWrapLenth)).setOrigin(0,0);
 
-                foodLogUI.setText(_stageData.foodLog).setOrigin(0,0);
-
+                var foodLogUIBottom = this.add.dom( GRID * 10, stageY + GRID , 'div', {
+                    color: 'darkslategrey',
+                    'font-size': '12px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
 
                 stageY += GRID * 2;
 
@@ -1364,14 +1368,14 @@ class TimeAttackScene extends Phaser.Scene{
                 console.log(runScore);
 
                 var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
-                    color: 'white',
+                    color: 'yellow',
                     'font-size': '28px',
                     'font-family': ["Sono", 'sans-serif'],
                     'text-decoration': 'overline dashed',
 
                 });
 
-                runScoreUI.setText(`Run Score ${runScore}`).setOrigin(0,0);
+                runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
 
 
 
