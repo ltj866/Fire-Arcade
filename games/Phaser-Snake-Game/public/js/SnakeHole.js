@@ -1304,8 +1304,9 @@ class TimeAttackScene extends Phaser.Scene{
                     "Food:", _stageData.foodLog
                 );
 
-                var baseScore = _stageData.calcBase()
-                var realScore = _stageData.calcScore()
+                var baseScore = _stageData.calcBase();
+                var realScore = _stageData.calcScore();
+                var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
 
                 //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
                 //var bestScore;
@@ -1341,7 +1342,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-family': ["Sono", 'sans-serif'],
                 });
 
-                foodLogUI.setText(_stageData.foodLog).setOrigin(0,0);
+                foodLogUI.setText(foodLogOrdered).setOrigin(0,0);
 
 
                 stageY += GRID * 2;
