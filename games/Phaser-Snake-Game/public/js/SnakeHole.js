@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -111,11 +111,11 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a','Stage-02b'],
-    'Stage-02a': ['Stage-03'],
-    'Stage-02b': ['Stage-03b'],
-    'Stage-03': ['Stage-04'],
-    'Stage-03b': ['Stage-04'],
+    'Stage-01': [['Stage-02a', 10],['Stage-02b', 10]],
+    'Stage-02a': [['Stage-03', 25]],
+    'Stage-02b': [['Stage-03b', 25]],
+    'Stage-03': [['Stage-04',50]],
+    'Stage-03b': [['Stage-04',50]],
     'Stage-04': [],
     'Bonus-Stage-x1': [],
 }
@@ -962,6 +962,7 @@ class ScoreScene extends Phaser.Scene
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
+        const ourTimeAttack = this.scene.get('TimeAttackScene');
         /////////
 
         // Pre Calculate needed values
@@ -1189,9 +1190,14 @@ class ScoreScene extends Phaser.Scene
 
             this.input.keyboard.on('keydown-SPACE', function() {
                     
+                
+
+
+
+                
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
-                // As the event is defined there
+                // As the event is defined there, but this works and is why I did it. - James
                 ourGame.events.off('addScore');
                 ourGame.events.off('saveScore');
 
@@ -1200,12 +1206,38 @@ class ScoreScene extends Phaser.Scene
                 
                 if (ourGame.stage != END_STAGE) {
                 
-                    ourUI.scene.restart( { score: stageScore + speedBonus, lives: ourUI.lives } );
-                
-                    var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
-                    ourGame.scene.restart( { stage: next_stage } );
+                    var nextScore = 0;
+                    ourGame.scene.get("TimeAttackScene").stageHistory.forEach ( _stage => {
+                        var baseScore = _stage.foodLog.reduce((a,b) => a + b, 0);
+                        nextScore += baseScore + calcBonus(baseScore)
+                    });
 
-                    ourScoreScene.scene.switch('GameScene');
+                    
+
+                    ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
+                
+                    var next_stage = Phaser.Utils.Array.RemoveRandomElement(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
+
+                    var goalSum = next_stage[1] * ourTimeAttack.stageHistory.length * 28
+                    debugger
+                    if (ourTimeAttack.histSum > goalSum) {
+
+                        
+                        ourGame.scene.restart( { stage: next_stage[0] } );
+
+                        ourScoreScene.scene.switch('GameScene');
+                        
+                    }
+                    else {
+                        if (bestrun < ourUI.score + speedBonus) {
+                            localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
+                        }
+                        
+                        ourGame.scene.stop();
+                        ourScoreScene.scene.switch('TimeAttackScene');
+                    }
+                    
+                    
                 }
                 else {
                     // Start From The beginning. Must force reset values or it won't reset.
@@ -1242,11 +1274,12 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(stageID, foodLog, newBest = false)
+    function StageData(stageID, foodLog, stageUUID, newBest = false)
     {
         this.stage = stageID;
         this.foodLog = foodLog;
         this.newBest = newBest;
+        this.uuid = stageUUID;
     },
     
     toString(){
@@ -1325,10 +1358,10 @@ class TimeAttackScene extends Phaser.Scene{
                 var bestChar;
 
                 if (_stageData.newBest) {
-                    bestChar = "*";
+                    bestChar = "+";
                 }
                 else {
-                    bestChar = "+";
+                    bestChar = "-";
                 }
 
                 //////
@@ -1637,15 +1670,34 @@ class UIScene extends Phaser.Scene {
 
         //  Event: saveScore
         ourGame.events.on('saveScore', function () {
-            const ourWin = ourGame.scene.get('TimeAttackScene');
-
-            var _stageData = new StageData(ourGame.stage, this.scoreHistory);
+            const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
             
-            ourWin.stageHistory.push(_stageData);
-            console.log(ourWin.stageHistory, _stageData.calcScore());
+            //// Make New Stage Data
+
+            var _stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
+            
+            ourTimeAttack.stageHistory.push(_stageData);
+            console.log(ourTimeAttack.stageHistory, _stageData.calcScore());
             
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
+            // #region Do Unlock Calculation of all Best Logs
+            
+            var historicalLog = [];
+            
+            ourTimeAttack.stageHistory.forEach( _stage => {
+                var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
+                if (stageBestLog) {
+                    historicalLog = [...historicalLog, ...stageBestLog];
+                }
+            });
+
+            ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
+
+            // #endregion
+
+
+
             // Calculate this locally
             var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
 
