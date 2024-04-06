@@ -296,7 +296,7 @@ class GameScene extends Phaser.Scene {
 
         const { stage = START_STAGE } = props
         this.stage = stage;
-        console.log("FIRST INIT", this.stage);
+        
 
         this.recombinate = true;
         this.startingArrowState = true;
@@ -321,8 +321,10 @@ class GameScene extends Phaser.Scene {
 
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
+        const ourTimeAttack = this.scene.get('TimeAttackScene');
 
         this.spaceKey = this.input.keyboard.addKey("Space");
+        console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
         
         // a = Global average best score + minScore 
         //For a=1400, min=1, max=100, goal=28
@@ -1182,68 +1184,78 @@ class ScoreScene extends Phaser.Scene
 
                 ourInputScene.scene.restart();
 
-                
-                if (ourGame.stage != END_STAGE) {
-                
-                    var nextScore = 0;
-                    ourGame.scene.get("TimeAttackScene").stageHistory.forEach ( _stage => {
-                        var baseScore = _stage.foodLog.reduce((a,b) => a + b, 0);
-                        nextScore += baseScore + calcBonus(baseScore)
-                    });
-
-                    var nextStages = STAGES_NEXT[ourGame.stage];
-                    var unlockedStages = [];
-
-                    console.log("CHECK NEXT STAGES");
-                    nextStages.forEach( _stage => {
-
-                        var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
-                        console.log(_stage[0], "histSum:", ourTimeAttack.histSum, "targetSum", goalSum, "unlocked=", ourTimeAttack.histSum > goalSum)
-                        if (ourTimeAttack.histSum > goalSum) {
-                            unlockedStages.push(_stage);
-                            
-                        }
-
-                    });
-
-                    if (unlockedStages.length != 0) {
-
-
-                        var nextStage = Phaser.Math.RND.pick(unlockedStages);
-
-                        ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
-                        ourGame.scene.restart( { stage: nextStage[0] } );
-
-                        ourScoreScene.scene.switch('GameScene');
-                        
-                    }
-                    else {
-
-                        // end run
-                        if (bestrun < ourUI.score + speedBonus) {
-                            localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
-                        }
-                        
-                        ourGame.scene.stop();
-                        ourScoreScene.scene.switch('TimeAttackScene');
-                    }
+                if (ourTimeAttack.inTimeAttack) {
                     
-                    
-                }
-                else {
-                    // Start From The beginning. Must force reset values or it won't reset.
-                    
-                    if (bestrun < ourUI.score + speedBonus) {
-                        localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
-                    }
-                    
+                    // Go back to time attack scene
                     ourGame.scene.stop();
                     ourScoreScene.scene.switch('TimeAttackScene');
                     
-                    // do in Win Screen After the very end.
-                    //console.log("END STAGE", ourGame.stage, END_STAGE);
-                    //ourUI.scene.restart( { score: 0 });
-                    //ourGame.scene.restart({ stage: START_STAGE });
+                }
+                else {
+                    if (ourGame.stage != END_STAGE) {
+                
+                        var nextScore = 0;
+                        ourGame.scene.get("TimeAttackScene").stageHistory.forEach ( _stage => {
+                            var baseScore = _stage.foodLog.reduce((a,b) => a + b, 0);
+                            nextScore += baseScore + calcBonus(baseScore)
+                        });
+    
+                        var nextStages = STAGES_NEXT[ourGame.stage];
+                        var unlockedStages = [];
+    
+                        console.log("CHECK NEXT STAGES");
+                        nextStages.forEach( _stage => {
+    
+                            var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
+                            console.log(_stage[0], "histSum:", ourTimeAttack.histSum, "targetSum", goalSum, "unlocked=", ourTimeAttack.histSum > goalSum)
+                            if (ourTimeAttack.histSum > goalSum) {
+                                unlockedStages.push(_stage);
+                                
+                            }
+    
+                        });
+    
+                        if (unlockedStages.length != 0) {
+    
+    
+                            var nextStage = Phaser.Math.RND.pick(unlockedStages);
+    
+                            ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
+                            ourGame.scene.restart( { stage: nextStage[0] } );
+    
+                            ourScoreScene.scene.switch('GameScene'); // This doubles the game scene I think.
+                            
+                        }
+                        else {
+    
+                            // go to Time Attack
+    
+                            
+                            ourGame.scene.stop();
+                            ourScoreScene.scene.switch('TimeAttackScene');
+                        }
+                        
+                        
+                    }
+                    else {
+                        // Start From The beginning. Must force reset values or it won't reset.
+                        
+                
+                        
+                        ourGame.scene.stop();
+                        ourScoreScene.scene.switch('TimeAttackScene');
+                        
+                        // do in Win Screen After the very end.
+                        //console.log("END STAGE", ourGame.stage, END_STAGE);
+                        //ourUI.scene.restart( { score: 0 });
+                        //ourGame.scene.restart({ stage: START_STAGE });
+                    }
+
+                }
+
+                // Maybe should only have this in the TimeAttackScene
+                if (bestrun < ourUI.score + speedBonus) {
+                    localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
                 }
                 
                 
@@ -1301,6 +1313,7 @@ class TimeAttackScene extends Phaser.Scene{
 
         // this.stageHistory = []; !Initalized in the start screen
         // This keeps the history from being reset during a run.
+        this.inTimeAttack = false;
 
 
     }
@@ -1312,6 +1325,8 @@ class TimeAttackScene extends Phaser.Scene{
         // Sets first time as an empty list. After this it will not be set again
         // Remember to reset manually on full game restart.
         const ourGame = this.scene.get('GameScene');
+        const ourUI = this.scene.get('UIScene');
+        const ourTimeAttack = this.scene.get("TimeAttackScene");
 
 
         console.log("Time Attack Stage Manager is Live");
@@ -1325,11 +1340,14 @@ class TimeAttackScene extends Phaser.Scene{
         var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
 
         var lowestStageUI;
+        var lowestStage;
         var lowestScore = 9999999999;
 
         
 
         if (this.stageHistory) {
+            this.inTimeAttack = true;
+
             this.stageHistory.forEach(_stageData => {
                 console.log(_stageData.stage,
                     "Base Score:", _stageData.calcBase(),
@@ -1360,6 +1378,7 @@ class TimeAttackScene extends Phaser.Scene{
                 //////
                 if (realScore < lowestScore) {
                     lowestScore = realScore;
+                    lowestStage = _stageData.stage;
                     lowestStageUI = this.add.dom(GRID * 9, stageY, 'div', {
                         color: 'white',
                         'font-size': '28px',
@@ -1407,8 +1426,8 @@ class TimeAttackScene extends Phaser.Scene{
 
             }); // End Level For Loop
 
-            debugger
             lowestStageUI.node.style.color = "red";
+            
 
 
             ///////// Run Score
@@ -1480,6 +1499,54 @@ class TimeAttackScene extends Phaser.Scene{
             var sumAveFood = sumFood / allFoodLog.length;
 
             //console.log ("sum:", sumFood, "Ave:", sumAveFood);
+            this.time.delayedCall(900, function() {
+                var continue_text = '[SPACE TO END GAME]';
+    
+                if (ourUI.lives > 0) {
+                    continue_text = `[RETRY ${lowestStage}]`;
+                }
+                
+                var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
+                continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+    
+    
+                this.tweens.add({
+                    targets: continueText,
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    repeat: -1,
+                    yoyo: true
+                  });
+                
+    
+                this.input.keyboard.on('keydown-SPACE', function() {
+
+                if (ourUI.lives > 0) {
+
+                    ourUI.lives -= 1; 
+
+                    ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
+                    ourGame.scene.restart( { stage: lowestStage } );
+
+                    ourTimeAttack.scene.stop();
+
+                    //ourTimeAttack.scene.switch('GameScene');
+                    
+                }
+                else {
+                    // end run
+                    // go to Time Attack
+                    //if (bestrun < ourUI.score + speedBonus) {
+                    //    localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
+                    //}
+                    this.scene.stop();
+                    //ourScoreScene.scene.switch('TimeAttackScene');
+                }
+                        
+                });
+            }, [], this);
+   
 
         }
 
@@ -1716,12 +1783,38 @@ class UIScene extends Phaser.Scene {
         //  Event: saveScore
         ourGame.events.on('saveScore', function () {
             const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
-            
-            //// Make New Stage Data
 
-            var _stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
+
+            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
             
-            ourTimeAttack.stageHistory.push(_stageData);
+            if (ourTimeAttack.inTimeAttack) {
+                ourTimeAttack.stageHistory.some( _stageData => {
+
+                    if (ourGame.stage === _stageData.stage) {
+                        var oldScore = _stageData.foodLog.reduce((a,b) => a + b, 0);
+                        var newScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+
+                        oldScore = oldScore + calcBonus(oldScore);
+                        newScore = newScore + calcBonus(newScore);
+                        
+                        if (newScore > oldScore) {
+                            console.log("YEAH YOU DID BETTER", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
+                            _stageData.foodLog = this.scoreHistory; 
+                        }
+                        else {
+                            console.log("SORRY TRY AGAIN", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
+                        }
+                        
+                        
+                    }
+
+                })
+            }
+            else {
+                //// Push New Stage Data
+                ourTimeAttack.stageHistory.push(stageData);
+
+            }
             
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
@@ -1757,7 +1850,7 @@ class UIScene extends Phaser.Scene {
                 bestLocal = stage_score;
                 this.bestScoreUI.setText(`Best : ${bestLocal}`);
 
-                _stageData.newBest = true;
+                stageData.newBest = true;
                 
                 localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
             }
