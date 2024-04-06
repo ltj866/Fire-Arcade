@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 4; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -1242,10 +1242,11 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(stageID, foodLog)
+    function StageData(stageID, foodLog, newBest = false)
     {
         this.stage = stageID;
         this.foodLog = foodLog;
+        this.newBest = newBest;
     },
     
     toString(){
@@ -1263,7 +1264,7 @@ var StageData = new Phaser.Class({
         var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
 
         return stageScore;
-    }
+    },
     
 });
 
@@ -1293,6 +1294,11 @@ class TimeAttackScene extends Phaser.Scene{
 
         // First Entry Y Coordinate
         var stageY = GRID *3;
+        var allFoodLog = [];
+
+        // Average Food
+        var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
+        var sumAveFood = sumFood / allFoodLog.length;
 
         
 
@@ -1308,11 +1314,22 @@ class TimeAttackScene extends Phaser.Scene{
                 var realScore = _stageData.calcScore();
                 var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
 
+                allFoodLog.push(...foodLogOrdered);
+
+                
+
 
                 var logWrapLenth = 8;
-
                 //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
                 //var bestScore;
+                var bestChar;
+
+                if (_stageData.newBest) {
+                    bestChar = "*";
+                }
+                else {
+                    bestChar = "+";
+                }
 
                 //////
             
@@ -1322,7 +1339,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-size': '28px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
-                levelUI.setText(_stageData.stage).setOrigin(1,0);
+                levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
 
 
                 // Run Stats
@@ -1331,7 +1348,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-size': '14px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
-                scoreUI.setText(`Base Score: ${baseScore} Score: ${realScore}`).setOrigin(0,0);
+                scoreUI.setText(`Score: ${realScore} SpeedBonus: ${calcBonus(baseScore)}`).setOrigin(0,0);
 
                 // food Log
                 var foodLogUITop = this.add.dom( scoreUI.x + scoreUI.width +  14, stageY + 4 , 'div', {
@@ -1350,41 +1367,43 @@ class TimeAttackScene extends Phaser.Scene{
 
                 stageY += GRID * 2;
 
-                });
+            });
 
-                // Run Score
+            ///////// Run Score
 
-                var runScore = 0;
+            var runScore = 0;
 
-                if (this.stageHistory) {
-                    this.stageHistory.forEach(_stageData => {
-                    
-                        runScore += _stageData.calcScore();
-
-                    });
-
-                };
+            if (this.stageHistory) {
+                this.stageHistory.forEach(_stageData => {
                 
-                console.log(runScore);
-
-                var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
-                    color: 'yellow',
-                    'font-size': '28px',
-                    'font-family': ["Sono", 'sans-serif'],
-                    'text-decoration': 'overline dashed',
+                    runScore += _stageData.calcScore();
 
                 });
 
-                runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
+            };
+            
+            console.log(runScore);
 
+            var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
+                color: 'yellow',
+                'font-size': '28px',
+                'font-family': ["Sono", 'sans-serif'],
+                'text-decoration': 'overline dashed',
 
+            });
 
+            runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
 
+            ////////// Run Average
 
+            var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
+
+            var sumAveFood = sumFood / allFoodLog.length;
+
+            console.log ("sum:", sumFood, "Ave:", sumAveFood);
+
+            // Only unlock stages if you are at length goal 28. We can add this as a global variable.
         }
-
-        
-        
 
 
     }
@@ -1641,6 +1660,8 @@ class UIScene extends Phaser.Scene {
             if (stage_score > bestLocal) {
                 bestLocal = stage_score;
                 this.bestScoreUI.setText(`Best : ${bestLocal}`);
+
+                _stageData.newBest = true;
                 
                 localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
             }
