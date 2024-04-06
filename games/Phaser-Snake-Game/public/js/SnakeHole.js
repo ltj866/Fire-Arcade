@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 5; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -111,7 +111,7 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 25],['Stage-02b', 10]],
+    'Stage-01': [['Stage-02a', 10],['Stage-02b', 80]],
     'Stage-02a': [['Stage-03', 50]],
     'Stage-02b': [['Stage-03b', 50]],
     'Stage-03': [['Stage-04',85]],
@@ -323,15 +323,6 @@ class GameScene extends Phaser.Scene {
         var ourGameScene = this.scene.get('GameScene');
 
         this.spaceKey = this.input.keyboard.addKey("Space");
-
-
-
-
-
-        
-
-
-
         
         // a = Global average best score + minScore 
         //For a=1400, min=1, max=100, goal=28
@@ -348,16 +339,6 @@ class GameScene extends Phaser.Scene {
         // 2250 + 5656
         // 2500 + 11_536
 
-
-
-
-
-
-        
-    
-        
-        
-        
 
         // Create the snake so it is addressable immediately 
         this.snake = new Snake(this, 15, 15);
@@ -982,8 +963,6 @@ class ScoreScene extends Phaser.Scene
 
         //var stageAverage = stageScore();
 
-
-        console.log(stageScore, speedBonus, stageScore + speedBonus);
         /////////
 
 
@@ -1212,23 +1191,34 @@ class ScoreScene extends Phaser.Scene
                         nextScore += baseScore + calcBonus(baseScore)
                     });
 
-                    
+                    var nextStages = STAGES_NEXT[ourGame.stage];
+                    var unlockedStages = [];
 
-                    ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
-                
-                    var next_stage = Phaser.Utils.Array.RemoveRandomElement(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
+                    nextStages.forEach( _stage => {
 
-                    var goalSum = next_stage[1] * ourTimeAttack.stageHistory.length * 28
+                        var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
+                        console.log(_stage[0], "histSum:", ourTimeAttack.histSum, "targetSum", goalSum, "unlocked=", ourTimeAttack.histSum > goalSum)
+                        if (ourTimeAttack.histSum > goalSum) {
+                            unlockedStages.push(_stage);
+                            
+                        }
 
-                    if (ourTimeAttack.histSum > goalSum) {
+                    });
 
-                        
-                        ourGame.scene.restart( { stage: next_stage[0] } );
+                    if (unlockedStages.length != 0) {
+
+
+                        var nextStage = Phaser.Math.RND.pick(unlockedStages);
+
+                        ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
+                        ourGame.scene.restart( { stage: nextStage[0] } );
 
                         ourScoreScene.scene.switch('GameScene');
                         
                     }
                     else {
+
+                        // end run
                         if (bestrun < ourUI.score + speedBonus) {
                             localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
                         }
@@ -1320,10 +1310,11 @@ class TimeAttackScene extends Phaser.Scene{
     create() {
         // Sets first time as an empty list. After this it will not be set again
         // Remember to reset manually on full game restart.
+        const ourGame = this.scene.get('GameScene');
 
 
         console.log("Time Attack Stage Manager is Live");
-        console.log(this.stageHistory);
+        
 
         // First Entry Y Coordinate
         var stageY = GRID *3;
@@ -1401,6 +1392,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             });
 
+
             ///////// Run Score
 
             var runScore = 0;
@@ -1414,7 +1406,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             };
             
-            console.log(runScore);
+            console.log("Runscore:", runScore);
 
             var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
                 color: 'yellow',
@@ -1427,6 +1419,39 @@ class TimeAttackScene extends Phaser.Scene{
 
             runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
 
+            // #region Check Unlock Level
+
+            if (this.scene.get('GameScene').stage != END_STAGE) {
+
+                
+                var unlockStage;
+                var goalSum;
+                
+                // Unlock Difficulty needs to be in order
+                STAGES_NEXT[ourGame.stage].some( _stage => {
+
+                    var _goalSum = _stage[1] * this.stageHistory.length * 28;
+                    unlockStage = _stage;
+                    goalSum = unlockStage[1] * this.stageHistory.length * 28;
+                    if (this.histSum < _goalSum && runScore > _goalSum) {
+                         
+                        return true;
+                    }
+                });
+
+                // Calc score required up to this point
+    
+                if (goalSum && runScore > goalSum) {
+                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "SCORE:", runScore, "REQ:", goalSum);
+                    
+                }
+                else {
+                    console.log("BETTER LUCK NEXT TIME!! You need", goalSum, "to unlock", unlockStage[0], "and you got", runScore);
+                }
+    
+            }
+            // #endregion
+
 
             ////////// Run Average
 
@@ -1436,7 +1461,6 @@ class TimeAttackScene extends Phaser.Scene{
 
             console.log ("sum:", sumFood, "Ave:", sumAveFood);
 
-            // Only unlock stages if you are at length goal 28. We can add this as a global variable.
         }
 
 
@@ -1678,7 +1702,6 @@ class UIScene extends Phaser.Scene {
             var _stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
             
             ourTimeAttack.stageHistory.push(_stageData);
-            console.log(ourTimeAttack.stageHistory, _stageData.calcScore());
             
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
