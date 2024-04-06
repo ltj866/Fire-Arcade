@@ -1349,8 +1349,6 @@ class TimeAttackScene extends Phaser.Scene{
 
                 allFoodLog.push(...foodLogOrdered);
 
-                
-
 
                 var logWrapLenth = 8;
                 //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
@@ -1363,6 +1361,7 @@ class TimeAttackScene extends Phaser.Scene{
                 else {
                     bestChar = "-";
                 }
+
 
                 //////
             
@@ -1423,9 +1422,11 @@ class TimeAttackScene extends Phaser.Scene{
                 'font-family': ["Sono", 'sans-serif'],
                 'text-decoration': 'overline dashed',
 
+
             });
 
             runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
+
 
             ////////// Run Average
 
