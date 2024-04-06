@@ -111,11 +111,11 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 10],['Stage-02b', 10]],
-    'Stage-02a': [['Stage-03', 25]],
-    'Stage-02b': [['Stage-03b', 25]],
-    'Stage-03': [['Stage-04',50]],
-    'Stage-03b': [['Stage-04',50]],
+    'Stage-01': [['Stage-02a', 25],['Stage-02b', 10]],
+    'Stage-02a': [['Stage-03', 50]],
+    'Stage-02b': [['Stage-03b', 50]],
+    'Stage-03': [['Stage-04',85]],
+    'Stage-03b': [['Stage-04',85]],
     'Stage-04': [],
     'Bonus-Stage-x1': [],
 }
@@ -1219,7 +1219,7 @@ class ScoreScene extends Phaser.Scene
                     var next_stage = Phaser.Utils.Array.RemoveRandomElement(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
 
                     var goalSum = next_stage[1] * ourTimeAttack.stageHistory.length * 28
-                    debugger
+
                     if (ourTimeAttack.histSum > goalSum) {
 
                         
