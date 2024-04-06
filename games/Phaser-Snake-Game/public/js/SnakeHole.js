@@ -1330,7 +1330,7 @@ class TimeAttackScene extends Phaser.Scene{
         if (this.stageHistory) {
             this.stageHistory.forEach(_stageData => {
                 console.log(_stageData.stage,
-                    "Score:", _stageData.calcScore(),
+                    "Base Score:", _stageData.calcBase(),
                     "SpeedBonus", calcBonus(_stageData.calcBase()), 
                     "FoodLog:", _stageData.foodLog
                 );
@@ -1397,11 +1397,13 @@ class TimeAttackScene extends Phaser.Scene{
             ///////// Run Score
 
             var runScore = 0;
+            var baseScore = 0;
 
             if (this.stageHistory) {
                 this.stageHistory.forEach(_stageData => {
                 
                     runScore += _stageData.calcScore();
+                    baseScore += _stageData.calcBase();
 
                 });
 
@@ -1434,7 +1436,7 @@ class TimeAttackScene extends Phaser.Scene{
                     var _goalSum = _stage[1] * this.stageHistory.length * 28;
                     unlockStage = _stage;
                     goalSum = unlockStage[1] * this.stageHistory.length * 28;
-                    if (this.histSum < _goalSum && runScore > _goalSum) {
+                    if (this.histSum < _goalSum && baseScore > _goalSum) {
                          
                         return true;
                     }
@@ -1442,12 +1444,12 @@ class TimeAttackScene extends Phaser.Scene{
 
                 // Calc score required up to this point
     
-                if (goalSum && runScore > goalSum) {
-                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "SCORE:", runScore, "REQ:", goalSum);
+                if (goalSum && baseScore > goalSum) {
+                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "BASE SCORE SUM:", baseScore, "REQ:", goalSum);
                     
                 }
                 else {
-                    console.log("BETTER LUCK NEXT TIME!! You need", goalSum, "to unlock", unlockStage[0], "and you got", runScore);
+                    console.log("BETTER LUCK NEXT TIME!! You need", goalSum, "to unlock", unlockStage[0], "and you got", baseScore);
                 }
     
             }
