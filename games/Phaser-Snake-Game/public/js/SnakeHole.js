@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 4; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -111,7 +111,7 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 10],['Stage-02b', 80]],
+    'Stage-01': [['Stage-02a', 10],['Stage-02b', 87]],
     'Stage-02a': [['Stage-03', 50]],
     'Stage-02b': [['Stage-03b', 50]],
     'Stage-03': [['Stage-04',85]],
@@ -1323,7 +1323,9 @@ class TimeAttackScene extends Phaser.Scene{
 
         // Average Food
         var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
-        var sumAveFood = sumFood / allFoodLog.length;
+
+        var lowestStageUI;
+        var lowestScore = 9999999999;
 
         
 
@@ -1356,15 +1358,26 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 //////
-            
-            
-                var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
-                    color: 'white',
-                    'font-size': '28px',
-                    'font-family': ["Sono", 'sans-serif'],
-                });
-                levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                if (realScore < lowestScore) {
+                    lowestScore = realScore;
+                    lowestStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
 
+                    lowestStageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+
+                } else {
+                    var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+
+                    levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                }
+            
 
                 // Run Stats
                 var scoreUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
@@ -1373,6 +1386,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-family': ["Sono", 'sans-serif'],
                 });
                 scoreUI.setText(`Score: ${realScore} SpeedBonus: ${calcBonus(baseScore)}`).setOrigin(0,0);
+
 
                 // food Log
                 var foodLogUITop = this.add.dom( scoreUI.x + scoreUI.width +  14, stageY + 4 , 'div', {
@@ -1391,7 +1405,10 @@ class TimeAttackScene extends Phaser.Scene{
 
                 stageY += GRID * 2;
 
-            });
+            }); // End Level For Loop
+
+            debugger
+            lowestStageUI.node.style.color = "red";
 
 
             ///////// Run Score
