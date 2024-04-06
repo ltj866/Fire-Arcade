@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -821,7 +821,7 @@ class GameScene extends Phaser.Scene {
         
         // Win State
         if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
-            console.log("YOU WIN");
+            console.log("YOU WIN" , this.stage);
             this.winnedYet = true; // stops update loop from moving snake.
             this.move_pause = true; // Keeps snake from turning
 
@@ -1194,6 +1194,7 @@ class ScoreScene extends Phaser.Scene
                     var nextStages = STAGES_NEXT[ourGame.stage];
                     var unlockedStages = [];
 
+                    console.log("CHECK NEXT STAGES");
                     nextStages.forEach( _stage => {
 
                         var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
@@ -1329,9 +1330,9 @@ class TimeAttackScene extends Phaser.Scene{
         if (this.stageHistory) {
             this.stageHistory.forEach(_stageData => {
                 console.log(_stageData.stage,
-                    "Base:", _stageData.calcBase(), 
-                    "Score:", _stageData.calcScore() ,
-                    "Food:", _stageData.foodLog
+                    "Score:", _stageData.calcScore(),
+                    "SpeedBonus", calcBonus(_stageData.calcBase()), 
+                    "FoodLog:", _stageData.foodLog
                 );
 
                 var baseScore = _stageData.calcBase();
@@ -1459,7 +1460,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             var sumAveFood = sumFood / allFoodLog.length;
 
-            console.log ("sum:", sumFood, "Ave:", sumAveFood);
+            //console.log ("sum:", sumFood, "Ave:", sumAveFood);
 
         }
 
