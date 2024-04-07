@@ -109,7 +109,7 @@ var SOUND_PORTAL = [
 
 const DREAMWALLSKIP = [0,1,2];
 
-
+// #region STAGES_NEXT
 const STAGES_NEXT = {
     'Stage-01': [['Stage-02a', 10],['Stage-02b', 20],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 92]],
     'Stage-02a': [['Stage-03a', 50]],
@@ -117,13 +117,13 @@ const STAGES_NEXT = {
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03a': [['Stage-04',90]],
-    'Stage-03b': [['Stage-04',99]],
-    'Stage-03c': [['Stage-04',90]],
-    'Stage-04': [['Stage-05',90]],
-    'Stage-05': [['Stage-06',90]],
-    'Stage-06': [['Stage-07',90]],
-    'Stage-07': [['Stage-08',90]],
+    'Stage-03a': [['Stage-04', 88]],
+    'Stage-03b': [['Stage-04', 99]],
+    'Stage-03c': [['Stage-04', 88]],
+    'Stage-04': [['Stage-05', 88]],
+    'Stage-05': [['Stage-06', 84]],
+    'Stage-06': [['Stage-07', 83]],
+    'Stage-07': [['Stage-08', 82]],
     'Bonus-Stage-x1': [],
 }
 
