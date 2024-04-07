@@ -111,13 +111,13 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 10],['Stage-02b', 20],['Stage-02c', 99],['Stage-02d', 99]['Stage-02e', 90]],
-    'Stage-02a': [['Stage-03', 50]],
-    'Stage-02b': [['Stage-03', 50]],
+    'Stage-01': [['Stage-02a', 10],['Stage-02b', 20],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 92]],
+    'Stage-02a': [['Stage-03a', 50]],
+    'Stage-02b': [['Stage-03a', 50]],
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03': [['Stage-04',99]],
+    'Stage-03a': [['Stage-04',90]],
     'Stage-03b': [['Stage-04',99]],
     'Stage-03c': [['Stage-04',90]],
     'Stage-04': [['Stage-05',90]],
@@ -460,7 +460,7 @@ class GameScene extends Phaser.Scene {
 
         
         
-        // Keyboard Inputs
+        // #region Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             // Separate if statements so the first will 
             // run with as small of a delay as possible
@@ -489,7 +489,9 @@ class GameScene extends Phaser.Scene {
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.spaceWhileReGrouping = false;
-        }) 
+        })
+
+        // #endregion
         
 
         // Add all tiles to walls for collision
@@ -1280,7 +1282,7 @@ class ScoreScene extends Phaser.Scene
 
 
 
-
+// #region Stage Data
 var StageData = new Phaser.Class({
 
     initialize:
@@ -1311,6 +1313,7 @@ var StageData = new Phaser.Class({
     },
     
 });
+// #endregion
 
 class TimeAttackScene extends Phaser.Scene{
     constructor () {
@@ -1491,6 +1494,8 @@ class TimeAttackScene extends Phaser.Scene{
     
                 if (goalSum && baseScore > goalSum) {
                     console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "BASE SCORE SUM:", baseScore, "REQ:", goalSum);
+
+                    lowestStage = unlockStage[0];
                     
                 }
                 else {
@@ -1512,7 +1517,7 @@ class TimeAttackScene extends Phaser.Scene{
                 var continue_text = '[SPACE TO END GAME]';
     
                 if (ourUI.lives > 0) {
-                    continue_text = `[RETRY ${lowestStage}]`;
+                    continue_text = `[GOTO ${lowestStage}]`;
                 }
                 
                 var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
@@ -1808,6 +1813,8 @@ class UIScene extends Phaser.Scene {
 
 
             var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
+
+            var stageFound = false;
             
             if (ourTimeAttack.inTimeAttack) {
                 ourTimeAttack.stageHistory.some( _stageData => {
@@ -1826,11 +1833,17 @@ class UIScene extends Phaser.Scene {
                         else {
                             console.log("SORRY TRY AGAIN", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
                         }
-                        
-                        
+
+                        stageFound = true;
                     }
 
+
                 })
+                if (!stageFound) {
+                    // Playing a new unlocked stage. Get one life back.
+                    this.lives += 1;
+                    ourTimeAttack.stageHistory.push(stageData);
+                }
             }
             else {
                 //// Push New Stage Data
