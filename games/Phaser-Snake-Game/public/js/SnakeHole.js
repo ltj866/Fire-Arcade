@@ -111,19 +111,24 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02', 10],['Stage-02b', 20],['Stage-02c', 99],['Stage-02d', 99]],
-    'Stage-02': [['Stage-03', 50]],
+    'Stage-01': [['Stage-02a', 10],['Stage-02b', 20],['Stage-02c', 99],['Stage-02d', 99]['Stage-02e', 90]],
+    'Stage-02a': [['Stage-03', 50]],
     'Stage-02b': [['Stage-03', 50]],
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
+    'Stage-02e': [['Stage-03c', 85]],
     'Stage-03': [['Stage-04',99]],
     'Stage-03b': [['Stage-04',99]],
-    'Stage-04': [],
+    'Stage-03c': [['Stage-04',90]],
+    'Stage-04': [['Stage-05',90]],
+    'Stage-05': [['Stage-06',90]],
+    'Stage-06': [['Stage-07',90]],
+    'Stage-07': [['Stage-08',90]],
     'Bonus-Stage-x1': [],
 }
 
 const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-04';
+const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
