@@ -14,8 +14,8 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28.. //32?................... Win Condition
-const  STARTING_LIVES = 25;
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+const  STARTING_LIVES = 12;
 
 
 
@@ -111,11 +111,11 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 10],['Stage-02b', 87]],
-    'Stage-02a': [['Stage-03', 50]],
-    'Stage-02b': [['Stage-03b', 50]],
-    'Stage-03': [['Stage-04',85]],
-    'Stage-03b': [['Stage-04',85]],
+    'Stage-01': [['Stage-02', 10],['Stage-02b', 99]],
+    'Stage-02': [['Stage-03', 50]],
+    'Stage-02b': [['Stage-03', 50]],
+    'Stage-03': [['Stage-04',99]],
+    'Stage-03b': [['Stage-04',99]],
     'Stage-04': [],
     'Bonus-Stage-x1': [],
 }
@@ -637,6 +637,7 @@ class GameScene extends Phaser.Scene {
 
         
         // Middle Row        
+        this.setFruit(this, [areaBB, areaBC]);
         this.setFruit(this, [areaBB, areaBC]);
 
 
@@ -1427,6 +1428,7 @@ class TimeAttackScene extends Phaser.Scene{
             }); // End Level For Loop
 
             lowestStageUI.node.style.color = "red";
+        
             
 
 
@@ -1518,6 +1520,21 @@ class TimeAttackScene extends Phaser.Scene{
                     repeat: -1,
                     yoyo: true
                   });
+
+                  /*
+                  this.tweens.add({
+                    targets: lowestStageUI,
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    repeat: -1,
+                    yoyo: true
+                  });*/
+
+                var bestRun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+                if (bestRun < runScore) {
+                    localStorage.setItem('BestFinalScore', runScore);
+                }
                 
     
                 this.input.keyboard.on('keydown-SPACE', function() {
@@ -1537,10 +1554,8 @@ class TimeAttackScene extends Phaser.Scene{
                 else {
                     // end run
                     // go to Time Attack
-                    //if (bestrun < ourUI.score + speedBonus) {
-                    //    localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
-                    //}
-                    this.scene.stop();
+                    console.log("That's All Folks!" , runScore);
+                    ourTimeAttack.scene.stop();
                     //ourScoreScene.scene.switch('TimeAttackScene');
                 }
                         
