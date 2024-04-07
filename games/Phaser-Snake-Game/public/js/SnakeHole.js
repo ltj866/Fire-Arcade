@@ -111,9 +111,11 @@ const DREAMWALLSKIP = [0,1,2];
 
 
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02', 10],['Stage-02b', 99]],
+    'Stage-01': [['Stage-02', 10],['Stage-02b', 20],['Stage-02c', 99],['Stage-02d', 99]],
     'Stage-02': [['Stage-03', 50]],
     'Stage-02b': [['Stage-03', 50]],
+    'Stage-02c': [['Stage-03b', 50]],
+    'Stage-02d': [['Stage-03b', 50]],
     'Stage-03': [['Stage-04',99]],
     'Stage-03b': [['Stage-04',99]],
     'Stage-04': [],
