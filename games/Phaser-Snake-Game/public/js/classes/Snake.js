@@ -190,7 +190,7 @@ var Snake = new Phaser.Class({
         if(this.head.x === _atom.x && this.head.y === _atom.y){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            console.log("time since last fruit:", timeSinceFruit);
+            //console.log("time since last fruit:", timeSinceFruit);
             
             if(timeSinceFruit > COMBO_ADD_FLOOR){
                  

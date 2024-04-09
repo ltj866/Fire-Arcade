@@ -270,6 +270,7 @@ class StartScene extends Phaser.Scene {
 
 
 class GameScene extends Phaser.Scene {
+    // #region GameScene
 
     constructor () {
         super({key: 'GameScene', active: false});
@@ -557,7 +558,7 @@ class GameScene extends Phaser.Scene {
         */
         
         
-        // Stage Logic
+        // #region Stage Logic
         
         var makePair = function (scene, to, from) {
             
@@ -654,9 +655,13 @@ class GameScene extends Phaser.Scene {
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
 
+
+        // #endregion
+
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
+        // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
         ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
         ourUI.bestScoreUI.setOrigin(0,0);
@@ -671,6 +676,7 @@ class GameScene extends Phaser.Scene {
         else {
             var bestLocal = 0;
         }
+
         
 
 
@@ -831,7 +837,7 @@ class GameScene extends Phaser.Scene {
             });
         }
         
-        // Win State
+        // #region Win State
         if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
             console.log("YOU WIN" , this.stage);
             this.winnedYet = true; // stops update loop from moving snake.
@@ -849,7 +855,11 @@ class GameScene extends Phaser.Scene {
             
         }
 
+        // #endregion
+
         // Only Calculate every move window
+
+        // #region Check move
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
 
@@ -941,6 +951,7 @@ class GameScene extends Phaser.Scene {
 
 
 class ScoreScene extends Phaser.Scene
+// #region ScoreScene
 {
     constructor () {
         super({key: 'ScoreScene', active: false});
@@ -1205,8 +1216,10 @@ class ScoreScene extends Phaser.Scene
                     if (ourGame.stage != END_STAGE) {
                 
                         var nextScore = 0;
+                        var currentBase = 0;
                         ourGame.scene.get("TimeAttackScene").stageHistory.forEach ( _stage => {
                             var baseScore = _stage.foodLog.reduce((a,b) => a + b, 0);
+                            currentBase += baseScore
                             nextScore += baseScore + calcBonus(baseScore)
                         });
     
@@ -1217,11 +1230,31 @@ class ScoreScene extends Phaser.Scene
                         nextStages.forEach( _stage => {
     
                             var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
-                            console.log(_stage[0], "histSum:", ourTimeAttack.histSum, "targetSum", goalSum, "unlocked=", ourTimeAttack.histSum > goalSum)
+                            console.log(
+                                _stage[0], 
+                                "histSum:", ourTimeAttack.histSum, 
+                                "targetSum", goalSum, 
+                                "unlocked=", ourTimeAttack.histSum > goalSum,
+                                "currentBase=", currentBase,
+                                "newUnlocked=", (currentBase > goalSum && ourTimeAttack.histSum < goalSum)
+                            )
                             if (ourTimeAttack.histSum > goalSum) {
                                 unlockedStages.push(_stage);
-                                
                             }
+
+                            if (currentBase > goalSum && ourTimeAttack.histSum < goalSum) {
+                                if (ourTimeAttack.newUnlocked) {
+                                    ourTimeAttack.newUnlocked.push(_stage);
+                                }
+                                else {
+                                    var currentAve = currentBase / (ourTimeAttack.stageHistory.length * 28);
+                                    ourTimeAttack.newUnlocked = [
+                                        _stage[0], // Stage Namr
+                                        _stage[1], // Requirement Average
+                                        currentAve]; // Average now
+                                }
+                            }
+                            
     
                         });
     
@@ -1316,6 +1349,7 @@ var StageData = new Phaser.Class({
 // #endregion
 
 class TimeAttackScene extends Phaser.Scene{
+    // #region TimeAttackScene
     constructor () {
         super({ key: 'TimeAttackScene', active: true });
     }
@@ -1477,29 +1511,35 @@ class TimeAttackScene extends Phaser.Scene{
                 
                 var unlockStage;
                 var goalSum;
+                var foodToNow = this.stageHistory.length * 28;
                 
                 // Unlock Difficulty needs to be in order
                 STAGES_NEXT[ourGame.stage].some( _stage => {
 
-                    var _goalSum = _stage[1] * this.stageHistory.length * 28;
+                    var _goalSum = _stage[1] * foodToNow;
                     unlockStage = _stage;
-                    goalSum = unlockStage[1] * this.stageHistory.length * 28;
+                    goalSum = unlockStage[1] * foodToNow;
                     if (this.histSum < _goalSum && baseScore > _goalSum) {
-                         
                         return true;
                     }
                 });
 
                 // Calc score required up to this point
+                // Add Stage History Sum Here
     
-                if (goalSum && baseScore > goalSum) {
-                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "BASE SCORE SUM:", baseScore, "REQ:", goalSum);
+                console.log(this.newUnlocked);
+                
+                if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
+                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
 
                     lowestStage = unlockStage[0];
                     
                 }
                 else {
-                    console.log("BETTER LUCK NEXT TIME!! You need", goalSum, "to unlock", unlockStage[0], "and you got", baseScore);
+                    console.log(
+                        "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
+                        "to unlock", unlockStage[0], 
+                        "and you got", baseScore / foodToNow);
                 }
     
             }
@@ -1572,6 +1612,11 @@ class TimeAttackScene extends Phaser.Scene{
                 }
                         
                 });
+                /// END STUFF
+                // Reset the unlocked stages after you load the scene.
+                // So they only show up once per Time Attack Scene.
+                this.newUnlocked = [];
+
             }, [], this);
    
 
@@ -1587,6 +1632,7 @@ class TimeAttackScene extends Phaser.Scene{
 
 
 class UIScene extends Phaser.Scene {
+    // #region UIScene
     constructor () {
         super({ key: 'UIScene', active: false });
     }
@@ -1864,13 +1910,14 @@ class UIScene extends Phaser.Scene {
                 }
             });
 
+            // make this an event?
             ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
-
+        
             // #endregion
 
 
 
-            // Calculate this locally
+            // #region Save Best To Local.
             var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
 
             if (bestLog) {
@@ -1889,6 +1936,8 @@ class UIScene extends Phaser.Scene {
                 
                 localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
             }
+
+            // #endregion
             
 
             
@@ -1903,7 +1952,7 @@ class UIScene extends Phaser.Scene {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         var ourInputScene = this.scene.get('InputScene');
 
-        // #region Custom Code for a Bonus Level
+        // #region Bonus Level Code
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
@@ -1990,7 +2039,9 @@ end() {
     
 }
 
+// #region Input Scene
 class InputScene extends Phaser.Scene {
+    
     constructor () {
         super({key: 'InputScene', active: true});
     }
@@ -2038,11 +2089,14 @@ class InputScene extends Phaser.Scene {
     }
     update() {
     }
+    
+    
     updateDirection(gameScene, event) {
         // Does not change the direction of the snake in code
         // Changes where the snake is looking with the sprite.
         
         
+        // #region UpdateDirection
         switch (event.keyCode) {
             case 87: // w
 
@@ -2133,12 +2187,14 @@ class InputScene extends Phaser.Scene {
               break;
         } 
     }
+
     moveDirection(gameScene, event) {
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
         //console.log(this.turns);
         
+        // #region MoveDirection
         switch (event.keyCode) {
             case 87: // w
 
@@ -2319,6 +2375,10 @@ class InputScene extends Phaser.Scene {
 
 
 
+
+
+
+ // #region Animations
 function loadAnimations(scene) {
     scene.anims.create({
       key: 'atom01idle',
@@ -2415,7 +2475,7 @@ function loadAnimations(scene) {
       repeat: -1
     })
   }
-
+// #endregion
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
