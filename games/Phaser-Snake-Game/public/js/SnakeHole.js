@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.4.04.05.010';
+const GAME_VERSION = 'v0.4.04.05.011';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
@@ -1231,6 +1231,7 @@ class ScoreScene extends Phaser.Scene
                         var nextStages = STAGES_NEXT[ourGame.stage];
                         var unlockedStages = [];
     
+                        // #region Next Stage
                         console.log("CHECK NEXT STAGES");
                         nextStages.forEach( _stage => {
     
@@ -1243,7 +1244,7 @@ class ScoreScene extends Phaser.Scene
                                 "currentBase=", currentBase,
                                 "newUnlocked=", (currentBase > goalSum && ourTimeAttack.histSum < goalSum)
                             )
-                            if (ourTimeAttack.histSum > goalSum) {
+                            if (ourTimeAttack.histSum >= goalSum) {
                                 unlockedStages.push(_stage);
                             }
 
@@ -1524,7 +1525,7 @@ class TimeAttackScene extends Phaser.Scene{
                     var _goalSum = _stage[1] * foodToNow;
                     unlockStage = _stage;
                     goalSum = unlockStage[1] * foodToNow;
-                    if (this.histSum < _goalSum && baseScore > _goalSum) {
+                    if (this.histSum <= _goalSum && baseScore > _goalSum) {
                         return true;
                     }
                 });
