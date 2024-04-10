@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.3.03.29.001';
+const GAME_VERSION = 'v0.4.04.05.010';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
@@ -45,8 +45,12 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 //var portalSounds = [];
 //var pointSounds = [];
 
+
+// #region calcBonus()
+
+
 // Speed Multiplier Stats
-const a = 1400; // Global Average Good Score (Ranked?)
+const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 2800; // Theoretical max score.
 
@@ -55,6 +59,7 @@ var calcBonus = function (scoreInput) {
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
 }
+console.log(calcBonus(2800));
 
 
 
@@ -111,8 +116,8 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 10],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
-    'Stage-02a': [['Stage-03a', 50]],
+    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
+    'Stage-02a': [['Stage-03a', 0]],
     'Stage-02b': [['Stage-03a', 50]],
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
