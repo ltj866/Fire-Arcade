@@ -11,11 +11,11 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.3.03.29.001';
+const GAME_VERSION = 'v0.4.04.05.010';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
-const  STARTING_LIVES = 25;
+const  STARTING_LIVES = 12;
 
 
 
@@ -30,7 +30,7 @@ var SPEEDSPRINT = 33; // 24
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 export const COMBO_ADD_FLOOR = 88;
-var SCORE_MULTI_GROWTH = 0.01;
+const RESET_WAIT_TIME = 240; // Amount of time space needs to be held to reset during recombinating.
 
 var comboCounter = 0;
 
@@ -44,6 +44,25 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 //var atomSounds = [];
 //var portalSounds = [];
 //var pointSounds = [];
+
+
+// #region calcBonus()
+
+
+// Speed Multiplier Stats
+const a = 1400; // Average Score
+const lm = 28; // Minimum score
+const lM = 2800; // Theoretical max score.
+
+var calcBonus = function (scoreInput) {
+    
+    var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
+    return _speedBonus
+}
+console.log(calcBonus(2800));
+
+
+
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -95,19 +114,26 @@ var SOUND_PORTAL = [
 
 const DREAMWALLSKIP = [0,1,2];
 
-
+// #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a','Stage-02b'],
-    'Stage-02a': ['Stage-03'],
-    'Stage-02b': ['Stage-03b'],
-    'Stage-03': ['Stage-04'],
-    'Stage-03b': ['Stage-04'],
-    'Stage-04': [],
+    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
+    'Stage-02a': [['Stage-03a', 0]],
+    'Stage-02b': [['Stage-03a', 50]],
+    'Stage-02c': [['Stage-03b', 50]],
+    'Stage-02d': [['Stage-03b', 50]],
+    'Stage-02e': [['Stage-03c', 85]],
+    'Stage-03a': [['Stage-04', 88]],
+    'Stage-03b': [['Stage-04', 99]],
+    'Stage-03c': [['Stage-04', 85]],
+    'Stage-04': [['Stage-05', 88]],
+    'Stage-05': [['Stage-06', 84]],
+    'Stage-06': [['Stage-07', 83]],
+    'Stage-07': [['Stage-08', 82]],
     'Bonus-Stage-x1': [],
 }
 
 const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-04';
+const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -192,6 +218,15 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+        /// Start Inital Game Settings
+
+        var ourTimeAttack = this.scene.get('TimeAttackScene');
+        ourTimeAttack.stageHistory = [];
+
+
+        ///
+        
+        
         
         // Load all animations once.
         this.anims.create({
@@ -240,6 +275,7 @@ class StartScene extends Phaser.Scene {
 
 
 class GameScene extends Phaser.Scene {
+    // #region GameScene
 
     constructor () {
         super({key: 'GameScene', active: false});
@@ -273,12 +309,14 @@ class GameScene extends Phaser.Scene {
 
         const { stage = START_STAGE } = props
         this.stage = stage;
-        console.log("FIRST INIT", this.stage);
+        
 
         this.recombinate = true;
         this.startingArrowState = true;
 
         this.moveInterval = SPEEDWALK;
+
+        this.spaceWhileReGrouping = false;
     
 
     }
@@ -296,15 +334,28 @@ class GameScene extends Phaser.Scene {
 
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
+        const ourTimeAttack = this.scene.get('TimeAttackScene');
 
+        this.spaceKey = this.input.keyboard.addKey("Space");
+        console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
         
-    
-        const ourInputScene = this.scene.get('InputScene');
-        
-        
+        // a = Global average best score + minScore 
+        //For a=1400, min=1, max=100, goal=28
+        // Floor(score bonus)
+        //
+        // Bonus Values
+        // 28 + 0
+        // 100 + 37.77  = 137
+        // 500 + 287.30 = 787
+        // 1000 + 756   = 1756
+        // **1400 + 1372** the "mid"point where x=y on the bonus curve = 2772
+        // 1500 + 1585.231
+        // 2000 + 3451
+        // 2250 + 5656
+        // 2500 + 11_536
 
-        // Snake needs to render immediately 
-        // Create the snake the  first time so it renders immediately
+
+        // Create the snake so it is addressable immediately 
         this.snake = new Snake(this, 15, 15);
     
         this.snake.direction = STOP;
@@ -321,13 +372,6 @@ class GameScene extends Phaser.Scene {
     
         // add background
         this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
-
-    
-
-
-        
-
-        // #region Animations
 
 
 
@@ -422,7 +466,7 @@ class GameScene extends Phaser.Scene {
 
         
         
-        // Keyboard Inputs
+        // #region Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             // Separate if statements so the first will 
             // run with as small of a delay as possible
@@ -437,48 +481,23 @@ class GameScene extends Phaser.Scene {
 
             if (this.move_pause) {
                // debugger
-                ourInputScene.updateDirection(this, e);
-                
-                
+                ourInputScene.updateDirection(this, e);  
             }
 
-            if (this.snake.regrouping && e.keyCode === 32) {
-                
-                // On key down.
-                // If you hold space into the regrouping animation this code is safe.
-                // You must press down SPACE after starting regrouping.
-                console.log("regrouping now respawn");
-                var pressTime = this.time.now;
-                console.log("PRESSTIME", pressTime);
-
-                /*
-                this.input.once('keyup', e => { // Capture for releasing sprint
-                    console.log(e.keyCode);
-                    var unPressTime = this.time.now;
-                    console.log(unPressTime - pressTime);
-                    
-                    //if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
-                    //ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
-                })
-
-                /*/
-                this.events.off('addScore');
-                this.events.off('saveScore');
-
-                const ourUI = this.scene.get('UIScene');
- 
-                ourUI.lives -= 1;
-                ourUI.scene.restart( { score: ourUI.stageStartScore, lives: ourUI.lives });
-                ourUI.scene.restart(  );
-                //ourUIScene.scene.restart();
-                this.scene.restart();
+            if (this.snake.regrouping) {
+                this.spaceWhileReGrouping = true;
             }
+
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
-        }) 
+
+            this.spaceWhileReGrouping = false;
+        })
+
+        // #endregion
         
 
         // Add all tiles to walls for collision
@@ -544,7 +563,7 @@ class GameScene extends Phaser.Scene {
         */
         
         
-        // Stage Logic
+        // #region Stage Logic
         
         var makePair = function (scene, to, from) {
             
@@ -634,23 +653,39 @@ class GameScene extends Phaser.Scene {
         
         // Middle Row        
         this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
 
 
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
 
+
+        // #endregion
+
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
+        // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
         ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
         ourUI.bestScoreUI.setOrigin(0,0);
+
+        // Calculate this locally
+        var bestLog = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestFruitLog`));
+
+        if (bestLog) {
+            // is false if best log has never existed
+            var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+        }
+        else {
+            var bestLocal = 0;
+        }
+
         
-        var bestScore = Number(JSON.parse(localStorage.getItem(`${this.stageUUID}-best`))); // Number resolves null to 0
 
 
-        ourUI.bestScoreUI.setText(`Best : ${bestScore}`);
+        ourUI.bestScoreUI.setText(`Best : ${bestLocal}`);
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
 
@@ -726,6 +761,22 @@ class GameScene extends Phaser.Scene {
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
+        if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
+                console.log("SPACE LONG ENOUGH BRO");
+ 
+                this.events.off('addScore');
+                this.events.off('saveScore');
+
+                const ourUI = this.scene.get('UIScene');
+ 
+                ourUI.lives -= 1;
+                ourUI.scene.restart( { score: ourUI.stageStartScore, lives: ourUI.lives });
+                //ourUIScene.scene.restart();
+                this.scene.restart();
+        }
+
+        
+
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
             console.log("DEAD, Now Rregroup", this.snake.alive);
@@ -791,9 +842,9 @@ class GameScene extends Phaser.Scene {
             });
         }
         
-        // Win State
+        // #region Win State
         if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
-            console.log("YOU WIN");
+            console.log("YOU WIN" , this.stage);
             this.winnedYet = true; // stops update loop from moving snake.
             this.move_pause = true; // Keeps snake from turning
 
@@ -805,11 +856,15 @@ class GameScene extends Phaser.Scene {
             ourUI.scene.pause();
             
 
-            ourUI.scene.start('WinScene');
+            ourUI.scene.start('ScoreScene');
             
         }
 
+        // #endregion
+
         // Only Calculate every move window
+
+        // #region Check move
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
 
@@ -900,10 +955,11 @@ class GameScene extends Phaser.Scene {
 }
 
 
-class WinScene extends Phaser.Scene
+class ScoreScene extends Phaser.Scene
+// #region ScoreScene
 {
     constructor () {
-        super({key: 'WinScene', active: false});
+        super({key: 'ScoreScene', active: false});
     }
 
     preload() {
@@ -914,21 +970,35 @@ class WinScene extends Phaser.Scene
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
-        const ourWinScene = this.scene.get('WinScene');
-        ///////
+        const ourScoreScene = this.scene.get('ScoreScene');
+        const ourTimeAttack = this.scene.get('TimeAttackScene');
+        /////////
 
         // Pre Calculate needed values
-        var stage_score = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageAve = stageScore/ourUI.scoreHistory.length;
+
+        var speedBonus = calcBonus(stageScore);
+
+        var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+        var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+        var bestAve = bestLocal/bestLog.length;
 
 
-        //////////////////////////////////////
-        // Later on we could have the score screen float transparently above the end scene. 
-        // For now we emulate the first level
+        var bestBonus = calcBonus(bestLocal);
+
+        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+
+        //var stageAverage = stageScore();
+
+        /////////
 
 
-        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, 0.75);
+
+        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
         this.scoreCardBackground.setOrigin(0,0).setDepth(8);
 
+        
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
@@ -959,6 +1029,7 @@ class WinScene extends Phaser.Scene
         
         }
         //////////////////////////////////////
+        
 
 
 
@@ -981,7 +1052,7 @@ class WinScene extends Phaser.Scene
             //'text-decoration': 'underline'
         });
         
-        currentScoreUI.setText(`Current Score: ${ourUI.score}`).setOrigin(0.5,0).setDepth(60);
+        currentScoreUI.setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
 
         const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*20.5, 'div', {
             "fontSize":'34px',
@@ -993,26 +1064,35 @@ class WinScene extends Phaser.Scene
             'border-radius': '16px',
             //'text-decoration': 'underline'
         });
-        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+
+
         bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
-        
-        
-
-        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
-            "fontSize":'28px',
+        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
+            "fontSize":'26px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             color: 'white',
             'text-align': 'right',
 
         });
-        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`));
-        highScore.setText(
-            `${ourGame.stage}
-            Stage Score: ${stage_score}
-            HighScore: ${bestLocal}
-            ---------------
+        stageUI.setText(ourGame.stage).setOrigin(1,0);
+
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', {
+            "fontSize":'20px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            color: 'white',
+            'text-align': 'right',
+
+        });
+        
+        
+        stageScoreUI.setText(
+            `Base: ${stageScore}
+            Speed Bonus: +${speedBonus}
+            Stage Score: ${stageScore+speedBonus}
+            HighScore: ${bestLocal + bestBonus}
             `
         
         ).setOrigin(1, 0);
@@ -1040,7 +1120,7 @@ class WinScene extends Phaser.Scene
         ----------------------
         SCORE: ${ourUI.score}
         LENGTH: ${ourUI.length}
-        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
+        FRUIT SCORE AVERAGE: ${stageAve}
         
         TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
@@ -1055,7 +1135,7 @@ class WinScene extends Phaser.Scene
         `);
 
         const logScreenStyle = {
-            width: '141px',
+            width: '156px',
             //height: '22px',
             color: 'white',
             'font-size': '12px',
@@ -1069,29 +1149,25 @@ class WinScene extends Phaser.Scene
         }
 
         
-        //var stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
-        var bestLogText = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
         
-        //var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestScoreAve`))
+        
 
-        if (bestLogText) {
-            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 13, 'div', logScreenStyle);
-            bestLog.setText(
-                `Best - ave( )
-                ------------------
-                [${bestLogText}]`
+        if (bestLog) {
+            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID*.5, GRID * 13, 'div', logScreenStyle);
+            bestLogUI.setText(
+                `Best - ave(${bestAve.toFixed(1)})
+                ---------------------
+                [${bestLog.slice().sort().reverse()}]`
             ).setOrigin(1,0);    
         }
         
 
         var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
         fruitLog.setText(
-            `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
-            ------------------ 
-            [${ourUI.scoreHistory.sort().reverse()}]`
-        ).setOrigin(1,0);
-
-        // [${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);    
+            `Current - ave(${stageAve.toFixed(1)})
+            --------------------- 
+            [${ourUI.scoreHistory.slice().sort().reverse()}]`
+        ).setOrigin(1,0);  
         
             
 
@@ -1102,7 +1178,7 @@ class WinScene extends Phaser.Scene
             var continue_text = '[SPACE TO CONTINUE]';
 
             if (ourGame.stage === END_STAGE) {
-                continue_text = '[SPACE TO RESTART]';
+                continue_text = '[SPACE TO WIN]';
             }
             
             var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
@@ -1121,34 +1197,116 @@ class WinScene extends Phaser.Scene
 
             this.input.keyboard.on('keydown-SPACE', function() {
                     
+                
+
+
+
+                
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
-                // As the event is defined there
+                // As the event is defined there, but this works and is why I did it. - James
                 ourGame.events.off('addScore');
                 ourGame.events.off('saveScore');
 
                 ourInputScene.scene.restart();
 
-                
-                if (ourGame.stage != END_STAGE) {
-                
-                    ourUI.scene.restart( { score: ourUI.score, lives: ourUI.lives } );
-                
-                    var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
-                    ourGame.scene.restart( { stage: next_stage } );
+                if (ourTimeAttack.inTimeAttack) {
+                    
+                    // Go back to time attack scene
+                    ourGame.scene.stop();
+                    ourScoreScene.scene.switch('TimeAttackScene');
+                    
                 }
                 else {
-                    // Start From The beginning. Must force reset values or it won't reset.
-                    
-                    
-                    localStorage.setItem('BestFinalScore', ourUI.score);
-                    
-                    console.log("END STAGE", ourGame.stage, END_STAGE);
-                    ourUI.scene.restart( { score: 0 });
-                    ourGame.scene.restart({ stage: START_STAGE });
+                    if (ourGame.stage != END_STAGE) {
+                
+                        var nextScore = 0;
+                        var currentBase = 0;
+                        ourGame.scene.get("TimeAttackScene").stageHistory.forEach ( _stage => {
+                            var baseScore = _stage.foodLog.reduce((a,b) => a + b, 0);
+                            currentBase += baseScore
+                            nextScore += baseScore + calcBonus(baseScore)
+                        });
+    
+                        var nextStages = STAGES_NEXT[ourGame.stage];
+                        var unlockedStages = [];
+    
+                        console.log("CHECK NEXT STAGES");
+                        nextStages.forEach( _stage => {
+    
+                            var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
+                            console.log(
+                                _stage[0], 
+                                "histSum:", ourTimeAttack.histSum, 
+                                "targetSum", goalSum, 
+                                "unlocked=", ourTimeAttack.histSum > goalSum,
+                                "currentBase=", currentBase,
+                                "newUnlocked=", (currentBase > goalSum && ourTimeAttack.histSum < goalSum)
+                            )
+                            if (ourTimeAttack.histSum > goalSum) {
+                                unlockedStages.push(_stage);
+                            }
+
+                            if (currentBase > goalSum && ourTimeAttack.histSum < goalSum) {
+                                if (ourTimeAttack.newUnlocked) {
+                                    ourTimeAttack.newUnlocked.push(_stage);
+                                }
+                                else {
+                                    var currentAve = currentBase / (ourTimeAttack.stageHistory.length * 28);
+                                    ourTimeAttack.newUnlocked = [
+                                        _stage[0], // Stage Namr
+                                        _stage[1], // Requirement Average
+                                        currentAve]; // Average now
+                                }
+                            }
+                            
+    
+                        });
+    
+                        if (unlockedStages.length != 0) {
+    
+    
+                            var nextStage = Phaser.Math.RND.pick(unlockedStages);
+    
+                            ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
+                            ourGame.scene.restart( { stage: nextStage[0] } );
+    
+                            ourScoreScene.scene.switch('GameScene'); // This doubles the game scene I think.
+                            
+                        }
+                        else {
+    
+                            // go to Time Attack
+    
+                            
+                            ourGame.scene.stop();
+                            ourScoreScene.scene.switch('TimeAttackScene');
+                        }
+                        
+                        
+                    }
+                    else {
+                        // Start From The beginning. Must force reset values or it won't reset.
+                        
+                
+                        
+                        ourGame.scene.stop();
+                        ourScoreScene.scene.switch('TimeAttackScene');
+                        
+                        // do in Win Screen After the very end.
+                        //console.log("END STAGE", ourGame.stage, END_STAGE);
+                        //ourUI.scene.restart( { score: 0 });
+                        //ourGame.scene.restart({ stage: START_STAGE });
+                    }
+
+                }
+
+                // Maybe should only have this in the TimeAttackScene
+                if (bestrun < ourUI.score + speedBonus) {
+                    localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
                 }
                 
-                ourWinScene.scene.switch('GameScene');
+                
 
             });
         }, [], this);
@@ -1162,7 +1320,324 @@ class WinScene extends Phaser.Scene
 
 
 
+// #region Stage Data
+var StageData = new Phaser.Class({
+
+    initialize:
+
+    function StageData(stageID, foodLog, stageUUID, newBest = false)
+    {
+        this.stage = stageID;
+        this.foodLog = foodLog;
+        this.newBest = newBest;
+        this.uuid = stageUUID;
+    },
+    
+    toString(){
+        return `${this.stage}`
+    },
+
+    calcScore() {
+        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+        var bonusScore = calcBonus(stageScore);
+
+        return stageScore + bonusScore;
+    },
+
+    calcBase() {
+        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+
+        return stageScore;
+    },
+    
+});
+// #endregion
+
+class TimeAttackScene extends Phaser.Scene{
+    // #region TimeAttackScene
+    constructor () {
+        super({ key: 'TimeAttackScene', active: true });
+    }
+
+    init () {
+
+        // this.stageHistory = []; !Initalized in the start screen
+        // This keeps the history from being reset during a run.
+        this.inTimeAttack = false;
+
+
+    }
+    preload () {
+        //this.stageHistory = [];
+
+    }
+    create() {
+        // Sets first time as an empty list. After this it will not be set again
+        // Remember to reset manually on full game restart.
+        const ourGame = this.scene.get('GameScene');
+        const ourUI = this.scene.get('UIScene');
+        const ourTimeAttack = this.scene.get("TimeAttackScene");
+
+
+        console.log("Time Attack Stage Manager is Live");
+        
+
+        // First Entry Y Coordinate
+        var stageY = GRID *3;
+        var allFoodLog = [];
+
+        // Average Food
+        var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
+
+        var lowestStageUI;
+        var lowestStage;
+        var lowestScore = 9999999999;
+
+        
+
+        if (this.stageHistory) {
+            this.inTimeAttack = true;
+
+            this.stageHistory.forEach(_stageData => {
+                console.log(_stageData.stage,
+                    "Base Score:", _stageData.calcBase(),
+                    "SpeedBonus", calcBonus(_stageData.calcBase()), 
+                    "FoodLog:", _stageData.foodLog
+                );
+
+                var baseScore = _stageData.calcBase();
+                var realScore = _stageData.calcScore();
+                var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
+
+                allFoodLog.push(...foodLogOrdered);
+
+
+                var logWrapLenth = 8;
+                //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+                //var bestScore;
+                var bestChar;
+
+                if (_stageData.newBest) {
+                    bestChar = "+";
+                }
+                else {
+                    bestChar = "-";
+                }
+
+
+                //////
+                if (realScore < lowestScore) {
+                    lowestScore = realScore;
+                    lowestStage = _stageData.stage;
+                    lowestStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+
+                    lowestStageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+
+                } else {
+                    var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+
+                    levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                }
+            
+
+                // Run Stats
+                var scoreUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
+                    color: 'white',
+                    'font-size': '14px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                scoreUI.setText(`Score: ${realScore} SpeedBonus: ${calcBonus(baseScore)}`).setOrigin(0,0);
+
+
+                // food Log
+                var foodLogUITop = this.add.dom( scoreUI.x + scoreUI.width +  14, stageY + 4 , 'div', {
+                    color: 'darkslategrey',
+                    'font-size': '12px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                foodLogUITop.setText(foodLogOrdered.slice(0,logWrapLenth)).setOrigin(0,0);
+
+                var foodLogUIBottom = this.add.dom( GRID * 10, stageY + GRID , 'div', {
+                    color: 'darkslategrey',
+                    'font-size': '12px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
+
+                stageY += GRID * 2;
+
+            }); // End Level For Loop
+
+            lowestStageUI.node.style.color = "red";
+        
+            
+
+
+            ///////// Run Score
+
+            var runScore = 0;
+            var baseScore = 0;
+
+            if (this.stageHistory) {
+                this.stageHistory.forEach(_stageData => {
+                
+                    runScore += _stageData.calcScore();
+                    baseScore += _stageData.calcBase();
+
+                });
+
+            };
+            
+            console.log("Runscore:", runScore);
+
+            var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
+                color: 'yellow',
+                'font-size': '28px',
+                'font-family': ["Sono", 'sans-serif'],
+                'text-decoration': 'overline dashed',
+
+
+            });
+
+            runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
+
+            // #region Check Unlock Level
+
+            if (this.scene.get('GameScene').stage != END_STAGE) {
+
+                
+                var unlockStage;
+                var goalSum;
+                var foodToNow = this.stageHistory.length * 28;
+                
+                // Unlock Difficulty needs to be in order
+                STAGES_NEXT[ourGame.stage].some( _stage => {
+
+                    var _goalSum = _stage[1] * foodToNow;
+                    unlockStage = _stage;
+                    goalSum = unlockStage[1] * foodToNow;
+                    if (this.histSum < _goalSum && baseScore > _goalSum) {
+                        return true;
+                    }
+                });
+
+                // Calc score required up to this point
+                // Add Stage History Sum Here
+    
+                console.log(this.newUnlocked);
+                
+                if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
+                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
+
+                    lowestStage = unlockStage[0];
+                    
+                }
+                else {
+                    console.log(
+                        "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
+                        "to unlock", unlockStage[0], 
+                        "and you got", baseScore / foodToNow);
+                }
+    
+            }
+            // #endregion
+
+
+            ////////// Run Average
+
+            var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
+
+            var sumAveFood = sumFood / allFoodLog.length;
+
+            //console.log ("sum:", sumFood, "Ave:", sumAveFood);
+            this.time.delayedCall(900, function() {
+                var continue_text = '[SPACE TO END GAME]';
+    
+                if (ourUI.lives > 0) {
+                    continue_text = `[GOTO ${lowestStage}]`;
+                }
+                
+                var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
+                continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+    
+    
+                this.tweens.add({
+                    targets: continueText,
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    repeat: -1,
+                    yoyo: true
+                  });
+
+                  /*
+                  this.tweens.add({
+                    targets: lowestStageUI,
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    repeat: -1,
+                    yoyo: true
+                  });*/
+
+                var bestRun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+                if (bestRun < runScore) {
+                    localStorage.setItem('BestFinalScore', runScore);
+                }
+                
+    
+                this.input.keyboard.on('keydown-SPACE', function() {
+
+                if (ourUI.lives > 0) {
+
+                    ourUI.lives -= 1; 
+
+                    ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
+                    ourGame.scene.restart( { stage: lowestStage } );
+
+                    ourTimeAttack.scene.stop();
+
+                    //ourTimeAttack.scene.switch('GameScene');
+                    
+                }
+                else {
+                    // end run
+                    // go to Time Attack
+                    console.log("That's All Folks!" , runScore);
+                    ourTimeAttack.scene.stop();
+                    //ourScoreScene.scene.switch('TimeAttackScene');
+                }
+                        
+                });
+                /// END STUFF
+                // Reset the unlocked stages after you load the scene.
+                // So they only show up once per Time Attack Scene.
+                this.newUnlocked = [];
+
+            }, [], this);
+   
+
+        }
+
+
+    }
+    update() {
+
+    }
+}
+
+
+
 class UIScene extends Phaser.Scene {
+    // #region UIScene
     constructor () {
         super({ key: 'UIScene', active: false });
     }
@@ -1199,6 +1674,7 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
+       // UI Icons
        this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
        this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
        this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 3).setOrigin(0,0).setDepth(50); // Tried to center flag
@@ -1219,16 +1695,11 @@ class UIScene extends Phaser.Scene {
        boostBar.play('increasing');
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
-
-
        // #endregion
 
         
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
         //stageUUID = this.cache.json.get(`${this.stage}-json`);
-    
-        
-    
    
         const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', {
             color: 'white',
@@ -1246,15 +1717,8 @@ class UIScene extends Phaser.Scene {
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UISTYLE);
         this.scoreUI.setText(`Stage: 0`).setOrigin(0,1);
+        
 
-        //this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
-        
-        // Best Score
-        
-        
-        //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
-        
-        // bonks
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
         this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UISTYLE);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
@@ -1373,6 +1837,7 @@ class UIScene extends Phaser.Scene {
 
             var length = `${this.length}`;
             
+            // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
                 this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
             }
@@ -1395,27 +1860,89 @@ class UIScene extends Phaser.Scene {
 
         //  Event: saveScore
         ourGame.events.on('saveScore', function () {
+            const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
+
+
+            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
+
+            var stageFound = false;
+            
+            if (ourTimeAttack.inTimeAttack) {
+                ourTimeAttack.stageHistory.some( _stageData => {
+
+                    if (ourGame.stage === _stageData.stage) {
+                        var oldScore = _stageData.foodLog.reduce((a,b) => a + b, 0);
+                        var newScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+
+                        oldScore = oldScore + calcBonus(oldScore);
+                        newScore = newScore + calcBonus(newScore);
+                        
+                        if (newScore > oldScore) {
+                            console.log("YEAH YOU DID BETTER", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
+                            _stageData.foodLog = this.scoreHistory; 
+                        }
+                        else {
+                            console.log("SORRY TRY AGAIN", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
+                        }
+
+                        stageFound = true;
+                    }
+
+
+                })
+                if (!stageFound) {
+                    // Playing a new unlocked stage. Get one life back.
+                    this.lives += 1;
+                    ourTimeAttack.stageHistory.push(stageData);
+                }
+            }
+            else {
+                //// Push New Stage Data
+                ourTimeAttack.stageHistory.push(stageData);
+
+            }
+            
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
+            // #region Do Unlock Calculation of all Best Logs
             
-            var bestScore = Number(JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-best`)));
+            var historicalLog = [];
             
-            
-            if (stage_score > bestScore) {
+            ourTimeAttack.stageHistory.forEach( _stage => {
+                var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
+                if (stageBestLog) {
+                    historicalLog = [...historicalLog, ...stageBestLog];
+                }
+            });
 
-                
-                bestScore = stage_score;
-                this.bestScoreUI.setText(`Best : ${bestScore}`);
+            // make this an event?
+            ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
+        
+            // #endregion
 
-                var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
-                
-                
-                localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, bestScoreHistory);
 
-                localStorage.setItem(`${ourGame.stageUUID}-bestScoreAve`, Math.round(this.score / LENGTH_GOAL));
+
+            // #region Save Best To Local.
+            var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+
+            if (bestLog) {
+                // is false if best log has never existed
+                var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+            }
+            else {
+                var bestLocal = 0;
             }
 
-            localStorage.setItem(`${ourGame.stageUUID}-best`, bestScore);
+            if (stage_score > bestLocal) {
+                bestLocal = stage_score;
+                this.bestScoreUI.setText(`Best : ${bestLocal}`);
+
+                stageData.newBest = true;
+                
+                localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
+            }
+
+            // #endregion
             
 
             
@@ -1430,7 +1957,7 @@ class UIScene extends Phaser.Scene {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         var ourInputScene = this.scene.get('InputScene');
 
-        // #region Custom Code for a Bonus Level
+        // #region Bonus Level Code
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
@@ -1441,7 +1968,7 @@ class UIScene extends Phaser.Scene {
 
             this.scene.pause();
 
-            this.scene.start('WinScene');
+            this.scene.start('ScoreScene');
         }
         // #endregion
 
@@ -1517,7 +2044,9 @@ end() {
     
 }
 
+// #region Input Scene
 class InputScene extends Phaser.Scene {
+    
     constructor () {
         super({key: 'InputScene', active: true});
     }
@@ -1565,11 +2094,14 @@ class InputScene extends Phaser.Scene {
     }
     update() {
     }
+    
+    
     updateDirection(gameScene, event) {
         // Does not change the direction of the snake in code
         // Changes where the snake is looking with the sprite.
         
         
+        // #region UpdateDirection
         switch (event.keyCode) {
             case 87: // w
 
@@ -1660,12 +2192,14 @@ class InputScene extends Phaser.Scene {
               break;
         } 
     }
+
     moveDirection(gameScene, event) {
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
         //console.log(this.turns);
         
+        // #region MoveDirection
         switch (event.keyCode) {
             case 87: // w
 
@@ -1846,6 +2380,10 @@ class InputScene extends Phaser.Scene {
 
 
 
+
+
+
+ // #region Animations
 function loadAnimations(scene) {
     scene.anims.create({
       key: 'atom01idle',
@@ -1942,7 +2480,7 @@ function loadAnimations(scene) {
       repeat: -1
     })
   }
-
+// #endregion
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
@@ -1965,7 +2503,7 @@ var config = {
         createContainer: true
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, GameScene, UIScene, InputScene, WinScene]
+    scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 
 };
 

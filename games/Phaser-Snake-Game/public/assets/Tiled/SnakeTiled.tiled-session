@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Stage-11.json",
+    "activeFile": "Stage-02d.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,8 +13,8 @@
             "scale": 0.7038411458333332,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 437.5987420220147,
-                "y": 372.24308574599945
+                "x": 434.75719174914457,
+                "y": 370.82231060956445
             }
         },
         "Bonus-Stage-x1.json#tileSheet": {
@@ -49,8 +49,8 @@
             "scale": 0.7953776041666667,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 270.31186052222307,
-                "y": 369.6357534582958
+                "x": 155.90079397560777,
+                "y": 531.8228697716297
             }
         },
         "Stage-01.json#tileSheet": {
@@ -63,8 +63,8 @@
             "scale": 0.7953776041666667,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 369.0071212245232,
-                "y": 371.5216501596137
+                "x": 262.7682737169518,
+                "y": 536.8519276418106
             }
         },
         "Stage-02.json#tileSheet": {
@@ -75,10 +75,10 @@
         },
         "Stage-02a.json": {
             "scale": 0.7953776041666667,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 394.78104280920024,
-                "y": 369.6357534582958
+                "x": 304.2580011459442,
+                "y": 362.0921666530245
             }
         },
         "Stage-02a.json#tileSheet": {
@@ -91,8 +91,8 @@
             "scale": 0.7953776041666667,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 369.63575345829577,
-                "y": 372.1502823933863
+                "x": 252.71015797659,
+                "y": 534.3373987067201
             }
         },
         "Stage-02b.json#tileSheet": {
@@ -101,12 +101,54 @@
         "Stage-02b.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "Stage-02c.json": {
+            "scale": 1.1351478494623655,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 248.42578888165295,
+                "y": 366.4720857261264
+            }
+        },
+        "Stage-02c.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-02c.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-02d.json": {
+            "scale": 0.8976478494623656,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 134.7967357939657,
+                "y": 516.9064909785133
+            }
+        },
+        "Stage-02d.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-02d.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-02e.json": {
+            "scale": 0.7953776041666667,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 391.00924940656466,
+                "y": 528.051076368994
+            }
+        },
+        "Stage-02e.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-02e.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "Stage-03.json": {
             "scale": 0.7953776041666667,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 369.63575345829577,
-                "y": 372.1502823933863
+                "x": 257.7392158467709,
+                "y": 534.3373987067201
             }
         },
         "Stage-03.json#tileSheet": {
@@ -115,12 +157,26 @@
         "Stage-03.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "Stage-03a.json": {
+            "scale": 1.0559811827956989,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 370.2717495067779,
+                "y": 370.27174950677784
+            }
+        },
+        "Stage-03a.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-03a.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "Stage-03b.json": {
             "scale": 0.8976478494623656,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 369.8555064760052,
-                "y": 369.8555064760051
+                "x": 132.56869057423074,
+                "y": 513.5644231489108
             }
         },
         "Stage-03b.json#tileSheet": {
@@ -129,19 +185,34 @@
         "Stage-03b.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "Stage-03c.json": {
+            "scale": 0.7953776041666667,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 393.5237783416551,
+                "y": 529.3083408365393
+            }
+        },
+        "Stage-03c.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-03c.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "Stage-04.json": {
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 369.33333333333337,
-                "y": 369.33333333333337
+                "x": 350.66666666666663,
+                "y": 350.6666666666666
             }
         },
         "Stage-04.json#tileSheet": {
             "scaleInDock": 1
         },
         "Stage-04.json#tileSheet02x24": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "Stage-04.json#tileSheetx24": {
             "scaleInDock": 1
@@ -150,8 +221,8 @@
             "scale": 0.6984543010752688,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 370.8188203598576,
-                "y": 370.8188203598576
+                "x": 372.2505532569999,
+                "y": 372.250553257
             }
         },
         "Stage-04.tmj#tileSheet": {
@@ -163,12 +234,80 @@
         "Stage-04.tmj#tileSheetx24": {
             "scaleInDock": 1
         },
+        "Stage-05.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 368,
+                "y": 495
+            }
+        },
+        "Stage-05.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-05.json#tileSheet02x24": {
+            "scaleInDock": 1
+        },
+        "Stage-05.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-06.json": {
+            "scale": 1.0559811827956989,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 370.2717495067779,
+                "y": 368.3777763635207
+            }
+        },
+        "Stage-06.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-06.json#tileSheet02x24": {
+            "scaleInDock": 1
+        },
+        "Stage-06.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-07.json": {
+            "scale": 1.0559811827956989,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 370.2717495067779,
+                "y": 370.27174950677784
+            }
+        },
+        "Stage-07.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-07.json#tileSheet02x24": {
+            "scaleInDock": 1
+        },
+        "Stage-07.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-08.json": {
+            "scale": 1.0559811827956989,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 370.2717495067779,
+                "y": 370.27174950677784
+            }
+        },
+        "Stage-08.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-08.json#tileSheet02x24": {
+            "scaleInDock": 1
+        },
+        "Stage-08.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "Stage-11.json": {
             "scale": 0.7265456989247311,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.62149662380915,
-                "y": 371.6214966238091
+                "x": 372.9978725372307,
+                "y": 371.62149662380915
             }
         },
         "Stage-11.json#tileSheet": {
@@ -209,8 +348,8 @@
             "scale": 0.5891826923076923,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 385.2794777641779,
-                "y": 361.5177478580171
+                "x": 383.5822113423092,
+                "y": 359.8204814361485
             }
         },
         "snakeMap.tmj#tileSheet": {
@@ -220,11 +359,11 @@
             "scaleInDock": 1
         },
         "snakeMap.tmx": {
-            "scale": 0.75,
+            "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 345.33333333333337,
-                "y": 365.33333333333337
+                "x": 360,
+                "y": 579
             }
         },
         "snakeMap.tmx#tileSheet": {
@@ -241,33 +380,44 @@
     "last.exportedFilePath": "C:/Users/jlhan/OneDrive/Documents/GitHub/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
     "last.imagePath": "E:/FireArcade/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
-    "map.lastUsedFormat": "tmx",
+    "map.lastUsedFormat": "json",
     "map.width": 26,
     "openFiles": [
         "snakeMap.tmx",
         "Stage-01.json",
-        "Stage-02a.json",
         "Stage-02b.json",
         "Stage-03.json",
         "snakeMap.tmj",
-        "Stage-04.json",
+        "Stage-05.json",
+        "Stage-03c.json",
+        "Stage-11.json",
+        "Bonus-Stage-x1.json",
+        "Stage-04.tmj",
+        "Stage-02d.json",
+        "Stage-02.json",
+        "Stage-02c.json",
         "Stage-03b.json",
-        "Stage-11.json"
+        "Stage-04.json",
+        "Stage-06.json",
+        "Stage-07.json",
+        "Stage-08.json",
+        "Stage-03a.json",
+        "Stage-02a.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "recentFiles": [
-        "snakeMap.tmx",
-        "Stage-01.json",
-        "Stage-02a.json",
-        "Stage-02b.json",
-        "Stage-03.json",
+        "Stage-02e.json",
+        "Stage-03c.json",
+        "Bonus-Stage-x1.json",
         "snakeMap.tmj",
-        "Stage-04.json",
         "Stage-03b.json",
+        "Stage-02c.json",
+        "Stage-02d.json",
         "Stage-11.json",
-        "Stage-02.json",
-        "Stage-04.tmj",
-        "snakeMap.json"
+        "Stage-05.json",
+        "Stage-01.json",
+        "Stage-02b.json",
+        "Stage-02a.json"
     ],
     "resizeMap.removeObjects": true,
     "tileset.embedInMap": true,
