@@ -1510,7 +1510,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
 
-            // #region Check Unlock Level
+            // #region Unlock New Level?
 
             if (this.scene.get('GameScene').stage != END_STAGE) {
 
@@ -2482,6 +2482,8 @@ function loadAnimations(scene) {
     })
   }
 // #endregion
+
+// #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
@@ -2508,7 +2510,7 @@ var config = {
 
 };
 
-// Screen Settings
+// #region Screen Settings
 export const SCREEN_WIDTH = config.width;
 export const SCREEN_HEIGHT = config.height; 
 
@@ -2521,6 +2523,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
+// region const Game
 export const game = new Phaser.Game(config);
 
 
