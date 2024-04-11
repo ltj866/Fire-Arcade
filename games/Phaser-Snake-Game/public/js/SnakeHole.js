@@ -779,7 +779,7 @@ class GameScene extends Phaser.Scene {
 
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
-            console.log("DEAD, Now Rregroup", this.snake.alive);
+            //console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
@@ -825,7 +825,7 @@ class GameScene extends Phaser.Scene {
             });
 
             tween.on('complete', test => {
-                console.log("COMPLETE AND SET ALIVE")
+                //console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
@@ -1533,7 +1533,7 @@ class TimeAttackScene extends Phaser.Scene{
                 // Calc score required up to this point
                 // Add Stage History Sum Here
     
-                console.log(this.newUnlocked);
+                console.log("New Unlocked this Run", this.newUnlocked);
                 
                 if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
                     console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
