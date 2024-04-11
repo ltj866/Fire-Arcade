@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.4.04.05.011';
+const GAME_VERSION = 'v0.4.04.19.002';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
@@ -30,7 +30,7 @@ var SPEEDSPRINT = 33; // 24
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 export const COMBO_ADD_FLOOR = 88;
-const RESET_WAIT_TIME = 240; // Amount of time space needs to be held to reset during recombinating.
+const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
 var comboCounter = 0;
 
@@ -325,7 +325,6 @@ class GameScene extends Phaser.Scene {
     preload () {
         
 
-        
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
     }
@@ -761,6 +760,7 @@ class GameScene extends Phaser.Scene {
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
+        // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
  
