@@ -1362,14 +1362,10 @@ class TimeAttackScene extends Phaser.Scene{
 
     init () {
 
-        // this.stageHistory = []; !Initalized in the start screen
-        // This keeps the history from being reset during a run.
         this.inTimeAttack = false;
-
 
     }
     preload () {
-        //this.stageHistory = [];
 
     }
     create() {
@@ -1390,10 +1386,20 @@ class TimeAttackScene extends Phaser.Scene{
         // Average Food
         var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
 
-        var lowestStageUI;
-        var lowestStage;
-        var lowestScore = 9999999999;
 
+        var playedStages = [];
+        var index = 0;
+
+        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+
+        
+
+        
+        var _i = 0;
+        var lowestScore = 9999999999;
+        
+        // Only loads the UI to the scene if you have played a level. 
+        // Allows this scene to start at the beginning without displaying anything, but when you restart the scene it plays correctly.
         
 
         if (this.stageHistory) {
@@ -1409,6 +1415,8 @@ class TimeAttackScene extends Phaser.Scene{
                 var baseScore = _stageData.calcBase();
                 var realScore = _stageData.calcScore();
                 var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
+
+                
 
                 allFoodLog.push(...foodLogOrdered);
 
@@ -1427,26 +1435,23 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 //////
+                var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
+                    color: 'white',
+                    'font-size': '28px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+
+
                 if (realScore < lowestScore) {
+                    index = _i;
                     lowestScore = realScore;
-                    lowestStage = _stageData.stage;
-                    lowestStageUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
+                };
+                    
 
-                    lowestStageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
 
-                } else {
-                    var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
-
-                    levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
-                }
+                playedStages.push([levelUI, _stageData.stage]);
+                
             
 
                 // Run Stats
@@ -1473,11 +1478,54 @@ class TimeAttackScene extends Phaser.Scene{
                 });
                 foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
 
+                _i += 1;
                 stageY += GRID * 2;
 
             }); // End Level For Loop
 
-            lowestStageUI.node.style.color = "red";
+
+            var selected = playedStages[index]
+
+            selected[0].node.style.color = "red";
+
+
+
+            // #region Stage Select Code
+            // Default End Game
+            var continue_text = '[SPACE TO END GAME]';
+    
+            if (ourUI.lives > 0) {
+                continue_text = `[GOTO ${selected[1]}]`;
+            }
+            
+            var continueTextUI = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'}).setVisible(false);
+            continueTextUI.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+
+            console.log("played Stages", playedStages);
+
+            this.input.keyboard.on('keydown-DOWN', function() {
+                selected[0].node.style.color = "white";
+                index = Phaser.Math.Wrap(index + 1, -1, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+                selected = playedStages[index];
+                selected[0].node.style.color = "red";
+
+                continueTextUI.setText(`[GOTO ${selected[1]}]`);
+                
+            }, [], this);
+    
+            this.input.keyboard.on('keydown-UP', function() {
+                selected[0].node.style.color = "white";
+                index = Phaser.Math.Wrap(index - 1, 0, playedStages.length);
+                
+                selected = playedStages[index];
+                selected[0].node.style.color = "red";
+
+                continueTextUI.setText(`[GOTO ${selected[1]}]`);
+            }, [], this);
+
+            
+            
         
             
 
@@ -1538,7 +1586,7 @@ class TimeAttackScene extends Phaser.Scene{
                 if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
                     console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
 
-                    lowestStage = unlockStage[0];
+                    lowestStage = unlockStage[0]; ////// BROKE
                     
                 }
                 else {
@@ -1550,6 +1598,7 @@ class TimeAttackScene extends Phaser.Scene{
     
             }
             // #endregion
+            
 
 
             ////////// Run Average
@@ -1560,18 +1609,12 @@ class TimeAttackScene extends Phaser.Scene{
 
             //console.log ("sum:", sumFood, "Ave:", sumAveFood);
             this.time.delayedCall(900, function() {
-                var continue_text = '[SPACE TO END GAME]';
-    
-                if (ourUI.lives > 0) {
-                    continue_text = `[GOTO ${lowestStage}]`;
-                }
-                
-                var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
-                continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+
+                continueTextUI.setVisible(true);
     
     
                 this.tweens.add({
-                    targets: continueText,
+                    targets: continueTextUI,
                     alpha: { from: 0, to: 1 },
                     ease: 'Sine.InOut',
                     duration: 1000,
@@ -1602,7 +1645,7 @@ class TimeAttackScene extends Phaser.Scene{
                     ourUI.lives -= 1; 
 
                     ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
-                    ourGame.scene.restart( { stage: lowestStage } );
+                    ourGame.scene.restart( { stage: playedStages[index][1] } );
 
                     ourTimeAttack.scene.stop();
 
