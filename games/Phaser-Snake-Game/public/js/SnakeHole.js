@@ -585,13 +585,81 @@ class GameScene extends Phaser.Scene {
         }
 
 
+        // Add try loop to get all Portal Layers
 
-        this.p1Layer = this.map.createLayer('Portal-1', [this.tileset]);
+        // do while loop Portal-X
+        
+        
 
-        this.p1Layer.forEachTile(tile => {
-            console.log(tile.index);
+        let _from;
+        let _to;
 
+        const PORTAL_N_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
+        const PORTAL_N_DIFF = 32;
+
+
+        const A_FROM = 34
+        const A_TO = 38
+
+        const B_FROM = 162;
+        const B_TO = 166;
+
+        this.pnLayer = this.map.createLayer('Portal-N', [this.tileset]);
+
+        var i = PORTAL_N_START;
+
+        var nPortalArray = [];
+
+        //do {
+            
+        //} while (i < PORTAL_N_START || i );
+
+        this.pnLayer.forEachTile(tile => {
+
+            if (tile.index > 0) {
+                console.log("TILEIndex, Tile Layer", tile.index, tile.layer);
+
+                if (nPortalArray[tile.index]) {
+                    nPortalArray[tile.index].push([tile.x, tile.y]);
+                }
+                else {
+                    nPortalArray[tile.index] = [[tile.x, tile.y]];
+                }
+            }
+
+            
+ 
+            
         });
+        
+        let toIndex;
+
+        for (let index = PORTAL_N_START + 1; index < PORTAL_N_START + 1 + PORTAL_N_DIFF; index++) {
+
+            if (nPortalArray[index]) {
+                // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                
+                toIndex = index + PORTAL_N_DIFF
+                _from = Phaser.Math.RND.pick(nPortalArray[index]);
+                _to = Phaser.Math.RND.pick(nPortalArray[toIndex]);
+                console.log("FROM TO",_from, _to);
+                makePair(this, _to, _from);
+            }
+            
+        }
+        
+        
+        console.log(nPortalArray);
+        console.log(nPortalArray[257]);
+
+        //Phaser.Math.RND.pick(nextGroup)
+        console.log(nPortalArray[258]);
+
+        
+        //makePair(this, _to, _from);
+
+
+        //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
 
 
 
