@@ -50,10 +50,10 @@
         },
         "Stage-01.json": {
             "scale": 0.7953776041666667,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 384.09429483506585,
-                "y": 525.5365474339036
+                "x": 381.5797658999754,
+                "y": 523.0220184988132
             }
         },
         "Stage-01.json#tileSheet": {

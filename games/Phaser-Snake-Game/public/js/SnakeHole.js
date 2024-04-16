@@ -358,6 +358,8 @@ class GameScene extends Phaser.Scene {
         this.snake = new Snake(this, 15, 15);
     
         this.snake.direction = STOP;
+
+        // #region TileMap
         
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
@@ -366,8 +368,11 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.layer = this.map.createLayer('Wall', [this.tileset,this.tileset2]);
-        this.layer.setDepth(25);
+        this.wallLayer = this.map.createLayer('Wall', [this.tileset]);
+        this.wallLayer.setDepth(25);
+        
+        console.log("CurrentLayerIndex - ", this.map.currentLayerIndex);
+        
     
         // add background
         this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
@@ -499,8 +504,10 @@ class GameScene extends Phaser.Scene {
         // #endregion
         
 
-        // Add all tiles to walls for collision
+    
+        // Map only contains Walls at this point
         this.map.forEachTile( tile => {
+
             // Empty tiles are indexed at -1. 
             // Any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
@@ -510,6 +517,7 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+        
 
         // Make Fruit
         //for (let index = 0; index < FRUIT; index++) {
@@ -575,6 +583,21 @@ class GameScene extends Phaser.Scene {
             p1.targetObject = p2;
             p2.targetObject = p1;
         }
+
+
+
+        this.p1Layer = this.map.createLayer('Portal-1', [this.tileset]);
+
+        this.p1Layer.forEachTile(tile => {
+            console.log(tile.index);
+
+        });
+
+
+
+
+        // #region Old Logic 
+        /*
         
         // AREA NAME is [GROUP][ID]
         var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
@@ -643,6 +666,10 @@ class GameScene extends Phaser.Scene {
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
         
 
+        
+         
+        
+
         // Fair Fruit Spawn (5x)
         
         // Top Row
@@ -658,6 +685,18 @@ class GameScene extends Phaser.Scene {
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+        // #endregion
+        */
+
+        // #region New Stage Logic
+
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+
 
 
         // #endregion
@@ -873,48 +912,54 @@ class GameScene extends Phaser.Scene {
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
  
-            // PORTAL HIGHLIGHT LOGIC
+            
+
+            if (this.portals.length > 0) {
+            
+                // PORTAL HIGHLIGHT LOGIC
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
-            closestPortal.fx.setActive(false);
+                
             
-            // Distance on an x y grid
+                closestPortal.fx.setActive(false);
+                
+                // Distance on an x y grid
 
-            var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
-                                                                closestPortal.x/GRID, closestPortal.y/GRID);
+                var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
+                                                                    closestPortal.x/GRID, closestPortal.y/GRID);
 
-            this.portals.forEach( portal => {
-                var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
-                                                    portal.x/GRID, portal.y/GRID);
+                this.portals.forEach( portal => {
+                    var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
+                                                        portal.x/GRID, portal.y/GRID);
 
-                if (dist < closestPortalDist) { // Compare and choose closer portals
-                    closestPortalDist = dist;
-                    closestPortal = portal;
-                }
-            });
-
-
-            // This is a bit eccessive because I only store the target portal coordinates
-            // and I need to get the portal object to turn on the effect. Probably can be optimized.
-            // Good enough for testing.
-            if (closestPortalDist < 6) {
-                this.portals.forEach(portal => {
-                    if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
-                        portal.fx.setActive(true);
-                        
-                        //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
-                        portal.fx.outerStrength = 6 - closestPortalDist;
-
-                        closestPortal.fx.setActive(true);
-                        //closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                        closestPortal.fx.outerStrength = 0;
-
+                    if (dist < closestPortalDist) { // Compare and choose closer portals
+                        closestPortalDist = dist;
+                        closestPortal = portal;
                     }
                 });
-            };
+
+
+                // This is a bit eccessive because I only store the target portal coordinates
+                // and I need to get the portal object to turn on the effect. Probably can be optimized.
+                // Good enough for testing.
+                if (closestPortalDist < 6) {
+                    this.portals.forEach(portal => {
+                        if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                            portal.fx.setActive(true);
+                            
+                            //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                            portal.fx.outerStrength = 6 - closestPortalDist;
+
+                            closestPortal.fx.setActive(true);
+                            //closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                            closestPortal.fx.outerStrength = 0;
+
+                        }
+                    });
+                };
+            } // End Closest Portal
+            
             const ourUI = this.scene.get('UIScene');
-
-
        
             if (DEBUG) {
                 const ourUI = this.scene.get('UIScene');
