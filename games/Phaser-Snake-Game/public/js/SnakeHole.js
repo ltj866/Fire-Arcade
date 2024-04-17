@@ -680,6 +680,9 @@ class GameScene extends Phaser.Scene {
         
         var layerIndex = 1
 
+
+        
+
         while (this.map.getLayer(`Portal-${layerIndex}`)) {
 
             console.log(`Portal-${layerIndex} Logic`);
@@ -702,22 +705,6 @@ class GameScene extends Phaser.Scene {
                 } 
             });
 
-
-
-            var getCords = function (tileArray) {
-
-            }
-            var checkPortalHere = function(scene,_tile) {
-                scene.portals.some( portal => {
-                    if(portal.x === _tile[0]*GRID && portal.y === _tile[1]*GRID){
-                        return true;
-                        //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
-                        //cords = this.genChords(scene);
-                    }
-                });
-                return false;
-
-            }
             
             console.log("portalLayerX", portalArrayN);
 
@@ -758,6 +745,7 @@ class GameScene extends Phaser.Scene {
 
             }
 
+            // Define From Portal if not yet defined above.
             if (fromN.length < 1) {
                 var fromAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
                 var fromArea = portalArrayN[fromAreaKey];
@@ -766,6 +754,7 @@ class GameScene extends Phaser.Scene {
                 delete portalArrayN[fromAreaKey];     
             }
 
+            // Define To Portal Randomly from avaible tiles.
             var toAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
             var toArea = portalArrayN[toAreaKey];
             toN = Phaser.Math.RND.pick(toArea);
@@ -774,16 +763,7 @@ class GameScene extends Phaser.Scene {
 
             console.log("MAKE PORTAL", fromN, toN);
             makePair(this, fromN, toN);
-
-            
-            
-
-            
-
-            
-            
     
-            
             portalLayerN.visible = false;
             layerIndex ++; 
  
