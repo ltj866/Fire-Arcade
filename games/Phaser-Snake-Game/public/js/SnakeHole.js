@@ -132,7 +132,7 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',
