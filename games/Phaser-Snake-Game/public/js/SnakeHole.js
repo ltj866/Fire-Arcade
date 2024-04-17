@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.4.04.19.002';
+const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
@@ -116,7 +116,7 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 191]],
+    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
     'Stage-02a': [['Stage-03a', 0]],
     'Stage-02b': [['Stage-03a', 50]],
     'Stage-02c': [['Stage-03b', 50]],
@@ -132,7 +132,8 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-03a';
+// #region START STAGE
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',
@@ -667,6 +668,14 @@ class GameScene extends Phaser.Scene {
             388:2,
             389:2,
             390:2,
+            417:3,
+            418:3,
+            419:3,
+            420:3,
+            421:3,
+            422:3,
+            423:3,
+            424:3
         };
         
         var layerIndex = 1
@@ -714,7 +723,7 @@ class GameScene extends Phaser.Scene {
 
 
             for (var [key, value] of Object.entries(portalArrayN)) {
-                console.log("Checking TileIndex", key, "has no more than", portalTileRules[key], "portals")
+                //console.log("Checking TileIndex", key, "has no more than", portalTileRules[key], "portals")
 
                 var count = 0;
                 

@@ -8,5 +8,6 @@ export const PORTAL_COLORS = [
     '#06f202',
     '#e2f202',
     '#fc03f8',
-    //'#AABBCC'
+    '#AABBCC',
+    '#EEDDCC'
 ];
