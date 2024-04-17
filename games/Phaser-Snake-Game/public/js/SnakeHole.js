@@ -132,7 +132,7 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-03a';
 const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',
@@ -317,6 +317,7 @@ class GameScene extends Phaser.Scene {
         this.moveInterval = SPEEDWALK;
 
         this.spaceWhileReGrouping = false;
+
     
 
     }
@@ -593,7 +594,7 @@ class GameScene extends Phaser.Scene {
         let _from;
         let _to;
 
-        const PORTAL_N_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
+        const PORTAL_X_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
         const PORTAL_N_DIFF = 32;
 
 
@@ -603,9 +604,6 @@ class GameScene extends Phaser.Scene {
         const B_FROM = 162;
         const B_TO = 166;
 
-        
-
-        var i = PORTAL_N_START;
 
         
 
@@ -636,7 +634,7 @@ class GameScene extends Phaser.Scene {
 
             let toIndex;
 
-            for (let index = PORTAL_N_START + 1; index < PORTAL_N_START + 1 + PORTAL_N_DIFF; index++) {
+            for (let index = PORTAL_X_START + 1; index < PORTAL_X_START + 1 + PORTAL_N_DIFF; index++) {
     
                 if (portalArrayX[index]) {
                     // consider throwing an error if a portal doesn't have a correctly defined _to or _from
@@ -662,6 +660,7 @@ class GameScene extends Phaser.Scene {
             356:1,
             357:1,
             358:1,
+            359:1,
             385:2,
             386:2,
             387:2,
@@ -669,16 +668,13 @@ class GameScene extends Phaser.Scene {
             389:2,
             390:2,
         };
-
-        i = 1;
-
-
         
+        var layerIndex = 1
 
-        while (this.map.getLayer(`Portal-${i}`)) {
+        while (this.map.getLayer(`Portal-${layerIndex}`)) {
 
-            console.log(`Portal-${i} Logic`);
-            var portalLayerN = this.map.createLayer(`Portal-${i}`, [this.tileset]);
+            console.log(`Portal-${layerIndex} Logic`);
+            var portalLayerN = this.map.createLayer(`Portal-${layerIndex}`, [this.tileset]);
             var portalArrayN = {};
             
             var toN = [];
@@ -755,8 +751,8 @@ class GameScene extends Phaser.Scene {
 
             if (fromN.length < 1) {
                 var fromAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
-                
-                var fromN = Phaser.Math.RND.pick(portalArrayN[fromAreaKey]);
+                var fromArea = portalArrayN[fromAreaKey];
+                var fromN = Phaser.Math.RND.pick(fromArea);
                 
                 delete portalArrayN[fromAreaKey];     
             }
@@ -780,7 +776,7 @@ class GameScene extends Phaser.Scene {
     
             
             portalLayerN.visible = false;
-            i++; 
+            layerIndex ++; 
  
         }
 
