@@ -116,7 +116,7 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
+    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 191]],
     'Stage-02a': [['Stage-03a', 0]],
     'Stage-02b': [['Stage-03a', 50]],
     'Stage-02c': [['Stage-03b', 50]],
@@ -132,7 +132,7 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',
@@ -371,7 +371,6 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer('Wall', [this.tileset]);
         this.wallLayer.setDepth(25);
         
-        console.log("CurrentLayerIndex - ", this.map.currentLayerIndex);
         
     
         // add background
@@ -604,56 +603,197 @@ class GameScene extends Phaser.Scene {
         const B_FROM = 162;
         const B_TO = 166;
 
-        this.pnLayer = this.map.createLayer('Portal-N', [this.tileset]);
+        
 
         var i = PORTAL_N_START;
 
-        var nPortalArray = [];
+        
 
         //do {
             
         //} while (i < PORTAL_N_START || i );
 
-        this.pnLayer.forEachTile(tile => {
+        
 
-            if (tile.index > 0) {
-                console.log("TILEIndex, Tile Layer", tile.index, tile.layer);
+        
+        // #region Portal-X
+        if (this.map.getLayer('Portal-X')) {
+            var portalLayerX = this.map.createLayer('Portal-X', [this.tileset]);
+            var portalArrayX = [];
 
-                if (nPortalArray[tile.index]) {
-                    nPortalArray[tile.index].push([tile.x, tile.y]);
+            portalLayerX.forEachTile(tile => {
+
+                if (tile.index > 0) {
+    
+                    if (portalArrayX[tile.index]) {
+                        portalArrayX[tile.index].push([tile.x, tile.y]);
+                    }
+                    else {
+                        portalArrayX[tile.index] = [[tile.x, tile.y]];
+                    }
+                } 
+            });
+
+            let toIndex;
+
+            for (let index = PORTAL_N_START + 1; index < PORTAL_N_START + 1 + PORTAL_N_DIFF; index++) {
+    
+                if (portalArrayX[index]) {
+                    // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                    
+                    toIndex = index + PORTAL_N_DIFF
+                    _from = Phaser.Math.RND.pick(portalArrayX[index]);
+                    _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
+                    console.log("Portal X Logic: FROM TO",_from, _to);
+                    makePair(this, _to, _from);
+                }
+            }
+
+            portalLayerX.visible = false;
+        }
+        // #endregion
+
+        // #region Portal-N
+
+        const portalTileRules = {
+            353:1,
+            354:1,
+            355:1,
+            356:1,
+            357:1,
+            358:1,
+            385:2,
+            386:2,
+            387:2,
+            388:2,
+            389:2,
+            390:2,
+        };
+
+        i = 1;
+
+
+        
+
+        while (this.map.getLayer(`Portal-${i}`)) {
+
+            console.log(`Portal-${i} Logic`);
+            var portalLayerN = this.map.createLayer(`Portal-${i}`, [this.tileset]);
+            var portalArrayN = {};
+            
+            var toN = [];
+            var fromN = [];
+
+            portalLayerN.forEachTile(tile => {
+
+                if (tile.index > 0) {
+    
+                    if (portalArrayN[tile.index]) {
+                        portalArrayN[tile.index].push([tile.x, tile.y]);
+                    }
+                    else {
+                        portalArrayN[tile.index] = [[tile.x, tile.y]];
+                    }
+                } 
+            });
+
+
+
+            var getCords = function (tileArray) {
+
+            }
+            var checkPortalHere = function(scene,_tile) {
+                scene.portals.some( portal => {
+                    if(portal.x === _tile[0]*GRID && portal.y === _tile[1]*GRID){
+                        return true;
+                        //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
+                        //cords = this.genChords(scene);
+                    }
+                });
+                return false;
+
+            }
+            
+            console.log("portalLayerX", portalArrayN);
+
+
+            for (var [key, value] of Object.entries(portalArrayN)) {
+                console.log("Checking TileIndex", key, "has no more than", portalTileRules[key], "portals")
+
+                var count = 0;
+                
+                // Special Case Block. Put a from portal. 
+                // TODO Probably needs to recursively try when double up portals.
+                if (portalTileRules[key] == undefined) {
+                    fromN = Phaser.Math.RND.pick(portalArrayN[key]);
+
+                    delete portalArrayN[key];
+
                 }
                 else {
-                    nPortalArray[tile.index] = [[tile.x, tile.y]];
+                    //
+                    var count = 0;
+                    value.forEach(tile => {
+                        this.portals.some( portal => {
+                            if(portal.x === tile[0]*GRID && portal.y === tile[1]*GRID){
+                                count += 1;
+                                //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
+                                //cords = this.genChords(scene);
+                            }
+                        });
+                    });
+                    
+
+                    if (count >= portalTileRules[key]) {
+                        delete portalArrayN[key];
+                        console.log("DELETING CAUSE PORTAL HERE", key);   
+                    }
+
                 }
+
             }
 
-            
- 
-            
-        });
-        
-        let toIndex;
-
-        for (let index = PORTAL_N_START + 1; index < PORTAL_N_START + 1 + PORTAL_N_DIFF; index++) {
-
-            if (nPortalArray[index]) {
-                // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+            if (fromN.length < 1) {
+                var fromAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
                 
-                toIndex = index + PORTAL_N_DIFF
-                _from = Phaser.Math.RND.pick(nPortalArray[index]);
-                _to = Phaser.Math.RND.pick(nPortalArray[toIndex]);
-                console.log("FROM TO",_from, _to);
-                makePair(this, _to, _from);
+                var fromN = Phaser.Math.RND.pick(portalArrayN[fromAreaKey]);
+                
+                delete portalArrayN[fromAreaKey];     
             }
+
+            var toAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
+            var toArea = portalArrayN[toAreaKey];
+            toN = Phaser.Math.RND.pick(toArea);
+            delete portalArrayN[toAreaKey];
+
+
+            console.log("MAKE PORTAL", fromN, toN);
+            makePair(this, fromN, toN);
+
             
+            
+
+            
+
+            
+            
+    
+            
+            portalLayerN.visible = false;
+            i++; 
+ 
         }
+
+        // #endregion
+
+
         
+
         
-        console.log(nPortalArray);
-        console.log(nPortalArray[257]);
+    
 
         //Phaser.Math.RND.pick(nextGroup)
-        console.log(nPortalArray[258]);
+       
 
         
         //makePair(this, _to, _from);
