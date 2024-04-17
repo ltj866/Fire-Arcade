@@ -133,7 +133,7 @@ const STAGES_NEXT = {
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-XX';
 const END_STAGE = 'Stage-08';
 
 const UISTYLE = { color: 'lightyellow',

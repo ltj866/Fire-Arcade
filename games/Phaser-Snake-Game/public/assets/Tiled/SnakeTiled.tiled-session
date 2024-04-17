@@ -289,7 +289,7 @@
             "scale": 1.0559811827956989,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 389.68497422516396,
+                "x": 704.5580092916694,
                 "y": 371.21873607840644
             }
         },
@@ -357,8 +357,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 456.66666666666663,
-                "y": 360
+                "x": 454.66666666666663,
+                "y": 369.33333333333326
             }
         },
         "Stage-XX.json#tileSheet": {
@@ -368,6 +368,23 @@
             "scaleInDock": 1
         },
         "Stage-XX.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-YY.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 456,
+                "y": 370.6666666666667
+            }
+        },
+        "Stage-YY.json#tileSheet": {
+            "scaleInDock": 1
+        },
+        "Stage-YY.json#tileSheet02x24": {
+            "scaleInDock": 1
+        },
+        "Stage-YY.json#tileSheetx24": {
             "scaleInDock": 1
         },
         "snakeMap..tmx": {
