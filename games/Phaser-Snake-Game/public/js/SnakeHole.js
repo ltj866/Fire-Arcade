@@ -129,12 +129,13 @@ const STAGES_NEXT = {
     'Stage-05': [['Stage-06', 84]],
     'Stage-06': [['Stage-07', 83]],
     'Stage-07': [['Stage-08', 82]],
+    'Stage-XX': [['Stage-YY', 82]],
     'Bonus-Stage-x1': [],
 }
 
 // #region START STAGE
 const START_STAGE = 'Stage-XX';
-const END_STAGE = 'Stage-08';
+const END_STAGE = 'Stage-YY';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
