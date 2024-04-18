@@ -126,16 +126,17 @@ const STAGES_NEXT = {
     'Stage-03b': [['Stage-04', 99]],
     'Stage-03c': [['Stage-04', 85]],
     'Stage-04': [['Stage-05', 88]],
-    'Stage-05': [['Stage-06', 84]],
-    'Stage-06': [['Stage-07', 83]],
-    'Stage-07': [['Stage-08', 82]],
-    'Stage-XX': [['Stage-YY', 82]],
+    'Stage-05': [['Stage-06', 85]],
+    'Stage-06': [['Stage-07', 84]],
+    'Stage-07': [['Stage-08', 83]],
+    'Stage-08': [['Stage-09', 82]],
+    'Stage-09': [['Stage-10', 81]],
     'Bonus-Stage-x1': [],
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-XX';
-const END_STAGE = 'Stage-YY';
+const START_STAGE = 'Stage-09';
+const END_STAGE = 'Stage-10';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -656,6 +657,7 @@ class GameScene extends Phaser.Scene {
         // #region Portal-N
 
         const portalTileRules = {
+            321:99,
             353:1,
             354:1,
             355:1,
@@ -663,6 +665,7 @@ class GameScene extends Phaser.Scene {
             357:1,
             358:1,
             359:1,
+            360:1,
             385:2,
             386:2,
             387:2,
