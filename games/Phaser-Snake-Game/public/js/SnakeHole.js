@@ -128,8 +128,8 @@ const STAGES_NEXT = {
     'Stage-04': [['Stage-05', 88]],
     'Stage-05': [['Stage-06', 85]],
     'Stage-06': [['Stage-07', 84]],
-    'Stage-07': [['Stage-08', 83]],
-    'Stage-08': [['Stage-09', 82]],
+    'Stage-07': [['Stage-88', 83]],
+    'Stage-88': [['Stage-09', 82]],
     'Stage-09': [['Stage-10', 81]],
     'Bonus-Stage-x1': [],
 }
