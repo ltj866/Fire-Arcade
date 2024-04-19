@@ -495,14 +495,14 @@ class GameScene extends Phaser.Scene {
                 this.spaceWhileReGrouping = true;
             }
 
-        })
+        });
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.spaceWhileReGrouping = false;
-        })
+        });
 
         // #endregion
         
@@ -1497,7 +1497,7 @@ class ScoreScene extends Phaser.Scene
                                 else {
                                     var currentAve = currentBase / (ourTimeAttack.stageHistory.length * 28);
                                     ourTimeAttack.newUnlocked = [
-                                        _stage[0], // Stage Namr
+                                        _stage[0], // Stage Name
                                         _stage[1], // Requirement Average
                                         currentAve]; // Average now
                                 }
