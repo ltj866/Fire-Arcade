@@ -135,7 +135,7 @@ const STAGES_NEXT = {
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-55';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-10';
 
 const UISTYLE = { color: 'lightyellow',
@@ -1716,7 +1716,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-size': '12px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
-                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0.5);
+                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
 
                 _i += 1;
                 stageY += GRID * 2;
