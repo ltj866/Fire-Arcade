@@ -122,15 +122,15 @@ const STAGES_NEXT = {
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03a': [['Stage-04', 88]],
-    'Stage-03b': [['Stage-04', 99]],
-    'Stage-03c': [['Stage-04', 85]],
-    'Stage-04': [['Stage-05', 88]],
-    'Stage-05': [['Stage-06', 85]],
-    'Stage-06': [['Stage-07', 84]],
-    'Stage-07': [['Stage-88', 83]],
-    'Stage-88': [['Stage-09', 82]],
-    'Stage-09': [['Stage-10', 81]],
+    'Stage-03a': [['Stage-04', 60]],
+    'Stage-03b': [['Stage-04', 60]],
+    'Stage-03c': [['Stage-04', 60]],
+    'Stage-04': [['Stage-05', 70]],
+    'Stage-05': [['Stage-06', 75]],
+    'Stage-06': [['Stage-07', 80]],
+    'Stage-07': [['Stage-88', 80]],
+    'Stage-88': [['Stage-09', 80]],
+    'Stage-09': [['Stage-10', 80]],
     'Bonus-Stage-x1': [],
 }
 
@@ -917,7 +917,6 @@ class GameScene extends Phaser.Scene {
             var bestLocal = 0;
         }
 
-        
 
 
         ourUI.bestScoreUI.setText(`Best : ${bestLocal}`);
@@ -2156,7 +2155,13 @@ class UIScene extends Phaser.Scene {
                 'text-align': 'right',
             };
 
-            var scoreText = this.add.dom(fruit.x -10, fruit.y - GRID, 'div', scoreStyle);
+            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', {
+                color: 'lightyellow',
+                'font-size': '22px',
+                'font-family': ["Sono", 'sans-serif'],
+                'font-weight': '400',
+                'font-weight': 'bold',
+            });
             scoreText.setOrigin(0,0);
             
             // Remove score text after a time period.
