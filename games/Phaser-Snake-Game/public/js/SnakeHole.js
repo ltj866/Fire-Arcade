@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -125,8 +125,8 @@ const STAGES_NEXT = {
     'Stage-03a': [['Stage-04', 60]],
     'Stage-03b': [['Stage-04', 60]],
     'Stage-03c': [['Stage-04', 60]],
-    'Stage-04': [['Stage-05', 70]],
-    'Stage-05': [['Stage-06', 75]],
+    'Stage-04': [['Stage-55', 70]],
+    'Stage-55': [['Stage-06', 75]],
     'Stage-06': [['Stage-07', 80]],
     'Stage-07': [['Stage-88', 80]],
     'Stage-88': [['Stage-09', 80]],
@@ -135,7 +135,7 @@ const STAGES_NEXT = {
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-55';
 const END_STAGE = 'Stage-10';
 
 const UISTYLE = { color: 'lightyellow',
@@ -1330,7 +1330,7 @@ class ScoreScene extends Phaser.Scene
         
         
         stageScoreUI.setText(
-            `Base: ${stageScore}
+            `Base Score: ${stageScore}
             Speed Bonus: +${speedBonus}
             Stage Score: ${stageScore+speedBonus}
             HighScore: ${bestLocal + bestBonus}
@@ -1357,13 +1357,12 @@ class ScoreScene extends Phaser.Scene
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        `STAGE STATS - ${ourGame.stage}
+        `EXTRA STAGE STATS - ${ourGame.stage}
         ----------------------
-        SCORE: ${ourUI.score}
         LENGTH: ${ourUI.length}
-        FRUIT SCORE AVERAGE: ${stageAve}
+        FOOD LOG AVERAGE: ${stageAve}
         
-        TURNS: ${ourInputScene.turns}
+        TOTAL TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
         
         BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
@@ -1832,8 +1831,11 @@ class TimeAttackScene extends Phaser.Scene{
                 var foodToNow = this.stageHistory.length * 28; // Calculated value of how many total fruit collect by this stage
                 stageY = stageY + GRID * 2;
                 
+
+                var lastStage = this.stageHistory.slice(-1);
+                
                 // Unlock Difficulty needs to be in order
-                STAGES_NEXT[ourGame.stage].some( _stage => {
+                STAGES_NEXT[lastStage[0].stage].some( _stage => {
 
                     var _goalSum = _stage[1] * foodToNow;
                     unlockStage = _stage;
@@ -1857,7 +1859,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'text-decoration': 'underline',
                 });
 
-                nextStageUI.setText("Next Stage").setOrigin(1,0);
+                nextStageUI.setText("Unlock Next Stage").setOrigin(1,0);
 
                 stageY += GRID;
                 
@@ -1888,8 +1890,8 @@ class TimeAttackScene extends Phaser.Scene{
                 var requiredAve = goalSum / foodToNow;
 
 
-                requiredAveUI.setText(`${requiredAve.toFixed(1)}: Required Food Average  `).setOrigin(0,0);
-                currentAveUI.setText(`${currentAve.toFixed(1)}: Current Average`).setOrigin(0,0.5);
+                requiredAveUI.setText(`${requiredAve.toFixed(1)}: Required Food Score Average to Unlock  `).setOrigin(0,0);
+                currentAveUI.setText(`${currentAve.toFixed(1)}: Current Food Score Average`).setOrigin(0,0.5);
 
                 var unlockMessageUI = this.add.dom( GRID * 10, stageY - 18 , 'div', {
                     color: 'white',
