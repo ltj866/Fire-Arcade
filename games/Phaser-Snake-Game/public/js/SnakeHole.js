@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 4; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -61,6 +61,19 @@ var calcBonus = function (scoreInput) {
 }
 console.log(calcBonus(2800));
 
+var calcHashInt = function (str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+    }
+    // Return a 32bit base 10 number
+    return (hash >>> 0).toString(10);
+}
+
+var intToBinHash = function (input) {
+    return (input >>> 0).toString(2).padStart(32, '0');
+}
 
 
 
@@ -1216,10 +1229,10 @@ class ScoreScene extends Phaser.Scene
         /////////
 
         // Pre Calculate needed values
-        var stageScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
-        var stageAve = stageScore/ourUI.scoreHistory.length;
+        var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageAve = baseScore/ourUI.scoreHistory.length;
 
-        var speedBonus = calcBonus(stageScore);
+        var speedBonus = calcBonus(baseScore);
 
         var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
         var bestLocal = bestLog.reduce((a,b) => a + b, 0);
@@ -1330,9 +1343,9 @@ class ScoreScene extends Phaser.Scene
         
         
         stageScoreUI.setText(
-            `Base Score: ${stageScore}
+            `Base Score: ${baseScore}
             Speed Bonus: +${speedBonus}
-            Stage Score: ${stageScore+speedBonus}
+            Stage Score: ${baseScore+speedBonus}
             HighScore: ${bestLocal + bestBonus}
             `
         
@@ -1402,12 +1415,34 @@ class ScoreScene extends Phaser.Scene
         }
         
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
-        fruitLog.setText(
+        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
+        fruitLogUI.setText(
             `Current - ave(${stageAve.toFixed(1)})
             --------------------- 
             [${ourUI.scoreHistory.slice().sort().reverse()}]`
-        ).setOrigin(1,0);  
+        ).setOrigin(1,0);
+        
+        
+        var foodLogSeed = ourUI.scoreHistory.slice();
+        foodLogSeed.push(ourInputScene.cornerTime);
+        foodLogSeed.push(baseScore+speedBonus);
+
+        console.log(foodLogSeed)
+        
+
+
+        var foodHash = calcHashInt(foodLogSeed.toString());
+        console.log("stage hash", foodHash, intToBinHash(foodHash));
+
+        var hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div', {
+            "fontSize":'26px',
+            'font-family': ["Sono", 'sans-serif'],
+            color: 'white',
+            'text-align':'center',
+        });
+        hashUI.setText(`${foodLogSeed.slice(-1)} - ${foodHash}
+        ${intToBinHash(foodHash)}
+        `).setOrigin(0.5, 0);
         
             
 
