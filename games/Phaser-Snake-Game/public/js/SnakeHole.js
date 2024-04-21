@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -1002,6 +1002,7 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    // #region Game Update
     update (time, delta) {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
@@ -1422,29 +1423,32 @@ class ScoreScene extends Phaser.Scene
             [${ourUI.scoreHistory.slice().sort().reverse()}]`
         ).setOrigin(1,0);
         
-        
-        var foodLogSeed = ourUI.scoreHistory.slice();
-        foodLogSeed.push(ourInputScene.cornerTime);
-        foodLogSeed.push(baseScore+speedBonus);
+        // #region Stage Hash Code
 
-        console.log(foodLogSeed)
         
 
+        this.foodLogSeed = ourUI.scoreHistory.slice();
+        this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
+        this.foodLogSeed.push(baseScore+speedBonus * 12);
 
-        var foodHash = calcHashInt(foodLogSeed.toString());
+        // Starts Best as Current Copy
+        this.bestSeed = this.foodLogSeed.slice();
+
+        var foodHash = calcHashInt(this.foodLogSeed.toString());
+        this.bestHashInt = parseInt(foodHash);
+
         console.log("stage hash", foodHash, intToBinHash(foodHash));
 
-        var hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div', {
-            "fontSize":'26px',
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div', {
+            "fontSize":'18px',
             'font-family': ["Sono", 'sans-serif'],
             color: 'white',
             'text-align':'center',
         });
-        hashUI.setText(`${foodLogSeed.slice(-1)} - ${foodHash}
+        
+        this.hashUI.setText(`${this.foodLogSeed.slice(-1)} - ${foodHash}
         ${intToBinHash(foodHash)}
         `).setOrigin(0.5, 0);
-        
-            
 
         //card.setScale(0.7);
 
@@ -1472,10 +1476,6 @@ class ScoreScene extends Phaser.Scene
 
             this.input.keyboard.on('keydown-SPACE', function() {
                     
-                
-
-
-
                 
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
@@ -1586,6 +1586,41 @@ class ScoreScene extends Phaser.Scene
 
             });
         }, [], this);
+    }
+
+    // #region Score - Update
+    update(time) {
+        
+        var scoreCountDown = this.foodLogSeed.slice(-1);
+        if (scoreCountDown > 0) {
+            
+            //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
+
+            //var i = 31;
+
+            for (let index = 189; index > 0 ; index--) {
+                var roll = Phaser.Math.RND.integer();
+                if (roll < this.bestHashInt) {
+                    this.bestHashInt = roll;
+                }
+
+                if (this.foodLogSeed.slice(-1) < 1) {
+                    break;
+                }
+
+                this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
+            }
+
+            this.hashUI.setText(`${this.foodLogSeed.slice(-1)} 
+            ${this.bestHashInt} - ${intToBinHash(this.bestHashInt)} - d${intToBinHash(this.bestHashInt).split('1').sort().pop().length}
+            ${roll} - ${intToBinHash(roll)} 
+            `);
+
+            //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
+
+            
+
+        }
     }
 
     end() {
@@ -2095,7 +2130,7 @@ class UIScene extends Phaser.Scene {
            add: false
        }).setOrigin(0.5,0);
 
-       const keys = [ 'increasing' ];
+       const keys = ['increasing'];
        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
        boostBar.setDepth(50);
        boostBar.play('increasing');
@@ -2214,8 +2249,6 @@ class UIScene extends Phaser.Scene {
                 repeat: 0,
                 yoyo: false
               });
-            
-            
             
             
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
