@@ -59,7 +59,7 @@ var calcBonus = function (scoreInput) {
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
 }
-console.log(calcBonus(2800));
+
 
 
 
@@ -308,7 +308,7 @@ class GameScene extends Phaser.Scene {
 
         this.move_pause = true;
         this.startMoving = false;
-        this.winnedYet = false;
+        this.stageOver = false;
 
         const { stage = START_STAGE } = props
         this.stage = stage;
@@ -1012,7 +1012,7 @@ class GameScene extends Phaser.Scene {
 
         
 
-        // Lose State
+        // #region Bonk and Regroup
         if (!this.snake.alive && !this.snake.regrouping) {
             //console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
@@ -1027,6 +1027,7 @@ class GameScene extends Phaser.Scene {
             
 
 
+            // Do this on hardcore mode and take a life down.
             //game.destroy();
             //this.scene.restart();
             
@@ -1053,7 +1054,7 @@ class GameScene extends Phaser.Scene {
                 x: GRID * 15,
                 y: GRID * 15,
                 yoyo: false,
-                duration: 720,
+                duration: 1000,
                 ease: 'Sine.easeOutIn',
                 repeat: 0,
                 delay: 500
@@ -1078,9 +1079,9 @@ class GameScene extends Phaser.Scene {
         }
         
         // #region Win State
-        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
+        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.stageOver) {
             console.log("YOU WIN" , this.stage);
-            this.winnedYet = true; // stops update loop from moving snake.
+            this.stageOver = true; // stops update loop from moving snake Score Scene.
             this.move_pause = true; // Keeps snake from turning
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
@@ -1175,7 +1176,7 @@ class GameScene extends Phaser.Scene {
             
             
             // Move at last second
-            if (!this.winnedYet) {
+            if (!this.stageOver) {
                 this.snake.move(this);
             }
             
@@ -1935,9 +1936,11 @@ class TimeAttackScene extends Phaser.Scene{
             var sumAveFood = sumFood / allFoodLog.length;
 
             //console.log ("sum:", sumFood, "Ave:", sumAveFood);
+             
             this.time.delayedCall(900, function() {
 
-                continueTextUI.setVisible(true);
+                // #region Continue Text 
+                //continueTextUI.setVisible(true);
     
     
                 this.tweens.add({
