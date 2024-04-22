@@ -2163,6 +2163,7 @@ class UIScene extends Phaser.Scene {
                 'font-family': ["Sono", 'sans-serif'],
                 'font-weight': '400',
                 'font-weight': 'bold',
+                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
             });
             scoreText.setOrigin(0,0);
             
