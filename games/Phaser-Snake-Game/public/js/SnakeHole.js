@@ -2284,7 +2284,7 @@ class UIScene extends Phaser.Scene {
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
             
             if (timeLeft > BOOST_ADD_FLOOR) {
-                this.energyAmount += 10;
+                this.energyAmount += 25;
             }
             
             if (timeLeft > SCORE_FLOOR) {
