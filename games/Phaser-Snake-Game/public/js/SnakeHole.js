@@ -177,6 +177,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
+        this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
 
 
         //WRAP BLOCKS:
@@ -297,6 +299,11 @@ class GameScene extends Phaser.Scene {
 
         this.comboCounter = comboCounter;
 
+        // Boost Array
+        this.boostOutlines = [];
+        this.boostOutlines.length = 1; //this needs to be set to 1 on init or else a lingering outline persists on space-down
+        this.boostGhosts = [];
+
         // Sounds
         this.atomSounds = [];
         this.portalSounds = [];
@@ -341,7 +348,8 @@ class GameScene extends Phaser.Scene {
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
-        
+
+
         // a = Global average best score + minScore 
         //For a=1400, min=1, max=100, goal=28
         // Floor(score bonus)
@@ -365,6 +373,10 @@ class GameScene extends Phaser.Scene {
 
         // #region TileMap
         
+        //Physics Overlap
+        //this.physics.add.overlap(sprite, boostOutline);
+        //this.physics.add.overlap(sprite, snake.body);
+
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
@@ -403,6 +415,8 @@ class GameScene extends Phaser.Scene {
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+
+        //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
     
 
@@ -478,6 +492,7 @@ class GameScene extends Phaser.Scene {
             // Separate if statements so the first will 
             // run with as small of a delay as possible
             // for input responsiveness
+
             this.snake.bonked = false;
             if (!this.move_pause || !this.startMoving) {
                 this.startMoving = true;
@@ -495,14 +510,25 @@ class GameScene extends Phaser.Scene {
                 this.spaceWhileReGrouping = true;
             }
 
-        });
+
+        })
+        this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
+            
+            //var boostOutline = this.add.sprite(this.snake.body.x, this.snake.body.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+            //this.boostOutlines.push(boostOutline)
+            
+            //console.log("space pressed")
+        })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+            //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.spaceWhileReGrouping = false;
         });
+
+        this.frameIndex = 0
 
         // #endregion
         
@@ -993,6 +1019,8 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
 
+        var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
+
         // console.log("update -- time=" + time + " delta=" + delta);
 
         // #region Hold Reset
@@ -1101,10 +1129,76 @@ class GameScene extends Phaser.Scene {
         // Only Calculate every move window
 
         // #region Check move
+
+        if (this.frameIndex < 9){
+            this.frameIndex += 1;
+        }
+        else{
+            this.frameIndex = 0;
+        }
+
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
+            //Phaser.Math.Between(0, 9);
 
             this.lastMoveTime = time;
+            let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
+            
+            var boosting
+            
+            if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+                boosting = true;
+                var boostGhost = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 3).setOrigin(0,0).setDepth(0);//setOrigin(0,0).setDepth(15)
+                //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
+                this.boostGhosts.push(boostGhost);
+                //this.boostGhosts.push(boostGhostSmall)
+                //console.log(this.frameIndex)
+                /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
+                boostTrailX.once('animationcomplete',()=>{
+                    boostTrailX.play("boostTrailXdissipate");
+                    boostTrailX.once('animationcomplete',()=>{
+                        boostTrailX.destroy() 
+                    })
+                    //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
+                })*/
+            }
+            else{
+                boosting = false;
+            }
+            if (this.boostGhosts.length > 1){
+                this.boostGhosts[this.boostGhosts.length-2].destroy();
+            }
+
+            if (boosting){
+                this.snake.body.forEach( part => {
+                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
+                    if(this.boostOutlines.length > this.snake.body.length){
+                        this.boostOutlines[latestOutline].destroy();
+                    }
+      
+                    //console.log("boost length = ",this.boostOutlines.length)
+                    //console.log("snake length = ",this.snake.body.length)
+                    //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    this.boostOutlines.push(boostOutline)
+                    boostOutline.play("snakeOutlineAnim");
+                })
+            }
+            else{
+                this.boostOutlines.forEach(boostOutline =>{
+                    boostOutline.destroy();
+                })
+                this.boostGhosts.forEach(boostGhost =>{
+                    boostGhost.destroy();
+                })
+                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostOutlines.length = 1;
+                }
+                if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostGhosts.length = 1;
+                } 
+
+            }
             
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
@@ -2190,7 +2284,7 @@ class UIScene extends Phaser.Scene {
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
             
             if (timeLeft > BOOST_ADD_FLOOR) {
-                ourGame.energyAmount += 10;
+                this.energyAmount += 10;
             }
             
             if (timeLeft > SCORE_FLOOR) {
@@ -2387,9 +2481,11 @@ class UIScene extends Phaser.Scene {
         
             // Has Boost Logic
             if(this.energyAmount > 1){
+                //CREATE BOOST ELECTRICITY HERE
                 this.scene.get('GameScene').moveInterval = SPEEDSPRINT;
             }
             else{
+                //DISSIPATE LIVE ELECTRICITY
                 this.scene.get('GameScene').moveInterval = SPEEDWALK;
             }
             this.mask.setScale(this.energyAmount/100,1);
@@ -2767,6 +2863,12 @@ class InputScene extends Phaser.Scene {
  // #region Animations
 function loadAnimations(scene) {
     scene.anims.create({
+        key: 'snakeOutlineAnim',
+        frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
+        frameRate: 12,
+        repeat: -1
+    })
+    scene.anims.create({
       key: 'atom01idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
       frameRate: 12,
@@ -2860,6 +2962,72 @@ function loadAnimations(scene) {
       frameRate: 8,
       repeat: -1
     })
+    scene.anims.create({
+      key: 'boostTrailX1',
+      frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+      frameRate: 16,
+      repeat: 0
+    })
+    scene.anims.create({
+        key: 'boostTrailX2',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX3',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX4',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX5',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX6',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX7',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX8',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX9',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX0',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
+        frameRate: 16,
+        repeat: 0
+      })
+    scene.anims.create({
+        key: 'boostTrailXdissipate',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 10,11,12,13,14]}),
+        frameRate: 16,
+        repeat: 0
+      })
   }
 // #endregion
 
