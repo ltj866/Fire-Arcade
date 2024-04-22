@@ -1130,75 +1130,20 @@ class GameScene extends Phaser.Scene {
 
         // #region Check move
 
-        if (this.frameIndex < 9){
-            this.frameIndex += 1;
-        }
-        else{
-            this.frameIndex = 0;
-        }
+        //if (this.frameIndex < 9){
+        //    this.frameIndex += 1;
+        //}
+        //else{
+        //    this.frameIndex = 0;
+        //}
 
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
             //Phaser.Math.Between(0, 9);
 
             this.lastMoveTime = time;
-            let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
+            //let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
             
-            var boosting
-            
-            if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
-                boosting = true;
-                var boostGhost = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 3).setOrigin(0,0).setDepth(0);//setOrigin(0,0).setDepth(15)
-                //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
-                this.boostGhosts.push(boostGhost);
-                //this.boostGhosts.push(boostGhostSmall)
-                //console.log(this.frameIndex)
-                /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
-                boostTrailX.once('animationcomplete',()=>{
-                    boostTrailX.play("boostTrailXdissipate");
-                    boostTrailX.once('animationcomplete',()=>{
-                        boostTrailX.destroy() 
-                    })
-                    //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
-                })*/
-            }
-            else{
-                boosting = false;
-            }
-            if (this.boostGhosts.length > 1){
-                this.boostGhosts[this.boostGhosts.length-2].destroy();
-            }
-
-            if (boosting){
-                this.snake.body.forEach( part => {
-                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
-                    if(this.boostOutlines.length > this.snake.body.length){
-                        this.boostOutlines[latestOutline].destroy();
-                    }
-      
-                    //console.log("boost length = ",this.boostOutlines.length)
-                    //console.log("snake length = ",this.snake.body.length)
-                    //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
-                    this.boostOutlines.push(boostOutline)
-                    boostOutline.play("snakeOutlineAnim");
-                })
-            }
-            else{
-                this.boostOutlines.forEach(boostOutline =>{
-                    boostOutline.destroy();
-                })
-                this.boostGhosts.forEach(boostGhost =>{
-                    boostGhost.destroy();
-                })
-                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
-                    this.boostOutlines.length = 1;
-                }
-                if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
-                    this.boostGhosts.length = 1;
-                } 
-
-            }
             
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
@@ -1267,11 +1212,77 @@ class GameScene extends Phaser.Scene {
             } 
 
             // Set Best Score UI element using local storage.
+            if(this.spaceKey.isDown && energyAmountX > 0) {
+                var boostGhost = this.add.sprite(
+                    this.snake.body[this.snake.body.length -1].x, 
+                    this.snake.body[this.snake.body.length -1].y, 
+                    'snakeDefault', 3);//setOrigin(0,0).setDepth(15)
+                boostGhost.setOrigin(0,0).setDepth(0);
+
+
+                this.boostGhosts.push(boostGhost);
+            }
             
             
             // Move at last second
             if (!this.stageOver) {
                 this.snake.move(this);
+            }
+
+            var boosting
+            
+            if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+                boosting = true;
+                
+                //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
+                
+                //this.boostGhosts.push(boostGhostSmall)
+                //console.log(this.frameIndex)
+                /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
+                boostTrailX.once('animationcomplete',()=>{
+                    boostTrailX.play("boostTrailXdissipate");
+                    boostTrailX.once('animationcomplete',()=>{
+                        boostTrailX.destroy() 
+                    })
+                    //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
+                })*/
+            }
+            else{
+                boosting = false;
+            }
+            if (this.boostGhosts.length > 1){
+                this.boostGhosts[this.boostGhosts.length-2].destroy();
+            }
+
+            if (boosting){
+                this.snake.body.forEach( part => {
+                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
+                    if(this.boostOutlines.length > this.snake.body.length){
+                        this.boostOutlines[latestOutline].destroy();
+                    }
+      
+                    //console.log("boost length = ",this.boostOutlines.length)
+                    //console.log("snake length = ",this.snake.body.length)
+                    //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    this.boostOutlines.push(boostOutline)
+                    boostOutline.play("snakeOutlineAnim");
+                })
+            }
+            else{
+                this.boostOutlines.forEach(boostOutline =>{
+                    boostOutline.destroy();
+                })
+                this.boostGhosts.forEach(boostGhost =>{
+                    boostGhost.destroy();
+                })
+                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostOutlines.length = 1;
+                }
+                if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostGhosts.length = 1;
+                } 
+
             }
             
         }
@@ -1375,12 +1386,12 @@ class ScoreScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*18.5, 'div', {
-            "fontSize":'34px',
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', {
+            "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '600',
-            color: 'white',
-            'background-color': "#607d8b",
+            'font-weight': '500',
+            color: 'yellow',
+            //'background-color': "#607d8b",
             padding: "4px 14px",
             'border-top-right-radius': '16px',
             'border-top-left-radius': '16px',
@@ -1390,14 +1401,14 @@ class ScoreScene extends Phaser.Scene
         
         currentScoreUI.setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
 
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*20.5, 'div', {
-            "fontSize":'34px',
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', {
+            "fontSize":'22px',
             'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '600',
+            'font-weight': '400',
             color: 'white',
-            'background-color': "#607d8b",
+            //'background-color': "#607d8b",
             padding: "4px 14px",
-            'border-radius': '16px',
+            //'border-radius': '16px',
             //'text-decoration': 'underline'
         });
 
@@ -1405,9 +1416,9 @@ class ScoreScene extends Phaser.Scene
         bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
         const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
-            "fontSize":'26px',
+            "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
+            'font-weight': '600',
             color: 'white',
             'text-align': 'right',
 
@@ -1415,7 +1426,7 @@ class ScoreScene extends Phaser.Scene
         stageUI.setText(ourGame.stage).setOrigin(1,0);
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', {
-            "fontSize":'20px',
+            "fontSize":'22px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             color: 'white',
@@ -1428,6 +1439,7 @@ class ScoreScene extends Phaser.Scene
             `Base Score: ${stageScore}
             Speed Bonus: +${speedBonus}
             Stage Score: ${stageScore+speedBonus}
+            ------------------
             HighScore: ${bestLocal + bestBonus}
             `
         
@@ -1448,7 +1460,7 @@ class ScoreScene extends Phaser.Scene
             outline: 'solid',
         }
         
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 7, 'div', scoreScreenStyle);
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 12.5, 'div', scoreScreenStyle);
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
@@ -1469,11 +1481,11 @@ class ScoreScene extends Phaser.Scene
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
         `);
 
-        const logScreenStyle = {
-            width: '156px',
+        const bestLogScreenStyle = {
+            width: '312px',
             //height: '22px',
             color: 'white',
-            'font-size': '12px',
+            'font-size': '14px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '200',
             'padding': '2px 12px 2px 12px',
@@ -1481,6 +1493,22 @@ class ScoreScene extends Phaser.Scene
             'word-wrap': 'break-word',
             //'border-radius': '24px',
             //outline: 'solid',
+            'text-align':'right',
+        }
+
+        const logScreenStyle = {
+            width: '312px',
+            //height: '22px',
+            color: 'white',
+            'font-size': '14px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '200',
+            'padding': '2px 12px 2px 12px',
+            //'font-weight': 'bold',
+            'word-wrap': 'break-word',
+            //'border-radius': '24px',
+            //outline: 'solid',
+            'text-align':'left',
         }
 
         
@@ -1488,22 +1516,26 @@ class ScoreScene extends Phaser.Scene
         
 
         if (bestLog) {
-            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID*.5, GRID * 13, 'div', logScreenStyle);
+            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID*.5, GRID * 14.5 + 4, 'div', bestLogScreenStyle);
             bestLogUI.setText(
-                `Best - ave(${bestAve.toFixed(1)})
-                ---------------------
-                [${bestLog.slice().sort().reverse()}]`
+                `Base ${bestLocal} + Speed Bonus ${bestBonus}
+
+                Best Food Log - ave(${bestAve.toFixed(2)})
+                ------------------------
+                [${bestLog.slice().sort().reverse()}] 
+                `
             ).setOrigin(1,0);    
         }
         
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
-        fruitLog.setText(
-            `Current - ave(${stageAve.toFixed(1)})
+        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2, GRID * 7.5, 'div', logScreenStyle);
+        fruitLogUI.setText(
+            `Food Log - ave(${stageAve.toFixed(1)})
             --------------------- 
-            [${ourUI.scoreHistory.slice().sort().reverse()}]`
-        ).setOrigin(1,0);  
+            [${bestLog.slice().sort().reverse()}]`
+        ).setOrigin(0,0);  
         
+        //  [${ourUI.scoreHistory.slice().sort().reverse()}]`
             
 
         //card.setScale(0.7);
@@ -1516,7 +1548,7 @@ class ScoreScene extends Phaser.Scene
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', {"fontSize":'48px'});
             continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
