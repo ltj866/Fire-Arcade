@@ -1470,7 +1470,7 @@ class ScoreScene extends Phaser.Scene
         `EXTRA STAGE STATS - ${ourGame.stage}
         ----------------------
         LENGTH: ${ourUI.length}
-        FOOD LOG AVERAGE: ${stageAve}
+        FOOD LOG AVERAGE: ${stageAve.toFixed(2)}
         
         TOTAL TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
