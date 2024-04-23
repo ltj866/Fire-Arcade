@@ -11,10 +11,10 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.4.04.05.011';
+const GAME_VERSION = 'v0.5.04.19.005';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -30,7 +30,7 @@ var SPEEDSPRINT = 33; // 24
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 export const COMBO_ADD_FLOOR = 88;
-const RESET_WAIT_TIME = 240; // Amount of time space needs to be held to reset during recombinating.
+const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
 var comboCounter = 0;
 
@@ -59,7 +59,7 @@ var calcBonus = function (scoreInput) {
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
 }
-console.log(calcBonus(2800));
+
 
 
 
@@ -122,18 +122,24 @@ const STAGES_NEXT = {
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03a': [['Stage-04', 88]],
-    'Stage-03b': [['Stage-04', 99]],
-    'Stage-03c': [['Stage-04', 85]],
-    'Stage-04': [['Stage-05', 88]],
-    'Stage-05': [['Stage-06', 84]],
-    'Stage-06': [['Stage-07', 83]],
-    'Stage-07': [['Stage-08', 82]],
+    'Stage-03a': [['Stage-04', 60]],
+    'Stage-03b': [['Stage-04', 60]],
+    'Stage-03c': [['Stage-04', 60]],
+    'Stage-04': [['Stage-05', 70]],
+    'Stage-05': [['Stage-06', 75]],
+    'Stage-06': [['Stage-07', 80]],
+    'Stage-07': [['Stage-08', 80]],
+    'Stage-08': [['Stage-09', 80]],
+    'Stage-09': [['Stage-10', 80]],
+    'Stage-10': [['Stage-11', 80]],
+    'Stage-11': [['Stage-12', 80]],
+    'Stage-13': [['Stage-01', 80]],
     'Bonus-Stage-x1': [],
 }
 
-const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-08';
+// #region START STAGE
+const START_STAGE = 'Stage-13';
+const END_STAGE = 'Stage-12';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -174,6 +180,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
+        this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
 
 
         //WRAP BLOCKS:
@@ -294,6 +302,11 @@ class GameScene extends Phaser.Scene {
 
         this.comboCounter = comboCounter;
 
+        // Boost Array
+        this.boostOutlines = [];
+        this.boostOutlines.length = 1; //this needs to be set to 1 on init or else a lingering outline persists on space-down
+        this.boostGhosts = [];
+
         // Sounds
         this.atomSounds = [];
         this.portalSounds = [];
@@ -305,7 +318,7 @@ class GameScene extends Phaser.Scene {
 
         this.move_pause = true;
         this.startMoving = false;
-        this.winnedYet = false;
+        this.stageOver = false;
 
         const { stage = START_STAGE } = props
         this.stage = stage;
@@ -317,6 +330,7 @@ class GameScene extends Phaser.Scene {
         this.moveInterval = SPEEDWALK;
 
         this.spaceWhileReGrouping = false;
+
     
 
     }
@@ -325,7 +339,6 @@ class GameScene extends Phaser.Scene {
     preload () {
         
 
-        
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
     }
@@ -338,7 +351,8 @@ class GameScene extends Phaser.Scene {
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
-        
+
+
         // a = Global average best score + minScore 
         //For a=1400, min=1, max=100, goal=28
         // Floor(score bonus)
@@ -359,7 +373,13 @@ class GameScene extends Phaser.Scene {
         this.snake = new Snake(this, 15, 15);
     
         this.snake.direction = STOP;
+
+        // #region TileMap
         
+        //Physics Overlap
+        //this.physics.add.overlap(sprite, boostOutline);
+        //this.physics.add.overlap(sprite, snake.body);
+
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
@@ -367,8 +387,10 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.layer = this.map.createLayer('Wall', [this.tileset,this.tileset2]);
-        this.layer.setDepth(25);
+        this.wallLayer = this.map.createLayer('Wall', [this.tileset]);
+        this.wallLayer.setDepth(25);
+        
+        
     
         // add background
         this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
@@ -396,6 +418,8 @@ class GameScene extends Phaser.Scene {
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+
+        //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
     
 
@@ -471,6 +495,7 @@ class GameScene extends Phaser.Scene {
             // Separate if statements so the first will 
             // run with as small of a delay as possible
             // for input responsiveness
+
             this.snake.bonked = false;
             if (!this.move_pause || !this.startMoving) {
                 this.startMoving = true;
@@ -488,20 +513,33 @@ class GameScene extends Phaser.Scene {
                 this.spaceWhileReGrouping = true;
             }
 
+
+        })
+        this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
+            
+            //var boostOutline = this.add.sprite(this.snake.body.x, this.snake.body.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+            //this.boostOutlines.push(boostOutline)
+            
+            //console.log("space pressed")
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+            //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.spaceWhileReGrouping = false;
-        })
+        });
+
+        this.frameIndex = 0
 
         // #endregion
         
 
-        // Add all tiles to walls for collision
+    
+        // Map only contains Walls at this point
         this.map.forEachTile( tile => {
+
             // Empty tiles are indexed at -1. 
             // Any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
@@ -511,6 +549,7 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+        
 
         // Make Fruit
         //for (let index = 0; index < FRUIT; index++) {
@@ -576,6 +615,215 @@ class GameScene extends Phaser.Scene {
             p1.targetObject = p2;
             p2.targetObject = p1;
         }
+
+
+        // Add try loop to get all Portal Layers
+
+        // do while loop Portal-X
+        
+        
+
+        let _from;
+        let _to;
+
+        const PORTAL_X_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
+        const PORTAL_N_DIFF = 32;
+
+
+        const A_FROM = 34
+        const A_TO = 38
+
+        const B_FROM = 162;
+        const B_TO = 166;
+
+
+        
+
+        //do {
+            
+        //} while (i < PORTAL_N_START || i );
+
+        
+
+        
+        // #region Portal-X
+        if (this.map.getLayer('Portal-X')) {
+            var portalLayerX = this.map.createLayer('Portal-X', [this.tileset]);
+            var portalArrayX = [];
+
+            portalLayerX.forEachTile(tile => {
+
+                if (tile.index > 0) {
+    
+                    if (portalArrayX[tile.index]) {
+                        portalArrayX[tile.index].push([tile.x, tile.y]);
+                    }
+                    else {
+                        portalArrayX[tile.index] = [[tile.x, tile.y]];
+                    }
+                } 
+            });
+
+            let toIndex;
+
+            for (let index = PORTAL_X_START + 1; index < PORTAL_X_START + 1 + PORTAL_N_DIFF; index++) {
+    
+                if (portalArrayX[index]) {
+                    // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                    
+                    toIndex = index + PORTAL_N_DIFF
+                    _from = Phaser.Math.RND.pick(portalArrayX[index]);
+                    _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
+                    console.log("Portal X Logic: FROM TO",_from, _to);
+                    makePair(this, _to, _from);
+                }
+            }
+
+            portalLayerX.visible = false;
+        }
+        // #endregion
+
+        // #region Portal-N
+
+        const portalTileRules = {
+            321:99,
+            353:1,
+            354:1,
+            355:1,
+            356:1,
+            357:1,
+            358:1,
+            359:1,
+            360:1,
+            385:2,
+            386:2,
+            387:2,
+            388:2,
+            389:2,
+            390:2,
+            417:3,
+            418:3,
+            419:3,
+            420:3,
+            421:3,
+            422:3,
+            423:3,
+            424:3
+        };
+        
+        var layerIndex = 1
+
+
+        
+
+        while (this.map.getLayer(`Portal-${layerIndex}`)) {
+
+            console.log(`Portal-${layerIndex} Logic`);
+            var portalLayerN = this.map.createLayer(`Portal-${layerIndex}`, [this.tileset]);
+            var portalArrayN = {};
+            
+            var toN = [];
+            var fromN = [];
+
+            portalLayerN.forEachTile(tile => {
+
+                if (tile.index > 0) {
+    
+                    if (portalArrayN[tile.index]) {
+                        portalArrayN[tile.index].push([tile.x, tile.y]);
+                    }
+                    else {
+                        portalArrayN[tile.index] = [[tile.x, tile.y]];
+                    }
+                } 
+            });
+
+            
+            console.log("portalLayerX", portalArrayN);
+
+
+            for (var [key, value] of Object.entries(portalArrayN)) {
+                //console.log("Checking TileIndex", key, "has no more than", portalTileRules[key], "portals")
+
+                var count = 0;
+                
+                // Special Case Block. Put a from portal. 
+                // TODO Probably needs to recursively try when double up portals.
+                if (portalTileRules[key] == undefined) {
+                    fromN = Phaser.Math.RND.pick(portalArrayN[key]);
+
+                    delete portalArrayN[key];
+
+                }
+                else {
+                    //
+                    var count = 0;
+                    value.forEach(tile => {
+                        this.portals.some( portal => {
+                            if(portal.x === tile[0]*GRID && portal.y === tile[1]*GRID){
+                                count += 1;
+                                //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
+                                //cords = this.genChords(scene);
+                            }
+                        });
+                    });
+                    
+
+                    if (count >= portalTileRules[key]) {
+                        delete portalArrayN[key];
+                        console.log("DELETING CAUSE PORTAL HERE", key);   
+                    }
+
+                }
+
+            }
+
+            // Define From Portal if not yet defined above.
+            if (fromN.length < 1) {
+                var fromAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
+                var fromArea = portalArrayN[fromAreaKey];
+                var fromN = Phaser.Math.RND.pick(fromArea);
+                
+                delete portalArrayN[fromAreaKey];     
+            }
+
+            // Define To Portal Randomly from avaible tiles.
+            var toAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
+            var toArea = portalArrayN[toAreaKey];
+            toN = Phaser.Math.RND.pick(toArea);
+            delete portalArrayN[toAreaKey];
+
+
+            console.log("MAKE PORTAL", fromN, toN);
+            makePair(this, fromN, toN);
+    
+            portalLayerN.visible = false;
+            layerIndex ++; 
+ 
+        }
+
+        // #endregion
+
+
+        
+
+        
+    
+
+        //Phaser.Math.RND.pick(nextGroup)
+       
+
+        
+        //makePair(this, _to, _from);
+
+
+        //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
+
+
+
+
+        // #region Old Logic 
+        /*
         
         // AREA NAME is [GROUP][ID]
         var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
@@ -644,6 +892,10 @@ class GameScene extends Phaser.Scene {
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
         
 
+        
+         
+        
+
         // Fair Fruit Spawn (5x)
         
         // Top Row
@@ -659,6 +911,18 @@ class GameScene extends Phaser.Scene {
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+        // #endregion
+        */
+
+        // #region New Stage Logic
+
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+
 
 
         // #endregion
@@ -682,7 +946,6 @@ class GameScene extends Phaser.Scene {
             var bestLocal = 0;
         }
 
-        
 
 
         ourUI.bestScoreUI.setText(`Best : ${bestLocal}`);
@@ -759,8 +1022,11 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
 
+        var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
+
         // console.log("update -- time=" + time + " delta=" + delta);
 
+        // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
  
@@ -777,9 +1043,9 @@ class GameScene extends Phaser.Scene {
 
         
 
-        // Lose State
+        // #region Bonk and Regroup
         if (!this.snake.alive && !this.snake.regrouping) {
-            console.log("DEAD, Now Rregroup", this.snake.alive);
+            //console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
@@ -792,6 +1058,7 @@ class GameScene extends Phaser.Scene {
             
 
 
+            // Do this on hardcore mode and take a life down.
             //game.destroy();
             //this.scene.restart();
             
@@ -818,14 +1085,14 @@ class GameScene extends Phaser.Scene {
                 x: GRID * 15,
                 y: GRID * 15,
                 yoyo: false,
-                duration: 720,
+                duration: 1000,
                 ease: 'Sine.easeOutIn',
                 repeat: 0,
                 delay: 500
             });
 
             tween.on('complete', test => {
-                console.log("COMPLETE AND SET ALIVE")
+                //console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
@@ -843,9 +1110,9 @@ class GameScene extends Phaser.Scene {
         }
         
         // #region Win State
-        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
+        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.stageOver) {
             console.log("YOU WIN" , this.stage);
-            this.winnedYet = true; // stops update loop from moving snake.
+            this.stageOver = true; // stops update loop from moving snake Score Scene.
             this.move_pause = true; // Keeps snake from turning
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
@@ -865,56 +1132,73 @@ class GameScene extends Phaser.Scene {
         // Only Calculate every move window
 
         // #region Check move
+
+        //if (this.frameIndex < 9){
+        //    this.frameIndex += 1;
+        //}
+        //else{
+        //    this.frameIndex = 0;
+        //}
+
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
+            //Phaser.Math.Between(0, 9);
 
             this.lastMoveTime = time;
+            //let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
+            
             
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
  
-            // PORTAL HIGHLIGHT LOGIC
+            
+
+            if (this.portals.length > 0) {
+            
+                // PORTAL HIGHLIGHT LOGIC
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
-            closestPortal.fx.setActive(false);
+                
             
-            // Distance on an x y grid
+                closestPortal.fx.setActive(false);
+                
+                // Distance on an x y grid
 
-            var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
-                                                                closestPortal.x/GRID, closestPortal.y/GRID);
+                var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
+                                                                    closestPortal.x/GRID, closestPortal.y/GRID);
 
-            this.portals.forEach( portal => {
-                var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
-                                                    portal.x/GRID, portal.y/GRID);
+                this.portals.forEach( portal => {
+                    var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
+                                                        portal.x/GRID, portal.y/GRID);
 
-                if (dist < closestPortalDist) { // Compare and choose closer portals
-                    closestPortalDist = dist;
-                    closestPortal = portal;
-                }
-            });
-
-
-            // This is a bit eccessive because I only store the target portal coordinates
-            // and I need to get the portal object to turn on the effect. Probably can be optimized.
-            // Good enough for testing.
-            if (closestPortalDist < 6) {
-                this.portals.forEach(portal => {
-                    if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
-                        portal.fx.setActive(true);
-                        
-                        //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
-                        portal.fx.outerStrength = 6 - closestPortalDist;
-
-                        closestPortal.fx.setActive(true);
-                        //closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                        closestPortal.fx.outerStrength = 0;
-
+                    if (dist < closestPortalDist) { // Compare and choose closer portals
+                        closestPortalDist = dist;
+                        closestPortal = portal;
                     }
                 });
-            };
+
+
+                // This is a bit eccessive because I only store the target portal coordinates
+                // and I need to get the portal object to turn on the effect. Probably can be optimized.
+                // Good enough for testing.
+                if (closestPortalDist < 6) {
+                    this.portals.forEach(portal => {
+                        if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                            portal.fx.setActive(true);
+                            
+                            //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                            portal.fx.outerStrength = 6 - closestPortalDist;
+
+                            closestPortal.fx.setActive(true);
+                            //closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                            closestPortal.fx.outerStrength = 0;
+
+                        }
+                    });
+                };
+            } // End Closest Portal
+            
             const ourUI = this.scene.get('UIScene');
-
-
        
             if (DEBUG) {
                 const ourUI = this.scene.get('UIScene');
@@ -931,11 +1215,77 @@ class GameScene extends Phaser.Scene {
             } 
 
             // Set Best Score UI element using local storage.
+            if(this.spaceKey.isDown && energyAmountX > 0) {
+                var boostGhost = this.add.sprite(
+                    this.snake.body[this.snake.body.length -1].x, 
+                    this.snake.body[this.snake.body.length -1].y, 
+                    'snakeDefault', 3);//setOrigin(0,0).setDepth(15)
+                boostGhost.setOrigin(0,0).setDepth(0);
+
+
+                this.boostGhosts.push(boostGhost);
+            }
             
             
             // Move at last second
-            if (!this.winnedYet) {
+            if (!this.stageOver) {
                 this.snake.move(this);
+            }
+
+            var boosting
+            
+            if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+                boosting = true;
+                
+                //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
+                
+                //this.boostGhosts.push(boostGhostSmall)
+                //console.log(this.frameIndex)
+                /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
+                boostTrailX.once('animationcomplete',()=>{
+                    boostTrailX.play("boostTrailXdissipate");
+                    boostTrailX.once('animationcomplete',()=>{
+                        boostTrailX.destroy() 
+                    })
+                    //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
+                })*/
+            }
+            else{
+                boosting = false;
+            }
+            if (this.boostGhosts.length > 1){
+                this.boostGhosts[this.boostGhosts.length-2].destroy();
+            }
+
+            if (boosting){
+                this.snake.body.forEach( part => {
+                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
+                    if(this.boostOutlines.length > this.snake.body.length){
+                        this.boostOutlines[latestOutline].destroy();
+                    }
+      
+                    //console.log("boost length = ",this.boostOutlines.length)
+                    //console.log("snake length = ",this.snake.body.length)
+                    //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    this.boostOutlines.push(boostOutline)
+                    boostOutline.play("snakeOutlineAnim");
+                })
+            }
+            else{
+                this.boostOutlines.forEach(boostOutline =>{
+                    boostOutline.destroy();
+                })
+                this.boostGhosts.forEach(boostGhost =>{
+                    boostGhost.destroy();
+                })
+                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostOutlines.length = 1;
+                }
+                if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostGhosts.length = 1;
+                } 
+
             }
             
         }
@@ -1039,12 +1389,12 @@ class ScoreScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*18.5, 'div', {
-            "fontSize":'34px',
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', {
+            "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '600',
-            color: 'white',
-            'background-color': "#607d8b",
+            'font-weight': '500',
+            color: 'yellow',
+            //'background-color': "#607d8b",
             padding: "4px 14px",
             'border-top-right-radius': '16px',
             'border-top-left-radius': '16px',
@@ -1054,14 +1404,14 @@ class ScoreScene extends Phaser.Scene
         
         currentScoreUI.setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
 
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*20.5, 'div', {
-            "fontSize":'34px',
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', {
+            "fontSize":'22px',
             'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '600',
+            'font-weight': '400',
             color: 'white',
-            'background-color': "#607d8b",
+            //'background-color': "#607d8b",
             padding: "4px 14px",
-            'border-radius': '16px',
+            //'border-radius': '16px',
             //'text-decoration': 'underline'
         });
 
@@ -1069,9 +1419,9 @@ class ScoreScene extends Phaser.Scene
         bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
         const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
-            "fontSize":'26px',
+            "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
+            'font-weight': '600',
             color: 'white',
             'text-align': 'right',
 
@@ -1079,7 +1429,7 @@ class ScoreScene extends Phaser.Scene
         stageUI.setText(ourGame.stage).setOrigin(1,0);
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', {
-            "fontSize":'20px',
+            "fontSize":'22px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             color: 'white',
@@ -1089,9 +1439,10 @@ class ScoreScene extends Phaser.Scene
         
         
         stageScoreUI.setText(
-            `Base: ${stageScore}
+            `Base Score: ${stageScore}
             Speed Bonus: +${speedBonus}
             Stage Score: ${stageScore+speedBonus}
+            ------------------
             HighScore: ${bestLocal + bestBonus}
             `
         
@@ -1112,17 +1463,16 @@ class ScoreScene extends Phaser.Scene
             outline: 'solid',
         }
         
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 7, 'div', scoreScreenStyle);
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 12.5, 'div', scoreScreenStyle);
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        `STAGE STATS - ${ourGame.stage}
+        `EXTRA STAGE STATS - ${ourGame.stage}
         ----------------------
-        SCORE: ${ourUI.score}
         LENGTH: ${ourUI.length}
-        FRUIT SCORE AVERAGE: ${stageAve}
+        FOOD LOG AVERAGE: ${stageAve}
         
-        TURNS: ${ourInputScene.turns}
+        TOTAL TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
         
         BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
@@ -1134,11 +1484,11 @@ class ScoreScene extends Phaser.Scene
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
         `);
 
-        const logScreenStyle = {
-            width: '156px',
+        const bestLogScreenStyle = {
+            width: '312px',
             //height: '22px',
             color: 'white',
-            'font-size': '12px',
+            'font-size': '14px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '200',
             'padding': '2px 12px 2px 12px',
@@ -1146,6 +1496,22 @@ class ScoreScene extends Phaser.Scene
             'word-wrap': 'break-word',
             //'border-radius': '24px',
             //outline: 'solid',
+            'text-align':'right',
+        }
+
+        const logScreenStyle = {
+            width: '312px',
+            //height: '22px',
+            color: 'white',
+            'font-size': '14px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '200',
+            'padding': '2px 12px 2px 12px',
+            //'font-weight': 'bold',
+            'word-wrap': 'break-word',
+            //'border-radius': '24px',
+            //outline: 'solid',
+            'text-align':'left',
         }
 
         
@@ -1153,22 +1519,26 @@ class ScoreScene extends Phaser.Scene
         
 
         if (bestLog) {
-            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID*.5, GRID * 13, 'div', logScreenStyle);
+            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID*.5, GRID * 14.5 + 4, 'div', bestLogScreenStyle);
             bestLogUI.setText(
-                `Best - ave(${bestAve.toFixed(1)})
-                ---------------------
-                [${bestLog.slice().sort().reverse()}]`
+                `Base ${bestLocal} + Speed Bonus ${bestBonus}
+
+                Best Food Log - ave(${bestAve.toFixed(2)})
+                ------------------------
+                [${bestLog.slice().sort().reverse()}] 
+                `
             ).setOrigin(1,0);    
         }
         
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
-        fruitLog.setText(
-            `Current - ave(${stageAve.toFixed(1)})
+        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2, GRID * 7.5, 'div', logScreenStyle);
+        fruitLogUI.setText(
+            `Food Log - ave(${stageAve.toFixed(1)})
             --------------------- 
-            [${ourUI.scoreHistory.slice().sort().reverse()}]`
-        ).setOrigin(1,0);  
+            [${bestLog.slice().sort().reverse()}]`
+        ).setOrigin(0,0);  
         
+        //  [${ourUI.scoreHistory.slice().sort().reverse()}]`
             
 
         //card.setScale(0.7);
@@ -1181,7 +1551,7 @@ class ScoreScene extends Phaser.Scene
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', {"fontSize":'48px'});
             continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
@@ -1255,7 +1625,7 @@ class ScoreScene extends Phaser.Scene
                                 else {
                                     var currentAve = currentBase / (ourTimeAttack.stageHistory.length * 28);
                                     ourTimeAttack.newUnlocked = [
-                                        _stage[0], // Stage Namr
+                                        _stage[0], // Stage Name
                                         _stage[1], // Requirement Average
                                         currentAve]; // Average now
                                 }
@@ -1362,14 +1732,10 @@ class TimeAttackScene extends Phaser.Scene{
 
     init () {
 
-        // this.stageHistory = []; !Initalized in the start screen
-        // This keeps the history from being reset during a run.
         this.inTimeAttack = false;
-
 
     }
     preload () {
-        //this.stageHistory = [];
 
     }
     create() {
@@ -1390,10 +1756,20 @@ class TimeAttackScene extends Phaser.Scene{
         // Average Food
         var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
 
-        var lowestStageUI;
-        var lowestStage;
-        var lowestScore = 9999999999;
 
+        var playedStages = [];
+        var index = 0;
+
+        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+
+        
+
+        
+        var _i = 0;
+        var lowestScore = 9999999999;
+        
+        // Only loads the UI to the scene if you have played a level. 
+        // Allows this scene to start at the beginning without displaying anything, but when you restart the scene it plays correctly.
         
 
         if (this.stageHistory) {
@@ -1409,6 +1785,8 @@ class TimeAttackScene extends Phaser.Scene{
                 var baseScore = _stageData.calcBase();
                 var realScore = _stageData.calcScore();
                 var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
+
+                
 
                 allFoodLog.push(...foodLogOrdered);
 
@@ -1427,26 +1805,23 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 //////
+                var stageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                    color: 'white',
+                    'font-size': '28px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+
+
                 if (realScore < lowestScore) {
+                    index = _i;
                     lowestScore = realScore;
-                    lowestStage = _stageData.stage;
-                    lowestStageUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
+                };
+                    
 
-                    lowestStageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                stageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
 
-                } else {
-                    var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
-
-                    levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
-                }
+                playedStages.push([stageUI, _stageData.stage]);
+                
             
 
                 // Run Stats
@@ -1473,11 +1848,75 @@ class TimeAttackScene extends Phaser.Scene{
                 });
                 foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
 
+                _i += 1;
                 stageY += GRID * 2;
 
             }); // End Level For Loop
 
-            lowestStageUI.node.style.color = "red";
+
+            var selected = playedStages[index]
+
+            selected[0].node.style.color = "red";
+
+            // Snake Head Code
+
+            var selector = this.add.sprite(GRID, selected[0].y + 6, 'snakeDefault', 5);
+            //this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
+            selector.setOrigin(0.5,0);
+
+            var upArrow = this.add.sprite(GRID, selected[0].y - 42).setDepth(15).setOrigin(0.5,0);
+            var downArrow = this.add.sprite(GRID, selected[0].y + 32).setDepth(15).setOrigin(0.5,0);
+
+            upArrow.play('idle');
+            downArrow.flipY = true;
+            downArrow.play('idle');
+
+
+
+            // #region Stage Select Code
+            // Default End Game
+            var continue_text = '[SPACE TO END GAME]';
+    
+            if (ourUI.lives > 0) {
+                continue_text = `[GOTO ${selected[1]}]`;
+            }
+            
+            var continueTextUI = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'}).setVisible(false);
+            continueTextUI.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+
+            console.log("played Stages", playedStages);
+
+            this.input.keyboard.on('keydown-DOWN', function() {
+                selected[0].node.style.color = "white";
+                index = Phaser.Math.Wrap(index + 1, -1, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+                selected = playedStages[index];
+                selected[0].node.style.color = "red";
+                selector.y = selected[0].y + 6;
+                
+                upArrow.y = selected[0].y - 42;
+                downArrow.y = selected[0].y + 32;
+
+                continueTextUI.setText(`[GOTO ${selected[1]}]`);
+                
+            }, [], this);
+    
+            this.input.keyboard.on('keydown-UP', function() {
+                selected[0].node.style.color = "white";
+                index = Phaser.Math.Wrap(index - 1, 0, playedStages.length);
+                
+                selected = playedStages[index];
+                selected[0].node.style.color = "red";
+                selector.y = selected[0].y + 6;
+                
+                upArrow.y = selected[0].y - 42;
+                downArrow.y = selected[0].y + 32;
+
+                continueTextUI.setText(`[GOTO ${selected[1]}]`);
+            }, [], this);
+
+            
+            
         
             
 
@@ -1499,7 +1938,9 @@ class TimeAttackScene extends Phaser.Scene{
             
             console.log("Runscore:", runScore);
 
-            var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
+            stageY = stageY + 4
+
+            var runScoreUI = this.add.dom(GRID * 10, stageY, 'div', {
                 color: 'yellow',
                 'font-size': '28px',
                 'font-family': ["Sono", 'sans-serif'],
@@ -1510,46 +1951,117 @@ class TimeAttackScene extends Phaser.Scene{
 
             runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
 
-            // #region Check Unlock Level
+            // #region Unlock New Level?
 
             if (this.scene.get('GameScene').stage != END_STAGE) {
 
                 
                 var unlockStage;
-                var goalSum;
-                var foodToNow = this.stageHistory.length * 28;
+                var goalSum; // Use sum instead of average to keep from unlocking stages early.
+                var foodToNow = this.stageHistory.length * 28; // Calculated value of how many total fruit collect by this stage
+                stageY = stageY + GRID * 2;
                 
-                // Unlock Difficulty needs to be in order
-                STAGES_NEXT[ourGame.stage].some( _stage => {
 
-                    var _goalSum = _stage[1] * foodToNow;
-                    unlockStage = _stage;
-                    goalSum = unlockStage[1] * foodToNow;
-                    if (this.histSum <= _goalSum && baseScore > _goalSum) {
-                        return true;
+                var lastStage = this.stageHistory.slice(-1);
+
+                // Allows levels with no stage afterwards.
+                if (STAGES_NEXT[lastStage[0].stage]) {
+
+                    // Unlock Difficulty needs to be in order
+                    STAGES_NEXT[lastStage[0].stage].some( _stage => {
+
+                        var _goalSum = _stage[1] * foodToNow;
+                        unlockStage = _stage;
+                        goalSum = unlockStage[1] * foodToNow;
+                        if (this.histSum <= _goalSum && baseScore > _goalSum) {
+                            return true;
+                        }
+                    });
+
+        
+                    // #region Unlock UI
+
+                    var nextStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'grey',
+                        'font-size': '20px',
+                        'font-family': ["Sono", 'sans-serif'],
+                        'text-decoration': 'underline',
+                    });
+
+                    nextStageUI.setText("Unlock Next Stage").setOrigin(1,0);
+
+                    stageY += GRID;
+
+                    var unlockStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+    
+                    unlockStageUI.setText(unlockStage[0]).setOrigin(1,0);
+                    
+
+                    // Run Stats
+                    var requiredAveUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
+                        color: 'white',
+                        'font-size': '14px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+                    
+                    var currentAveUI = this.add.dom( GRID * 10, stageY + GRID + 4, 'div', {
+                        color: 'white',
+                        'font-size': '14px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+
+                    var currentAve = baseScore / foodToNow; 
+                    var requiredAve = goalSum / foodToNow;
+
+
+                    requiredAveUI.setText(`${requiredAve.toFixed(1)}: Required Food Score Average to Unlock  `).setOrigin(0,0);
+                    currentAveUI.setText(`${currentAve.toFixed(1)}: Current Food Score Average`).setOrigin(0,0.5);
+
+                    var unlockMessageUI = this.add.dom( GRID * 10, stageY - 18 , 'div', {
+                        color: 'white',
+                        'font-size': '14px',
+                        'font-family': ["Sono", 'sans-serif'],
+                        'font-style': 'italic',
+                    });
+                    
+                    if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
+                        unlockMessageUI.setText("YOU UNLOCKED A NEW LEVEL!! Try now it out now!").setOrigin(0,0);
+                        unlockMessageUI.node.style.color = "limegreen";
+                        currentAveUI.node.style.color = "limegreen";
+
+                        playedStages.push([unlockStageUI, unlockStage[0]]);
+                        
+                        //console.log(unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
+
+                        //lowestStage = unlockStage[0]; ////// BROKE
+                        
                     }
-                });
+                    else {
+                        unlockMessageUI.setText("Redo a previous stage to increase your average.").setOrigin(0,0);
+                        unlockMessageUI.node.style.color = "red";
+                        currentAveUI.node.style.color = "yellow";
 
+                        //console.log(
+                        //    "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
+                        //    "to unlock", unlockStage[0], 
+                        //    "and you got", baseScore / foodToNow);
+                    }
+                }
+                
                 // Calc score required up to this point
                 // Add Stage History Sum Here
-    
-                console.log(this.newUnlocked);
-                
-                if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
-                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
 
-                    lowestStage = unlockStage[0];
-                    
-                }
-                else {
-                    console.log(
-                        "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
-                        "to unlock", unlockStage[0], 
-                        "and you got", baseScore / foodToNow);
+                if (this.newUnlocked) {
+                    console.log("New Unlocked this Run", this.newUnlocked); // Display mid run unlocks
                 }
     
             }
             // #endregion
+            
 
 
             ////////// Run Average
@@ -1559,19 +2071,15 @@ class TimeAttackScene extends Phaser.Scene{
             var sumAveFood = sumFood / allFoodLog.length;
 
             //console.log ("sum:", sumFood, "Ave:", sumAveFood);
+             
             this.time.delayedCall(900, function() {
-                var continue_text = '[SPACE TO END GAME]';
-    
-                if (ourUI.lives > 0) {
-                    continue_text = `[GOTO ${lowestStage}]`;
-                }
-                
-                var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
-                continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+
+                // #region Continue Text 
+                //continueTextUI.setVisible(true);
     
     
                 this.tweens.add({
-                    targets: continueText,
+                    targets: continueTextUI,
                     alpha: { from: 0, to: 1 },
                     ease: 'Sine.InOut',
                     duration: 1000,
@@ -1602,7 +2110,7 @@ class TimeAttackScene extends Phaser.Scene{
                     ourUI.lives -= 1; 
 
                     ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
-                    ourGame.scene.restart( { stage: lowestStage } );
+                    ourGame.scene.restart( { stage: playedStages[index][1] } );
 
                     ourTimeAttack.scene.stop();
 
@@ -1787,7 +2295,14 @@ class UIScene extends Phaser.Scene {
                 'text-align': 'right',
             };
 
-            var scoreText = this.add.dom(fruit.x -10, fruit.y - GRID, 'div', scoreStyle);
+            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', {
+                color: 'lightyellow',
+                'font-size': '22px',
+                'font-family': ["Sono", 'sans-serif'],
+                'font-weight': '400',
+                'font-weight': 'bold',
+                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
+            });
             scoreText.setOrigin(0,0);
             
             // Remove score text after a time period.
@@ -1810,7 +2325,7 @@ class UIScene extends Phaser.Scene {
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
             
             if (timeLeft > BOOST_ADD_FLOOR) {
-                ourGame.energyAmount += 10;
+                this.energyAmount += 25;
             }
             
             if (timeLeft > SCORE_FLOOR) {
@@ -2007,9 +2522,11 @@ class UIScene extends Phaser.Scene {
         
             // Has Boost Logic
             if(this.energyAmount > 1){
+                //CREATE BOOST ELECTRICITY HERE
                 this.scene.get('GameScene').moveInterval = SPEEDSPRINT;
             }
             else{
+                //DISSIPATE LIVE ELECTRICITY
                 this.scene.get('GameScene').moveInterval = SPEEDWALK;
             }
             this.mask.setScale(this.energyAmount/100,1);
@@ -2387,6 +2904,12 @@ class InputScene extends Phaser.Scene {
  // #region Animations
 function loadAnimations(scene) {
     scene.anims.create({
+        key: 'snakeOutlineAnim',
+        frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
+        frameRate: 12,
+        repeat: -1
+    })
+    scene.anims.create({
       key: 'atom01idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
       frameRate: 12,
@@ -2480,8 +3003,76 @@ function loadAnimations(scene) {
       frameRate: 8,
       repeat: -1
     })
+    scene.anims.create({
+      key: 'boostTrailX1',
+      frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+      frameRate: 16,
+      repeat: 0
+    })
+    scene.anims.create({
+        key: 'boostTrailX2',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX3',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX4',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX5',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX6',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX7',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX8',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX9',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX0',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
+        frameRate: 16,
+        repeat: 0
+      })
+    scene.anims.create({
+        key: 'boostTrailXdissipate',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 10,11,12,13,14]}),
+        frameRate: 16,
+        repeat: 0
+      })
   }
 // #endregion
+
+// #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
@@ -2508,7 +3099,7 @@ var config = {
 
 };
 
-// Screen Settings
+// #region Screen Settings
 export const SCREEN_WIDTH = config.width;
 export const SCREEN_HEIGHT = config.height; 
 
@@ -2521,6 +3112,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
+// region const Game
 export const game = new Phaser.Game(config);
 
 
