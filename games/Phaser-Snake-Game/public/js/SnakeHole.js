@@ -179,6 +179,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
         this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
+        this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
 
 
         //WRAP BLOCKS:
@@ -302,6 +303,7 @@ class GameScene extends Phaser.Scene {
         // Boost Array
         this.boostOutlines = [];
         this.boostOutlines.length = 1; //this needs to be set to 1 on init or else a lingering outline persists on space-down
+        this.boostOutlinesSmall = [];
         this.boostGhosts = [];
 
         // Sounds
@@ -1216,7 +1218,7 @@ class GameScene extends Phaser.Scene {
                 var boostGhost = this.add.sprite(
                     this.snake.body[this.snake.body.length -1].x, 
                     this.snake.body[this.snake.body.length -1].y, 
-                    'snakeDefault', 3);//setOrigin(0,0).setDepth(15)
+                    'snakeDefault', 3);
                 boostGhost.setOrigin(0,0).setDepth(0);
 
 
@@ -1250,14 +1252,11 @@ class GameScene extends Phaser.Scene {
             else{
                 boosting = false;
             }
-            if (this.boostGhosts.length > 1){
-                this.boostGhosts[this.boostGhosts.length-2].destroy();
-            }
 
             if (boosting){
                 this.snake.body.forEach( part => {
                     var latestOutline = (this.boostOutlines.length - this.snake.body.length);
-                    if(this.boostOutlines.length > this.snake.body.length){
+                    if(this.boostOutlines.length > (this.snake.body.length)){
                         this.boostOutlines[latestOutline].destroy();
                     }
       
@@ -1266,12 +1265,20 @@ class GameScene extends Phaser.Scene {
                     //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
                     var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
                     this.boostOutlines.push(boostOutline)
+                    //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
                     boostOutline.play("snakeOutlineAnim");
+                    //boostOutlineSmall.play("snakeOutlineSmallAnim");
+                if (this.boostGhosts.length > 1){
+                    this.boostGhosts[this.boostGhosts.length-2].destroy();
+                }
+                var boostOutlineSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y).setOrigin(.083333,.083333).setDepth(0);
+                boostOutlineSmall.play("snakeOutlineSmallAnim");
                 })
             }
             else{
                 this.boostOutlines.forEach(boostOutline =>{
                     boostOutline.destroy();
+                    //boostOutlineSmall.destroy();
                 })
                 this.boostGhosts.forEach(boostGhost =>{
                     boostGhost.destroy();
@@ -1284,7 +1291,6 @@ class GameScene extends Phaser.Scene {
                 } 
 
             }
-            
         }
         
         // Boost and Boost Multi Code
@@ -2897,6 +2903,12 @@ function loadAnimations(scene) {
     scene.anims.create({
         key: 'snakeOutlineAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
+        frameRate: 12,
+        repeat: -1
+    })
+    scene.anims.create({
+        key: 'snakeOutlineSmallAnim',
+        frames: scene.anims.generateFrameNumbers('snakeOutlineBoostingSmall',{ frames: [ 0, 1, 2, 3]}),
         frameRate: 12,
         repeat: -1
     })

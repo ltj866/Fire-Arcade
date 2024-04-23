@@ -24,7 +24,6 @@ var Snake = new Phaser.Class({
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
-        
     },
     
     grow: function (scene)
@@ -35,8 +34,12 @@ var Snake = new Phaser.Class({
         // Add a new part at the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
-        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 1);
+        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(9);
+
+        if (this.body.length > 1){
+            this.body[this.body.length -1].setTexture('snakeDefault',[1])
+        }
 
         this.body.push(newPart);
 
