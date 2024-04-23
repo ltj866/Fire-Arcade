@@ -125,18 +125,19 @@ const STAGES_NEXT = {
     'Stage-03a': [['Stage-04', 60]],
     'Stage-03b': [['Stage-04', 60]],
     'Stage-03c': [['Stage-04', 60]],
-    'Stage-04': [['Stage-55', 70]],
-    'Stage-55': [['Stage-06', 75]],
+    'Stage-04': [['Stage-05', 70]],
+    'Stage-05': [['Stage-06', 75]],
     'Stage-06': [['Stage-07', 80]],
-    'Stage-07': [['Stage-88', 80]],
-    'Stage-88': [['Stage-09', 80]],
+    'Stage-07': [['Stage-08', 80]],
+    'Stage-08': [['Stage-09', 80]],
     'Stage-09': [['Stage-10', 80]],
+    'Stage-10': [['Stage-11', 80]],
     'Bonus-Stage-x1': [],
 }
 
 // #region START STAGE
 const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-10';
+const END_STAGE = 'Stage-11';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
