@@ -39,8 +39,8 @@ var Snake = new Phaser.Class({
 
         if (this.body.length > 1){
             this.body[this.body.length -1].setTexture('snakeDefault',[1])
+            
         }
-
         this.body.push(newPart);
 
         

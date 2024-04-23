@@ -1255,15 +1255,16 @@ class GameScene extends Phaser.Scene {
 
             if (boosting){
                 this.snake.body.forEach( part => {
-                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
+                    var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
                     if(this.boostOutlines.length > (this.snake.body.length)){
                         this.boostOutlines[latestOutline].destroy();
                     }
       
                     //console.log("boost length = ",this.boostOutlines.length)
                     //console.log("snake length = ",this.snake.body.length)
+                    console.log(latestOutline)
                     //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
                     this.boostOutlines.push(boostOutline)
                     //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
                     boostOutline.play("snakeOutlineAnim");
@@ -1271,14 +1272,24 @@ class GameScene extends Phaser.Scene {
                 if (this.boostGhosts.length > 1){
                     this.boostGhosts[this.boostGhosts.length-2].destroy();
                 }
-                var boostOutlineSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y).setOrigin(.083333,.083333).setDepth(0);
-                boostOutlineSmall.play("snakeOutlineSmallAnim");
+                })
+                this.snake.body.forEach( part => {
+                    var latestOutlineSmall = (this.boostOutlinesSmall.length - this.snake.body.length);
+                    if(this.boostOutlinesSmall.length > (this.snake.body.length)){
+                        //console.log(this.boostOutlinesSmall.length)
+                        this.boostOutlinesSmall[latestOutlineSmall].destroy();
+                    }
+                    var boostOutlineSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y).setOrigin(.083333,.083333).setDepth(0);
+                    this.boostOutlinesSmall.push(boostOutlineSmall)
+                    boostOutlineSmall.play("snakeOutlineSmallAnim");
                 })
             }
             else{
                 this.boostOutlines.forEach(boostOutline =>{
                     boostOutline.destroy();
-                    //boostOutlineSmall.destroy();
+                })
+                this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
+                    boostOutlineSmall.destroy();
                 })
                 this.boostGhosts.forEach(boostGhost =>{
                     boostGhost.destroy();
