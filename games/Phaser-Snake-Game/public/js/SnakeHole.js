@@ -1975,15 +1975,8 @@ class TimeAttackScene extends Phaser.Scene{
                         }
                     });
 
-                    var unlockStageUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
-    
-                    unlockStageUI.setText(unlockStage[0]).setOrigin(1,0);
-
-                                    // #region Unlock UI
+        
+                    // #region Unlock UI
 
                     var nextStageUI = this.add.dom(GRID * 9, stageY, 'div', {
                         color: 'grey',
@@ -1995,6 +1988,14 @@ class TimeAttackScene extends Phaser.Scene{
                     nextStageUI.setText("Unlock Next Stage").setOrigin(1,0);
 
                     stageY += GRID;
+
+                    var unlockStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+    
+                    unlockStageUI.setText(unlockStage[0]).setOrigin(1,0);
                     
 
                     // Run Stats
