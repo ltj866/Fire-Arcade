@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.04.19.005';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -1960,94 +1960,99 @@ class TimeAttackScene extends Phaser.Scene{
                 
 
                 var lastStage = this.stageHistory.slice(-1);
-                
-                // Unlock Difficulty needs to be in order
-                STAGES_NEXT[lastStage[0].stage].some( _stage => {
 
-                    var _goalSum = _stage[1] * foodToNow;
-                    unlockStage = _stage;
-                    goalSum = unlockStage[1] * foodToNow;
-                    if (this.histSum <= _goalSum && baseScore > _goalSum) {
-                        return true;
+                // Allows levels with no stage afterwards.
+                if (STAGES_NEXT[lastStage[0].stage]) {
+
+                    // Unlock Difficulty needs to be in order
+                    STAGES_NEXT[lastStage[0].stage].some( _stage => {
+
+                        var _goalSum = _stage[1] * foodToNow;
+                        unlockStage = _stage;
+                        goalSum = unlockStage[1] * foodToNow;
+                        if (this.histSum <= _goalSum && baseScore > _goalSum) {
+                            return true;
+                        }
+                    });
+
+                    var unlockStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'white',
+                        'font-size': '28px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+    
+                    unlockStageUI.setText(unlockStage[0]).setOrigin(1,0);
+
+                                    // #region Unlock UI
+
+                    var nextStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                        color: 'grey',
+                        'font-size': '20px',
+                        'font-family': ["Sono", 'sans-serif'],
+                        'text-decoration': 'underline',
+                    });
+
+                    nextStageUI.setText("Unlock Next Stage").setOrigin(1,0);
+
+                    stageY += GRID;
+                    
+
+                    // Run Stats
+                    var requiredAveUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
+                        color: 'white',
+                        'font-size': '14px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+                    
+                    var currentAveUI = this.add.dom( GRID * 10, stageY + GRID + 4, 'div', {
+                        color: 'white',
+                        'font-size': '14px',
+                        'font-family': ["Sono", 'sans-serif'],
+                    });
+
+                    var currentAve = baseScore / foodToNow; 
+                    var requiredAve = goalSum / foodToNow;
+
+
+                    requiredAveUI.setText(`${requiredAve.toFixed(1)}: Required Food Score Average to Unlock  `).setOrigin(0,0);
+                    currentAveUI.setText(`${currentAve.toFixed(1)}: Current Food Score Average`).setOrigin(0,0.5);
+
+                    var unlockMessageUI = this.add.dom( GRID * 10, stageY - 18 , 'div', {
+                        color: 'white',
+                        'font-size': '14px',
+                        'font-family': ["Sono", 'sans-serif'],
+                        'font-style': 'italic',
+                    });
+                    
+                    if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
+                        unlockMessageUI.setText("YOU UNLOCKED A NEW LEVEL!! Try now it out now!").setOrigin(0,0);
+                        unlockMessageUI.node.style.color = "limegreen";
+                        currentAveUI.node.style.color = "limegreen";
+
+                        playedStages.push([unlockStageUI, unlockStage[0]]);
+                        
+                        //console.log(unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
+
+                        //lowestStage = unlockStage[0]; ////// BROKE
+                        
                     }
-                });
+                    else {
+                        unlockMessageUI.setText("Redo a previous stage to increase your average.").setOrigin(0,0);
+                        unlockMessageUI.node.style.color = "red";
+                        currentAveUI.node.style.color = "yellow";
 
+                        //console.log(
+                        //    "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
+                        //    "to unlock", unlockStage[0], 
+                        //    "and you got", baseScore / foodToNow);
+                    }
+                }
+                
                 // Calc score required up to this point
                 // Add Stage History Sum Here
 
                 if (this.newUnlocked) {
                     console.log("New Unlocked this Run", this.newUnlocked); // Display mid run unlocks
-                }
-    
-                var nextStageUI = this.add.dom(GRID * 9, stageY, 'div', {
-                    color: 'grey',
-                    'font-size': '20px',
-                    'font-family': ["Sono", 'sans-serif'],
-                    'text-decoration': 'underline',
-                });
-
-                nextStageUI.setText("Unlock Next Stage").setOrigin(1,0);
-
-                stageY += GRID;
-                
-                // #region Unlock UI
-
-                var unlockStageUI = this.add.dom(GRID * 9, stageY, 'div', {
-                    color: 'white',
-                    'font-size': '28px',
-                    'font-family': ["Sono", 'sans-serif'],
-                });
-
-                unlockStageUI.setText(unlockStage[0]).setOrigin(1,0);
-
-                // Run Stats
-                var requiredAveUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
-                    color: 'white',
-                    'font-size': '14px',
-                    'font-family': ["Sono", 'sans-serif'],
-                });
-                
-                var currentAveUI = this.add.dom( GRID * 10, stageY + GRID + 4, 'div', {
-                    color: 'white',
-                    'font-size': '14px',
-                    'font-family': ["Sono", 'sans-serif'],
-                });
-
-                var currentAve = baseScore / foodToNow; 
-                var requiredAve = goalSum / foodToNow;
-
-
-                requiredAveUI.setText(`${requiredAve.toFixed(1)}: Required Food Score Average to Unlock  `).setOrigin(0,0);
-                currentAveUI.setText(`${currentAve.toFixed(1)}: Current Food Score Average`).setOrigin(0,0.5);
-
-                var unlockMessageUI = this.add.dom( GRID * 10, stageY - 18 , 'div', {
-                    color: 'white',
-                    'font-size': '14px',
-                    'font-family': ["Sono", 'sans-serif'],
-                    'font-style': 'italic',
-                });
-                
-                if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
-                    unlockMessageUI.setText("YOU UNLOCKED A NEW LEVEL!! Try now it out now!").setOrigin(0,0);
-                    unlockMessageUI.node.style.color = "limegreen";
-                    currentAveUI.node.style.color = "limegreen";
-
-                    playedStages.push([unlockStageUI, unlockStage[0]]);
-                    
-                    //console.log(unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
-
-                    //lowestStage = unlockStage[0]; ////// BROKE
-                    
-                }
-                else {
-                    unlockMessageUI.setText("Redo a previous stage to increase your average.").setOrigin(0,0);
-                    unlockMessageUI.node.style.color = "red";
-                    currentAveUI.node.style.color = "yellow";
-
-                    //console.log(
-                    //    "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
-                    //    "to unlock", unlockStage[0], 
-                    //    "and you got", baseScore / foodToNow);
                 }
     
             }
