@@ -62,6 +62,19 @@ var calcBonus = function (scoreInput) {
 }
 
 
+var calcHashInt = function (str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+    }
+    // Return a 32bit base 10 number
+    return (hash >>> 0).toString(10);
+}
+
+var intToBinHash = function (input) {
+    return (input >>> 0).toString(2).padStart(32, '0');
+}
 
 
 
@@ -1055,6 +1068,7 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    // #region Game Update
     update (time, delta) {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
@@ -1362,10 +1376,10 @@ class ScoreScene extends Phaser.Scene
         /////////
 
         // Pre Calculate needed values
-        var stageScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
-        var stageAve = stageScore/ourUI.scoreHistory.length;
+        var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageAve = baseScore/ourUI.scoreHistory.length;
 
-        var speedBonus = calcBonus(stageScore);
+        var speedBonus = calcBonus(baseScore);
 
         var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
         var bestLocal = bestLog.reduce((a,b) => a + b, 0);
@@ -1485,10 +1499,9 @@ class ScoreScene extends Phaser.Scene
         
         
         stageScoreUI.setText(
-            `Base Score: ${stageScore}
+            `Base Score: ${baseScore}
             Speed Bonus: +${speedBonus}
-            Stage Score: ${stageScore+speedBonus}
-            ------------------
+            Stage Score: ${baseScore+speedBonus}
             HighScore: ${bestLocal + bestBonus}
             `
         
@@ -1577,15 +1590,39 @@ class ScoreScene extends Phaser.Scene
         }
         
 
-        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 13, GRID * 7.5, 'div', logScreenStyle);
+        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
         fruitLogUI.setText(
-            `Food Log - ave(${stageAve.toFixed(1)})
+            `Current - ave(${stageAve.toFixed(1)})
             --------------------- 
-            [${bestLog.slice().sort().reverse()}]`
-        ).setOrigin(0,0);  
+            [${ourUI.scoreHistory.slice().sort().reverse()}]`
+        ).setOrigin(1,0);
         
-        //  [${ourUI.scoreHistory.slice().sort().reverse()}]`
-            
+        // #region Stage Hash Code
+
+        
+
+        this.foodLogSeed = ourUI.scoreHistory.slice();
+        this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
+        this.foodLogSeed.push(baseScore+speedBonus * 12);
+
+        // Starts Best as Current Copy
+        this.bestSeed = this.foodLogSeed.slice();
+
+        var foodHash = calcHashInt(this.foodLogSeed.toString());
+        this.bestHashInt = parseInt(foodHash);
+
+        console.log("stage hash", foodHash, intToBinHash(foodHash));
+
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div', {
+            "fontSize":'18px',
+            'font-family': ["Sono", 'sans-serif'],
+            color: 'white',
+            'text-align':'center',
+        });
+        
+        this.hashUI.setText(`${this.foodLogSeed.slice(-1)} - ${foodHash}
+        ${intToBinHash(foodHash)}
+        `).setOrigin(0.5, 0);
 
         //card.setScale(0.7);
 
@@ -1613,10 +1650,6 @@ class ScoreScene extends Phaser.Scene
 
             this.input.keyboard.on('keydown-SPACE', function() {
                     
-                
-
-
-
                 
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
@@ -1727,6 +1760,41 @@ class ScoreScene extends Phaser.Scene
 
             });
         }, [], this);
+    }
+
+    // #region Score - Update
+    update(time) {
+        
+        var scoreCountDown = this.foodLogSeed.slice(-1);
+        if (scoreCountDown > 0) {
+            
+            //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
+
+            //var i = 31;
+
+            for (let index = 189; index > 0 ; index--) {
+                var roll = Phaser.Math.RND.integer();
+                if (roll < this.bestHashInt) {
+                    this.bestHashInt = roll;
+                }
+
+                if (this.foodLogSeed.slice(-1) < 1) {
+                    break;
+                }
+
+                this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
+            }
+
+            this.hashUI.setText(`${this.foodLogSeed.slice(-1)} 
+            ${this.bestHashInt} - ${intToBinHash(this.bestHashInt)} - d${intToBinHash(this.bestHashInt).split('1').sort().pop().length}
+            ${roll} - ${intToBinHash(roll)} 
+            `);
+
+            //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
+
+            
+
+        }
     }
 
     end() {
@@ -2245,7 +2313,7 @@ class UIScene extends Phaser.Scene {
            add: false
        }).setOrigin(0.5,0);
 
-       const keys = [ 'increasing' ];
+       const keys = ['increasing'];
        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
        boostBar.setDepth(50);
        boostBar.play('increasing');
@@ -2365,8 +2433,6 @@ class UIScene extends Phaser.Scene {
                 repeat: 0,
                 yoyo: false
               });
-            
-            
             
             
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
