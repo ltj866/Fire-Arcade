@@ -38,7 +38,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = true;
+const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -1577,7 +1577,7 @@ class ScoreScene extends Phaser.Scene
         }
         
 
-        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2, GRID * 7.5, 'div', logScreenStyle);
+        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 13, GRID * 7.5, 'div', logScreenStyle);
         fruitLogUI.setText(
             `Food Log - ave(${stageAve.toFixed(1)})
             --------------------- 
