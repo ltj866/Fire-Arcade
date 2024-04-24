@@ -82,7 +82,7 @@
          "name":"Portal-X",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":31,
          "x":0,
          "y":0
@@ -125,7 +125,7 @@
          "name":"Portal-1",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":31,
          "x":0,
          "y":0
@@ -167,7 +167,7 @@
          "name":"Portal-2",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":31,
          "x":0,
          "y":0
@@ -209,7 +209,7 @@
          "name":"Portal-3",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":31,
          "x":0,
          "y":0
@@ -251,7 +251,7 @@
          "name":"Portal-4",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":31,
          "x":0,
          "y":0

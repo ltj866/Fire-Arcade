@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.5.04.19.005';
+const GAME_VERSION = 'v0.5.04.19.006';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
@@ -133,12 +133,11 @@ const STAGES_NEXT = {
     'Stage-09': [['Stage-10', 80]],
     'Stage-10': [['Stage-11', 80]],
     'Stage-11': [['Stage-12', 80]],
-    'Stage-13': [['Stage-01', 80]],
     'Bonus-Stage-x1': [],
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-13';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-12';
 
 const UISTYLE = { color: 'lightyellow',
@@ -1470,7 +1469,7 @@ class ScoreScene extends Phaser.Scene
         `EXTRA STAGE STATS - ${ourGame.stage}
         ----------------------
         LENGTH: ${ourUI.length}
-        FOOD LOG AVERAGE: ${stageAve}
+        FOOD LOG AVERAGE: ${stageAve.toFixed(2)}
         
         TOTAL TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
