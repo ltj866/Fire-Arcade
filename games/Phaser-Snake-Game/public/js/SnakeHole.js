@@ -34,10 +34,11 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 
 var comboCounter = 0;
 
-// DEBUG OPTIONS
+// #region DEBUG OPTIONS
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
+const SCORE_SCENE_DEBUG = true;
 
 // Game Objects
 
@@ -136,9 +137,11 @@ const STAGES_NEXT = {
     'Bonus-Stage-x1': [],
 }
 
+
+
 // #region START STAGE
 const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-12';
+var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -263,10 +266,45 @@ class StartScene extends Phaser.Scene {
           });
 
         this.input.keyboard.on('keydown', e => {
-            this.scene.launch('UIScene');
-            this.scene.launch('GameScene');
-            //var ourGameScene = this.scene.get("GameScene");
-            //console.log(e)
+
+            // #region SCORE DEBUG
+            if (SCORE_SCENE_DEBUG) {
+                
+                var ourUI = this.scene.get("UIScene");
+                var ourGame = this.scene.get("GameScene");
+                var ourInput = this.scene.get("InputScene");
+                var ourTimeAttack = this.scene.get("TimeAttackScene");
+            
+
+                ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
+                ourGame.stage = END_STAGE;
+                //END_STAGE = "Stage-01";
+
+                ourUI.score = 12345;
+                ourUI.bonks = 2;
+                ourUI.length = 28;
+                ourUI.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+
+                ourInput.turns = 79;
+                ourInput.cornerTime = 190;
+                ourInput.boostBonusTime = 436;
+                ourInput.boostTime = 400;
+
+                var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
+                var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
+                var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
+
+                ourTimeAttack.stageHistory = [stage01, stage02, stage03];
+                this.scene.start('ScoreScene');
+            }
+            else {
+                this.scene.launch('UIScene');
+                this.scene.launch('GameScene');
+                //var ourGameScene = this.scene.get("GameScene");
+                //console.log(e)
+
+            }
+
             
             this.scene.stop();
         })
@@ -1339,6 +1377,7 @@ class ScoreScene extends Phaser.Scene
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
         //var stageAverage = stageScore();
+        
 
         /////////
 
@@ -1390,6 +1429,8 @@ class ScoreScene extends Phaser.Scene
 
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', {
             "fontSize":'28px',
+            "width": '500px',
+            'text-align': 'center',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '500',
             color: 'yellow',
@@ -1407,6 +1448,8 @@ class ScoreScene extends Phaser.Scene
             "fontSize":'22px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
+            "width": '500px',
+            'text-align': 'center',
             color: 'white',
             //'background-color': "#607d8b",
             padding: "4px 14px",
@@ -1417,11 +1460,14 @@ class ScoreScene extends Phaser.Scene
 
         bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
+        console.log(SCREEN_WIDTH/2);
+
         const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
             "fontSize":'28px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '600',
             color: 'white',
+            "width": '320px',
             'text-align': 'right',
 
         });
@@ -1432,6 +1478,7 @@ class ScoreScene extends Phaser.Scene
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             color: 'white',
+            "width": '320px',
             'text-align': 'right',
 
         });
@@ -1771,6 +1818,7 @@ class TimeAttackScene extends Phaser.Scene{
         // Allows this scene to start at the beginning without displaying anything, but when you restart the scene it plays correctly.
         
 
+        
         if (this.stageHistory) {
             this.inTimeAttack = true;
 
