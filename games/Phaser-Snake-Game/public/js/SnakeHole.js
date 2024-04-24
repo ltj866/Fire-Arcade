@@ -38,7 +38,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
+const SCORE_SCENE_DEBUG = true;
 
 // Game Objects
 
@@ -1441,7 +1441,7 @@ class ScoreScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', {
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25.5, 'div', {
             "fontSize":'28px',
             "width": '500px',
             'text-align': 'center',
@@ -1458,7 +1458,7 @@ class ScoreScene extends Phaser.Scene
         
         currentScoreUI.setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
 
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', {
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*27, 'div', {
             "fontSize":'22px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
@@ -1603,7 +1603,7 @@ class ScoreScene extends Phaser.Scene
 
         this.foodLogSeed = ourUI.scoreHistory.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(baseScore+speedBonus * 12);
+        this.foodLogSeed.push(baseScore+speedBonus);
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -1634,7 +1634,7 @@ class ScoreScene extends Phaser.Scene
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', {"fontSize":'48px'});
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*29,'', {"fontSize":'48px'});
             continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
