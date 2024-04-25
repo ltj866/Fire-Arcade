@@ -38,7 +38,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = true;
+const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -1375,9 +1375,8 @@ class ScoreScene extends Phaser.Scene {
     }
 
     init() {
-        this.rollSpeed = 500;
+        this.rollSpeed = 250;
         this.lastRollTime = 0;
-        this.rollDiff = 1;
     }
 
     preload() {
@@ -1773,8 +1772,6 @@ class ScoreScene extends Phaser.Scene {
     update(time) {
         
         var scoreCountDown = this.foodLogSeed.slice(-1);
-        if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
-        }
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
             
@@ -1791,7 +1788,9 @@ class ScoreScene extends Phaser.Scene {
                 var difficulty = 1;
             }
 
-            for (let index = difficulty * 2; index > 0 ; index--) {
+            // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
+            // Which is a 50% chance.
+            for (let index = (difficulty + 1) * 3; index > 0 ; index--) {
                 var roll = Phaser.Math.RND.integer();
                 if (roll < this.bestHashInt) {
                     this.bestHashInt = roll;
