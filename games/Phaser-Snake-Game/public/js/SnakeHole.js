@@ -38,7 +38,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
+const SCORE_SCENE_DEBUG = true;
 
 // Game Objects
 
@@ -1462,17 +1462,19 @@ class ScoreScene extends Phaser.Scene {
         
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '320px',
+            width: '300px',
             color: 'white',
-            "font-size":'22px',
+            "font-size":'18px',
             'font-weight': 400,
             'text-align': 'right',
-            })).setText(
-                `Base Score: ${baseScore}
-                Speed Bonus: +${speedBonus}
-                Stage Score: ${baseScore+speedBonus}
-                ---------------------
-                HighScore: ${bestLocal + bestBonus}`
+            })).setHTML(
+                `Base Score: ${baseScore}</br>
+                <span style="text-decoration:none;">Speed Bonus: <span style="color:red">+${speedBonus}</span></span></br>
+                <hr/>
+                <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>
+                <span style="display: flex;font-size: 6px;"></br></span> 
+                Stage Highscore</br>
+                ${bestLocal} + <span style="color:red">${bestBonus}</span> = ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
 
         
@@ -1530,17 +1532,17 @@ class ScoreScene extends Phaser.Scene {
         const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
-            })).setText(
-                `BEST STATS - ${ourGame.stage}
-                ----------------------
-                BASE SCORE: ${bestLocal}
-                SPEED BONUS: ${bestBonus}
-                
-                BEST SCORE: ${bestLocal + bestBonus}
+            })).setHTML(
+                `BEST STATS - ${ourGame.stage}</br>
+                <hr></br>
+                BASE SCORE: ${bestLocal}</br>
+                SPEED BONUS: ${bestBonus}</br>
+                </br>
+                BEST SCORE: ${bestLocal + bestBonus}</br>
 
-                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]
-                [${bestLog.slice().sort().reverse()}]
-
+                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
+                [${bestLog.slice().sort().reverse()}]</br>
+                </br>
                 ----------- < ○ ○ ● > -----------`
         ).setOrigin(0,0).setVisible(false);
 
@@ -1781,6 +1783,7 @@ class ScoreScene extends Phaser.Scene {
 
             if (this.bestHashInt) {
                 var leadingZeros = intToBinHash(this.bestHashInt).split('1').reverse().pop()
+                 
                 var difficulty = leadingZeros.length;
             }
             else {
@@ -1806,11 +1809,13 @@ class ScoreScene extends Phaser.Scene {
             // #region HashUI Update
 
             this.rollSpeed = ROLL_SPEED[difficulty];
+            var grouped4 = intToBinHash(this.bestHashInt).replace(/\B(?=(\d{4})+(?!\d))/g, " ")
+            var leadingZeros4Form = grouped4.slice().split('1').reverse().pop();
             //console.log(ROLL_SPEED[difficulty]);
-            this.hashUI.setText(
-                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeros
-                ${leadingZeros}1${intToBinHash(roll).slice(difficulty + 1)}
-                ${intToBinHash(this.bestHashInt).replace(/\B(?=(\d{4})+(?!\d))/g, " ")}`
+            this.hashUI.setHTML(
+                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeds</br>
+                <span style="color:limegreen">${leadingZeros}1</span>${intToBinHash(roll).slice(difficulty + 1)}</br>
+                ${grouped4}</br>`
             );
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -1837,7 +1842,7 @@ const ROLL_SPEED = [
     1,1,1,1,
     1,1,1,1,
     1,1,1,1,
-    1,1,1,1];
+    1,1,1,1,1,1];
 
 console.log("ROLL LENGTH", ROLL_SPEED.length);
 
