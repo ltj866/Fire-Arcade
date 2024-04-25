@@ -3,15 +3,8 @@
  <editorsettings>
   <export target="Stage-07.json" format="json"/>
  </editorsettings>
- <tileset firstgid="1" name="tileSheet" tilewidth="32" tileheight="32" tilecount="0" columns="3">
-  <grid orientation="orthogonal" width="24" height="24"/>
-  <image source="../../../../../../../../../../holde/Desktop/Tiled/tileSheet.png" width="96" height="96"/>
- </tileset>
  <tileset firstgid="1" name="tileSheetx24" tilewidth="24" tileheight="24" tilecount="1024" columns="32">
   <image source="tileSheetx24.png" width="768" height="768"/>
- </tileset>
- <tileset firstgid="1025" name="tileSheet02x24" tilewidth="24" tileheight="24" tilecount="16" columns="4">
-  <image source="tileSheet02x24.png" width="96" height="96"/>
  </tileset>
  <layer id="1" name="Wall" width="31" height="31">
   <data encoding="csv">

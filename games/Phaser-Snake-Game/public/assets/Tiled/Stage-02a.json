@@ -270,25 +270,6 @@
  "tileheight":24,
  "tilesets":[
         {
-         "columns":3,
-         "firstgid":1,
-         "grid":
-            {
-             "height":24,
-             "orientation":"orthogonal",
-             "width":24
-            },
-         "image":"..\/..\/..\/..\/..\/..\/..\/..\/..\/..\/holde\/Desktop\/Tiled\/tileSheet.png",
-         "imageheight":96,
-         "imagewidth":96,
-         "margin":0,
-         "name":"tileSheet",
-         "spacing":0,
-         "tilecount":0,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
          "columns":32,
          "firstgid":1,
          "image":"tileSheetx24.png",
