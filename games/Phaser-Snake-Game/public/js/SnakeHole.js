@@ -73,7 +73,9 @@ var calcHashInt = function (str) {
 }
 
 var intToBinHash = function (input) {
+    // remove the Regex to make it a single string of digits.
     return (input >>> 0).toString(2).padStart(32, '0');
+    //return (input >>> 0).toString(2).padStart(32, '0').replace(/\B(?=(\d{4})+(?!\d))/g, " ");
 }
 
 
@@ -91,6 +93,23 @@ export const DOWN = 3;
 const START_SPRINT = 4;
 const STOP_SPRINT = 5;
 export const STOP = 10;
+
+
+// #region GLOBAL STYLES 
+const STYLE_DEFAULT = {
+    color: 'white',
+    'font-size': '12px',
+    'font-family': ["Sono", 'sans-serif'],
+    'font-weight': '200',
+    'text-align': 'center',
+}
+
+const UISTYLE = { 
+    color: 'lightyellow',
+   'font-size': '16px',
+   'font-weight': '400',
+   'padding': '0px 0px 0px 12px'
+   };
 
 
 
@@ -156,11 +175,6 @@ const STAGES_NEXT = {
 const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
-const UISTYLE = { color: 'lightyellow',
-'font-size': '16px',
-'font-family': ["Sono", 'sans-serif'],
-'font-weight': '400',
-'padding': '0px 0px 0px 12px'};
 
 class StartScene extends Phaser.Scene {
     constructor () {
@@ -982,7 +996,7 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
+        ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
         ourUI.bestScoreUI.setOrigin(0,0);
 
         // Calculate this locally
@@ -1182,7 +1196,7 @@ class GameScene extends Phaser.Scene {
 
         // Only Calculate every move window
 
-        // #region Check move
+        // #region Check Update
 
         //if (this.frameIndex < 9){
         //    this.frameIndex += 1;
@@ -1356,57 +1370,30 @@ class GameScene extends Phaser.Scene {
 }
 
 
-class ScoreScene extends Phaser.Scene
+class ScoreScene extends Phaser.Scene {
 // #region ScoreScene
-{
     constructor () {
         super({key: 'ScoreScene', active: false});
+    }
+
+    init() {
+        this.rollSpeed = 250;
+        this.lastRollTime = 0;
     }
 
     preload() {
     }
 
     create() {
-        
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
-        /////////
-
-        // Pre Calculate needed values
-        var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
-        var stageAve = baseScore/ourUI.scoreHistory.length;
-
-        var speedBonus = calcBonus(baseScore);
-
-        var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
-        var bestLocal = bestLog.reduce((a,b) => a + b, 0);
-        var bestAve = bestLocal/bestLog.length;
-
-
-        var bestBonus = calcBonus(bestLocal);
-
-        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
-
-        //var stageAverage = stageScore();
         
-
-        /////////
-
-
-
-        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
-        this.scoreCardBackground.setOrigin(0,0).setDepth(8);
-
-        
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
-        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
-        
+        // #region
         // Dream walls for Horizontal Wrap
+                
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
@@ -1430,180 +1417,195 @@ class ScoreScene extends Phaser.Scene
             //this.dreamWalls.push(wallShimmerBottom);
         
         }
-        //////////////////////////////////////
+
+        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
+        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+
+        // #endregion
+
+        // Pre Calculate needed values
+        var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
+        var stageAve = baseScore/ourUI.scoreHistory.length;
+
+        var speedBonus = calcBonus(baseScore);
+
+        var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+        var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+        var bestAve = bestLocal/bestLog.length;
+
+
+        var bestBonus = calcBonus(bestLocal);
+
+        var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+
+        //var stageAverage = stageScore();
         
-
-
+        // Stage Background Color
+        this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
+        this.stageBackGround.setOrigin(0,0).setDepth(8);
 
         ///////
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0).setDepth(25);
+
+        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
+            {"fontSize":'48px'}
+        ).setOrigin(0.5,0).setDepth(25);
+
+
+        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            width: '320px',
+            "font-size":'28px',
+            "font-weight": 600,
+            "text-align": 'right',
+        })).setText(ourGame.stage).setOrigin(1,0);
+
+        // #region Main Stats
         
-        //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
-        //card.setOrigin(0,0);
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', {
-            "fontSize":'28px',
-            "width": '500px',
-            'text-align': 'center',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '500',
-            color: 'yellow',
-            //'background-color': "#607d8b",
-            padding: "4px 14px",
-            'border-top-right-radius': '16px',
-            'border-top-left-radius': '16px',
-            
-            //'text-decoration': 'underline'
-        });
-        
-        currentScoreUI.setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
-
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', {
-            "fontSize":'22px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
-            "width": '500px',
-            'text-align': 'center',
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            width: '300px',
             color: 'white',
-            //'background-color': "#607d8b",
-            padding: "4px 14px",
-            //'border-radius': '16px',
-            //'text-decoration': 'underline'
-        });
-
-
-        bestRunUI.setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
-
-        console.log(SCREEN_WIDTH/2);
-
-        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
-            "fontSize":'28px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '600',
-            color: 'white',
-            "width": '320px',
+            "font-size":'18px',
+            'font-weight': 400,
             'text-align': 'right',
-
-        });
-        stageUI.setText(ourGame.stage).setOrigin(1,0);
-
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', {
-            "fontSize":'22px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
-            color: 'white',
-            "width": '320px',
-            'text-align': 'right',
-
-        });
-        
-        
-        stageScoreUI.setText(
-            `Base Score: ${baseScore}
-            Speed Bonus: +${speedBonus}
-            Stage Score: ${baseScore+speedBonus}
-            HighScore: ${bestLocal + bestBonus}
-            `
-        
+            })).setHTML(
+                `Base Score: ${baseScore}</br>
+                <span style="text-decoration:none;">Speed Bonus: <span style="color:red">+${speedBonus}</span></span></br>
+                <hr/>
+                <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>
+                <span style="display: flex;font-size: 6px;"></br></span> 
+                Stage Highscore</br>
+                ${bestLocal} + <span style="color:red">${bestBonus}</span> = ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
 
         
-        const scoreScreenStyle = {
-            width: '270px',
-            //height: '22px',
-            color: 'white',
-            'font-size': '12px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
-            'padding': '12px 0px 12px 12px',
-            //'font-weight': 'bold',
-            'word-wrap': 'break-word',
-            //'border-radius': '24px',
+        // #region Stat Cards
+        var cardY = 6.5;
+        var styleCard = {
+            width: '246px',
+            "max-height": '290px',
             outline: 'solid',
-        }
-        
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 12.5, 'div', scoreScreenStyle);
-        scoreScreen.setOrigin(0,0);
-        
-        scoreScreen.setText(
-        `EXTRA STAGE STATS - ${ourGame.stage}
-        ----------------------
-        LENGTH: ${ourUI.length}
-        FOOD LOG AVERAGE: ${stageAve.toFixed(2)}
-        
-        TOTAL TURNS: ${ourInputScene.turns}
-        CORNER TIME: ${ourInputScene.cornerTime} FRAMES
-        
-        BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
-        BOOST TIME: ${ourInputScene.boostTime} FRAMES
-        
-        BETA: ${GAME_VERSION}
+            //"font-size": '10px',
+            "font-weight": 300,
+            "padding": '12px 12px 6px 12px',
+            "text-align": 'left',
+            "word-wrap": 'break-word'
 
-        BONK RESETS: ${ourUI.bonks}
-        TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
-        `);
-
-        const bestLogScreenStyle = {
-            width: '312px',
-            //height: '22px',
-            color: 'white',
-            'font-size': '14px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '200',
-            'padding': '2px 12px 2px 12px',
-            //'font-weight': 'bold',
-            'word-wrap': 'break-word',
-            //'border-radius': '24px',
-            //outline: 'solid',
-            'text-align':'right',
         }
 
-        const logScreenStyle = {
-            width: '312px',
-            //height: '22px',
-            color: 'white',
-            'font-size': '14px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '200',
-            'padding': '2px 12px 2px 12px',
-            //'font-weight': 'bold',
-            'word-wrap': 'break-word',
-            //'border-radius': '24px',
-            //outline: 'solid',
-            'text-align':'left',
-        }
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            styleCard, {
+            })).setText(
+                `STAGE STATS - ${ourGame.stage}
+                ----------------------
+                LENGTH: ${ourUI.length}
+                ATTEMPTS: xx
+                
+                BETA: ${GAME_VERSION}
+
+                FOOD LOG ........... AVE: [${stageAve.toFixed(2)}]
+                [${ourUI.scoreHistory.slice().sort().reverse()}]
+
+                ----------- < ● ○ ○ > -----------`
+        ).setOrigin(0,0).setVisible(false);
+
+        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            styleCard, {
+
+            })).setText(
+                `EXTRA STAGE STATS - ${ourGame.stage}
+                ----------------------
+                TOTAL TURNS: ${ourInputScene.turns}
+                CORNER TIME: ${ourInputScene.cornerTime} FRAMES
+            
+                BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
+                BOOST TIME: ${ourInputScene.boostTime} FRAMES
+            
+                BETA: ${GAME_VERSION}
+
+                BONK RESETS: ${ourUI.bonks}
+                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
+                ----------- < ○ ● ○ > -----------`
+        ).setOrigin(0,0).setVisible(false);
+
 
         
+        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            styleCard, {
+
+            })).setHTML(
+                `BEST STATS - ${ourGame.stage}</br>
+                <hr></br>
+                BASE SCORE: ${bestLocal}</br>
+                SPEED BONUS: ${bestBonus}</br>
+                </br>
+                BEST SCORE: ${bestLocal + bestBonus}</br>
+
+                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
+                [${bestLog.slice().sort().reverse()}]</br>
+                </br>
+                ----------- < ○ ○ ● > -----------`
+        ).setOrigin(0,0).setVisible(false);
+
+        var sIndex = 1 // Default Card
+        var statsCards = [stageStats, extraStats, bestStats];
+
+        statsCards[sIndex].setVisible(true);
+        var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
+        arrowsE.angle = 90;
+        arrowsE.play('idle');
         
-        
+
+        this.input.keyboard.on('keydown-RIGHT', function() {
+            statsCards[sIndex].setVisible(false);
+            sIndex = Phaser.Math.Wrap(sIndex + 1, -1, statsCards.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+            statsCards[sIndex].setVisible(true);
+        }, [], this);
+
+        this.input.keyboard.on('keydown-LEFT', function() {
+            statsCards[sIndex].setVisible(false);
+            sIndex = Phaser.Math.Wrap(sIndex - 1, 0, statsCards.length); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+            statsCards[sIndex].setVisible(true);   
+        }, [], this);
+
+        // #endregion
+
+
 
         if (bestLog) {
-            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID*.5, GRID * 14.5 + 4, 'div', bestLogScreenStyle);
-            bestLogUI.setText(
-                `Base ${bestLocal} + Speed Bonus ${bestBonus}
+            /*
+            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID*.5, GRID * 14.5 + 4, 'div', Object.assign({}, STYLE_DEFAULT, 
+                logScreenStyle, {
+                "text-align": 'right',
+                })).setText(
+                    `Base ${bestLocal} + Speed Bonus ${bestBonus}
 
-                Best Food Log - ave(${bestAve.toFixed(2)})
-                ------------------------
-                [${bestLog.slice().sort().reverse()}] 
-                `
-            ).setOrigin(1,0);    
+                    Best Food Log - ave(${bestAve.toFixed(2)})
+                    ------------------------
+                    [${bestLog.slice().sort().reverse()}] 
+                    `
+            ).setOrigin(1,0);    */
         }
         
 
-        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 13, 'div', logScreenStyle);
-        fruitLogUI.setText(
-            `Current - ave(${stageAve.toFixed(1)})
-            --------------------- 
-            [${ourUI.scoreHistory.slice().sort().reverse()}]`
-        ).setOrigin(1,0);
+        /*
+        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 13, GRID * 13, 'div', Object.assign({}, STYLE_DEFAULT, 
+            logScreenStyle, {
+            "text-align":'left',
+            })).setText(
+                `Current - ave(${stageAve.toFixed(1)})
+                --------------------- 
+                [${ourUI.scoreHistory.slice().sort().reverse()}]`
+        ).setOrigin(0,0); */
         
-        // #region Stage Hash Code
 
-        
-
+        // #region Hash Display Code
         this.foodLogSeed = ourUI.scoreHistory.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(baseScore+speedBonus * 12);
+        this.foodLogSeed.push(baseScore+speedBonus);
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -1611,20 +1613,28 @@ class ScoreScene extends Phaser.Scene
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        console.log("stage hash", foodHash, intToBinHash(foodHash));
-
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div', {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
-            'font-family': ["Sono", 'sans-serif'],
-            color: 'white',
-            'text-align':'center',
-        });
-        
-        this.hashUI.setText(`${this.foodLogSeed.slice(-1)} - ${foodHash}
-        ${intToBinHash(foodHash)}
-        `).setOrigin(0.5, 0);
+            })).setOrigin(0.5, 0);
 
-        //card.setScale(0.7);
+        // #region Help Card
+        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID + 10, 'howToCard').setDepth(10);
+        card.setOrigin(0.5,0);
+        card.displayHeight = 120;
+
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*24, 'div', Object.assign({}, STYLE_DEFAULT, {
+            width: '500px',
+            color: 'yellow',
+            "font-size":'28px',
+            'font-weight': 500,
+        })).setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
+
+
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            width: '500px',
+            'font-size':'22px',
+            'font-weight': 400,
+        })).setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -1634,8 +1644,9 @@ class ScoreScene extends Phaser.Scene
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', {"fontSize":'48px'});
-            continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', 
+                {"fontSize":'48px'}
+            ).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
             this.tweens.add({
@@ -1648,8 +1659,7 @@ class ScoreScene extends Phaser.Scene
               });
             
 
-            this.input.keyboard.on('keydown-SPACE', function() {
-                    
+            this.input.keyboard.on('keydown-SPACE', function() {      
                 
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
@@ -1766,13 +1776,26 @@ class ScoreScene extends Phaser.Scene
     update(time) {
         
         var scoreCountDown = this.foodLogSeed.slice(-1);
-        if (scoreCountDown > 0) {
+        if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
+            this.lastRollTime = time;
             
             //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
 
             //var i = 31;
 
-            for (let index = 189; index > 0 ; index--) {
+            if (this.bestHashInt) {
+                var leadingZeros = intToBinHash(this.bestHashInt).split('1').reverse().pop()
+                 
+                var difficulty = leadingZeros.length;
+            }
+            else {
+                var leadingZeros = "";
+                var difficulty = 1;
+            }
+
+            // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
+            // Which is a 50% chance.
+            for (let index = (difficulty + 1) * 3; index > 0 ; index--) {
                 var roll = Phaser.Math.RND.integer();
                 if (roll < this.bestHashInt) {
                     this.bestHashInt = roll;
@@ -1785,10 +1808,17 @@ class ScoreScene extends Phaser.Scene
                 this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
             }
 
-            this.hashUI.setText(`${this.foodLogSeed.slice(-1)} 
-            ${this.bestHashInt} - ${intToBinHash(this.bestHashInt)} - d${intToBinHash(this.bestHashInt).split('1').sort().pop().length}
-            ${roll} - ${intToBinHash(roll)} 
-            `);
+            // #region HashUI Update
+
+            this.rollSpeed = ROLL_SPEED[difficulty];
+            var grouped4 = intToBinHash(this.bestHashInt).replace(/\B(?=(\d{4})+(?!\d))/g, " ")
+            var leadingZeros4Form = grouped4.slice().split('1').reverse().pop();
+            //console.log(ROLL_SPEED[difficulty]);
+            this.hashUI.setHTML(
+                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeds</br>
+                <span style="color:limegreen">${leadingZeros}1</span>${intToBinHash(roll).slice(difficulty + 1)}</br>
+                ${grouped4}</br>`
+            );
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
 
@@ -1803,6 +1833,20 @@ class ScoreScene extends Phaser.Scene
 
 }
 
+const ROLL_SPEED = [
+    100,100,
+    100,100,
+    50,50,
+    25,25,
+    20,20,
+    10,10,
+    5,5,
+    1,1,1,1,
+    1,1,1,1,
+    1,1,1,1,
+    1,1,1,1,1,1];
+
+console.log("ROLL LENGTH", ROLL_SPEED.length);
 
 
 // #region Stage Data
@@ -1875,8 +1919,6 @@ class TimeAttackScene extends Phaser.Scene{
         var index = 0;
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
-
-        
 
         
         var _i = 0;
@@ -2029,12 +2071,6 @@ class TimeAttackScene extends Phaser.Scene{
 
                 continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }, [], this);
-
-            
-            
-        
-            
-
 
             ///////// Run Score
 
@@ -2298,6 +2334,7 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
+
        // UI Icons
        this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
        this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
@@ -2325,13 +2362,13 @@ class UIScene extends Phaser.Scene {
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
         //stageUUID = this.cache.json.get(`${this.stage}-json`);
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', {
-            color: 'white',
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
             'font-size': '10px',
-            'font-family': ["Sono", 'sans-serif'],
-        }).setOrigin(1,1);
+            })).setText(
+                `snakehole.${GAME_VERSION}`
+        ).setOrigin(1,1);
       
-        gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
+        //gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
 
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
@@ -2339,17 +2376,17 @@ class UIScene extends Phaser.Scene {
         
         
         // Score Text
-        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UISTYLE);
-        this.scoreUI.setText(`Stage: 0`).setOrigin(0,1);
+        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`Stage: 0`).setOrigin(0,1);
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UISTYLE);
-        this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
+        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', UISTYLE);
+        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
         
         
         var length = `${this.length}`;
@@ -2373,15 +2410,17 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', {
+        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: 'white',
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
             padding: '1px 5px',
             'border-radius': '4px',
             outline: 'solid'
-        }).setOrigin(1,0);
-        this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+            })).setText(
+                this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        ).setOrigin(1,0);
+        
 
         
         if (DEBUG) {
@@ -2396,29 +2435,13 @@ class UIScene extends Phaser.Scene {
         //  Event: addScore
         ourGame.events.on('addScore', function (fruit) {
 
-            const scoreStyle = {
-                //width: '220px',
-                //height: '22px',
-                color: 'lightyellow',
-                'font-size': '13px',
-                'font-family': ["Sono", 'sans-serif'],
-                'font-weight': '400',
-                'padding': '2px 9px 2px 9px',
-                'font-weight': 'bold',
-                //'border-radius': '24px',
-                //outline: 'solid',
-                'text-align': 'right',
-            };
-
-            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', {
-                color: 'lightyellow',
+            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                color: 'limegreen',
                 'font-size': '22px',
-                'font-family': ["Sono", 'sans-serif'],
                 'font-weight': '400',
                 'font-weight': 'bold',
                 'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
-            });
-            scoreText.setOrigin(0,0);
+            })).setOrigin(0,0);
             
             // Remove score text after a time period.
             this.time.delayedCall(1000, event => {
