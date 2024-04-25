@@ -2436,7 +2436,7 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('addScore', function (fruit) {
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
-                color: 'lightgreen',
+                color: 'limegreen',
                 'font-size': '22px',
                 'font-weight': '400',
                 'font-weight': 'bold',
