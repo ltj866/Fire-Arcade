@@ -1488,7 +1488,7 @@ class ScoreScene extends Phaser.Scene
         var styleCard = {
             width: '246px',
             "max-height": '290px',
-            outline: 'dashed',
+            outline: 'solid',
             //"font-size": '10px',
             "font-weight": 300,
             "padding": '12px 12px 6px 12px',
