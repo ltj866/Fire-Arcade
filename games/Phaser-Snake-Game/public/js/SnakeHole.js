@@ -1441,7 +1441,7 @@ class ScoreScene extends Phaser.Scene
         ///////
 
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
-            {"font-size":'48px'}
+            {"fontSize":'48px'}
         ).setOrigin(0.5,0).setDepth(25);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
@@ -1481,23 +1481,47 @@ class ScoreScene extends Phaser.Scene
                 `Base Score: ${baseScore}
                 Speed Bonus: +${speedBonus}
                 Stage Score: ${baseScore+speedBonus}
+                ---------------------
                 HighScore: ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
-        
 
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
-            width: '270px',
-            outline: 'solid',
-            "font-weight": '400',
-            "padding": '12px 0px 12px 12px',
+        var styleCard = {
+            width: '246px',
+            "max-height": '290px',
+            outline: 'dashed',
+            //"font-size": '10px',
+            "font-weight": 300,
+            "padding": '12px 12px 6px 12px',
             "text-align": 'left',
             "word-wrap": 'break-word'
+
+        }
+
+        // #region Stat Cards
+        var cardY = 6.5;
+
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            styleCard, {
+            })).setText(
+                `STAGE STATS - ${ourGame.stage}
+                ----------------------
+                LENGTH: ${ourUI.length}
+                ATTEMPTS: xx
+                
+                BETA: ${GAME_VERSION}
+
+                FOOD LOG ........... AVE: [${stageAve.toFixed(2)}]
+                [${ourUI.scoreHistory.slice().sort().reverse()}]
+
+                ----------- < ● ○ ○ > -----------`
+        ).setOrigin(0,0).setVisible(false);
+
+        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            styleCard, {
+
             })).setText(
                 `EXTRA STAGE STATS - ${ourGame.stage}
                 ----------------------
-                LENGTH: ${ourUI.length}
-                FOOD LOG AVERAGE: ${stageAve.toFixed(2)}
-            
                 TOTAL TURNS: ${ourInputScene.turns}
                 CORNER TIME: ${ourInputScene.cornerTime} FRAMES
             
@@ -1507,19 +1531,54 @@ class ScoreScene extends Phaser.Scene
                 BETA: ${GAME_VERSION}
 
                 BONK RESETS: ${ourUI.bonks}
-                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds`
-        ).setOrigin(0,0);
+                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
+                ----------- < ○ ● ○ > -----------`
+        ).setOrigin(0,0).setVisible(false);
 
-        const logScreenStyle = {
-            width: '312px',
-            padding: '2px 12px 2px 12px',
-            'font-size': '14px',
-            'text-align':'right',
-            'word-wrap': 'break-word',
-        }
+
+        
+        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            styleCard, {
+
+            })).setText(
+                `BEST STATS - ${ourGame.stage}
+                ----------------------
+                BASE SCORE: ${bestLocal}
+                SPEED BONUS: ${bestBonus}
+                
+                BEST SCORE: ${bestLocal + bestBonus}
+
+                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]
+                [${bestLog.slice().sort().reverse()}]
+
+                ----------- < ○ ○ ● > -----------`
+        ).setOrigin(0,0).setVisible(false);
+
+        var sIndex = 1 // Default Card
+        var statsCards = [stageStats, extraStats, bestStats];
+
+        statsCards[sIndex].setVisible(true);
+
+        this.input.keyboard.on('keydown-RIGHT', function() {
+            statsCards[sIndex].setVisible(false);
+            sIndex = Phaser.Math.Wrap(sIndex + 1, -1, statsCards.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+            statsCards[sIndex].setVisible(true);
+        }, [], this);
+
+        this.input.keyboard.on('keydown-LEFT', function() {
+            statsCards[sIndex].setVisible(false);
+            sIndex = Phaser.Math.Wrap(sIndex - 1, 0, statsCards.length); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+            statsCards[sIndex].setVisible(true);   
+        }, [], this);
+
+        // #endregion
+
 
 
         if (bestLog) {
+            /*
             var bestLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID*.5, GRID * 14.5 + 4, 'div', Object.assign({}, STYLE_DEFAULT, 
                 logScreenStyle, {
                 "text-align": 'right',
@@ -1530,10 +1589,11 @@ class ScoreScene extends Phaser.Scene
                     ------------------------
                     [${bestLog.slice().sort().reverse()}] 
                     `
-            ).setOrigin(1,0);    
+            ).setOrigin(1,0);    */
         }
         
 
+        /*
         var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 13, GRID * 13, 'div', Object.assign({}, STYLE_DEFAULT, 
             logScreenStyle, {
             "text-align":'left',
@@ -1541,7 +1601,7 @@ class ScoreScene extends Phaser.Scene
                 `Current - ave(${stageAve.toFixed(1)})
                 --------------------- 
                 [${ourUI.scoreHistory.slice().sort().reverse()}]`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0); */
         
 
         // #region Stage Hash Code
