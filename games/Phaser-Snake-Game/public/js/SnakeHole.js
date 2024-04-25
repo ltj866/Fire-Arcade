@@ -38,7 +38,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = true;
+const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -95,7 +95,7 @@ const STOP_SPRINT = 5;
 export const STOP = 10;
 
 
-// #region STYLE DEFAULT
+// #region GLOBAL STYLES 
 const STYLE_DEFAULT = {
     color: 'white',
     'font-size': '12px',
@@ -103,6 +103,13 @@ const STYLE_DEFAULT = {
     'font-weight': '200',
     'text-align': 'center',
 }
+
+const UISTYLE = { 
+    color: 'lightyellow',
+   'font-size': '16px',
+   'font-weight': '400',
+   'padding': '0px 0px 0px 12px'
+   };
 
 
 
@@ -168,11 +175,6 @@ const STAGES_NEXT = {
 const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
-const UISTYLE = { color: 'lightyellow',
-'font-size': '12px',
-'font-family': ["Sono", 'sans-serif'],
-'font-weight': '400',
-'padding': '0px 0px 0px 12px'};
 
 class StartScene extends Phaser.Scene {
     constructor () {
@@ -994,7 +996,7 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', UISTYLE);
+        ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
         ourUI.bestScoreUI.setOrigin(0,0);
 
         // Calculate this locally
@@ -2332,6 +2334,7 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
+
        // UI Icons
        this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
        this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
@@ -2359,13 +2362,13 @@ class UIScene extends Phaser.Scene {
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
         //stageUUID = this.cache.json.get(`${this.stage}-json`);
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', {
-            color: 'white',
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
             'font-size': '10px',
-            'font-family': ["Sono", 'sans-serif'],
-        }).setOrigin(1,1);
+            })).setText(
+                `snakehole.${GAME_VERSION}`
+        ).setOrigin(1,1);
       
-        gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
+        //gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
 
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
@@ -2373,17 +2376,17 @@ class UIScene extends Phaser.Scene {
         
         
         // Score Text
-        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UISTYLE);
-        this.scoreUI.setText(`Stage: 0`).setOrigin(0,1);
+        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`Stage: 0`).setOrigin(0,1);
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UISTYLE);
-        this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
+        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', UISTYLE);
+        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
         
         
         var length = `${this.length}`;
@@ -2407,15 +2410,17 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', {
+        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: 'white',
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
             padding: '1px 5px',
             'border-radius': '4px',
             outline: 'solid'
-        }).setOrigin(1,0);
-        this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+            })).setText(
+                this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        ).setOrigin(1,0);
+        
 
         
         if (DEBUG) {
@@ -2430,29 +2435,13 @@ class UIScene extends Phaser.Scene {
         //  Event: addScore
         ourGame.events.on('addScore', function (fruit) {
 
-            const scoreStyle = {
-                //width: '220px',
-                //height: '22px',
-                color: 'lightyellow',
-                'font-size': '13px',
-                'font-family': ["Sono", 'sans-serif'],
-                'font-weight': '400',
-                'padding': '2px 9px 2px 9px',
-                'font-weight': 'bold',
-                //'border-radius': '24px',
-                //outline: 'solid',
-                'text-align': 'right',
-            };
-
-            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', {
-                color: 'lightyellow',
+            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                color: 'lightgreen',
                 'font-size': '22px',
-                'font-family': ["Sono", 'sans-serif'],
                 'font-weight': '400',
                 'font-weight': 'bold',
                 'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
-            });
-            scoreText.setOrigin(0,0);
+            })).setOrigin(0,0);
             
             // Remove score text after a time period.
             this.time.delayedCall(1000, event => {
