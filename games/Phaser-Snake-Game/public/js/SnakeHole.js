@@ -1192,7 +1192,7 @@ class GameScene extends Phaser.Scene {
 
         // Only Calculate every move window
 
-        // #region Check move
+        // #region Check Update
 
         //if (this.frameIndex < 9){
         //    this.frameIndex += 1;
@@ -1366,18 +1366,22 @@ class GameScene extends Phaser.Scene {
 }
 
 
-class ScoreScene extends Phaser.Scene
+class ScoreScene extends Phaser.Scene {
 // #region ScoreScene
-{
     constructor () {
         super({key: 'ScoreScene', active: false});
+    }
+
+    init() {
+        this.rollSpeed = 500;
+        this.lastRollTime = 0;
+        this.rollDiff = 1;
     }
 
     preload() {
     }
 
     create() {
-        
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
@@ -1444,9 +1448,11 @@ class ScoreScene extends Phaser.Scene
             {"fontSize":'48px'}
         ).setOrigin(0.5,0).setDepth(25);
         
-        //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
-        //card.setOrigin(0,0);
-
+        var card = this.add.image(SCREEN_WIDTH/2, 22*GRID, 'howToCard').setDepth(10);
+        card.setOrigin(0.5,0);
+        card.displayHeight = 120;
+        
+    
 
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*26.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
@@ -1469,6 +1475,8 @@ class ScoreScene extends Phaser.Scene
             "font-weight": 600,
             "text-align": 'right',
         })).setText(ourGame.stage).setOrigin(1,0);
+
+        // #region Main Stats
         
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1485,6 +1493,9 @@ class ScoreScene extends Phaser.Scene
                 HighScore: ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
 
+        
+        // #region Stat Cards
+        var cardY = 6.5;
         var styleCard = {
             width: '246px',
             "max-height": '290px',
@@ -1496,9 +1507,6 @@ class ScoreScene extends Phaser.Scene
             "word-wrap": 'break-word'
 
         }
-
-        // #region Stat Cards
-        var cardY = 6.5;
 
         const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
@@ -1558,6 +1566,10 @@ class ScoreScene extends Phaser.Scene
         var statsCards = [stageStats, extraStats, bestStats];
 
         statsCards[sIndex].setVisible(true);
+        var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
+        arrowsE.angle = 90;
+        arrowsE.play('idle');
+        
 
         this.input.keyboard.on('keydown-RIGHT', function() {
             statsCards[sIndex].setVisible(false);
@@ -1604,7 +1616,7 @@ class ScoreScene extends Phaser.Scene
         ).setOrigin(0,0); */
         
 
-        // #region Stage Hash Code
+        // #region Hash Display Code
         this.foodLogSeed = ourUI.scoreHistory.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
         this.foodLogSeed.push(baseScore+speedBonus);
@@ -1615,7 +1627,7 @@ class ScoreScene extends Phaser.Scene
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
             })).setText(
                 `${this.foodLogSeed.slice(-1)} - ${foodHash}
@@ -1765,13 +1777,23 @@ class ScoreScene extends Phaser.Scene
     update(time) {
         
         var scoreCountDown = this.foodLogSeed.slice(-1);
-        if (scoreCountDown > 0) {
+        if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
+        }
+        if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
+            this.lastRollTime = time;
             
             //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
 
             //var i = 31;
 
-            for (let index = 189; index > 0 ; index--) {
+            if (this.bestHashInt) {
+                var difficulty = intToBinHash(this.bestHashInt).split('1').reverse().pop().length;
+            }
+            else {
+                var difficulty = 1;
+            }
+
+            for (let index = difficulty * 2; index > 0 ; index--) {
                 var roll = Phaser.Math.RND.integer();
                 if (roll < this.bestHashInt) {
                     this.bestHashInt = roll;
@@ -1784,9 +1806,14 @@ class ScoreScene extends Phaser.Scene
                 this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
             }
 
-            this.hashUI.setText(`${this.foodLogSeed.slice(-1)} 
-            ${this.bestHashInt} - ${intToBinHash(this.bestHashInt)} - d${intToBinHash(this.bestHashInt).split('1').sort().pop().length}
-            ${roll} - ${intToBinHash(roll)} 
+            // #region Hash Update
+
+            this.rollSpeed = ROLL_SPEED[difficulty];
+            //console.log(ROLL_SPEED[difficulty]);
+            this.hashUI.setText(`
+            Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeros
+            ${intToBinHash(this.bestHashInt)} 
+            ${intToBinHash(roll)} 
             `);
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -1802,6 +1829,20 @@ class ScoreScene extends Phaser.Scene
 
 }
 
+const ROLL_SPEED = [
+    100,100,
+    100,100,
+    50,50,
+    25,25,
+    20,20,
+    10,10,
+    5,5,
+    1,1,1,1,
+    1,1,1,1,
+    1,1,1,1,
+    1,1,1,1];
+
+console.log("ROLL LENGTH", ROLL_SPEED.length);
 
 
 // #region Stage Data
@@ -1874,8 +1915,6 @@ class TimeAttackScene extends Phaser.Scene{
         var index = 0;
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
-
-        
 
         
         var _i = 0;
