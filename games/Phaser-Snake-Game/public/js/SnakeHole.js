@@ -73,7 +73,9 @@ var calcHashInt = function (str) {
 }
 
 var intToBinHash = function (input) {
+    // remove the Regex to make it a single string of digits.
     return (input >>> 0).toString(2).padStart(32, '0');
+    //return (input >>> 0).toString(2).padStart(32, '0').replace(/\B(?=(\d{4})+(?!\d))/g, " ");
 }
 
 
@@ -1439,34 +1441,15 @@ class ScoreScene extends Phaser.Scene {
 
         //var stageAverage = stageScore();
         
-        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
-        this.scoreCardBackground.setOrigin(0,0).setDepth(8);
+        // Stage Background Color
+        this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
+        this.stageBackGround.setOrigin(0,0).setDepth(8);
 
         ///////
 
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
             {"fontSize":'48px'}
         ).setOrigin(0.5,0).setDepth(25);
-        
-        var card = this.add.image(SCREEN_WIDTH/2, 22*GRID, 'howToCard').setDepth(10);
-        card.setOrigin(0.5,0);
-        card.displayHeight = 120;
-        
-    
-
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*26.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '500px',
-            color: 'yellow',
-            "font-size":'28px',
-            'font-weight': 500,
-        })).setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
-
-
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*28, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '500px',
-            'font-size':'22px',
-            'font-weight': 400,
-        })).setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
 
         const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1629,12 +1612,26 @@ class ScoreScene extends Phaser.Scene {
 
         this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
-            })).setText(
-                `${this.foodLogSeed.slice(-1)} - ${foodHash}
-                ${intToBinHash(foodHash)}`
-        ).setOrigin(0.5, 0);
+            })).setOrigin(0.5, 0);
 
-        //card.setScale(0.7);
+        // #region Help Card
+        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID + 10, 'howToCard').setDepth(10);
+        card.setOrigin(0.5,0);
+        card.displayHeight = 120;
+
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*24, 'div', Object.assign({}, STYLE_DEFAULT, {
+            width: '500px',
+            color: 'yellow',
+            "font-size":'28px',
+            'font-weight': 500,
+        })).setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
+
+
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            width: '500px',
+            'font-size':'22px',
+            'font-weight': 400,
+        })).setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -1644,7 +1641,7 @@ class ScoreScene extends Phaser.Scene {
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*29,'', 
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', 
                 {"fontSize":'48px'}
             ).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
@@ -1659,8 +1656,7 @@ class ScoreScene extends Phaser.Scene {
               });
             
 
-            this.input.keyboard.on('keydown-SPACE', function() {
-                    
+            this.input.keyboard.on('keydown-SPACE', function() {      
                 
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
@@ -1787,9 +1783,11 @@ class ScoreScene extends Phaser.Scene {
             //var i = 31;
 
             if (this.bestHashInt) {
-                var difficulty = intToBinHash(this.bestHashInt).split('1').reverse().pop().length;
+                var leadingZeros = intToBinHash(this.bestHashInt).split('1').reverse().pop()
+                var difficulty = leadingZeros.length;
             }
             else {
+                var leadingZeros = "";
                 var difficulty = 1;
             }
 
@@ -1806,15 +1804,15 @@ class ScoreScene extends Phaser.Scene {
                 this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
             }
 
-            // #region Hash Update
+            // #region HashUI Update
 
             this.rollSpeed = ROLL_SPEED[difficulty];
             //console.log(ROLL_SPEED[difficulty]);
-            this.hashUI.setText(`
-            Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeros
-            ${intToBinHash(this.bestHashInt)} 
-            ${intToBinHash(roll)} 
-            `);
+            this.hashUI.setText(
+                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeros
+                ${leadingZeros}1${intToBinHash(roll).slice(difficulty + 1)}
+                ${intToBinHash(this.bestHashInt).replace(/\B(?=(\d{4})+(?!\d))/g, " ")}`
+            );
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
 
@@ -2067,12 +2065,6 @@ class TimeAttackScene extends Phaser.Scene{
 
                 continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }, [], this);
-
-            
-            
-        
-            
-
 
             ///////// Run Score
 
