@@ -1993,7 +1993,7 @@ class TimeAttackScene extends Phaser.Scene{
         this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setHTML(
-                `SUM OF BEST : <span style="color:${COLOR_SCORE}">${commaNum(this.sumOfBest)}</span>`
+                `SUM OF BEST : <span style="color:goldenrod">${commaNum(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
         this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -2673,7 +2673,7 @@ class UIScene extends Phaser.Scene {
                 
                 localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
                 calcSumOfBest(ourTimeAttack);
-                ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:${COLOR_SCORE}">${commaNum(ourTimeAttack.sumOfBest)}`);
+                ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaNum(ourTimeAttack.sumOfBest)}`);
                 ourTimeAttack.stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
             }
 
