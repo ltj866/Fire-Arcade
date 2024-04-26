@@ -82,7 +82,7 @@ var calcSumOfBest = function(scene) {
 }
 
 var commaNum = function(int) {
-    return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
 var calcHashInt = function (str) {
@@ -1478,6 +1478,8 @@ class ScoreScene extends Phaser.Scene {
 
         ///////
 
+        
+
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
             {"fontSize":'48px'}
         ).setOrigin(0.5,0).setDepth(25);
@@ -1508,6 +1510,9 @@ class ScoreScene extends Phaser.Scene {
                 Stage Highscore</br>
                 ${bestLocal}<span style="color:${COLOR_FOCUS}"> + ${bestBonus}</span> = ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
+
+        // Put Letter Rank Code Here.
+        var medianScore = 10000;
 
         
         // #region Stat Cards
