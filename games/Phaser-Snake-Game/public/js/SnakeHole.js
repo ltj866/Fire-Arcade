@@ -186,6 +186,7 @@ class StartScene extends Phaser.Scene {
 
     preload() {
         this.load.image('howToCard', 'assets/howToCardNew.png');
+        this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
 
         this.load.image('bg01', 'assets/sprites/background01.png');
 
@@ -1474,12 +1475,12 @@ class ScoreScene extends Phaser.Scene {
             'text-align': 'right',
             })).setHTML(
                 `Base Score: ${baseScore}</br>
-                <span style="text-decoration:none;">Speed Bonus: <span style="color:${COLOR_FOCUS}">+${speedBonus}</span></span></br>
+                <span style="text-decoration:none;">Speed Bonus: <span style="color:${COLOR_FOCUS}">+ ${speedBonus}</span></span></br>
                 <hr/>
                 <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>
                 <span style="display: flex;font-size: 6px;"></br></span> 
                 Stage Highscore</br>
-                ${bestLocal} + <span style="color:${COLOR_FOCUS}">${bestBonus}</span> = ${bestLocal + bestBonus}`
+                ${bestLocal}<span style="color:${COLOR_FOCUS}"> + ${bestBonus}</span> = ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
 
         
@@ -1621,8 +1622,8 @@ class ScoreScene extends Phaser.Scene {
             })).setOrigin(0.5, 0);
 
         // #region Help Card
-        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID + 10, 'howToCard').setDepth(10);
-        card.setOrigin(0.5,0);
+        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID + 10, 'helpCard02').setDepth(10);
+        card.setOrigin(0.5,0); 
         card.displayHeight = 108;
 
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*24, 'div', Object.assign({}, STYLE_DEFAULT, {

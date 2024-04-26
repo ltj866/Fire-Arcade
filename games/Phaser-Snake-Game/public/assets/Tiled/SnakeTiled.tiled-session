@@ -61,8 +61,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 371.75,
-                "y": 372
+                "x": 367.25,
+                "y": 367
             }
         },
         "Stage-01.json#tileSheet": {
@@ -335,8 +335,8 @@
             "scale": 1.0559811827956989,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 372.63921593584934,
-                "y": 372.1657226500351
+                "x": 368.85126964933494,
+                "y": 360.8018837904919
             }
         },
         "Stage-10.json#tileSheet": {
