@@ -1464,7 +1464,7 @@ class ScoreScene extends Phaser.Scene {
         
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '300px',
+            width: '260px',
             color: 'white',
             "font-size":'18px',
             'font-weight': 400,
@@ -1620,7 +1620,7 @@ class ScoreScene extends Phaser.Scene {
         // #region Help Card
         var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID + 10, 'howToCard').setDepth(10);
         card.setOrigin(0.5,0);
-        card.displayHeight = 120;
+        card.displayHeight = 108;
 
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*24, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
@@ -1795,7 +1795,7 @@ class ScoreScene extends Phaser.Scene {
 
             // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
             // Which is a 50% chance.
-            for (let index = (difficulty + 1) * 3; index > 0 ; index--) {
+            for (let index = (difficulty + 1) * 2; index > 0 ; index--) {
                 var roll = Phaser.Math.RND.integer();
                 if (roll < this.bestHashInt) {
                     this.bestHashInt = roll;
@@ -1811,13 +1811,11 @@ class ScoreScene extends Phaser.Scene {
             // #region HashUI Update
 
             this.rollSpeed = ROLL_SPEED[difficulty];
-            var grouped4 = intToBinHash(this.bestHashInt).replace(/\B(?=(\d{4})+(?!\d))/g, " ")
-            var leadingZeros4Form = grouped4.slice().split('1').reverse().pop();
+
             //console.log(ROLL_SPEED[difficulty]);
             this.hashUI.setHTML(
-                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeds</br>
-                <span style="color:limegreen">${leadingZeros}1</span>${intToBinHash(roll).slice(difficulty + 1)}</br>
-                ${grouped4}</br>`
+                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${difficulty} Zeds
+                <span style="color:limegreen">${leadingZeros}1</span>${intToBinHash(roll).slice(difficulty + 1)}`
             );
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -2411,12 +2409,13 @@ class UIScene extends Phaser.Scene {
 
          // Countdown Text
         this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: 'white',
+            color: 'yellow',
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
             padding: '1px 5px',
             'border-radius': '4px',
-            outline: 'solid'
+            outline: 'solid',
+            "outline-color": 'white',
             })).setText(
                 this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         ).setOrigin(1,0);
@@ -2436,7 +2435,7 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('addScore', function (fruit) {
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
-                color: 'limegreen',
+                color: 'yellow',
                 'font-size': '22px',
                 'font-weight': '400',
                 'font-weight': 'bold',
