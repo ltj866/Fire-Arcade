@@ -111,6 +111,9 @@ const UISTYLE = {
    'padding': '0px 0px 0px 12px'
    };
 
+const COLOR_SCORE = "yellow";
+const COLOR_FOCUS = "red";
+const COLOR_BONUS = "limegreen";
 
 
 var SOUND_ATOM = [
@@ -1471,12 +1474,12 @@ class ScoreScene extends Phaser.Scene {
             'text-align': 'right',
             })).setHTML(
                 `Base Score: ${baseScore}</br>
-                <span style="text-decoration:none;">Speed Bonus: <span style="color:red">+${speedBonus}</span></span></br>
+                <span style="text-decoration:none;">Speed Bonus: <span style="color:${COLOR_FOCUS}">+${speedBonus}</span></span></br>
                 <hr/>
                 <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>
                 <span style="display: flex;font-size: 6px;"></br></span> 
                 Stage Highscore</br>
-                ${bestLocal} + <span style="color:red">${bestBonus}</span> = ${bestLocal + bestBonus}`
+                ${bestLocal} + <span style="color:${COLOR_FOCUS}">${bestBonus}</span> = ${bestLocal + bestBonus}`
         ).setOrigin(1, 0);
 
         
@@ -1624,7 +1627,7 @@ class ScoreScene extends Phaser.Scene {
 
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*24, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
-            color: 'yellow',
+            color: COLOR_SCORE,
             "font-size":'28px',
             'font-weight': 500,
         })).setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
@@ -2011,7 +2014,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             var selected = playedStages[index]
 
-            selected[0].node.style.color = "red";
+            selected[0].node.style.color = COLOR_FOCUS;
 
             // Snake Head Code
 
@@ -2046,7 +2049,7 @@ class TimeAttackScene extends Phaser.Scene{
                 index = Phaser.Math.Wrap(index + 1, -1, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
 
                 selected = playedStages[index];
-                selected[0].node.style.color = "red";
+                selected[0].node.style.color = COLOR_FOCUS;
                 selector.y = selected[0].y + 6;
                 
                 upArrow.y = selected[0].y - 42;
@@ -2061,7 +2064,7 @@ class TimeAttackScene extends Phaser.Scene{
                 index = Phaser.Math.Wrap(index - 1, 0, playedStages.length);
                 
                 selected = playedStages[index];
-                selected[0].node.style.color = "red";
+                selected[0].node.style.color = COLOR_FOCUS;
                 selector.y = selected[0].y + 6;
                 
                 upArrow.y = selected[0].y - 42;
@@ -2090,7 +2093,7 @@ class TimeAttackScene extends Phaser.Scene{
             stageY = stageY + 4
 
             var runScoreUI = this.add.dom(GRID * 10, stageY, 'div', {
-                color: 'yellow',
+                color: COLOR_SCORE,
                 'font-size': '28px',
                 'font-family': ["Sono", 'sans-serif'],
                 'text-decoration': 'overline dashed',
@@ -2191,8 +2194,8 @@ class TimeAttackScene extends Phaser.Scene{
                     }
                     else {
                         unlockMessageUI.setText("Redo a previous stage to increase your average.").setOrigin(0,0);
-                        unlockMessageUI.node.style.color = "red";
-                        currentAveUI.node.style.color = "yellow";
+                        unlockMessageUI.node.style.color = COLOR_FOCUS;
+                        currentAveUI.node.style.color = COLOR_SCORE;
 
                         //console.log(
                         //    "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
@@ -2409,7 +2412,7 @@ class UIScene extends Phaser.Scene {
 
          // Countdown Text
         this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: 'yellow',
+            color: COLOR_SCORE,
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
             padding: '1px 5px',
@@ -2435,7 +2438,7 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('addScore', function (fruit) {
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
-                color: 'yellow',
+                color: COLOR_SCORE,
                 'font-size': '22px',
                 'font-weight': '400',
                 'font-weight': 'bold',
