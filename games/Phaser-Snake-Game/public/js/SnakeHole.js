@@ -1849,13 +1849,13 @@ class ScoreScene extends Phaser.Scene {
 
             //console.log(ROLL_SPEED[difficulty]);
             this.hashUI.setHTML(
-                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = ${this.difficulty} Zeds
+                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = <span style ="color:${COLOR_BONUS}">${this.difficulty}</span> Zeds
                 <span style="color:limegreen">${leadingZeros}1</span>${intToBinHash(roll).slice(this.difficulty + 1)}`
             );
 
             if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
                 ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                ourTimeAttack.zedsUI.setText(`ZEDS:${ourTimeAttack.zeds}`);
+                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS}">${commaNum(ourTimeAttack.zeds)}`);
             }
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
