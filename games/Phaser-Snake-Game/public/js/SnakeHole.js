@@ -1652,7 +1652,7 @@ class ScoreScene extends Phaser.Scene {
         card.setOrigin(0.5,0); 
         card.displayHeight = 108;
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*24, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             color: COLOR_SCORE,
             "font-size":'28px',
@@ -1660,7 +1660,7 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
 
 
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             'font-size':'22px',
             'font-weight': 400,
@@ -1677,7 +1677,7 @@ class ScoreScene extends Phaser.Scene {
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*27,'', 
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26.75,'', 
                 {"fontSize":'48px'}
             ).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
@@ -1977,28 +1977,28 @@ class TimeAttackScene extends Phaser.Scene{
 
         calcSumOfBest(this);
 
-        this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const styleBottomText = {
             "font-size": '14px',
-            "font-weight": 500,
+            "font-weight": 400,
             "text-align": 'right',
-            })).setHTML(
+        }
+
+        this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+            styleBottomText
+            )).setHTML(
                 `ZEDS : <span style ="color:${COLOR_BONUS}">${commaNum(this.zeds)}</span>`
         ).setOrigin(0,0.5);
 
 
-        this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "font-size": '14px',
-            "font-weight": 500,
-            "text-align": 'right',
-            })).setHTML(
+        this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+            styleBottomText    
+            )).setHTML(
                 `SUM OF BEST : <span style="color:${COLOR_SCORE}">${commaNum(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
-        this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "font-size": '14px',
-            "font-weight": 500,
-            "text-align": 'right',
-            })).setText(
+        this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+            styleBottomText    
+            )).setText(
                 `STAGES COMPLETE : ${commaNum(this.stagesComplete)}`
         ).setOrigin(0,0.5);
 
@@ -2673,7 +2673,7 @@ class UIScene extends Phaser.Scene {
                 
                 localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
                 calcSumOfBest(ourTimeAttack);
-                ourTimeAttack.sumOfBestUI.setText(`SUM OF BEST : ${commaNum(ourTimeAttack.sumOfBest)}`);
+                ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:${COLOR_SCORE}">${commaNum(ourTimeAttack.sumOfBest)}`);
                 ourTimeAttack.stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
             }
 
