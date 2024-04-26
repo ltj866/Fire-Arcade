@@ -1648,7 +1648,7 @@ class ScoreScene extends Phaser.Scene {
             })).setOrigin(0.5, 0);
 
         // #region Help Card
-        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID + 10, 'helpCard02').setDepth(10);
+        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID, 'helpCard02').setDepth(10);
         card.setOrigin(0.5,0); 
         card.displayHeight = 108;
 
@@ -1981,8 +1981,8 @@ class TimeAttackScene extends Phaser.Scene{
             "font-size": '14px',
             "font-weight": 500,
             "text-align": 'right',
-            })).setText(
-                `ZEDS : ${commaNum(this.zeds)}`
+            })).setHTML(
+                `ZEDS : <span style ="color:${COLOR_BONUS}">${commaNum(this.zeds)}</span>`
         ).setOrigin(0,0.5);
 
 
@@ -1990,8 +1990,8 @@ class TimeAttackScene extends Phaser.Scene{
             "font-size": '14px',
             "font-weight": 500,
             "text-align": 'right',
-            })).setText(
-                `SUM OF BEST : ${commaNum(this.sumOfBest)}`
+            })).setHTML(
+                `SUM OF BEST : <span style="color:${COLOR_SCORE}">${commaNum(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
         this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, {
