@@ -1633,7 +1633,7 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16 - 6, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
             })).setOrigin(0.5, 0);
 
