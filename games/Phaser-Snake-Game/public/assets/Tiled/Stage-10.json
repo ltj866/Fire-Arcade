@@ -304,6 +304,11 @@
          "name":"UUID",
          "type":"string",
          "value":"298f9852-523a-4f5f-b0e2-e36ef1ba0bd7"
+        }, 
+        {
+         "name":"diffBonus",
+         "type":"int",
+         "value":200
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

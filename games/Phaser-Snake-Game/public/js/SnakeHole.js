@@ -31,6 +31,7 @@ var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 export const COMBO_ADD_FLOOR = 88;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
+const NO_BONK_BASE = 1000;
 
 var comboCounter = 0;
 
@@ -38,7 +39,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = true;
+const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -81,7 +82,7 @@ var calcSumOfBest = function(scene) {
     })
 }
 
-var commaNum = function(int) {
+var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -334,11 +335,12 @@ class StartScene extends Phaser.Scene {
             
 
                 ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
+                ourGame.stageDiffBonus = 200;
                 ourGame.stage = END_STAGE;
                 //END_STAGE = "Stage-01";
 
                 ourUI.score = 12345;
-                ourUI.bonks = 2;
+                ourUI.bonks = 3;
                 ourUI.length = 28;
                 ourUI.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
 
@@ -477,6 +479,7 @@ class GameScene extends Phaser.Scene {
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.map.properties[1].value;
 
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -1494,19 +1497,25 @@ class ScoreScene extends Phaser.Scene {
         })).setText(ourGame.stage).setOrigin(1,0);
 
         // #region Main Stats
+
+        var bonkBonus = NO_BONK_BASE/(ourUI.bonks+1);
+        let diffBonus = ourGame.stageDiffBonus * .01;
+        this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
         
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '260px',
+            //width: '260px',
             color: 'white',
             "font-size":'18px',
             'font-weight': 400,
             'text-align': 'right',
             })).setHTML(
                 `Base Score: ${baseScore}</br>
-                <span style="text-decoration:none;">Speed Bonus: <span style="color:${COLOR_FOCUS}">+ ${speedBonus}</span></span></br>
+                Speed Bonus: <span style="color:${COLOR_FOCUS}">+ ${commaInt(speedBonus)}</span></br>
+                <span style="font-size:12px">Difficulty Bonus %${ourGame.stageDiffBonus} = ${(baseScore+speedBonus) * diffBonus}</span><br/>
+                <span style="font-size:12px">No-Bonk Bonus: + ${bonkBonus.toFixed(0)}</span><br/>
                 <hr/>
-                <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>`
+                <span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
         ).setOrigin(1, 0);
 
         // Put Letter Rank Code Here.
@@ -1643,7 +1652,7 @@ class ScoreScene extends Phaser.Scene {
         // #region Hash Display Code
         this.foodLogSeed = ourUI.scoreHistory.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(baseScore+speedBonus);
+        this.foodLogSeed.push(this.scoreTotal.toFixed(0));
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -1863,7 +1872,7 @@ class ScoreScene extends Phaser.Scene {
 
             if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
                 ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS}">${commaNum(ourTimeAttack.zeds)}`);
+                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(ourTimeAttack.zeds)}`);
             }
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -1900,12 +1909,13 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(stageID, foodLog, stageUUID, newBest = false)
+    function StageData(stageID, foodLog, stageUUID, scoreTotal, newBest = false)
     {
         this.stage = stageID;
         this.foodLog = foodLog;
         this.newBest = newBest;
         this.uuid = stageUUID;
+        this.scoreTotal = scoreTotal;
     },
     
     toString(){
@@ -1913,10 +1923,11 @@ var StageData = new Phaser.Class({
     },
 
     calcScore() {
-        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
-        var bonusScore = calcBonus(stageScore);
+        //var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+        //var bonusScore = calcBonus(stageScore);
 
-        return stageScore + bonusScore;
+        //return stageScore + bonusScore;
+        return this.scoreTotal;
     },
 
     calcBase() {
@@ -1992,20 +2003,20 @@ class TimeAttackScene extends Phaser.Scene{
         this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
             styleBottomText
             )).setHTML(
-                `ZEDS : <span style ="color:${COLOR_BONUS}">${commaNum(this.zeds)}</span>`
+                `ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(this.zeds)}</span>`
         ).setOrigin(0,0.5);
 
 
         this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setHTML(
-                `SUM OF BEST : <span style="color:goldenrod">${commaNum(this.sumOfBest)}</span>`
+                `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
         this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setText(
-                `STAGES COMPLETE : ${commaNum(this.stagesComplete)}`
+                `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
         ).setOrigin(0,0.5);
 
         const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -2024,11 +2035,6 @@ class TimeAttackScene extends Phaser.Scene{
             this.inTimeAttack = true;
 
             this.stageHistory.forEach(_stageData => {
-                console.log(_stageData.stage,
-                    "Base Score:", _stageData.calcBase(),
-                    "SpeedBonus", calcBonus(_stageData.calcBase()), 
-                    "FoodLog:", _stageData.foodLog
-                );
 
                 var baseScore = _stageData.calcBase();
                 var realScore = _stageData.calcScore();
@@ -2598,9 +2604,10 @@ class UIScene extends Phaser.Scene {
         //  Event: saveScore
         ourGame.events.on('saveScore', function () {
             const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
+            const ourScoreScene = ourGame.scene.get('ScoreScene');
 
 
-            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID);
+            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID, ourScoreScene.scoreTotal);
 
             var stageFound = false;
             
@@ -2679,7 +2686,7 @@ class UIScene extends Phaser.Scene {
                 
                 localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
                 calcSumOfBest(ourTimeAttack);
-                ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaNum(ourTimeAttack.sumOfBest)}`);
+                ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourTimeAttack.sumOfBest)}`);
                 ourTimeAttack.stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
             }
 
