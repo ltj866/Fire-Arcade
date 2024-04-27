@@ -38,7 +38,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
+const SCORE_SCENE_DEBUG = true;
 
 // Game Objects
 
@@ -82,7 +82,7 @@ var calcSumOfBest = function(scene) {
 }
 
 var commaNum = function(int) {
-    return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 var calcHashInt = function (str) {
@@ -137,8 +137,9 @@ const UISTYLE = {
    };
 
 const COLOR_SCORE = "yellow";
-const COLOR_FOCUS = "red";
+const COLOR_FOCUS = "fuchsia";
 const COLOR_BONUS = "limegreen";
+const COLOR_TERTIARY = "goldenrod"
 
 
 var SOUND_ATOM = [
@@ -1485,7 +1486,7 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(0.5,0).setDepth(25);
 
 
-        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 2, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '320px',
             "font-size":'28px',
             "font-weight": 600,
@@ -1495,7 +1496,7 @@ class ScoreScene extends Phaser.Scene {
         // #region Main Stats
         
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '260px',
             color: 'white',
             "font-size":'18px',
@@ -1505,10 +1506,7 @@ class ScoreScene extends Phaser.Scene {
                 `Base Score: ${baseScore}</br>
                 <span style="text-decoration:none;">Speed Bonus: <span style="color:${COLOR_FOCUS}">+ ${speedBonus}</span></span></br>
                 <hr/>
-                <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>
-                <span style="display: flex;font-size: 6px;"></br></span> 
-                Stage Highscore</br>
-                ${bestLocal}<span style="color:${COLOR_FOCUS}"> + ${bestBonus}</span> = ${bestLocal + bestBonus}`
+                <span style="font-size:28px;padding-bottom:10px;">Score: ${baseScore+speedBonus}</span></br>`
         ).setOrigin(1, 0);
 
         // Put Letter Rank Code Here.
@@ -1516,7 +1514,7 @@ class ScoreScene extends Phaser.Scene {
 
         
         // #region Stat Cards
-        var cardY = 6.5;
+        var cardY = 6;
         var styleCard = {
             width: '246px',
             "max-height": '290px',
@@ -1531,37 +1529,38 @@ class ScoreScene extends Phaser.Scene {
 
         const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
-            })).setText(
-                `STAGE STATS - ${ourGame.stage}
-                ----------------------
-                LENGTH: ${ourUI.length}
-                ATTEMPTS: xx
-                
-                BETA: ${GAME_VERSION}
-
-                FOOD LOG ........... AVE: [${stageAve.toFixed(2)}]
-                [${ourUI.scoreHistory.slice().sort().reverse()}]
-
-                ----------- < ● ○ ○ > -----------`
+            })).setHTML(
+                `----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
+                </br>
+                STAGE STATS - ${ourGame.stage}</br>
+                <hr/>
+                LENGTH: ${ourUI.length}</br>
+                ATTEMPTS: xx</br>
+                </br>
+                BETA: ${GAME_VERSION}</br>
+                </br>
+                FOOD LOG ........... AVE: [${stageAve.toFixed(2)}]</br>
+                [${ourUI.scoreHistory.slice().sort().reverse()}]</br>`
         ).setOrigin(0,0).setVisible(false);
 
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
-            })).setText(
-                `EXTRA STAGE STATS - ${ourGame.stage}
-                ----------------------
-                TOTAL TURNS: ${ourInputScene.turns}
-                CORNER TIME: ${ourInputScene.cornerTime} FRAMES
-            
-                BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
-                BOOST TIME: ${ourInputScene.boostTime} FRAMES
-            
-                BETA: ${GAME_VERSION}
-
-                BONK RESETS: ${ourUI.bonks}
-                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
-                ----------- < ○ ● ○ > -----------`
+            })).setHTML(
+                `----------- < <span style="color:${COLOR_TERTIARY};">○ ● ○</span> > -----------</br>
+                </br>
+                EXTRA STAGE STATS - ${ourGame.stage}</br>
+                <hr/>
+                TOTAL TURNS: ${ourInputScene.turns}</br>
+                CORNER TIME: ${ourInputScene.cornerTime} FRAMES</br>
+                </br>
+                BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES</br>
+                BOOST TIME: ${ourInputScene.boostTime} FRAMES</br>
+                </br>
+                BETA: ${GAME_VERSION}</br>
+                </br>
+                BONK RESETS: ${ourUI.bonks}</br>
+                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds</br>`
         ).setOrigin(0,0).setVisible(false);
 
 
@@ -1570,17 +1569,17 @@ class ScoreScene extends Phaser.Scene {
             styleCard, {
 
             })).setHTML(
-                `BEST STATS - ${ourGame.stage}</br>
-                <hr></br>
+                `----------- < <span style="color:${COLOR_TERTIARY};">○ ○ ●</span> > -----------</br>
+                </br>
+                BEST STATS - ${ourGame.stage}</br>
+                <hr>
                 BASE SCORE: ${bestLocal}</br>
                 SPEED BONUS: ${bestBonus}</br>
                 </br>
                 BEST SCORE: ${bestLocal + bestBonus}</br>
-
-                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
-                [${bestLog.slice().sort().reverse()}]</br>
                 </br>
-                ----------- < ○ ○ ● > -----------`
+                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
+                [${bestLog.slice().sort().reverse()}]`
         ).setOrigin(0,0).setVisible(false);
 
         var sIndex = 1 // Default Card
@@ -1590,6 +1589,10 @@ class ScoreScene extends Phaser.Scene {
         var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsE.angle = 90;
         arrowsE.play('idle');
+
+        var arrowsW = this.add.sprite(GRID * 15, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
+        arrowsW.angle = 270;
+        arrowsW.play('idle');
         
 
         this.input.keyboard.on('keydown-RIGHT', function() {
@@ -1977,8 +1980,6 @@ class TimeAttackScene extends Phaser.Scene{
 
         // Is Zero if there is none.
         this.zeds = Number(JSON.parse(localStorage.getItem(`zeds`)));
-
-        let entries = Object.entries(localStorage);
 
         calcSumOfBest(this);
 

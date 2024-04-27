@@ -1,5 +1,5 @@
 {
-    "activeFile": "Stage-10.json",
+    "activeFile": "Stage-02a.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -90,7 +90,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 358.9490054841615,
-                "y": 359.57763771793395
+                "y": 358.3203732503888
             }
         },
         "Stage-02a.json#tileSheet": {
@@ -589,10 +589,10 @@
         "Stage-04.json",
         "Stage-03c.json",
         "Stage-09.json",
-        "Stage-03b.json",
-        "Stage-03a.json",
-        "Stage-02e.json",
-        "Stage-02b.json",
-        "Stage-02a.json"
+        "Stage-10.json",
+        "Stage-11.json",
+        "snakeMap.tmx",
+        "Stage-06.json",
+        "Stage-12.json"
     ]
 }
