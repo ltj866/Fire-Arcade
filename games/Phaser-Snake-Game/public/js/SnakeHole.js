@@ -1511,7 +1511,7 @@ class ScoreScene extends Phaser.Scene {
             'text-align': 'right',
             })).setHTML(
                 `Base Score: ${baseScore}</br>
-                Speed Bonus: <span style="color:${COLOR_FOCUS}">+ ${commaInt(speedBonus)}</span></br>
+                Speed Bonus: <span style="color:${COLOR_FOCUS};font-weight:600;">+ ${commaInt(speedBonus)}</span></br>
                 <span style="font-size:12px">Difficulty Bonus %${ourGame.stageDiffBonus} = ${(baseScore+speedBonus) * diffBonus}</span><br/>
                 <span style="font-size:12px">No-Bonk Bonus: + ${bonkBonus.toFixed(0)}</span><br/>
                 <hr/>
@@ -1620,33 +1620,6 @@ class ScoreScene extends Phaser.Scene {
 
         // #endregion
 
-
-
-        if (bestLog) {
-            /*
-            var bestLogUI = this.add.dom(SCREEN_WIDTH/2 - GRID*.5, GRID * 14.5 + 4, 'div', Object.assign({}, STYLE_DEFAULT, 
-                logScreenStyle, {
-                "text-align": 'right',
-                })).setText(
-                    `Base ${bestLocal} + Speed Bonus ${bestBonus}
-
-                    Best Food Log - ave(${bestAve.toFixed(2)})
-                    ------------------------
-                    [${bestLog.slice().sort().reverse()}] 
-                    `
-            ).setOrigin(1,0);    */
-        }
-        
-
-        /*
-        var fruitLogUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 13, GRID * 13, 'div', Object.assign({}, STYLE_DEFAULT, 
-            logScreenStyle, {
-            "text-align":'left',
-            })).setText(
-                `Current - ave(${stageAve.toFixed(1)})
-                --------------------- 
-                [${ourUI.scoreHistory.slice().sort().reverse()}]`
-        ).setOrigin(0,0); */
         
 
         // #region Hash Display Code
@@ -1665,7 +1638,7 @@ class ScoreScene extends Phaser.Scene {
             })).setOrigin(0.5, 0);
 
         // #region Help Card
-        var card = this.add.image(SCREEN_WIDTH/2, 18.5*GRID, 'helpCard02').setDepth(10);
+        var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
         card.setOrigin(0.5,0); 
         card.displayHeight = 108;
 
@@ -1674,14 +1647,14 @@ class ScoreScene extends Phaser.Scene {
             color: COLOR_SCORE,
             "font-size":'28px',
             'font-weight': 500,
-        })).setText(`Current Score: ${ourUI.score + speedBonus}`).setOrigin(0.5,0).setDepth(60);
+        })).setText(`Current Score: ${commaInt(ourUI.score + speedBonus)}`).setOrigin(0.5,0).setDepth(60);
 
 
         const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             'font-size':'22px',
             'font-weight': 400,
-        })).setText(`Previous Best Run: ${bestrun}`).setOrigin(0.5,0).setDepth(60);
+        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);
 
 
         this.prevZeds = ourTimeAttack.zeds;
@@ -1866,13 +1839,14 @@ class ScoreScene extends Phaser.Scene {
 
             //console.log(ROLL_SPEED[difficulty]);
             this.hashUI.setHTML(
-                `Rolls Left ${this.foodLogSeed.slice(-1)} at Difficulty = <span style ="color:${COLOR_BONUS}">${this.difficulty}</span> Zeds
-                <span style="color:limegreen">${leadingZeros}1</span>${intToBinHash(roll).slice(this.difficulty + 1)}`
+                `Rolling for Zeds (${this.foodLogSeed.slice(-1)})<br/> 
+                <span style="color:limegreen;text-decoration:underline;">${leadingZeros}</span><span style="color:limegreen">1</span>${intToBinHash(roll).slice(this.difficulty + 1)}<br/>
+                You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
             if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
                 ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(ourTimeAttack.zeds)}`);
+                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS};text-decoration:underline;">${commaInt(ourTimeAttack.zeds)}`);
             }
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
