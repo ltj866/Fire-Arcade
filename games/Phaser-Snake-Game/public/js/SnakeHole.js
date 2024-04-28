@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 120; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -135,7 +135,7 @@ const STAGES_NEXT = {
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 const END_STAGE = 'Stage-10';
 
 const UISTYLE = { color: 'lightyellow',
@@ -330,7 +330,7 @@ class GameScene extends Phaser.Scene {
 
         this.spaceWhileReGrouping = false;
 
-        this.ghosting = false;
+        this.ghosting = true;
 
     
 

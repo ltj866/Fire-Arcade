@@ -142,29 +142,31 @@ var Snake = new Phaser.Class({
             //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
             
             this.direction = STOP;
-            this.bonked = true;
+            if (scene.bonkable) {
+                this.bonked = true;
             
-            if(scene.recombinate) {
-                this.death(scene);
+                if(scene.recombinate) {
+                    this.death(scene);
+                }   
             }
         }
 
         
     
-        // #region Bonk Self
+        // #region intesect self
         if (scene.startMoving && !onPortal && scene.ghosting) {
         // Game Has started. Snake head has left Starting Square
             
 
-            var tail = this.body.slice(1);
+            var body = this.body.slice(1);
 
 
             // Remove the Tail because the Tail will always move out of the way
             // when the head moves forward.
-            tail.pop();
+            body.pop();
 
             
-            tail.some(part => {
+            body.some(part => {
                 if (part.x === xN && part.y === yN) {
                     var portalSafe = false; // Assume not on portal
                     scene.portals.forEach(portal => { 
@@ -176,9 +178,11 @@ var Snake = new Phaser.Class({
                     
                     if (!portalSafe) {
                         this.direction = STOP;
-                        this.bonked = true;
-                        if(scene.recombinate) {
-                            this.death(scene);
+                        if (scene.bonkable) {
+                            this.bonked = true;
+                            if(scene.recombinate) {
+                                this.death(scene);
+                            }
                         }
                         // Only colide if the snake has left the center square    
                     }  
@@ -191,19 +195,11 @@ var Snake = new Phaser.Class({
 
     
     // Actually Move the Snake Head
-    if (this.alive) {
+    if (this.alive && this.direction != STOP) {
         if (!this.bonked) {
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
     }
-    
-    
-    
-
-    // Check if dead by map
-
-    
-    
     
 
     // Check collision for all atoms
