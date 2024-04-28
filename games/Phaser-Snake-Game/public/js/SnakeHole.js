@@ -14,8 +14,8 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 120; //28..................... Win Condition
-const  STARTING_LIVES = 12;
+export const LENGTH_GOAL = 28; //28..................... Win Condition
+const  STARTING_ATTEMPTS = 25;
 
 
 
@@ -135,7 +135,7 @@ const STAGES_NEXT = {
 }
 
 // #region START STAGE
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-10';
 
 const UISTYLE = { color: 'lightyellow',
@@ -290,6 +290,7 @@ class GameScene extends Phaser.Scene {
     
     init(props) {
         
+        // #region Init Vals
         // Arrays for collision detection
         this.atoms = [];
         this.walls = [];
@@ -330,9 +331,9 @@ class GameScene extends Phaser.Scene {
 
         this.spaceWhileReGrouping = false;
 
-        this.ghosting = true;
-
-    
+        // special flags
+        this.ghosting = false;
+        this.bonkable = true;
 
     }
     
@@ -550,12 +551,7 @@ class GameScene extends Phaser.Scene {
                 }
                 
             }
-            console.log(this.boostOutlines)
-            //var boostOutline = this.add.sprite(this.snake.body.x, this.snake.body.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-            //this.boostOutlines.push(boostOutline)
-            
-            //console.log("space pressed")
-        })
+        });
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             if (this.boostOutlines.length > 0){
@@ -583,15 +579,13 @@ class GameScene extends Phaser.Scene {
         this.frameIndex = 0
 
         // #endregion
-        
 
-    
         // Map only contains Walls at this point
         this.map.forEachTile( tile => {
 
             // Empty tiles are indexed at -1. 
             // Any tilemap object that is not empty will be considered a wall
-            // Index is the sprite value, not the array index. Normal wall is Index 4
+            // Index is the sprite value, not the array index.
             if (tile.index > 0) {  
                 var wall = new Phaser.Geom.Point(tile.x,tile.y);
                 this.walls.push(wall);
@@ -2272,7 +2266,7 @@ class UIScene extends Phaser.Scene {
         this.globalFruitCount = 0;
         this.bonks = 0;
 
-        var {lives = STARTING_LIVES } = props
+        var {lives = STARTING_ATTEMPTS } = props
         this.lives = lives;
 
         this.scoreHistory = [];

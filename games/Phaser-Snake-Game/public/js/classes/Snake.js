@@ -154,7 +154,7 @@ var Snake = new Phaser.Class({
         
     
         // #region intesect self
-        if (scene.startMoving && !onPortal && scene.ghosting) {
+        if (scene.startMoving && !onPortal && !scene.ghosting) {
         // Game Has started. Snake head has left Starting Square
             
 
