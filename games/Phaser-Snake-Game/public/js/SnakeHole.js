@@ -15,7 +15,7 @@ const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
-const  STARTING_LIVES = 12;
+const  STARTING_ATTEMPTS = 25;
 
 
 
@@ -24,7 +24,7 @@ const  STARTING_LIVES = 12;
 export const SPEEDWALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
-var SPEEDSPRINT = 33; // 24
+var SPEEDSPRINT = 24; // 24
 
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
@@ -242,6 +242,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
         this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
+        this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
 
 
         //WRAP BLOCKS:
@@ -388,6 +389,7 @@ class GameScene extends Phaser.Scene {
     
     init(props) {
         
+        // #region Init Vals
         // Arrays for collision detection
         this.atoms = [];
         this.walls = [];
@@ -400,7 +402,8 @@ class GameScene extends Phaser.Scene {
 
         // Boost Array
         this.boostOutlines = [];
-        this.boostOutlines.length = 1; //this needs to be set to 1 on init or else a lingering outline persists on space-down
+        //this.boostOutlines.length = 0; //this needs to be set to 1 on init or else a lingering outline persists on space-down
+        this.boostOutlinesSmall;
         this.boostGhosts = [];
 
         // Sounds
@@ -427,7 +430,9 @@ class GameScene extends Phaser.Scene {
 
         this.spaceWhileReGrouping = false;
 
-    
+        // special flags
+        this.ghosting = false;
+        this.bonkable = true;
 
     }
     
@@ -471,10 +476,6 @@ class GameScene extends Phaser.Scene {
         this.snake.direction = STOP;
 
         // #region TileMap
-        
-        //Physics Overlap
-        //this.physics.add.overlap(sprite, boostOutline);
-        //this.physics.add.overlap(sprite, snake.body);
 
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
@@ -599,6 +600,22 @@ class GameScene extends Phaser.Scene {
                 this.move_pause = false;
                 ourInputScene.moveDirection(this, e);
                 
+                
+                // Adds
+                if (this.boostOutlines.length > 0 && e.code != "Space") {
+                    
+                    var toDelete = this.boostOutlines.shift();
+                    toDelete.destroy();
+    
+                    // Make the new one
+                    var boostOutline = this.add.sprite(
+                        this.snake.head.x, 
+                        this.snake.head.y
+                    ).setOrigin(.083333,.083333).setDepth(15);
+                    
+                    boostOutline.play("snakeOutlineAnim");
+                    this.boostOutlines.push(boostOutline);
+                }
             }
 
             if (this.move_pause) {
@@ -614,13 +631,44 @@ class GameScene extends Phaser.Scene {
         })
         this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
             
-            //var boostOutline = this.add.sprite(this.snake.body.x, this.snake.body.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-            //this.boostOutlines.push(boostOutline)
-            
-            //console.log("space pressed")
-        })
+            // #region Boost Outlines
+            this.boostOutlines = [];
+            for (let index = 0; index < this.snake.body.length; index++) {
+                if (index < this.snake.body.length -1) {
+                var boostOutline = this.add.sprite(
+                    this.snake.body[index].x, 
+                    this.snake.body[index].y
+                ).setOrigin(.083333,.083333).setDepth(15);
+                //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                boostOutline.play("snakeOutlineAnim");
+                this.boostOutlines.unshift(boostOutline);
+                }
+                else{
+                //var boostOutlineSmall = this.add.sprite(
+                //    this.snake.body[this.snake.body.length -1].x,
+                //     this.snake.body[this.snake.body.length -1].y
+                //).setOrigin(.083333,.083333).setDepth(0);
+                }
+                
+            }
+        });
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+            if (this.boostOutlines.length > 0){
+                ////debugger
+
+                this.boostOutlines.forEach(boostOutline =>{
+                    boostOutline.destroy();
+                });
+
+                this.boostOutlines = [];
+                //this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
+                //    boostOutlineSmall.destroy();
+                //});
+                //this.boostGhosts.forEach(boostGhost =>{
+                //    boostGhost.destroy();
+                //})
+            }
             //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
@@ -631,15 +679,13 @@ class GameScene extends Phaser.Scene {
         this.frameIndex = 0
 
         // #endregion
-        
 
-    
         // Map only contains Walls at this point
         this.map.forEachTile( tile => {
 
             // Empty tiles are indexed at -1. 
             // Any tilemap object that is not empty will be considered a wall
-            // Index is the sprite value, not the array index. Normal wall is Index 4
+            // Index is the sprite value, not the array index.
             if (tile.index > 0) {  
                 var wall = new Phaser.Geom.Point(tile.x,tile.y);
                 this.walls.push(wall);
@@ -1313,28 +1359,57 @@ class GameScene extends Phaser.Scene {
             } 
 
             // Set Best Score UI element using local storage.
-            if(this.spaceKey.isDown && energyAmountX > 0) {
+            /*if(this.spaceKey.isDown && energyAmountX > 0) {
                 var boostGhost = this.add.sprite(
                     this.snake.body[this.snake.body.length -1].x, 
                     this.snake.body[this.snake.body.length -1].y, 
-                    'snakeDefault', 3);//setOrigin(0,0).setDepth(15)
+                    'snakeDefault', 3);
                 boostGhost.setOrigin(0,0).setDepth(0);
 
 
                 this.boostGhosts.push(boostGhost);
+            }*/
+            if (this.boostOutlines.length > 0) {
+
+                
             }
-            
             
             // Move at last second
             if (!this.stageOver) {
                 this.snake.move(this);
+                //move ghost segments here
             }
 
-            var boosting
+            //var boosting
             
-            if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
-                boosting = true;
+            //this.spaceKey.isDown
+
+            if(this.boostOutlines.length > 0 && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+                // Get ride of the old one
+                var toDelete = this.boostOutlines.shift();
+                toDelete.destroy();
+
+                // Make the new one
+                var boostOutline = this.add.sprite(
+                    this.snake.head.x, 
+                    this.snake.head.y
+                ).setOrigin(.083333,.083333).setDepth(15);
                 
+                boostOutline.play("snakeOutlineAnim");
+                this.boostOutlines.push(boostOutline);
+                
+
+                
+                //this.boostOutlines = this.boostOutlines.slice(1,this.boostOutlines.length);
+                //console.log("boost length = ",this.boostOutlines.length)
+                //console.log("snake length = ",this.snake.body.length)
+                //this.boostOutlines[0].destroy();
+                //debugger;
+                console.log(this.boostOutlines.length, this.snake.body.length)
+                /*var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
+                if(this.boostOutlines.length > (this.snake.body.length)){
+                    this.boostOutlines[latestOutline].destroy();
+                }*/
                 //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
                 
                 //this.boostGhosts.push(boostGhostSmall)
@@ -1349,30 +1424,67 @@ class GameScene extends Phaser.Scene {
                 })*/
             }
             else{
-                boosting = false;
+                //boosting = false;
             }
-            if (this.boostGhosts.length > 1){
-                this.boostGhosts[this.boostGhosts.length-2].destroy();
-            }
-
-            if (boosting){
-                this.snake.body.forEach( part => {
-                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
-                    if(this.boostOutlines.length > this.snake.body.length){
+            // #region boost update
+            ourUI.energyAmount = 100;
+            //if (boosting){
+                /*for (let index = 0; index < this.snake.body.length; index++) {
+                    if (index < this.snake.body.length -1) {
+                    var boostOutline = this.add.sprite(
+                        this.snake.body[index].x, 
+                        this.snake.body[index].y
+                    ).setOrigin(.083333,.083333).setDepth(15);
+                    this.boostOutlines.push(boostOutline)
+                    //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    boostOutline.play("snakeOutlineAnim");
+                    }
+                    else{
+                    var boostOutlineSmall = this.add.sprite(
+                        this.snake.body[this.snake.body.length -1].x,
+                         this.snake.body[this.snake.body.length -1].y
+                    ).setOrigin(.083333,.083333).setDepth(0);
+                    this.boostOutlinesSmall.push(boostOutlineSmall)
+                    boostOutlineSmall.play("snakeOutlineSmallAnim");
+                    }
+                    
+                }*/
+                /*this.snake.body.forEach( part => {
+                    var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
+                    if(this.boostOutlines.length > (this.snake.body.length)){
                         this.boostOutlines[latestOutline].destroy();
                     }
       
                     //console.log("boost length = ",this.boostOutlines.length)
                     //console.log("snake length = ",this.snake.body.length)
+                    console.log(latestOutline)
                     //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
                     this.boostOutlines.push(boostOutline)
+                    //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
                     boostOutline.play("snakeOutlineAnim");
-                })
-            }
-            else{
-                this.boostOutlines.forEach(boostOutline =>{
+                    //boostOutlineSmall.play("snakeOutlineSmallAnim");
+                if (this.boostGhosts.length > 1){
+                    this.boostGhosts[this.boostGhosts.length-2].destroy();
+                }
+                })*/
+                /*this.snake.body.forEach( part => {
+                    var latestOutlineSmall = (this.boostOutlinesSmall.length - this.snake.body.length);
+                    if(this.boostOutlinesSmall.length > (this.snake.body.length)){
+                        //console.log(this.boostOutlinesSmall.length)
+                        this.boostOutlinesSmall[latestOutlineSmall].destroy();
+                    }
+                    var boostOutlineSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y).setOrigin(.083333,.083333).setDepth(0);
+                    this.boostOutlinesSmall.push(boostOutlineSmall)
+                    boostOutlineSmall.play("snakeOutlineSmallAnim");
+                })*/
+            //}
+            //else{
+                /*this.boostOutlines.forEach(boostOutline =>{
                     boostOutline.destroy();
+                })/*
+                this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
+                    boostOutlineSmall.destroy();
                 })
                 this.boostGhosts.forEach(boostGhost =>{
                     boostGhost.destroy();
@@ -1382,10 +1494,9 @@ class GameScene extends Phaser.Scene {
                 }
                 if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
                     this.boostGhosts.length = 1;
-                } 
+                }*/
 
-            }
-            
+            //}
         }
         
         // Boost and Boost Multi Code
@@ -2386,7 +2497,7 @@ class UIScene extends Phaser.Scene {
         this.globalFruitCount = 0;
         this.bonks = 0;
 
-        var {lives = STARTING_LIVES } = props
+        var {lives = STARTING_ATTEMPTS } = props
         this.lives = lives;
 
         this.scoreHistory = [];
@@ -3112,6 +3223,12 @@ function loadAnimations(scene) {
     scene.anims.create({
         key: 'snakeOutlineAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
+        frameRate: 12,
+        repeat: -1
+    })
+    scene.anims.create({
+        key: 'snakeOutlineSmallAnim',
+        frames: scene.anims.generateFrameNumbers('snakeOutlineBoostingSmall',{ frames: [ 0, 1, 2, 3]}),
         frameRate: 12,
         repeat: -1
     })

@@ -17,28 +17,46 @@ var Snake = new Phaser.Class({
         this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
         this.head.setOrigin(0,0).setDepth(10);
         
-        this.body.push(this.head);
+        this.body.unshift(this.head);
 
         this.bonked = false;
         this.lastPlayedCombo = 0;
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
-        
     },
     
     grow: function (scene)
     {
-        // Current Tail of the snake
-        this.tail = this.body.slice(-1);
+        if (scene.boostOutlines.length > 0) {
+            //newPart.setTint(0xFF00FF);
+            // Make the new one
+            var boostOutline = scene.add.sprite(
+                this.body[this.body.length - 2].x, 
+                this.body[this.body.length - 2].y
+            ).setOrigin(.083333,.083333).setDepth(15);
+             
+            boostOutline.play("snakeOutlineAnim");
+            scene.boostOutlines.unshift(boostOutline);
+        }
         
-        // Add a new part at the current tail position
+        this.tail = this.body.slice(-1);
+
+        
+        // Add a new part at  the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
-        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 1);
+        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(9);
+        
 
+        if (this.body.length > 1){
+            this.body[this.body.length -1].setTexture('snakeDefault',[1])
+            
+        }
         this.body.push(newPart);
+
+
 
         
         
@@ -124,29 +142,31 @@ var Snake = new Phaser.Class({
             //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
             
             this.direction = STOP;
-            this.bonked = true;
+            if (scene.bonkable) {
+                this.bonked = true;
             
-            if(scene.recombinate) {
-                this.death(scene);
+                if(scene.recombinate) {
+                    this.death(scene);
+                }   
             }
         }
 
         
     
-        // #region Bonk Self
-        if (scene.startMoving && !onPortal) {
+        // #region intesect self
+        if (scene.startMoving && !onPortal && !scene.ghosting) {
         // Game Has started. Snake head has left Starting Square
             
 
-            var tail = this.body.slice(1);
+            var body = this.body.slice(1);
 
 
             // Remove the Tail because the Tail will always move out of the way
             // when the head moves forward.
-            tail.pop();
+            body.pop();
 
             
-            tail.some(part => {
+            body.some(part => {
                 if (part.x === xN && part.y === yN) {
                     var portalSafe = false; // Assume not on portal
                     scene.portals.forEach(portal => { 
@@ -158,9 +178,11 @@ var Snake = new Phaser.Class({
                     
                     if (!portalSafe) {
                         this.direction = STOP;
-                        this.bonked = true;
-                        if(scene.recombinate) {
-                            this.death(scene);
+                        if (scene.bonkable) {
+                            this.bonked = true;
+                            if(scene.recombinate) {
+                                this.death(scene);
+                            }
                         }
                         // Only colide if the snake has left the center square    
                     }  
@@ -173,19 +195,11 @@ var Snake = new Phaser.Class({
 
     
     // Actually Move the Snake Head
-    if (this.alive) {
+    if (this.alive && this.direction != STOP) {
         if (!this.bonked) {
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
     }
-    
-    
-    
-
-    // Check if dead by map
-
-    
-    
     
 
     // Check collision for all atoms

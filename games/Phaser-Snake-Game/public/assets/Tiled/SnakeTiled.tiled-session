@@ -583,17 +583,23 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "int",
     "recentFiles": [
-        "Stage-08.json",
-        "Stage-05.json",
-        "Stage-13.json",
-        "Stage-07.json",
-        "Stage-04.json",
+        "Stage-02d.json",
         "Stage-03c.json",
-        "Stage-09.json",
+        "Stage-03b.json",
+        "Stage-08.json",
+        "Stage-07.json",
         "Stage-10.json",
-        "Stage-11.json",
+        "Stage-02b.json",
+        "Stage-05.json",
         "snakeMap.tmx",
-        "Stage-06.json",
-        "Stage-12.json"
-    ]
+        "Stage-02a.json",
+        "Stage-AA.json",
+        "Stage-02e.json"
+    ],
+    "resizeMap.removeObjects": true,
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 24,
+        "width": 24
+    }
 }
