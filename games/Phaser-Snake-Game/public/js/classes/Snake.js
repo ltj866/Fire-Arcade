@@ -17,7 +17,7 @@ var Snake = new Phaser.Class({
         this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
         this.head.setOrigin(0,0).setDepth(10);
         
-        this.body.push(this.head);
+        this.body.unshift(this.head);
 
         this.bonked = false;
         this.lastPlayedCombo = 0;
@@ -28,20 +28,35 @@ var Snake = new Phaser.Class({
     
     grow: function (scene)
     {
-        // Current Tail of the snake
-        this.tail = this.body.slice(-1);
+        if (scene.boostOutlines.length > 0) {
+            //newPart.setTint(0xFF00FF);
+            // Make the new one
+            var boostOutline = scene.add.sprite(
+                this.body[this.body.length - 2].x, 
+                this.body[this.body.length - 2].y
+            ).setOrigin(.083333,.083333).setDepth(15);
+            
+            boostOutline.play("snakeOutlineAnim");
+            scene.boostOutlines.unshift(boostOutline);
+        }
         
-        // Add a new part at the current tail position
+        this.tail = this.body.slice(-1);
+
+        
+        // Add a new part at  the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(9);
+        
 
         if (this.body.length > 1){
             this.body[this.body.length -1].setTexture('snakeDefault',[1])
             
         }
         this.body.push(newPart);
+
+
 
         
         
