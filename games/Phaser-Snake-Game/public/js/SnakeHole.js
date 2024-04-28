@@ -641,6 +641,17 @@ class GameScene extends Phaser.Scene {
                 ).setOrigin(.083333,.083333).setDepth(15);
                 //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
                 boostOutline.play("snakeOutlineAnim");
+                boostOutline.alpha = 0;
+
+                var fadeinTween = this.tweens.add({
+                    targets: boostOutline,
+                    alpha: 100,
+                    duration: 200,
+                    ease: 'linear'
+                  }, this);
+
+
+
                 this.boostOutlines.unshift(boostOutline);
                 }
                 else{
@@ -658,10 +669,22 @@ class GameScene extends Phaser.Scene {
                 ////debugger
 
                 this.boostOutlines.forEach(boostOutline =>{
-                    boostOutline.destroy();
+                    var fadeoutTween = this.tweens.add({
+                        targets: boostOutline,
+                        alpha: 0,
+                        duration: 400,
+                        ease: 'linear'
+                      }, this);
+    
+                    fadeoutTween.on('complete', e => {
+                        boostOutline.destroy()
+                    });
                 });
 
+
+                // Remove all of the array allocated spaces through reasignment.
                 this.boostOutlines = [];
+
                 //this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
                 //    boostOutlineSmall.destroy();
                 //});
