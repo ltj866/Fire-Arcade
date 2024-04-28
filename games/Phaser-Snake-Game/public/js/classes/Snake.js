@@ -35,7 +35,7 @@ var Snake = new Phaser.Class({
                 this.body[this.body.length - 2].x, 
                 this.body[this.body.length - 2].y
             ).setOrigin(.083333,.083333).setDepth(15);
-            
+             
             boostOutline.play("snakeOutlineAnim");
             scene.boostOutlines.unshift(boostOutline);
         }
@@ -152,7 +152,7 @@ var Snake = new Phaser.Class({
         
     
         // #region Bonk Self
-        if (scene.startMoving && !onPortal) {
+        if (scene.startMoving && !onPortal && scene.ghosting) {
         // Game Has started. Snake head has left Starting Square
             
 

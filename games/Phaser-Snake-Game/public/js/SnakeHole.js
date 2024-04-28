@@ -24,7 +24,7 @@ const  STARTING_LIVES = 12;
 export const SPEEDWALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
-var SPEEDSPRINT = 500; // 24
+var SPEEDSPRINT = 24; // 24
 
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
@@ -329,6 +329,8 @@ class GameScene extends Phaser.Scene {
         this.moveInterval = SPEEDWALK;
 
         this.spaceWhileReGrouping = false;
+
+        this.ghosting = false;
 
     
 
