@@ -233,6 +233,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
+        this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -1558,6 +1559,10 @@ class ScoreScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
+
+
+
+
         
         // #region
         // Dream walls for Horizontal Wrap
@@ -1585,6 +1590,7 @@ class ScoreScene extends Phaser.Scene {
             //this.dreamWalls.push(wallShimmerBottom);
         
         }
+
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -1654,6 +1660,26 @@ class ScoreScene extends Phaser.Scene {
 
         // Put Letter Rank Code Here.
         var medianScore = 10000;
+        var rankIndex = [0,1,2,3,4]; //0 = D, 1 = C, 2 = B... etc.
+
+        if (this.scoreTotal > 0 && this.scoreTotal < (medianScore * .5)) {
+            rankIndex = 0
+        }
+        else if (this.scoreTotal > (medianScore * .5) && this.scoreTotal < medianScore) {
+            rankIndex = 1
+        }
+        else if(this.scoreTotal > (medianScore) && this.scoreTotal < (medianScore * 1.5)){
+            rankIndex = 2
+        }
+        else if(this.scoreTotal > (medianScore * 1.5)&& this.scoreTotal < (medianScore * 2)){
+            rankIndex = 3
+        }
+        else if(this.scoreTotal > (medianScore * 2)){
+            rankIndex = 4
+        }
+        console.log(this.scoreTotal)
+
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rankIndex).setDepth(20).setOrigin(0,0);
 
         
         // #region Stat Cards
