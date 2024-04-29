@@ -234,7 +234,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
-
+        this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
+        
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
@@ -1680,7 +1681,12 @@ class ScoreScene extends Phaser.Scene {
         console.log(this.scoreTotal)
 
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rankIndex).setDepth(20).setOrigin(0,0);
+        this.twinkles = [];
+        var twinkle01 = this.add.sprite(GRID * 3.5, GRID * 6).play("twinkle01").setDepth(21).setOrigin(0,0)
+        this.twinkles.push(twinkle01)
 
+        //twinkle01.play("twinkle01")
+        //var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         
         // #region Stat Cards
         var cardY = 6;
@@ -1955,10 +1961,23 @@ class ScoreScene extends Phaser.Scene {
             });
         }, [], this);
     }
+    rankTwinkle () {
+        //this.twinkle01.destroy();
+        var twinkleX = Phaser.Math.Between(GRID * 3.5, GRID * 5);
+        var twinkleY = Phaser.Math.Between(GRID * 6, GRID * 9);
+        var twinkle01 = this.add.sprite(twinkleX,twinkleY).play("twinkle01").setDepth(21).setOrigin(0,0);
+        this.twinkles.push(twinkle01)
+    };
 
     // #region Score - Update
     update(time) {
-        
+        if (this.twinkles.length > 0) {
+            this.twinkles[this.twinkles.length -1].on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (){
+                this.twinkles[this.twinkles.length -1].destroy();
+                this.rankTwinkle();
+            }, this);
+        }
+        console.log(this.twinkles.length)
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -3269,6 +3288,12 @@ class InputScene extends Phaser.Scene {
 
  // #region Animations
 function loadAnimations(scene) {
+    scene.anims.create({
+        key: 'twinkle01',
+        frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
+        frameRate: 6,
+        repeat: 0
+    })
     scene.anims.create({
         key: 'snakeOutlineAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
