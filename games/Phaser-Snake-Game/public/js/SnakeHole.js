@@ -1965,15 +1965,18 @@ class ScoreScene extends Phaser.Scene {
         //this.twinkle01.destroy();
         var twinkleX = Phaser.Math.Between(GRID * 3.5, GRID * 5);
         var twinkleY = Phaser.Math.Between(GRID * 6, GRID * 9);
-        var twinkle01 = this.add.sprite(twinkleX,twinkleY).play("twinkle01").setDepth(21).setOrigin(0,0);
-        this.twinkles.push(twinkle01)
+        var twinkle01 = this.add.sprite(twinkleX,twinkleY).play(
+            "twinkle01"
+        ).setOrigin(0,0).setDepth(21);
+        this.twinkles.push(twinkle01);
     };
 
     // #region Score - Update
     update(time) {
         if (this.twinkles.length > 0) {
             this.twinkles[this.twinkles.length -1].on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (){
-                this.twinkles[this.twinkles.length -1].destroy();
+                var twinkle = this.twinkles.pop();
+                twinkle.destroy();
                 this.rankTwinkle();
             }, this);
         }
