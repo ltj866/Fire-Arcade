@@ -97,11 +97,51 @@ var calcHashInt = function (str) {
 }
 
 var intToBinHash = function (input) {
-    // remove the Regex to make it a single string of digits.
     return (input >>> 0).toString(2).padStart(32, '0');
-    //return (input >>> 0).toString(2).padStart(32, '0').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+const ZED_CONSTANT = 16;
+const ZEDS_LEVEL_SCALAR = 0.02;
+const ZEDS_OVERLEVEL_SCALAR = 0.8;
+var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
+
+    let nextLevelZeds;
+    let zedsLevel;
+
+    if (level < 99) {
+        nextLevelZeds = reqZeds + ZED_CONSTANT + Math.floor(reqZeds*ZEDS_LEVEL_SCALAR);
+    }
+    else {
+        nextLevelZeds = reqZeds + ZED_CONSTANT + Math.floor(reqZeds*ZEDS_OVERLEVEL_SCALAR);
+        debugger
+    }
+
+    if (remainingZeds > nextLevelZeds - 1) {
+        level += 1;
+        remainingZeds = remainingZeds - nextLevelZeds;
+        zedsLevel = calcZedLevel(remainingZeds, nextLevelZeds, level);
+    }
+    else {
+        debugger
+        remainingZeds = nextLevelZeds - remainingZeds
+        zedsLevel = {level:level, zedsToNext: remainingZeds}
+    }
+
+    return zedsLevel;
+}
+
+//console.log("5 Zeds =", calcZedLevel(5));
+//console.log("20 Zeds = ",calcZedLevel(20));
+//console.log("1000 Zeds =", calcZedLevel(500));
+//console.log("5952", calcZedLevel(5952));
+//console.log("164583", calcZedLevel(164583));
+//console.log("1000000", calcZedLevel(1000000));
+
+// 5 => {0,11}
+// 20 => {1,14}
+// 5952 => {25,522}
+// 164583 => {99,8535}
+// 1_000_000 => {levelCurrent: 106, zedsToNext: 332151}
 // #endregion
 
 
