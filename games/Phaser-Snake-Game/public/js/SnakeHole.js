@@ -24,7 +24,7 @@ const  STARTING_ATTEMPTS = 25;
 export const SPEEDWALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
-var SPEEDSPRINT = 24; // 24
+var SPEEDSPRINT = 300; // 24
 
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
@@ -113,7 +113,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
     }
     else {
         nextLevelZeds = reqZeds + ZED_CONSTANT + Math.floor(reqZeds*ZEDS_OVERLEVEL_SCALAR);
-        debugger
     }
 
     if (remainingZeds > nextLevelZeds - 1) {
@@ -122,7 +121,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
         zedsLevel = calcZedLevel(remainingZeds, nextLevelZeds, level);
     }
     else {
-        debugger
         remainingZeds = nextLevelZeds - remainingZeds
         zedsLevel = {level:level, zedsToNext: remainingZeds}
     }
@@ -140,7 +138,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 // 5 => {0,11}
 // 20 => {1,14}
 // 5952 => {25,522}
-// 164583 => {99,8535}
+// 164_583 => {99,8535}
 // 1_000_000 => {levelCurrent: 106, zedsToNext: 332151}
 // #endregion
 
@@ -641,7 +639,6 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveDirection(this, e);
                 
                 
-                // Adds
                 if (this.boostOutlines.length > 0 && e.code != "Space") {
                     
                     var toDelete = this.boostOutlines.shift();
@@ -655,6 +652,9 @@ class GameScene extends Phaser.Scene {
                     
                     boostOutline.play("snakeOutlineAnim");
                     this.boostOutlines.push(boostOutline);
+
+                    this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 }
             }
 
@@ -675,32 +675,45 @@ class GameScene extends Phaser.Scene {
             this.boostOutlines = [];
             for (let index = 0; index < this.snake.body.length; index++) {
                 if (index < this.snake.body.length -1) {
-                var boostOutline = this.add.sprite(
-                    this.snake.body[index].x, 
-                    this.snake.body[index].y
-                ).setOrigin(.083333,.083333).setDepth(15);
-                //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
-                boostOutline.play("snakeOutlineAnim");
-                boostOutline.alpha = 0;
+                    // For all the body segments
+                    var boostOutline = this.add.sprite(
+                        this.snake.body[index].x, 
+                        this.snake.body[index].y
+                    ).setOrigin(.083333,.083333).setDepth(15);
+                    //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
+                    boostOutline.play("snakeOutlineAnim");
+                    boostOutline.alpha = 0;
 
-                var fadeinTween = this.tweens.add({
-                    targets: boostOutline,
-                    alpha: 100,
-                    duration: 200,
-                    ease: 'linear'
-                  }, this);
+                    var fadeinTween = this.tweens.add({
+                        targets: boostOutline,
+                        alpha: 100,
+                        duration: 200,
+                        ease: 'linear'
+                        }, this);
 
 
 
-                this.boostOutlines.unshift(boostOutline);
+                    this.boostOutlines.unshift(boostOutline);
                 }
                 else{
-                //var boostOutlineSmall = this.add.sprite(
-                //    this.snake.body[this.snake.body.length -1].x,
-                //     this.snake.body[this.snake.body.length -1].y
-                //).setOrigin(.083333,.083333).setDepth(0);
+                    // On the Tail
+                    var boostOutline = this.add.sprite(
+                        this.snake.body[index].x,
+                        this.snake.body[index].y
+                    ).setOrigin(.083333,.083333).setDepth(100);
+                    boostOutline.play("snakeOutlineSmallAnim");
+                    
+                    
+                    boostOutline.alpha = 0;
+
+                    var fadeinTween = this.tweens.add({
+                        targets: boostOutline,
+                        alpha: 100,
+                        duration: 200,
+                        ease: 'linear'
+                      }, this);
+                    this.boostOutlineTail = boostOutline;
                 }
-                
             }
         });
 
@@ -708,11 +721,14 @@ class GameScene extends Phaser.Scene {
             if (this.boostOutlines.length > 0){
                 ////debugger
 
+                // add the tail in.
+                this.boostOutlines.push(this.boostOutlineTail);
+
                 this.boostOutlines.forEach(boostOutline =>{
                     var fadeoutTween = this.tweens.add({
                         targets: boostOutline,
                         alpha: 0,
-                        duration: 400,
+                        duration: 340,
                         ease: 'linear'
                       }, this);
     
@@ -720,17 +736,8 @@ class GameScene extends Phaser.Scene {
                         boostOutline.destroy()
                     });
                 });
-
-
-                // Remove all of the array allocated spaces through reasignment.
                 this.boostOutlines = [];
 
-                //this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
-                //    boostOutlineSmall.destroy();
-                //});
-                //this.boostGhosts.forEach(boostGhost =>{
-                //    boostGhost.destroy();
-                //})
             }
             //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
@@ -1460,8 +1467,10 @@ class GameScene extends Phaser.Scene {
                 
                 boostOutline.play("snakeOutlineAnim");
                 this.boostOutlines.push(boostOutline);
-                
 
+                //move the tail
+                this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 
                 //this.boostOutlines = this.boostOutlines.slice(1,this.boostOutlines.length);
                 //console.log("boost length = ",this.boostOutlines.length)
