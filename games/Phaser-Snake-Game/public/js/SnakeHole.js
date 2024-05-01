@@ -1663,7 +1663,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Rank Sprites
         
-        const medianScore = 7000;
+        const medianScore = 8000;
 
         const COPPER = 0;
         const BRONZE = 1;
@@ -1688,7 +1688,6 @@ class ScoreScene extends Phaser.Scene {
                 break;
             default:
                 rank = COPPER;
-            return rank;
         }
 
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
@@ -1999,14 +1998,6 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        /*if (this.twinkles.length > 0) {
-            this.twinkles[this.twinkles.length -1].on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (){
-                var twinkle = this.twinkles.pop();
-                twinkle.destroy();
-                this.rankTwinkle();
-            }, this);
-        }
-        console.log(this.twinkles.length)*/
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
