@@ -1693,7 +1693,7 @@ class ScoreScene extends Phaser.Scene {
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
-        if(rank >= 2){
+        if(rank >= SILVER){
             this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -1701,7 +1701,7 @@ class ScoreScene extends Phaser.Scene {
                 lifespan: 1000,
             }).setFrequency(500,[1]).setDepth(20);
         }
-        if(rank === 3){
+        if(rank === GOLD){
             this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -1709,7 +1709,7 @@ class ScoreScene extends Phaser.Scene {
                 lifespan: 1000,
             }).setFrequency(1332,[1]).setDepth(20);
         }
-        if(rank === 4){
+        if(rank === PLATINUM){
             this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
