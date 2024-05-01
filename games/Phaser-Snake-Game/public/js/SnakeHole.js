@@ -2729,7 +2729,7 @@ class UIScene extends Phaser.Scene {
             var lastHistory = this.scoreHistory.slice();
             lastHistory.pop();
             var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
-            console.log("Current Score:", this.score + calcBonus(baseScore), "delta score" ,this.score + calcBonus(baseScore) - lastScore);
+            console.log("Current Score:", this.score + calcBonus(baseScore), "Δ" ,baseScore + calcBonus(baseScore) - lastScore);
 
 
 
