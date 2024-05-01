@@ -1472,7 +1472,6 @@ class GameScene extends Phaser.Scene {
                 //console.log("snake length = ",this.snake.body.length)
                 //this.boostOutlines[0].destroy();
                 //debugger;
-                console.log(this.boostOutlines.length, this.snake.body.length)
                 /*var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
                 if(this.boostOutlines.length > (this.snake.body.length)){
                     this.boostOutlines[latestOutline].destroy();
@@ -2724,6 +2723,13 @@ class UIScene extends Phaser.Scene {
                 // Record Score for Stats
                 this.scoreHistory.push(SCORE_FLOOR);
             }
+
+            // Calc Level Score
+            var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+            var lastHistory = this.scoreHistory.slice();
+            lastHistory.pop();
+            var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
+            console.log("Current Score:", this.score + calcBonus(baseScore), "delta score" ,this.score + calcBonus(baseScore) - lastScore);
 
 
 
