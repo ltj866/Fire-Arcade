@@ -2667,7 +2667,9 @@ class UIScene extends Phaser.Scene {
             this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
             { font: '30px Arial', 
               fill: '#FFFFFF',
-              fontSize: "32px"
+              fontSize: "32px",
+              width: '38px',
+              "text-align": 'right',
             });
         }
         
@@ -2873,13 +2875,15 @@ class UIScene extends Phaser.Scene {
         if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
             if (timeTick < SCORE_FLOOR ) {
-                this.countDown.setText(this.score + SCORE_FLOOR);
+                this.countDown.setText(SCORE_FLOOR);
+            } else if (timeTick > 99) {
+                this.countDown.setText(99);
             } else {
-                this.countDown.setText(this.score + (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10));
+                this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
             }
         }
         else {
-            this.countDown.setText(this.score);
+            //this.countDown.setText(this.score);
         } 
         
         if (DEBUG) {
