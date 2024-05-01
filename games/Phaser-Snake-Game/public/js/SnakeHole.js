@@ -1681,13 +1681,24 @@ class ScoreScene extends Phaser.Scene {
         console.log(this.scoreTotal)
 
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rankIndex).setDepth(20).setOrigin(0,0);
-        this.twinkles = [];
+        /*this.twinkles = [];
         var twinkle01 = this.add.sprite(GRID * 3.5, GRID * 6).play("twinkle01").setDepth(21).setOrigin(0,0)
-        this.twinkles.push(twinkle01)
+        this.twinkles.push(twinkle01)*/
 
         //twinkle01.play("twinkle01")
         //var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         
+        //particle emitter
+        this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
+            x:{min: 0, max: 32},
+            y:{min: 0, max: 68},
+            anim: 'twinkle01',
+            speed: 0,
+            animQuantity: 1,
+            lifespan: 1000,
+            gravityY: 0,
+        }).setFrequency(500,[1]).setDepth(20);
+
         // #region Stat Cards
         var cardY = 6;
         var styleCard = {
@@ -1961,7 +1972,7 @@ class ScoreScene extends Phaser.Scene {
             });
         }, [], this);
     }
-    rankTwinkle () {
+    /*rankTwinkle () {
         //this.twinkle01.destroy();
         var twinkleX = Phaser.Math.Between(GRID * 3.5, GRID * 5);
         var twinkleY = Phaser.Math.Between(GRID * 6, GRID * 9);
@@ -1969,18 +1980,18 @@ class ScoreScene extends Phaser.Scene {
             "twinkle01"
         ).setOrigin(0,0).setDepth(21);
         this.twinkles.push(twinkle01);
-    };
+    };*/
 
     // #region Score - Update
     update(time) {
-        if (this.twinkles.length > 0) {
+        /*if (this.twinkles.length > 0) {
             this.twinkles[this.twinkles.length -1].on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (){
                 var twinkle = this.twinkles.pop();
                 twinkle.destroy();
                 this.rankTwinkle();
             }, this);
         }
-        console.log(this.twinkles.length)
+        console.log(this.twinkles.length)*/
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
