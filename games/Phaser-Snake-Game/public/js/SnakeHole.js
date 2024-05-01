@@ -1010,8 +1010,9 @@ class GameScene extends Phaser.Scene {
 
         // #endregion
         this.portals.forEach(portal => {
-            var portalAnim = this.add.sprite(portal.x,portal.y).setDepth(15).setOrigin(.25,.25);
+            var portalAnim = this.add.sprite(portal.x,portal.y).setDepth(5).setOrigin(.25,.25);
             portalAnim.play("portalIdle");
+            portalAnim.tint = 0xAC30DE;
         });
 
         
