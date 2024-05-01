@@ -260,6 +260,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
+        this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
 
@@ -1013,6 +1014,18 @@ class GameScene extends Phaser.Scene {
             var portalAnim = this.add.sprite(portal.x,portal.y).setDepth(5).setOrigin(.25,.25);
             portalAnim.play("portalIdle");
             portalAnim.tint = 0xAC30DE;
+
+            this.add.particles(portal.x, portal.y, "portalParticle01", {
+                x:{steps: 2, min: -14, max: 44},
+                y:{steps: 2, min: -14, max: 44},
+                scale: {start: 1, end: 0},
+                speed: 5,
+                moveToX: 16,
+                moveToY: 16,
+                color: [0xFFFFFF,0xAC30DE], 
+                colorEase: 'quad.out',
+                alpha:{start: 1, end: 0 },
+            }).setFrequency(332,[1]).setDepth(20);
         });
 
         
