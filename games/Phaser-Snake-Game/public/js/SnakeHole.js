@@ -235,7 +235,9 @@ class StartScene extends Phaser.Scene {
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
-        
+        this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
+
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
@@ -1660,7 +1662,7 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(1, 0);
 
         // Put Letter Rank Code Here.
-        var medianScore = 10000;
+        var medianScore = 7000;
         var rankIndex = [0,1,2,3,4]; //0 = D, 1 = C, 2 = B... etc.
 
         if (this.scoreTotal > 0 && this.scoreTotal < (medianScore * .5)) {
@@ -1689,15 +1691,45 @@ class ScoreScene extends Phaser.Scene {
         //var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         
         //particle emitter
-        this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
-            x:{min: 0, max: 32},
-            y:{min: 0, max: 68},
-            anim: 'twinkle01',
-            speed: 0,
-            animQuantity: 1,
-            lifespan: 1000,
-            gravityY: 0,
-        }).setFrequency(500,[1]).setDepth(20);
+        if(rankIndex < 5){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
+                x:{min: 0, max: 32},
+                y:{min: 0, max: 68},
+                anim: 'twinkle01',
+                speed: 0,
+                animQuantity: 1,
+                lifespan: 1000,
+                gravityY: 0,
+            }).setFrequency(500,[1]).setDepth(20);
+        }
+
+        if(rankIndex === 3){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
+                x:{min: 0, max: 32},
+                y:{min: 0, max: 68},
+                anim: 'twinkle02',
+                speed: 0,
+                animQuantity: 1,
+                lifespan: 1000,
+                gravityY: -5,
+            }).setFrequency(1332,[1]).setDepth(20);
+        }
+        
+        if(rankIndex === 4){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
+                x:{steps: 8, min: -8, max: 40},
+                y:{steps: 8, min: 8, max: 74},
+                anim: 'twinkle03',
+                speed: 0,
+                animQuantity: 1,
+                color: [0x8fd3ff,0xffffff,0x8ff8e2,0xeaaded], 
+                colorEase: 'quad.out',
+                alpha:{start: 1, end: 0 },
+                lifespan: 3000,
+                gravityY: -5,
+
+            }).setFrequency(666,[1]).setDepth(20);
+        }
 
         // #region Stat Cards
         var cardY = 6;
@@ -3307,6 +3339,18 @@ function loadAnimations(scene) {
         frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
         frameRate: 6,
         repeat: 0
+    })
+    scene.anims.create({
+        key: 'twinkle02',
+        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6 ,7]}),
+        frameRate: 6,
+        repeat: 0
+    })
+    scene.anims.create({
+        key: 'twinkle03',
+        frames: scene.anims.generateFrameNumbers('twinkle03Anim',{ frames: [0, 1, 2, 3, 2, 1,]}),
+        frameRate: 6,
+        repeat: -1
     })
     scene.anims.create({
         key: 'snakeOutlineAnim',
