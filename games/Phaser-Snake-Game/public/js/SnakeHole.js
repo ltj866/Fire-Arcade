@@ -1661,74 +1661,66 @@ class ScoreScene extends Phaser.Scene {
                 <span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
         ).setOrigin(1, 0);
 
-        // Put Letter Rank Code Here.
-        var medianScore = 7000;
-        var rankIndex = [0,1,2,3,4]; //0 = D, 1 = C, 2 = B... etc.
-
-        if (this.scoreTotal > 0 && this.scoreTotal < (medianScore * .5)) {
-            rankIndex = 0
-        }
-        else if (this.scoreTotal > (medianScore * .5) && this.scoreTotal < medianScore) {
-            rankIndex = 1
-        }
-        else if(this.scoreTotal > (medianScore) && this.scoreTotal < (medianScore * 1.5)){
-            rankIndex = 2
-        }
-        else if(this.scoreTotal > (medianScore * 1.5)&& this.scoreTotal < (medianScore * 2)){
-            rankIndex = 3
-        }
-        else if(this.scoreTotal > (medianScore * 2)){
-            rankIndex = 4
-        }
-        console.log(this.scoreTotal)
-
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rankIndex).setDepth(20).setOrigin(0,0);
-        /*this.twinkles = [];
-        var twinkle01 = this.add.sprite(GRID * 3.5, GRID * 6).play("twinkle01").setDepth(21).setOrigin(0,0)
-        this.twinkles.push(twinkle01)*/
-
-        //twinkle01.play("twinkle01")
-        //var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
+        // #region Rank Sprites
         
-        //particle emitter
-        if(rankIndex < 5){
+        const medianScore = 7000;
+
+        const COPPER = 0;
+        const BRONZE = 1;
+        const SILVER = 2;
+        const GOLD = 3;
+        const PLATINUM = 4;
+
+        let rank;
+
+        switch (true) {
+            case this.scoreTotal > medianScore * 2:
+                rank = PLATINUM;
+                break;
+            case this.scoreTotal > medianScore * 1.5:
+                rank = GOLD;
+                break;
+            case this.scoreTotal > medianScore:
+                rank = SILVER;
+                break;
+            case this.scoreTotal > medianScore * .5:
+                rank = BRONZE;
+                break;
+            default:
+                rank = COPPER;
+            return rank;
+        }
+
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        
+        // region Particle Emitter
+        if(rank >= 2){
             this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
-                speed: 0,
-                animQuantity: 1,
                 lifespan: 1000,
-                gravityY: 0,
             }).setFrequency(500,[1]).setDepth(20);
         }
-
-        if(rankIndex === 3){
+        if(rank === 3){
             this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
-                speed: 0,
-                animQuantity: 1,
                 lifespan: 1000,
-                gravityY: -5,
             }).setFrequency(1332,[1]).setDepth(20);
         }
-        
-        if(rankIndex === 4){
+        if(rank === 4){
             this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
-                speed: 0,
-                animQuantity: 1,
                 color: [0x8fd3ff,0xffffff,0x8ff8e2,0xeaaded], 
                 colorEase: 'quad.out',
                 alpha:{start: 1, end: 0 },
                 lifespan: 3000,
                 gravityY: -5,
-
-            }).setFrequency(666,[1]).setDepth(20);
+            }).setFrequency(667,[1]).setDepth(20);
         }
 
         // #region Stat Cards
@@ -2004,15 +1996,6 @@ class ScoreScene extends Phaser.Scene {
             });
         }, [], this);
     }
-    /*rankTwinkle () {
-        //this.twinkle01.destroy();
-        var twinkleX = Phaser.Math.Between(GRID * 3.5, GRID * 5);
-        var twinkleY = Phaser.Math.Between(GRID * 6, GRID * 9);
-        var twinkle01 = this.add.sprite(twinkleX,twinkleY).play(
-            "twinkle01"
-        ).setOrigin(0,0).setDepth(21);
-        this.twinkles.push(twinkle01);
-    };*/
 
     // #region Score - Update
     update(time) {
