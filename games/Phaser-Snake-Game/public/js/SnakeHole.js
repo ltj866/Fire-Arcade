@@ -257,7 +257,7 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('bg01', 'assets/sprites/background01.png');
 
-        this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
         // Tilemap
@@ -1009,7 +1009,10 @@ class GameScene extends Phaser.Scene {
         }
 
         // #endregion
-
+        this.portals.forEach(portal => {
+            var portalAnim = this.add.sprite(portal.x,portal.y).setDepth(15).setOrigin(.125,.125);
+            portalAnim.play("portalIdle");
+        });
 
         
 
@@ -3287,6 +3290,12 @@ class InputScene extends Phaser.Scene {
 
  // #region Animations
 function loadAnimations(scene) {
+    scene.anims.create({
+        key: 'portalIdle',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    })
     scene.anims.create({
         key: 'snakeOutlineAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
