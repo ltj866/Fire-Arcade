@@ -200,7 +200,6 @@ var Snake = new Phaser.Class({
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
     }
-    
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
@@ -214,13 +213,17 @@ var Snake = new Phaser.Class({
                 //console.log("combo",this.lastPlayedCombo)
                 
                 scene.pointSounds[this.lastPlayedCombo].play();
+                //console.log(scene.comboCounter)
                 
                 if (this.lastPlayedCombo < 7) {
                     this.lastPlayedCombo += 1;
+                    ourUI.comboCounter += 1;
+                    //console.log(scene.comboCounter)
                 }
             }
             else {
                 this.lastPlayedCombo = 0;
+                ourUI.comboCounter = 0;
             }
             
 
