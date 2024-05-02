@@ -271,6 +271,10 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
+        this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -1590,6 +1594,10 @@ class ScoreScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
+
+
+
+
         
         // #region
         // Dream walls for Horizontal Wrap
@@ -1617,6 +1625,7 @@ class ScoreScene extends Phaser.Scene {
             //this.dreamWalls.push(wallShimmerBottom);
         
         }
+
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -1684,10 +1693,67 @@ class ScoreScene extends Phaser.Scene {
                 <span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
         ).setOrigin(1, 0);
 
-        // Put Letter Rank Code Here.
-        var medianScore = 10000;
-
+        // #region Rank Sprites
         
+        const medianScore = 8000;
+
+        const COPPER = 0;
+        const BRONZE = 1;
+        const SILVER = 2;
+        const GOLD = 3;
+        const PLATINUM = 4;
+
+        let rank;
+
+        switch (true) {
+            case this.scoreTotal > medianScore * 2:
+                rank = PLATINUM;
+                break;
+            case this.scoreTotal > medianScore * 1.5:
+                rank = GOLD;
+                break;
+            case this.scoreTotal > medianScore:
+                rank = SILVER;
+                break;
+            case this.scoreTotal > medianScore * .5:
+                rank = BRONZE;
+                break;
+            default:
+                rank = COPPER;
+        }
+
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        
+        // region Particle Emitter
+        if(rank >= SILVER){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
+                x:{min: 0, max: 32},
+                y:{min: 0, max: 68},
+                anim: 'twinkle01',
+                lifespan: 1000,
+            }).setFrequency(500,[1]).setDepth(20);
+        }
+        if(rank === GOLD){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
+                x:{min: 0, max: 32},
+                y:{min: 0, max: 68},
+                anim: 'twinkle02',
+                lifespan: 1000,
+            }).setFrequency(1332,[1]).setDepth(20);
+        }
+        if(rank === PLATINUM){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
+                x:{steps: 8, min: -8, max: 40},
+                y:{steps: 8, min: 8, max: 74},
+                anim: 'twinkle03',
+                color: [0x8fd3ff,0xffffff,0x8ff8e2,0xeaaded], 
+                colorEase: 'quad.out',
+                alpha:{start: 1, end: 0 },
+                lifespan: 3000,
+                gravityY: -5,
+            }).setFrequency(667,[1]).setDepth(20);
+        }
+
         // #region Stat Cards
         var cardY = 6;
         var styleCard = {
@@ -1964,7 +2030,6 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -3279,6 +3344,24 @@ class InputScene extends Phaser.Scene {
 
  // #region Animations
 function loadAnimations(scene) {
+    scene.anims.create({
+        key: 'twinkle01',
+        frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
+        frameRate: 6,
+        repeat: 0
+    })
+    scene.anims.create({
+        key: 'twinkle02',
+        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6 ,7]}),
+        frameRate: 6,
+        repeat: 0
+    })
+    scene.anims.create({
+        key: 'twinkle03',
+        frames: scene.anims.generateFrameNumbers('twinkle03Anim',{ frames: [0, 1, 2, 3, 2, 1,]}),
+        frameRate: 6,
+        repeat: -1
+    })
     scene.anims.create({
         key: 'snakeOutlineAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
