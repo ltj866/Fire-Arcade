@@ -3377,6 +3377,7 @@ function loadAnimations(scene) {
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
         frameRate: 8,
+        repeat: -1
     })
     scene.anims.create({
         key: 'twinkle01',
