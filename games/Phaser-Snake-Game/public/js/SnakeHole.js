@@ -1448,17 +1448,24 @@ class GameScene extends Phaser.Scene {
 
             if(this.boostOutlinesBody.length > 0){ //needs to only happen when boost bar has energy, will abstract later
                 // Get ride of the old one
-                var toDelete = this.boostOutlinesBody.shift();
-                toDelete.destroy();
-
-                // Make the new one
-                var boostOutline = this.add.sprite(
-                    this.snake.head.x, 
-                    this.snake.head.y
-                ).setOrigin(.083333,.083333).setDepth(15);
+                if (this.boostOutlinesBody.length > 0) {
+                    var toDelete = this.boostOutlinesBody.shift();
+                    toDelete.destroy();
+    
+                    // Make the new one
+                    var boostOutline = this.add.sprite(
+                        this.snake.head.x, 
+                        this.snake.head.y
+                    ).setOrigin(.083333,.083333).setDepth(15);
+                    
+                    boostOutline.play("snakeOutlineAnim");
+                    this.boostOutlinesBody.push(boostOutline);
+                    
+                }
+                    this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+        
                 
-                boostOutline.play("snakeOutlineAnim");
-                this.boostOutlinesBody.push(boostOutline);
 
                 //move the tail
                 //this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
@@ -1487,11 +1494,7 @@ class GameScene extends Phaser.Scene {
                 })*/
             }
             
-            if (this.boostOutlineTail) {
-                this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
-                this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
-                
-            }
+
             if (energyAmountX < 1 && this.startMoving) {
                 // add the tail in.
                 this.boostOutlinesBody.push(this.boostOutlineTail);
