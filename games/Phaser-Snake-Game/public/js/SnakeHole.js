@@ -113,7 +113,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
     }
     else {
         nextLevelZeds = reqZeds + ZED_CONSTANT + Math.floor(reqZeds*ZEDS_OVERLEVEL_SCALAR);
-        debugger
     }
 
     if (remainingZeds > nextLevelZeds - 1) {
@@ -122,7 +121,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
         zedsLevel = calcZedLevel(remainingZeds, nextLevelZeds, level);
     }
     else {
-        debugger
         remainingZeds = nextLevelZeds - remainingZeds
         zedsLevel = {level:level, zedsToNext: remainingZeds}
     }
@@ -140,7 +138,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 // 5 => {0,11}
 // 20 => {1,14}
 // 5952 => {25,522}
-// 164583 => {99,8535}
+// 164_583 => {99,8535}
 // 1_000_000 => {levelCurrent: 106, zedsToNext: 332151}
 // #endregion
 
@@ -441,7 +439,7 @@ class GameScene extends Phaser.Scene {
         this.comboCounter = comboCounter;
 
         // Boost Array
-        this.boostOutlines = [];
+        this.boostOutlinesBody = [];
         //this.boostOutlines.length = 0; //this needs to be set to 1 on init or else a lingering outline persists on space-down
         this.boostOutlinesSmall;
         this.boostGhosts = [];
@@ -641,10 +639,9 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveDirection(this, e);
                 
                 
-                // Adds
-                if (this.boostOutlines.length > 0 && e.code != "Space") {
+                if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
                     
-                    var toDelete = this.boostOutlines.shift();
+                    var toDelete = this.boostOutlinesBody.shift();
                     toDelete.destroy();
     
                     // Make the new one
@@ -654,7 +651,10 @@ class GameScene extends Phaser.Scene {
                     ).setOrigin(.083333,.083333).setDepth(15);
                     
                     boostOutline.play("snakeOutlineAnim");
-                    this.boostOutlines.push(boostOutline);
+                    this.boostOutlinesBody.push(boostOutline);
+
+                    this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 }
             }
 
@@ -672,47 +672,46 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
             
             // #region Boost Outlines
-            this.boostOutlines = [];
+            this.boostOutlinesBody = [];
             for (let index = 0; index < this.snake.body.length; index++) {
-                if (index < this.snake.body.length -1) {
+                
                 var boostOutline = this.add.sprite(
                     this.snake.body[index].x, 
                     this.snake.body[index].y
                 ).setOrigin(.083333,.083333).setDepth(15);
-                //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
-                boostOutline.play("snakeOutlineAnim");
                 boostOutline.alpha = 0;
-
                 var fadeinTween = this.tweens.add({
                     targets: boostOutline,
                     alpha: 100,
                     duration: 200,
                     ease: 'linear'
-                  }, this);
+                    }, this);
 
-
-
-                this.boostOutlines.unshift(boostOutline);
+                if (index < this.snake.body.length -1) {
+                    // For all the body segments
+                    boostOutline.play("snakeOutlineAnim");
+                    this.boostOutlinesBody.unshift(boostOutline);
                 }
                 else{
-                //var boostOutlineSmall = this.add.sprite(
-                //    this.snake.body[this.snake.body.length -1].x,
-                //     this.snake.body[this.snake.body.length -1].y
-                //).setOrigin(.083333,.083333).setDepth(0);
+                    // on taill
+                    boostOutline.play("snakeOutlineSmallAnim");
+                    this.boostOutlineTail = boostOutline;
                 }
-                
             }
         });
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-            if (this.boostOutlines.length > 0){
+            if (this.boostOutlinesBody.length > 0){
                 ////debugger
 
-                this.boostOutlines.forEach(boostOutline =>{
+                // add the tail in.
+                this.boostOutlinesBody.push(this.boostOutlineTail);
+
+                this.boostOutlinesBody.forEach(boostOutline =>{
                     var fadeoutTween = this.tweens.add({
                         targets: boostOutline,
                         alpha: 0,
-                        duration: 400,
+                        duration: 340,
                         ease: 'linear'
                       }, this);
     
@@ -720,17 +719,8 @@ class GameScene extends Phaser.Scene {
                         boostOutline.destroy()
                     });
                 });
+                this.boostOutlinesBody = [];
 
-
-                // Remove all of the array allocated spaces through reasignment.
-                this.boostOutlines = [];
-
-                //this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
-                //    boostOutlineSmall.destroy();
-                //});
-                //this.boostGhosts.forEach(boostGhost =>{
-                //    boostGhost.destroy();
-                //})
             }
             //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
@@ -1432,7 +1422,7 @@ class GameScene extends Phaser.Scene {
 
                 this.boostGhosts.push(boostGhost);
             }*/
-            if (this.boostOutlines.length > 0) {
+            if (this.boostOutlinesBody.length > 0) {
 
                 
             }
@@ -1447,9 +1437,9 @@ class GameScene extends Phaser.Scene {
             
             //this.spaceKey.isDown
 
-            if(this.boostOutlines.length > 0 && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+            if(this.boostOutlinesBody.length > 0 && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
                 // Get ride of the old one
-                var toDelete = this.boostOutlines.shift();
+                var toDelete = this.boostOutlinesBody.shift();
                 toDelete.destroy();
 
                 // Make the new one
@@ -1459,16 +1449,18 @@ class GameScene extends Phaser.Scene {
                 ).setOrigin(.083333,.083333).setDepth(15);
                 
                 boostOutline.play("snakeOutlineAnim");
-                this.boostOutlines.push(boostOutline);
-                
+                this.boostOutlinesBody.push(boostOutline);
 
+                //move the tail
+                this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 
                 //this.boostOutlines = this.boostOutlines.slice(1,this.boostOutlines.length);
                 //console.log("boost length = ",this.boostOutlines.length)
                 //console.log("snake length = ",this.snake.body.length)
                 //this.boostOutlines[0].destroy();
                 //debugger;
-                console.log(this.boostOutlines.length, this.snake.body.length)
+                console.log(this.boostOutlinesBody.length, this.snake.body.length)
                 /*var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
                 if(this.boostOutlines.length > (this.snake.body.length)){
                     this.boostOutlines[latestOutline].destroy();

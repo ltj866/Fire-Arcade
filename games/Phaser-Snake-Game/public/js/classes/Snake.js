@@ -28,7 +28,7 @@ var Snake = new Phaser.Class({
     
     grow: function (scene)
     {
-        if (scene.boostOutlines.length > 0) {
+        if (scene.boostOutlinesBody.length > 0) {
             //newPart.setTint(0xFF00FF);
             // Make the new one
             var boostOutline = scene.add.sprite(
@@ -37,7 +37,7 @@ var Snake = new Phaser.Class({
             ).setOrigin(.083333,.083333).setDepth(15);
              
             boostOutline.play("snakeOutlineAnim");
-            scene.boostOutlines.unshift(boostOutline);
+            scene.boostOutlinesBody.unshift(boostOutline);
         }
         
         this.tail = this.body.slice(-1);
