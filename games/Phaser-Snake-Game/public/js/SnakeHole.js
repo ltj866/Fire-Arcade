@@ -710,7 +710,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-            if (this.boostOutlinesBody.length > 0){
+            if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
 
                 // add the tail in.
@@ -1462,7 +1462,8 @@ class GameScene extends Phaser.Scene {
             
             //this.spaceKey.isDown
 
-            if(this.boostOutlinesBody.length > 0 && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+
+            if(this.boostOutlinesBody.length > 0){ //needs to only happen when boost bar has energy, will abstract later
                 // Get ride of the old one
                 var toDelete = this.boostOutlinesBody.shift();
                 toDelete.destroy();
@@ -1477,8 +1478,8 @@ class GameScene extends Phaser.Scene {
                 this.boostOutlinesBody.push(boostOutline);
 
                 //move the tail
-                this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
-                this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+                //this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                //this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 
                 //this.boostOutlines = this.boostOutlines.slice(1,this.boostOutlines.length);
                 //console.log("boost length = ",this.boostOutlines.length)
@@ -1502,11 +1503,33 @@ class GameScene extends Phaser.Scene {
                     //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
                 })*/
             }
-            else{
-                //boosting = false;
+            
+            if (this.boostOutlineTail) {
+                this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+                
             }
+            if (energyAmountX < 1 && this.startMoving) {
+                // add the tail in.
+                this.boostOutlinesBody.push(this.boostOutlineTail);
+
+                this.boostOutlinesBody.forEach(boostOutline =>{
+                    var fadeoutTween = this.tweens.add({
+                        targets: boostOutline,
+                        alpha: 0,
+                        duration: 340,
+                        ease: 'linear'
+                        }, this);
+
+                    fadeoutTween.on('complete', e => {
+                        boostOutline.destroy()
+                    });
+                });
+                this.boostOutlinesBody = [];
+                
+            } 
+
             // #region boost update
-            ourUI.energyAmount = 100;
             //if (boosting){
                 /*for (let index = 0; index < this.snake.body.length; index++) {
                     if (index < this.snake.body.length -1) {
