@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
-var FRUIT = 5;                 //.................... Number of fruit to spawn
+//var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
@@ -28,9 +28,10 @@ var SPEEDSPRINT = 24; // 24
 
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
-const BOOST_ADD_FLOOR = 80;
-export const COMBO_ADD_FLOOR = 88;
+const BOOST_ADD_FLOOR = 100;
+export const COMBO_ADD_FLOOR = 108;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
+const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
 
 var comboCounter = 0;
@@ -51,7 +52,7 @@ const SCORE_SCENE_DEBUG = false;
 // Speed Multiplier Stats
 const a = 1400; // Average Score
 const lm = 28; // Minimum score
-const lM = 2800; // Theoretical max score.
+const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
 
 // #region Utils Functions
@@ -217,23 +218,26 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
+    'Stage-01': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
+    
     'Stage-02a': [['Stage-03a', 0]],
     'Stage-02b': [['Stage-03a', 50]],
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
-    'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03a': [['Stage-04', 60]],
-    'Stage-03b': [['Stage-04', 60]],
-    'Stage-03c': [['Stage-04', 60]],
-    'Stage-04': [['Stage-05', 70]],
-    'Stage-05': [['Stage-06', 75]],
-    'Stage-06': [['Stage-07', 80]],
-    'Stage-07': [['Stage-08', 80]],
-    'Stage-08': [['Stage-09', 80]],
-    'Stage-09': [['Stage-10', 80]],
-    'Stage-10': [['Stage-11', 80]],
-    'Stage-11': [['Stage-12', 80]],
+    'Stage-02e': [['Stage-03c', 105]],
+    
+    'Stage-03a': [['Stage-04', 85]],
+    'Stage-03b': [['Stage-04', 85]],
+    'Stage-03c': [['Stage-04', 85]],
+    
+    'Stage-04': [['Stage-05', 90]],
+    'Stage-05': [['Stage-06', 95]],
+    'Stage-06': [['Stage-07', 100]],
+    'Stage-07': [['Stage-08', 100]],
+    'Stage-08': [['Stage-09', 100]],
+    'Stage-09': [['Stage-10', 100]],
+    'Stage-10': [['Stage-11', 100]],
+    'Stage-11': [['Stage-12', 100]],
     'Bonus-Stage-x1': [],
 }
 
@@ -1464,7 +1468,6 @@ class GameScene extends Phaser.Scene {
                 //console.log("snake length = ",this.snake.body.length)
                 //this.boostOutlines[0].destroy();
                 //debugger;
-                console.log(this.boostOutlinesBody.length, this.snake.body.length)
                 /*var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
                 if(this.boostOutlines.length > (this.snake.body.length)){
                     this.boostOutlines[latestOutline].destroy();
@@ -2699,9 +2702,11 @@ class UIScene extends Phaser.Scene {
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
         this.scoreTimer = this.time.addEvent({
-            delay: 10000,
+            delay: MAX_SCORE *100,
             paused: false
          });
+
+        var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
 
          // Countdown Text
@@ -2714,7 +2719,7 @@ class UIScene extends Phaser.Scene {
             outline: 'solid',
             "outline-color": 'white',
             })).setText(
-                this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+                countDown.toString().padStart(3,"0")
         ).setOrigin(1,0);
         
 
@@ -2776,6 +2781,13 @@ class UIScene extends Phaser.Scene {
                 this.scoreHistory.push(SCORE_FLOOR);
             }
 
+            // Calc Level Score
+            var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+            var lastHistory = this.scoreHistory.slice();
+            lastHistory.pop();
+            var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
+            console.log("Current Score:", this.score + calcBonus(baseScore), "Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+
 
 
             // Update UI
@@ -2801,7 +2813,7 @@ class UIScene extends Phaser.Scene {
              // Restart Score Timer
             if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: 10000,
+                    delay: MAX_SCORE * 100,
                     paused: false
                  });   
             }
@@ -2931,12 +2943,12 @@ class UIScene extends Phaser.Scene {
         
         if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
+            var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             if (timeTick < SCORE_FLOOR ) {
-                this.countDown.setText(SCORE_FLOOR);
-            } else if (timeTick > 99) {
-                this.countDown.setText(99);
-            } else {
-                this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0"));
+            }
+            else {
+                this.countDown.setText(countDown.toString().padStart(3,"0"));
             }
         }
         else {
