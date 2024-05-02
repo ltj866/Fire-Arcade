@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
-var FRUIT = 5;                 //.................... Number of fruit to spawn
+//var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
@@ -28,9 +28,10 @@ var SPEEDSPRINT = 24; // 24
 
 
 var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
-const BOOST_ADD_FLOOR = 80;
-export const COMBO_ADD_FLOOR = 88;
+const BOOST_ADD_FLOOR = 100;
+export const COMBO_ADD_FLOOR = 108;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
+const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
 
 var comboCounter = 0;
@@ -51,7 +52,7 @@ const SCORE_SCENE_DEBUG = false;
 // Speed Multiplier Stats
 const a = 1400; // Average Score
 const lm = 28; // Minimum score
-const lM = 2800; // Theoretical max score.
+const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
 
 // #region Utils Functions
@@ -113,7 +114,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
     }
     else {
         nextLevelZeds = reqZeds + ZED_CONSTANT + Math.floor(reqZeds*ZEDS_OVERLEVEL_SCALAR);
-        debugger
     }
 
     if (remainingZeds > nextLevelZeds - 1) {
@@ -122,7 +122,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
         zedsLevel = calcZedLevel(remainingZeds, nextLevelZeds, level);
     }
     else {
-        debugger
         remainingZeds = nextLevelZeds - remainingZeds
         zedsLevel = {level:level, zedsToNext: remainingZeds}
     }
@@ -140,7 +139,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 // 5 => {0,11}
 // 20 => {1,14}
 // 5952 => {25,522}
-// 164583 => {99,8535}
+// 164_583 => {99,8535}
 // 1_000_000 => {levelCurrent: 106, zedsToNext: 332151}
 // #endregion
 
@@ -219,23 +218,26 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 0],['Stage-02b', 99],['Stage-02c', 99],['Stage-02d', 99],['Stage-02e', 91]],
+    'Stage-01': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
+    
     'Stage-02a': [['Stage-03a', 0]],
     'Stage-02b': [['Stage-03a', 50]],
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
-    'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03a': [['Stage-04', 60]],
-    'Stage-03b': [['Stage-04', 60]],
-    'Stage-03c': [['Stage-04', 60]],
-    'Stage-04': [['Stage-05', 70]],
-    'Stage-05': [['Stage-06', 75]],
-    'Stage-06': [['Stage-07', 80]],
-    'Stage-07': [['Stage-08', 80]],
-    'Stage-08': [['Stage-09', 80]],
-    'Stage-09': [['Stage-10', 80]],
-    'Stage-10': [['Stage-11', 80]],
-    'Stage-11': [['Stage-12', 80]],
+    'Stage-02e': [['Stage-03c', 105]],
+    
+    'Stage-03a': [['Stage-04', 85]],
+    'Stage-03b': [['Stage-04', 85]],
+    'Stage-03c': [['Stage-04', 85]],
+    
+    'Stage-04': [['Stage-05', 90]],
+    'Stage-05': [['Stage-06', 95]],
+    'Stage-06': [['Stage-07', 100]],
+    'Stage-07': [['Stage-08', 100]],
+    'Stage-08': [['Stage-09', 100]],
+    'Stage-09': [['Stage-10', 100]],
+    'Stage-10': [['Stage-11', 100]],
+    'Stage-11': [['Stage-12', 100]],
     'Bonus-Stage-x1': [],
 }
 
@@ -274,6 +276,10 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
+        this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -442,7 +448,7 @@ class GameScene extends Phaser.Scene {
         this.comboCounter = comboCounter;
 
         // Boost Array
-        this.boostOutlines = [];
+        this.boostOutlinesBody = [];
         //this.boostOutlines.length = 0; //this needs to be set to 1 on init or else a lingering outline persists on space-down
         this.boostOutlinesSmall;
         this.boostGhosts = [];
@@ -642,10 +648,9 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveDirection(this, e);
                 
                 
-                // Adds
-                if (this.boostOutlines.length > 0 && e.code != "Space") {
+                if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
                     
-                    var toDelete = this.boostOutlines.shift();
+                    var toDelete = this.boostOutlinesBody.shift();
                     toDelete.destroy();
     
                     // Make the new one
@@ -655,7 +660,10 @@ class GameScene extends Phaser.Scene {
                     ).setOrigin(.083333,.083333).setDepth(15);
                     
                     boostOutline.play("snakeOutlineAnim");
-                    this.boostOutlines.push(boostOutline);
+                    this.boostOutlinesBody.push(boostOutline);
+
+                    this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 }
             }
 
@@ -673,47 +681,46 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
             
             // #region Boost Outlines
-            this.boostOutlines = [];
+            this.boostOutlinesBody = [];
             for (let index = 0; index < this.snake.body.length; index++) {
-                if (index < this.snake.body.length -1) {
+                
                 var boostOutline = this.add.sprite(
                     this.snake.body[index].x, 
                     this.snake.body[index].y
                 ).setOrigin(.083333,.083333).setDepth(15);
-                //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
-                boostOutline.play("snakeOutlineAnim");
                 boostOutline.alpha = 0;
-
                 var fadeinTween = this.tweens.add({
                     targets: boostOutline,
                     alpha: 100,
                     duration: 200,
                     ease: 'linear'
-                  }, this);
+                    }, this);
 
-
-
-                this.boostOutlines.unshift(boostOutline);
+                if (index < this.snake.body.length -1) {
+                    // For all the body segments
+                    boostOutline.play("snakeOutlineAnim");
+                    this.boostOutlinesBody.unshift(boostOutline);
                 }
                 else{
-                //var boostOutlineSmall = this.add.sprite(
-                //    this.snake.body[this.snake.body.length -1].x,
-                //     this.snake.body[this.snake.body.length -1].y
-                //).setOrigin(.083333,.083333).setDepth(0);
+                    // on taill
+                    boostOutline.play("snakeOutlineSmallAnim");
+                    this.boostOutlineTail = boostOutline;
                 }
-                
             }
         });
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-            if (this.boostOutlines.length > 0){
+            if (this.boostOutlinesBody.length > 0){
                 ////debugger
 
-                this.boostOutlines.forEach(boostOutline =>{
+                // add the tail in.
+                this.boostOutlinesBody.push(this.boostOutlineTail);
+
+                this.boostOutlinesBody.forEach(boostOutline =>{
                     var fadeoutTween = this.tweens.add({
                         targets: boostOutline,
                         alpha: 0,
-                        duration: 400,
+                        duration: 340,
                         ease: 'linear'
                       }, this);
     
@@ -721,17 +728,8 @@ class GameScene extends Phaser.Scene {
                         boostOutline.destroy()
                     });
                 });
+                this.boostOutlinesBody = [];
 
-
-                // Remove all of the array allocated spaces through reasignment.
-                this.boostOutlines = [];
-
-                //this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
-                //    boostOutlineSmall.destroy();
-                //});
-                //this.boostGhosts.forEach(boostGhost =>{
-                //    boostGhost.destroy();
-                //})
             }
             //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
@@ -1449,7 +1447,7 @@ class GameScene extends Phaser.Scene {
 
                 this.boostGhosts.push(boostGhost);
             }*/
-            if (this.boostOutlines.length > 0) {
+            if (this.boostOutlinesBody.length > 0) {
 
                 
             }
@@ -1464,9 +1462,9 @@ class GameScene extends Phaser.Scene {
             
             //this.spaceKey.isDown
 
-            if(this.boostOutlines.length > 0 && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+            if(this.boostOutlinesBody.length > 0 && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
                 // Get ride of the old one
-                var toDelete = this.boostOutlines.shift();
+                var toDelete = this.boostOutlinesBody.shift();
                 toDelete.destroy();
 
                 // Make the new one
@@ -1476,16 +1474,17 @@ class GameScene extends Phaser.Scene {
                 ).setOrigin(.083333,.083333).setDepth(15);
                 
                 boostOutline.play("snakeOutlineAnim");
-                this.boostOutlines.push(boostOutline);
-                
+                this.boostOutlinesBody.push(boostOutline);
 
+                //move the tail
+                this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
                 
                 //this.boostOutlines = this.boostOutlines.slice(1,this.boostOutlines.length);
                 //console.log("boost length = ",this.boostOutlines.length)
                 //console.log("snake length = ",this.snake.body.length)
                 //this.boostOutlines[0].destroy();
                 //debugger;
-                console.log(this.boostOutlines.length, this.snake.body.length)
                 /*var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
                 if(this.boostOutlines.length > (this.snake.body.length)){
                     this.boostOutlines[latestOutline].destroy();
@@ -1615,6 +1614,10 @@ class ScoreScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
+
+
+
+
         
         // #region
         // Dream walls for Horizontal Wrap
@@ -1642,6 +1645,7 @@ class ScoreScene extends Phaser.Scene {
             //this.dreamWalls.push(wallShimmerBottom);
         
         }
+
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -1709,10 +1713,67 @@ class ScoreScene extends Phaser.Scene {
                 <span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
         ).setOrigin(1, 0);
 
-        // Put Letter Rank Code Here.
-        var medianScore = 10000;
-
+        // #region Rank Sprites
         
+        const medianScore = 8000;
+
+        const COPPER = 0;
+        const BRONZE = 1;
+        const SILVER = 2;
+        const GOLD = 3;
+        const PLATINUM = 4;
+
+        let rank;
+
+        switch (true) {
+            case this.scoreTotal > medianScore * 2:
+                rank = PLATINUM;
+                break;
+            case this.scoreTotal > medianScore * 1.5:
+                rank = GOLD;
+                break;
+            case this.scoreTotal > medianScore:
+                rank = SILVER;
+                break;
+            case this.scoreTotal > medianScore * .5:
+                rank = BRONZE;
+                break;
+            default:
+                rank = COPPER;
+        }
+
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        
+        // region Particle Emitter
+        if(rank >= SILVER){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
+                x:{min: 0, max: 32},
+                y:{min: 0, max: 68},
+                anim: 'twinkle01',
+                lifespan: 1000,
+            }).setFrequency(500,[1]).setDepth(20);
+        }
+        if(rank === GOLD){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
+                x:{min: 0, max: 32},
+                y:{min: 0, max: 68},
+                anim: 'twinkle02',
+                lifespan: 1000,
+            }).setFrequency(1332,[1]).setDepth(20);
+        }
+        if(rank === PLATINUM){
+            this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
+                x:{steps: 8, min: -8, max: 40},
+                y:{steps: 8, min: 8, max: 74},
+                anim: 'twinkle03',
+                color: [0x8fd3ff,0xffffff,0x8ff8e2,0xeaaded], 
+                colorEase: 'quad.out',
+                alpha:{start: 1, end: 0 },
+                lifespan: 3000,
+                gravityY: -5,
+            }).setFrequency(667,[1]).setDepth(20);
+        }
+
         // #region Stat Cards
         var cardY = 6;
         var styleCard = {
@@ -1989,7 +2050,6 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -2659,9 +2719,11 @@ class UIScene extends Phaser.Scene {
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
         this.scoreTimer = this.time.addEvent({
-            delay: 10000,
+            delay: MAX_SCORE *100,
             paused: false
          });
+
+        var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
 
          // Countdown Text
@@ -2674,7 +2736,7 @@ class UIScene extends Phaser.Scene {
             outline: 'solid',
             "outline-color": 'white',
             })).setText(
-                this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+                countDown.toString().padStart(3,"0")
         ).setOrigin(1,0);
         
 
@@ -2736,6 +2798,13 @@ class UIScene extends Phaser.Scene {
                 this.scoreHistory.push(SCORE_FLOOR);
             }
 
+            // Calc Level Score
+            var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+            var lastHistory = this.scoreHistory.slice();
+            lastHistory.pop();
+            var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
+            console.log("Current Score:", this.score + calcBonus(baseScore), "Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+
 
 
             // Update UI
@@ -2761,7 +2830,7 @@ class UIScene extends Phaser.Scene {
              // Restart Score Timer
             if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: 10000,
+                    delay: MAX_SCORE * 100,
                     paused: false
                  });   
             }
@@ -2891,12 +2960,12 @@ class UIScene extends Phaser.Scene {
         
         if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
+            var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             if (timeTick < SCORE_FLOOR ) {
-                this.countDown.setText(SCORE_FLOOR);
-            } else if (timeTick > 99) {
-                this.countDown.setText(99);
-            } else {
-                this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0"));
+            }
+            else {
+                this.countDown.setText(countDown.toString().padStart(3,"0"));
             }
         }
         else {
@@ -3308,6 +3377,23 @@ function loadAnimations(scene) {
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
         frameRate: 8,
+    })
+    scene.anims.create({
+        key: 'twinkle01',
+        frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
+        frameRate: 6,
+        repeat: 0
+    })
+    scene.anims.create({
+        key: 'twinkle02',
+        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6 ,7]}),
+        frameRate: 6,
+        repeat: 0
+    })
+    scene.anims.create({
+        key: 'twinkle03',
+        frames: scene.anims.generateFrameNumbers('twinkle03Anim',{ frames: [0, 1, 2, 3, 2, 1,]}),
+        frameRate: 6,
         repeat: -1
     })
     scene.anims.create({
