@@ -819,9 +819,16 @@ class GameScene extends Phaser.Scene {
 
             p1.targetObject = p2;
             p2.targetObject = p1;
+
+            //p1.flipX = true;
+            //var randomStart = Phaser.Math.Between(0,5);
+            //p1.setFrame(randomStart)
+            //p2.setFrame(randomStart)
         }
 
-
+        //makePair(this, [5,5],[3,3]);
+        //makePair(this, [6,5],[4,3]);
+        //makePair(this, [7,5],[5,3]);
         // Add try loop to get all Portal Layers
 
         // do while loop Portal-X
@@ -1009,19 +1016,15 @@ class GameScene extends Phaser.Scene {
 
         // #endregion
         this.portals.forEach(portal => {
-            var portalAnim = this.add.sprite(portal.x,portal.y).setDepth(5).setOrigin(.25,.25);
-            portalAnim.play("portalIdle");
-            portalAnim.tint = 0xAC30DE;
-
             this.add.particles(portal.x, portal.y, "portalParticle01", {
-                x:{steps: 2, min: -14, max: 44},
-                y:{steps: 2, min: -14, max: 44},
-                scale: {start: 1, end: 0},
+                color: [ portal.tintTopLeft,0x000000, 0x000000],
+                colorEase: 'quad.out',
+                x:{steps: 2, min: -18, max: 48},
+                y:{steps: 2, min: -18, max: 48},
+                scale: {start: 1, end: .5},
                 speed: 5,
                 moveToX: 16,
                 moveToY: 16,
-                color: [0xFFFFFF,0xAC30DE], 
-                colorEase: 'quad.out',
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
         });
@@ -1417,7 +1420,7 @@ class GameScene extends Phaser.Scene {
 
                         }
                     });
-                };
+                }
             } // End Closest Portal
             
             const ourUI = this.scene.get('UIScene');
@@ -3610,8 +3613,8 @@ var config = {
     },
     fx: {
         glow: {
-            distance: 32,
-            quality: 0.1
+            distance: 24,
+            quality: .1
         }
     },
     dom: {

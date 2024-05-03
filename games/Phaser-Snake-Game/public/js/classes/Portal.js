@@ -13,6 +13,8 @@ var Portal = new Phaser.Class({
         this.setPosition(from[0] * GRID, from[1] * GRID);
         this.setOrigin(.25,.25);
         this.setDepth(5);
+        this.play("portalIdle")
+
 
         this.target = { x: to[0], y: to[1]};
         this.targetObject = {};
