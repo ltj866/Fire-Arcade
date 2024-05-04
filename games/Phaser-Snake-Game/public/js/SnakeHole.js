@@ -274,6 +274,7 @@ class StartScene extends Phaser.Scene {
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -2671,6 +2672,8 @@ class UIScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.25,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+
 
        this.mask = this.make.image({
            x: SCREEN_WIDTH/2,
@@ -2750,9 +2753,9 @@ class UIScene extends Phaser.Scene {
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
             padding: '1px 5px',
-            'border-radius': '4px',
-            outline: 'solid',
-            "outline-color": 'white',
+            //'border-radius': '4px',
+            //outline: 'solid',
+            //"outline-color": 'white',
             })).setText(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
