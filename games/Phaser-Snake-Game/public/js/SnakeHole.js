@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 
@@ -2708,10 +2708,10 @@ class UIScene extends Phaser.Scene {
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID * 28, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
 
-        var snakeBody = this.add.sprite(GRID * 29.5, GRID - 4, 'snakeDefault', 1).setOrigin(0,1).setDepth(50)      // Snake Body
-        var flagGoal = this.add.sprite(GRID * 29.5, GRID + 4, 'ui-blocks', 3).setOrigin(0,0.1).setDepth(50); // Tried to center flag
+        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)      // Snake Body
+        var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
  
         snakeBody.scale = .667;
         flagGoal.scale = .667;
@@ -2756,6 +2756,15 @@ class UIScene extends Phaser.Scene {
             })).setText(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
+
+        
+        this.deltaScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `LastΔ: +0 `
+        ).setOrigin(0,1);
+        
+        this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `Score: ${commaInt(this.score.toString())}`
+        ).setOrigin(0,0);
         
 
         
@@ -2821,8 +2830,19 @@ class UIScene extends Phaser.Scene {
             var lastHistory = this.scoreHistory.slice();
             lastHistory.pop();
             var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
-            console.log("Current Score:", this.score + calcBonus(baseScore), "Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
 
+            var runningScore = this.score + calcBonus(baseScore);
+            var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
+
+            this.deltaScoreUI.setText(
+                `LastΔ: +${deltaScore}`
+            )
+            
+            this.runningScoreUI.setText(
+                `Score: ${commaInt(runningScore.toString())}`
+            );
+            
 
 
             // Update UI
@@ -2836,7 +2856,11 @@ class UIScene extends Phaser.Scene {
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
-                this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
+                this.lengthGoalUI.setHTML(
+                    `${length.padStart(2, "0")}<br/>
+                    <hr style="font-size:3px"/>
+                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
+                )
             }
             else {
                 this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
