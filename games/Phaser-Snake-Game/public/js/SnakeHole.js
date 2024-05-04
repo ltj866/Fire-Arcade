@@ -1023,8 +1023,8 @@ class GameScene extends Phaser.Scene {
                 y:{steps: 2, min: -18, max: 48},
                 scale: {start: 1, end: .5},
                 speed: 5,
-                moveToX: 16,
-                moveToY: 16,
+                moveToX: 14,
+                moveToY: 14,
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
         });
