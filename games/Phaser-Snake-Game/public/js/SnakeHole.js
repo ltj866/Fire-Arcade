@@ -226,18 +226,18 @@ const STAGES_NEXT = {
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 105]],
     
-    'Stage-03a': [['Stage-04', 85]],
+    'Stage-03a': [['Stage-04', 0]],
     'Stage-03b': [['Stage-04', 85]],
     'Stage-03c': [['Stage-04', 85]],
     
-    'Stage-04': [['Stage-05', 90]],
-    'Stage-05': [['Stage-06', 95]],
-    'Stage-06': [['Stage-07', 100]],
-    'Stage-07': [['Stage-08', 100]],
-    'Stage-08': [['Stage-09', 100]],
-    'Stage-09': [['Stage-10', 100]],
-    'Stage-10': [['Stage-11', 100]],
-    'Stage-11': [['Stage-12', 100]],
+    'Stage-04': [['Stage-05', 0]],
+    'Stage-05': [['Stage-06', 0]],
+    'Stage-06': [['Stage-07', 0]],
+    'Stage-07': [['Stage-08', 0]],
+    'Stage-08': [['Stage-09', 0]],
+    'Stage-09': [['Stage-10', 0]],
+    'Stage-10': [['Stage-11', 0]],
+    'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
 }
 
