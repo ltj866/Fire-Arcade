@@ -259,9 +259,10 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('bg01', 'assets/sprites/background01.png');
 
-        this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
+        this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
 
@@ -819,9 +820,16 @@ class GameScene extends Phaser.Scene {
 
             p1.targetObject = p2;
             p2.targetObject = p1;
+
+            p1.flipX = true;
+            //var randomStart = Phaser.Math.Between(0,5);
+            //p1.setFrame(randomStart)
+            //p2.setFrame(randomStart)
         }
 
-
+        //makePair(this, [5,5],[3,3]);
+        //makePair(this, [6,5],[4,3]);
+        //makePair(this, [7,5],[5,3]);
         // Add try loop to get all Portal Layers
 
         // do while loop Portal-X
@@ -1008,7 +1016,19 @@ class GameScene extends Phaser.Scene {
         }
 
         // #endregion
-
+        this.portals.forEach(portal => {
+            this.add.particles(portal.x, portal.y, "portalParticle01", {
+                color: [ portal.tintTopLeft,0x000000, 0x000000],
+                colorEase: 'quad.out',
+                x:{steps: 2, min: -18, max: 48},
+                y:{steps: 2, min: -18, max: 48},
+                scale: {start: 1, end: .5},
+                speed: 5,
+                moveToX: 14,
+                moveToY: 14,
+                alpha:{start: 1, end: 0 },
+            }).setFrequency(332,[1]).setDepth(20);
+        });
 
         
 
@@ -1401,7 +1421,7 @@ class GameScene extends Phaser.Scene {
 
                         }
                     });
-                };
+                }
             } // End Closest Portal
             
             const ourUI = this.scene.get('UIScene');
@@ -3419,6 +3439,12 @@ class InputScene extends Phaser.Scene {
  // #region Animations
 function loadAnimations(scene) {
     scene.anims.create({
+        key: 'portalIdle',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    })
+    scene.anims.create({
         key: 'twinkle01',
         frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
         frameRate: 6,
@@ -3626,8 +3652,8 @@ var config = {
     },
     fx: {
         glow: {
-            distance: 32,
-            quality: 0.1
+            distance: 36,
+            quality: .1
         }
     },
     dom: {
