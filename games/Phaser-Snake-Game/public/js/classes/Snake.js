@@ -72,7 +72,6 @@ var Snake = new Phaser.Class({
     let y = this.head.y;
 
     var onPortal = false;
-    console.log(this.traveling)
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){

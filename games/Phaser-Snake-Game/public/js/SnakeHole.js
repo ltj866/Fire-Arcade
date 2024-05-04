@@ -1136,8 +1136,8 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreUI.setOrigin(0,0);
+        ourUI.bestScoreUI = ourUI.add.dom(0, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        ourUI.bestScoreUI.setOrigin(0,1);
 
         // Calculate this locally
         var bestLog = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestFruitLog`));
@@ -2639,7 +2639,6 @@ class UIScene extends Phaser.Scene {
         this.score = score;
         this.stageStartScore = score;
         
-
         this.length = 0;
 
         this.scoreMulti = 0;
@@ -2667,22 +2666,21 @@ class UIScene extends Phaser.Scene {
 
 
        // UI Icons
-       this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
-       this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
-       this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 3).setOrigin(0,0).setDepth(50); // Tried to center flag
+       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
+       this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
 
        this.mask = this.make.image({
            x: SCREEN_WIDTH/2,
-           y: GRID*.25,
+           y: GRID,
            key: 'mask',
            add: false
-       }).setOrigin(0.5,0);
+       }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID).setOrigin(0.5,0.5);
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
@@ -2700,24 +2698,35 @@ class UIScene extends Phaser.Scene {
         
         
         // Score Text
-        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`Stage: 0`).setOrigin(0,1);
+        this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`Stage: 0`).setOrigin(0,0);
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`x ${this.lives}`).setOrigin(0,1);
+        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //).setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUI = this.add.dom(GRID * 28, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+
+        var snakeBody = this.add.sprite(GRID * 29.5, GRID - 4, 'snakeDefault', 1).setOrigin(0,1).setDepth(50)      // Snake Body
+        var flagGoal = this.add.sprite(GRID * 29.5, GRID + 4, 'ui-blocks', 3).setOrigin(0,0.1).setDepth(50); // Tried to center flag
+ 
+        snakeBody.scale = .667;
+        flagGoal.scale = .667;
         
         
         var length = `${this.length}`;
         if (LENGTH_GOAL != 0) {
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`).setOrigin(0,1);
+            this.lengthGoalUI.setHTML(
+                `${length.padStart(2, "0")}<br/>
+                <hr style="font-size:3px"/>
+                ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            ).setOrigin(0,0.5);
         }
         else {
+            // Special Level
             this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,1);
             this.lengthGoalUI.x = GRID * 27
         }
@@ -2736,7 +2745,7 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
@@ -2746,7 +2755,7 @@ class UIScene extends Phaser.Scene {
             "outline-color": 'white',
             })).setText(
                 countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0);
+        ).setOrigin(1,0.5);
         
 
         
