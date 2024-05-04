@@ -820,7 +820,7 @@ class GameScene extends Phaser.Scene {
             p1.targetObject = p2;
             p2.targetObject = p1;
 
-            //p1.flipX = true;
+            p1.flipX = true;
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
@@ -3613,7 +3613,7 @@ var config = {
     },
     fx: {
         glow: {
-            distance: 24,
+            distance: 36,
             quality: .1
         }
     },

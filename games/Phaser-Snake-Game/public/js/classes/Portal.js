@@ -27,7 +27,7 @@ var Portal = new Phaser.Class({
         // Add Glow
         this.preFX.setPadding(32);
 
-        this.fx = this.preFX.addGlow();
+        this.fx = this.preFX.addGlow([color.color],[.5],[.25],[true]);
 
         //  For PreFX Glow the quality and distance are set in the Game Configuration
 
