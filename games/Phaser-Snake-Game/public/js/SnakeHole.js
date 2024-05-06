@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 
@@ -1709,13 +1709,15 @@ class ScoreScene extends Phaser.Scene {
 
         
 
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
-            {"fontSize":'48px'}
-        ).setOrigin(0.5,0).setDepth(25);
+        //this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
+        //    {"fontSize":'48px'}
+        //).setOrigin(0.5,0).setDepth(25);
 
 
         const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 2, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '320px',
+            color: "white",
+            "text-shadow": "2px 2px 4px #000000",
             "font-size":'28px',
             "font-weight": 600,
             "text-align": 'right',
@@ -1728,20 +1730,57 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
         
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            //width: '260px',
-            color: 'white',
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*4, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: "white",
+            "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
             'font-weight': 400,
             'text-align': 'right',
             })).setHTML(
-                `Base Score: ${baseScore}</br>
-                Speed Bonus: <span style="color:${COLOR_FOCUS};font-weight:600;">+ ${commaInt(speedBonus)}</span></br>
-                <span style="font-size:12px">Difficulty Bonus %${ourGame.stageDiffBonus} = ${(baseScore+speedBonus) * diffBonus}</span><br/>
-                <span style="font-size:12px">No-Bonk Bonus: + ${bonkBonus.toFixed(0)}</span><br/>
-                <hr/>
-                <span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
+                `Base Score:  </br>
+                Speed Bonus:  </br>
+                <span style="font-size:18px">Difficulty Bonus %${ourGame.stageDiffBonus}:  </span><br/>
+                <span style="font-size:18px">No-Bonk Bonus:  </span><br/>
+                </br>
+                SCORE:
+                </br>`
         ).setOrigin(1, 0);
+
+        const stageScoreUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "2px 2px 4px #000000",
+            "font-size":'18px',
+            'font-weight': 400,
+            'text-align': 'right',
+            })).setHTML(
+                `${baseScore}</br>
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+ ${commaInt(speedBonus)}</span></br>
+                ${(baseScore+speedBonus) * diffBonus}</span><br/>
+                <span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>
+                </br>`
+        ).setOrigin(1, 0);
+
+        /*const stageScoreUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*1.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            //color: 'white',
+            "font-size":'18px',
+            'font-weight': 400,
+            'text-align': 'right',
+            })).setHTML(
+                `<span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
+        ).setOrigin(1, 0);*/
+        
+        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *2, GRID * 13.25, this.scoreTotal.toFixed(0),
+        { fontFamily: "Sono", fontStyle: 'bold',
+        fontSize: 28, color: '#ffff00', align: 'right' })
+        .setOrigin(0.5, 0.5).setDepth(20);
+        const fx1 = stageScoreUI3.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
+        this.tweens.add({
+            targets: fx1,
+            outerStrength: 2,
+            yoyo: true,
+            loop: -1,
+            ease: 'sine.inout'
+        });
+
 
         // #region Rank Sprites
         
@@ -1877,13 +1916,13 @@ class ScoreScene extends Phaser.Scene {
         var statsCards = [stageStats, extraStats, bestStats];
 
         statsCards[sIndex].setVisible(true);
-        var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
+        /*var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsE.angle = 90;
         arrowsE.play('idle');
 
         var arrowsW = this.add.sprite(GRID * 15, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsW.angle = 270;
-        arrowsW.play('idle');
+        arrowsW.play('idle');*/
         
 
         this.input.keyboard.on('keydown-RIGHT', function() {
