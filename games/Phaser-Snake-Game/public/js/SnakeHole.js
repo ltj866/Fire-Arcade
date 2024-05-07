@@ -277,6 +277,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
+        this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -1676,6 +1677,7 @@ class ScoreScene extends Phaser.Scene {
         
         }
 
+        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -1707,21 +1709,15 @@ class ScoreScene extends Phaser.Scene {
 
         ///////
 
-        
-
-        //this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
-        //    {"fontSize":'48px'}
-        //).setOrigin(0.5,0).setDepth(25);
-
-
-        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 2, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '320px',
+        this.add.dom(SCREEN_WIDTH/2 + GRID * 6.5, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: "white",
             "text-shadow": "2px 2px 4px #000000",
-            "font-size":'28px',
-            "font-weight": 600,
-            "text-align": 'right',
-        })).setText(ourGame.stage).setOrigin(1,0);
+            "font-size":'36px',
+            'font-weight': 400,
+            'text-align': 'center',
+            })).setHTML(
+                `${ourGame.stage} CLEAR`
+        ).setOrigin(1, 0);
 
         // #region Main Stats
 
@@ -1730,7 +1726,7 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
         
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*4, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: "white",
             "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
@@ -1741,34 +1737,25 @@ class ScoreScene extends Phaser.Scene {
                 Speed Bonus:  </br>
                 <span style="font-size:18px">Difficulty Bonus %${ourGame.stageDiffBonus}:  </span><br/>
                 <span style="font-size:18px">No-Bonk Bonus:  </span><br/>
-                </br>
+                </br> </br>
                 SCORE:
                 </br>`
         ).setOrigin(1, 0);
 
-        const stageScoreUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
             'font-weight': 400,
             'text-align': 'right',
             })).setHTML(
                 `${baseScore}</br>
-                <span style="color:${COLOR_FOCUS};font-weight:600;">+ ${commaInt(speedBonus)}</span></br>
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(speedBonus)}</span></br>
                 ${(baseScore+speedBonus) * diffBonus}</span><br/>
                 <span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>
                 </br>`
         ).setOrigin(1, 0);
-
-        /*const stageScoreUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*1.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            //color: 'white',
-            "font-size":'18px',
-            'font-weight': 400,
-            'text-align': 'right',
-            })).setHTML(
-                `<span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
-        ).setOrigin(1, 0);*/
         
-        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *2, GRID * 13.25, this.scoreTotal.toFixed(0),
+        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 14.25, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
@@ -1811,11 +1798,11 @@ class ScoreScene extends Phaser.Scene {
                 rank = COPPER;
         }
 
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        var letterRank = this.add.sprite(GRID * 6.5,GRID * 12.5,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
         if(rank >= SILVER){
-            this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
+            this.add.particles(GRID * 5.5,GRID * 12.5, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -1823,7 +1810,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
+            this.add.particles(GRID * 5.5,GRID * 12.5, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -1831,7 +1818,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
+            this.add.particles(GRID * 5.5,GRID * 12.5, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -1844,11 +1831,11 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Stat Cards
-        var cardY = 6;
+        var cardY = 8;
         var styleCard = {
             width: '246px',
             "max-height": '290px',
-            outline: 'solid',
+            //outline: 'solid',
             //"font-size": '10px',
             "font-weight": 300,
             "padding": '12px 12px 6px 12px',
@@ -1857,7 +1844,7 @@ class ScoreScene extends Phaser.Scene {
 
         }
 
-        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
                 `----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
@@ -1873,7 +1860,7 @@ class ScoreScene extends Phaser.Scene {
                 [${ourUI.scoreHistory.slice().sort().reverse()}]</br>`
         ).setOrigin(0,0).setVisible(false);
 
-        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
             })).setHTML(
@@ -1895,7 +1882,7 @@ class ScoreScene extends Phaser.Scene {
 
 
         
-        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID *2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
             })).setHTML(
@@ -1954,16 +1941,16 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16 - 6, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
             })).setOrigin(0.5, 0);
 
         // #region Help Card
-        var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
+        /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
         card.setOrigin(0.5,0); 
-        card.displayHeight = 108;
+        card.displayHeight = 108;*/
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             color: COLOR_SCORE,
             "font-size":'28px',
@@ -1971,11 +1958,11 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Current Score: ${commaInt(ourUI.score + speedBonus)}`).setOrigin(0.5,0).setDepth(60);
 
 
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
+        /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             'font-size':'22px',
             'font-weight': 400,
-        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);
+        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
         this.prevZeds = ourTimeAttack.zeds;
