@@ -200,30 +200,44 @@ var Snake = new Phaser.Class({
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
     }
-
+    var currentCombo = this.lastPlayedCombo;
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+            //ourUI.checkCombo(currentCombo);
+            console.log("lastplayedcombo", this.lastPlayedCombo, "currentCombo", currentCombo)
+            ourUI.time.delayedCall(2500, function(){
+                if (currentCombo != this.lastPlayedCombo) {
+                    ourUI.comboFade();
+                    currentCombo = 0
+                }
+                })
             //console.log("time since last fruit:", timeSinceFruit);
             
             if(timeSinceFruit > COMBO_ADD_FLOOR){
                  
                 //console.log("combo",this.lastPlayedCombo)
+                if (this.lastPlayedCombo > 0) {
+                    ourUI.comboCounter += 1;
+                    ourUI.comboBounce();
+                    };
                 
+                //ourUI.comboCounter += 1;
                 scene.pointSounds[this.lastPlayedCombo].play();
                 //console.log(scene.comboCounter)
                 
                 if (this.lastPlayedCombo < 7) {
                     this.lastPlayedCombo += 1;
-                    ourUI.comboCounter += 1;
+                    //console.log("snake combo", this.lastPlayedCombo)
                     //console.log(scene.comboCounter)
                 }
             }
             else {
                 this.lastPlayedCombo = 0;
-                ourUI.comboCounter = 0;
+                //ourUI.comboCounter = 0;
             }
             
 

@@ -2954,7 +2954,8 @@ class UIScene extends Phaser.Scene {
 
         }, this);
 
-        
+        this.input.keyboard.on('keydown-L', e => {this.comboBounce();})
+        this.input.keyboard.on('keydown-O', e => {this.comboFade();})
         
     }
     update() {
@@ -3042,35 +3043,56 @@ class UIScene extends Phaser.Scene {
         //#endregion Boost Logic
         
         // #region Combo Logic
-        if (this.comboCounter > 1){ //need to find a better way to check when comboCounter is reset back to 0
+        //var currentCombo = this.currentCounter;
+        /*if (this.comboCounter > 0){ //need to find a better way to check when comboCounter is reset back to 0
             this.comboBounce();
-        }
+            this.time.delayedCall(1200, this.checkCombo(currentCombo)   
+        )}
         else{
-            this.comboFade();
-        }
+            this.comboFade;
+        }*/
+        //console.log("main combo", this.comboCounter)
+
+        //HERE
     }
     comboBounce(){
+        //bounceReady = false;
+        
         var tweenC = this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
             y: { from: GRID * 4, to: GRID * 3 },
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 400,
-            repeat: 1,
+            repeat: 0,
             delay: this.tweens.stagger(60),
             yoyo: true
-          });
+            });
+
     }
     comboFade(){
-        var tweenD = this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
-            y: { from: GRID * 4, to: GRID * 3 },
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 300,
-            repeat: 0,
-          });
+        console.log("fading")
+        if (this.letterC.alpha > .5) {
+            var tweenD = this.tweens.add({
+                targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
+                //y: { from: GRID * 4, to: GRID * 3 },
+                alpha: { from: 1, to: 0 },
+                ease: 'Sine.InOut',
+                duration: 300,
+                repeat: 0,
+            });
+        }
     }
+    /*checkCombo(currentCombo){
+        //currentCombo -= 1;
+        console.log("hello")
+        
+        if (this.comboCounter === currentCombo){
+            this.comboCounter = 0;
+            this.comboFade();
+        }
+        
+    }*/
 
 end() {
 
