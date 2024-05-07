@@ -278,6 +278,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
+        this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -1678,6 +1679,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
         this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
+        this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -1802,7 +1804,7 @@ class ScoreScene extends Phaser.Scene {
         
         // region Particle Emitter
         if(rank >= SILVER){
-            this.add.particles(GRID * 5.5,GRID * 12.5, "twinkle01Anim", {
+            this.add.particles(GRID * 6.5,GRID * 12.5, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -1810,7 +1812,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            this.add.particles(GRID * 5.5,GRID * 12.5, "twinkle02Anim", {
+            this.add.particles(GRID * 6.5,GRID * 12.5, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -1818,7 +1820,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            this.add.particles(GRID * 5.5,GRID * 12.5, "twinkle03Anim", {
+            this.add.particles(GRID * 6.5,GRID * 12.5, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -1950,7 +1952,7 @@ class ScoreScene extends Phaser.Scene {
         card.setOrigin(0.5,0); 
         card.displayHeight = 108;*/
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             color: COLOR_SCORE,
             "font-size":'28px',
@@ -1975,7 +1977,7 @@ class ScoreScene extends Phaser.Scene {
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26.75,'', 
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26.7875,'', 
                 {"fontSize":'48px'}
             ).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
