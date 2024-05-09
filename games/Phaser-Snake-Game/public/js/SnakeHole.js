@@ -163,7 +163,7 @@ export const STOP = 10;
 // #region GLOBAL STYLES 
 const STYLE_DEFAULT = {
     color: 'white',
-    'font-size': '12px',
+    'font-size': '14px',
     'font-family': ["Sono", 'sans-serif'],
     'font-weight': '200',
     'text-align': 'center',
@@ -279,6 +279,7 @@ class StartScene extends Phaser.Scene {
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
+        this.load.image('scoreScreenMask', 'assets/sprites/UI_ScoreScreenMask.png');
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -1678,15 +1679,16 @@ class ScoreScene extends Phaser.Scene {
         
         }
 
-        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
-        this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
-
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
-
         // #endregion
+
+        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
+        this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
+        //this.add.image(GRID * 17.625, - GRID * 2,'scoreScreenMask').setDepth(21).setOrigin(0,0);
+        
 
         // Pre Calculate needed values
         var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
@@ -1836,30 +1838,48 @@ class ScoreScene extends Phaser.Scene {
         var cardY = 8;
         var styleCard = {
             width: '246px',
-            "max-height": '290px',
-            //outline: 'solid',
-            //"font-size": '10px',
+            "max-height": '242px',
             "font-weight": 300,
-            "padding": '12px 12px 6px 12px',
+            "padding": '12px 12px 12px 12px',
             "text-align": 'left',
-            "word-wrap": 'break-word'
-
+            "word-wrap": 'break-word',
+            'overflow-y': 'scroll',
+            //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
-        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 4, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
-                `----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
-                </br>
-                STAGE STATS - ${ourGame.stage}</br>
+                //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
+                //</br>
+                `<span style="color:${COLOR_TERTIARY};"> ${ourGame.stage} STATS</span>:</br>
                 <hr/>
                 LENGTH: ${ourUI.length}</br>
                 ATTEMPTS: xx</br>
                 </br>
-                BETA: ${GAME_VERSION}</br>
+
                 </br>
-                FOOD LOG ........... AVE: [${stageAve.toFixed(2)}]</br>
-                [${ourUI.scoreHistory.slice().sort().reverse()}]</br>`
+                FOOD LOG ........ AVE: [${stageAve.toFixed(2)}]</br>
+                [${ourUI.scoreHistory.slice().sort().reverse()}]</br>
+                TOTAL TURNS: ${ourInputScene.turns}</br>
+                CORNER TIME: ${ourInputScene.cornerTime} FRAMES</br>
+                </br>
+                BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES</br>
+                BOOST TIME: ${ourInputScene.boostTime} FRAMES</br>
+                </br>
+                BONK RESETS: ${ourUI.bonks}</br>
+                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds</br>
+                </br>
+                BEST STATS - ${ourGame.stage}</br>
+                <hr>
+                BASE SCORE: ${bestLocal}</br>
+                SPEED BONUS: ${bestBonus}</br>
+                </br>
+                BEST SCORE: ${bestLocal + bestBonus}</br>
+                </br>
+                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
+                [${bestLog.slice().sort().reverse()}]`
+                
         ).setOrigin(0,0).setVisible(false);
 
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
@@ -1904,7 +1924,8 @@ class ScoreScene extends Phaser.Scene {
         var sIndex = 1 // Default Card
         var statsCards = [stageStats, extraStats, bestStats];
 
-        statsCards[sIndex].setVisible(true);
+        //statsCards[sIndex].setVisible(true);
+        //this.statCards.setMask(ourScoreScene.mask)
         /*var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsE.angle = 90;
         arrowsE.play('idle');
@@ -1928,7 +1949,45 @@ class ScoreScene extends Phaser.Scene {
             statsCards[sIndex].setVisible(true);   
         }, [], this);
 
-        // #endregion
+        //var yTargetVal = 192
+        this.yTargetVal = 192;
+        //console.log(stageStats.y)
+
+        this.input.keyboard.on('keydown-UP', function() {
+            
+            if (stageStats.y >= -218 && stageStats.y < 192) {
+            //console.log(this.yTargetVal) 
+            //this.yTargetVal -=5;
+                
+                stageStats.y += 5;
+            }
+            else{
+            //    this.yTargetVal = 192;
+                stageStats.y = 192
+            }
+            
+        });
+        this.input.keyboard.on('keydown-DOWN', function() {
+            
+            if (stageStats.y <= 192 && stageStats.y < 218) {
+                this.yTargetVal -= 5;
+                //console.log(yTargetVal)
+                stageStats.y -= 5;
+            }
+            else{
+                stageStats.y = 187
+            }
+        });
+
+        const mask = this.make.image({
+            x: GRID * 17.625,
+            y: 500,
+            key: 'scoreScreenMask',
+            add: false
+        });
+        stageStats.mask = new Phaser.Display.Masks.BitmapMask(this, mask);
+        stageStats.mask.invertAlpha = true;
+
 
         
 
@@ -1959,7 +2018,7 @@ class ScoreScene extends Phaser.Scene {
             'font-weight': 500,
         })).setText(`Current Score: ${commaInt(ourUI.score + speedBonus)}`).setOrigin(0.5,0).setDepth(60);
 
-
+        // #endregion
         /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             'font-size':'22px',
@@ -2108,6 +2167,18 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
+        const ourScoreScene = this.scene.get('ScoreScene');
+        console.log(ourScoreScene.yTargetVal)
+        //this.stageStats.y = Phaser.Math.Interpolation.Linear([ourScoreScene.yTargetVal], .1)
+        /*this.tweens.add({
+            targets: this.stageStats,
+            y: [this.yTargetVal],
+            duration: 1000,
+            repeat: -1,
+            hold: 500,
+            repeatDelay: 500,
+            ease: 'linear'
+        })*/
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -3685,7 +3756,7 @@ var config = {
         }
     },
     dom: {
-        createContainer: true
+        createContainer: true,
     },
     //scene: [ StartScene, InputScene]
     scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
