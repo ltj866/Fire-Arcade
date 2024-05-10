@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 
@@ -1738,11 +1738,15 @@ class ScoreScene extends Phaser.Scene {
             'font-weight': 400,
             'text-align': 'right',
             })).setHTML(
-                `Base Score:  </br>
-                Speed Bonus:  </br>
-                <span style="font-size:18px">Difficulty Bonus %${ourGame.stageDiffBonus}:  </span><br/>
-                <span style="font-size:18px">No-Bonk Bonus:  </span><br/>
-                </br></br>
+                `Base Score:</br>
+                Speed Bonus:</span></br>
+                <br/>
+                Difficulty Bonus %${ourGame.stageDiffBonus}:<br/>
+                Zed Lvl. Bonus:<br/>
+                Medal Bonus:<br/>
+                <br/>
+                No-Bonk Bonus:<br/>
+                <br/>
                 SCORE:
                 </br>`
         ).setOrigin(1, 0);
@@ -1755,12 +1759,15 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 `${baseScore}</br>
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(speedBonus)}</span></br>
-                ${(baseScore+speedBonus) * diffBonus}</span><br/>
-                <span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>
-                </br>`
+                </br>
+                ${(baseScore+speedBonus) * diffBonus}</span><br/> 
+                </br>
+                </br>
+                </br>
+                <span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>`
         ).setOrigin(1, 0);
         
-        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 17.125, this.scoreTotal.toFixed(0),
+        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 19.75, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
@@ -1803,7 +1810,7 @@ class ScoreScene extends Phaser.Scene {
                 rank = COPPER;
         }
 
-        var letterRank = this.add.sprite(GRID * 6.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
         if(rank >= SILVER){
@@ -1846,6 +1853,7 @@ class ScoreScene extends Phaser.Scene {
             "word-wrap": 'break-word',
             'overflow-y': 'scroll',
             'scroll-behavior': 'smooth',
+            '-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, .9),rgba(0, 0, 0, 0))'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
@@ -1861,8 +1869,6 @@ class ScoreScene extends Phaser.Scene {
                 LENGTH: <span style = "float: right">${ourUI.length}</span></br>
                 AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span></br>
                 </br>
-                </br>
-                
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span></br>
                 CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span></br>
                 </br>
@@ -1872,11 +1878,14 @@ class ScoreScene extends Phaser.Scene {
                 BONK RESETS: <span style = "float: right">${ourUI.bonks}</span></br>
                 ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span></br>
                 </br>
+                MEDALS </br>
+                <hr/>
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span></br>
                 <hr>
                 BASE SCORE: <span style = "float: right">${bestLocal}</span></br>
                 SPEED BONUS: <span style = "float: right">${bestBonus}</span></br>
                 </br>
+
                 BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span></br>
                 </br>
                 AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span></br>
