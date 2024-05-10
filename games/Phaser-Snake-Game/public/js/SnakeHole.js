@@ -40,7 +40,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
+const SCORE_SCENE_DEBUG = true;
 
 // Game Objects
 
@@ -1731,43 +1731,77 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
         
 
-        const stageLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 11.75, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: "white",
             "text-shadow": "2px 2px 4px #000000",
-            "font-size":'18px',
-            'font-weight': 400,
-            'text-align': 'right',
+            "font-size":'16px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
             })).setHTML(
-                `Base Score:</br>
-                Speed Bonus:</span></br>
-                <br/>
-                Difficulty Bonus %${ourGame.stageDiffBonus}:<br/>
-                Zed Lvl. Bonus:<br/>
-                Medal Bonus:<br/>
-                <br/>
-                No-Bonk Bonus:<br/>
-                <br/>
-                SCORE:
-                </br>`
+                `Base Score:
+                Speed Bonus:`
         ).setOrigin(1, 0);
 
-        const stageValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 11.75, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "2px 2px 4px #000000",
-            "font-size":'18px',
+            "font-size":'16px',
             'font-weight': 400,
             'text-align': 'right',
+            "white-space": 'pre-line'
             })).setHTML(
-                `${baseScore}</br>
-                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(speedBonus)}</span></br>
-                </br>
-                ${(baseScore+speedBonus) * diffBonus}</span><br/> 
-                </br>
-                </br>
-                </br>
-                <span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>`
+                `${baseScore}</span>
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(speedBonus)}</span>
+                <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(baseScore + speedBonus)}</span>`
+        ).setOrigin(1, 0);
+
+        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 15, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: "white",
+            "text-shadow": "2px 2px 4px #000000",
+            "font-size":'12px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+            })).setHTML(
+                `Difficulty +${ourGame.stageDiffBonus}%
+                Zed Lvl +0.0%
+                Medal +0.0%
+                `
+        ).setOrigin(1,0);
+
+        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 15, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "2px 2px 4px #000000",
+            "font-size":'10px',
+            'font-weight': 400,
+            'text-align': 'right',
+            "white-space": 'pre-line'
+            })).setHTML(
+                `<span style="font-size:16px">X ${ourGame.stageDiffBonus + 0 + 0}%</span>
+                <hr style="font-size:3px"/><span style="font-size:20px">${commaInt((baseScore+speedBonus) * diffBonus)}</span>`
+        ).setOrigin(1, 0);
+
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 17.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: "white",
+            "text-shadow": "2px 2px 4px #000000",
+            "font-size":'16px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+            })).setHTML(
+                `No-Bonk Bonus:`
+        ).setOrigin(1,0);
+
+        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 17.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "2px 2px 4px #000000",
+            "font-size":'16px',
+            'font-weight': 400,
+            'text-align': 'right',
+            "white-space": 'pre-line'
+            })).setHTML(
+                `<span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>`
         ).setOrigin(1, 0);
         
-        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 19.75, this.scoreTotal.toFixed(0),
+        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 20, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
