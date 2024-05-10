@@ -1895,7 +1895,10 @@ class ScoreScene extends Phaser.Scene {
                 BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span></br>
                 </br>
                 AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span></br>
-                [${bestLog.slice().sort().reverse()}]`
+                [${bestLog.slice().sort().reverse()}]
+                </br>
+                </br>
+                </br>`
                 
         ).setOrigin(0,0).setVisible(true);
 
@@ -1941,7 +1944,7 @@ class ScoreScene extends Phaser.Scene {
         */
 
         var sIndex = 1 // Default Card
-        var statsCards = [stageStats, extraStats, bestStats];
+        var statsCards = [stageStats];
 
         //statsCards[sIndex].setVisible(true);
         //this.statCards.setMask(ourScoreScene.mask)
@@ -2186,7 +2189,7 @@ class ScoreScene extends Phaser.Scene {
     // #region Score - Update
     update(time) {
         const ourScoreScene = this.scene.get('ScoreScene');
-        console.log(ourScoreScene.yTargetVal)
+        //console.log(ourScoreScene.yTargetVal)
         //this.stageStats.y = Phaser.Math.Interpolation.Linear([ourScoreScene.yTargetVal], .1)
         /*this.tweens.add({
             targets: this.stageStats,
