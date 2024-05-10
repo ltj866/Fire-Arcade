@@ -1880,6 +1880,7 @@ class ScoreScene extends Phaser.Scene {
         var cardY = 8;
         var styleCard = {
             width: '246px',
+            "font-size": '14px',
             "max-height": '236px',
             "font-weight": 300,
             "padding": '12px 12px 12px 12px',
