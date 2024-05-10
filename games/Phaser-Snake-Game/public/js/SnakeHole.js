@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 
@@ -1814,7 +1814,7 @@ class ScoreScene extends Phaser.Scene {
         
         // region Particle Emitter
         if(rank >= SILVER){
-            this.add.particles(GRID * 7.0,GRID * 16.0, "twinkle01Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -1822,7 +1822,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            this.add.particles(GRID * 7.0,GRID * 16.0, "twinkle02Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -1830,7 +1830,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            this.add.particles(GRID * 7.0,GRID * 16.0, "twinkle03Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
