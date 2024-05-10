@@ -1685,7 +1685,7 @@ class ScoreScene extends Phaser.Scene {
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
         // #endregion
 
-        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
+        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0).setScale(.5);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
         //this.add.image(GRID * 17.625, - GRID * 2,'scoreScreenMask').setDepth(21).setOrigin(0,0);
         
@@ -1719,7 +1719,8 @@ class ScoreScene extends Phaser.Scene {
             "font-size":'36px',
             'font-weight': 400,
             'text-align': 'center',
-            'text-transform': 'uppercase'
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui'
             })).setHTML(
                 `${ourGame.stage} CLEAR`
         ).setOrigin(1, 0);
@@ -1869,6 +1870,7 @@ class ScoreScene extends Phaser.Scene {
             "padding": '12px 12px 12px 12px',
             "text-align": 'left', 
             "word-wrap": 'break-word',
+            "white-space": 'pre-line',
             'overflow-y': 'scroll',
             'scroll-behavior': 'smooth',
             '-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, .9),rgba(0, 0, 0, 0))'
@@ -1881,22 +1883,17 @@ class ScoreScene extends Phaser.Scene {
                 //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
                 //</br>
                 //[${ourUI.scoreHistory.slice().sort().reverse()}]</br> individual food score printout array
-                `<span style ="text-transform: uppercase"> ${ourGame.stage} STATS</span></br>
-                <hr/>
-
-                ATTEMPTS: <span style = "float: right">xx</span><br>
-                LENGTH: <span style = "float: right">${ourUI.length}</span></br>
-                AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span></br>
-                BONKS: <span style = "float: right">${ourUI.bonks}</span></br>
-                </br>
+                `<span style ="text-transform: uppercase"> ${ourGame.stage} STATS</span>
+                <hr style="font-size:6px"/>ATTEMPTS: <span style = "float: right">xx</span>
+                LENGTH: <span style = "float: right">${ourUI.length}</span>
+                AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span>
+                BONKS: <span style = "float: right">${ourUI.bonks}</span>
 
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span></br>
                 CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span></br>
-                </br>
 
                 BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span></br>
                 BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span></br>
-                </br>
 
                 ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span></br>
                 </br>
@@ -2075,9 +2072,12 @@ class ScoreScene extends Phaser.Scene {
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26.7875,'', 
-                {"fontSize":'48px'}
-            ).setText(continue_text).setOrigin(0.5,0).setDepth(25);
+            var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*26.7875,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'48px',
+                "font-family": '"Press Start 2P", system-ui',
+                "text-shadow": "6px 6px 0px #000000"
+                }
+            )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
             this.tweens.add({
