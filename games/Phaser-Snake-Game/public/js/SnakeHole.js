@@ -1731,7 +1731,7 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
         
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: "white",
             "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
@@ -1751,7 +1751,7 @@ class ScoreScene extends Phaser.Scene {
                 </br>`
         ).setOrigin(1, 0);
 
-        const stageScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
             'font-weight': 400,
@@ -1865,19 +1865,24 @@ class ScoreScene extends Phaser.Scene {
                 //[${ourUI.scoreHistory.slice().sort().reverse()}]</br> individual food score printout array
                 `<span style ="text-transform: uppercase"> ${ourGame.stage} STATS</span></br>
                 <hr/>
+
                 ATTEMPTS: <span style = "float: right">xx</span><br>
                 LENGTH: <span style = "float: right">${ourUI.length}</span></br>
                 AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span></br>
                 </br>
+
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span></br>
                 CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span></br>
                 </br>
+
                 BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span></br>
                 BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span></br>
                 </br>
+
                 BONK RESETS: <span style = "float: right">${ourUI.bonks}</span></br>
                 ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span></br>
                 </br>
+
                 MEDALS </br>
                 <hr/>
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span></br>
