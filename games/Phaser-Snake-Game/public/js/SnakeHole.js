@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 
@@ -1719,6 +1719,7 @@ class ScoreScene extends Phaser.Scene {
             "font-size":'36px',
             'font-weight': 400,
             'text-align': 'center',
+            'text-transform': 'uppercase'
             })).setHTML(
                 `${ourGame.stage} CLEAR`
         ).setOrigin(1, 0);
@@ -1730,7 +1731,7 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
         
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: "white",
             "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
@@ -1741,12 +1742,12 @@ class ScoreScene extends Phaser.Scene {
                 Speed Bonus:  </br>
                 <span style="font-size:18px">Difficulty Bonus %${ourGame.stageDiffBonus}:  </span><br/>
                 <span style="font-size:18px">No-Bonk Bonus:  </span><br/>
-                </br> </br>
+                </br></br>
                 SCORE:
                 </br>`
         ).setOrigin(1, 0);
 
-        const stageScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const stageScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 11.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "2px 2px 4px #000000",
             "font-size":'18px',
             'font-weight': 400,
@@ -1759,7 +1760,7 @@ class ScoreScene extends Phaser.Scene {
                 </br>`
         ).setOrigin(1, 0);
         
-        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 14.25, this.scoreTotal.toFixed(0),
+        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 17.125, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
@@ -1802,11 +1803,11 @@ class ScoreScene extends Phaser.Scene {
                 rank = COPPER;
         }
 
-        var letterRank = this.add.sprite(GRID * 6.5,GRID * 12.5,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        var letterRank = this.add.sprite(GRID * 6.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
         if(rank >= SILVER){
-            this.add.particles(GRID * 6.5,GRID * 12.5, "twinkle01Anim", {
+            this.add.particles(GRID * 7.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -1814,7 +1815,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            this.add.particles(GRID * 6.5,GRID * 12.5, "twinkle02Anim", {
+            this.add.particles(GRID * 7.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -1822,7 +1823,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            this.add.particles(GRID * 6.5,GRID * 12.5, "twinkle03Anim", {
+            this.add.particles(GRID * 7.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -1838,12 +1839,13 @@ class ScoreScene extends Phaser.Scene {
         var cardY = 8;
         var styleCard = {
             width: '246px',
-            "max-height": '242px',
+            "max-height": '212px',
             "font-weight": 300,
             "padding": '12px 12px 12px 12px',
-            "text-align": 'left',
+            "text-align": 'left', 
             "word-wrap": 'break-word',
             'overflow-y': 'scroll',
+            'scroll-behavior': 'smooth',
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
@@ -1852,35 +1854,35 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
                 //</br>
-                `<span style="color:${COLOR_TERTIARY};"> ${ourGame.stage} STATS</span>:</br>
+                //[${ourUI.scoreHistory.slice().sort().reverse()}]</br> individual food score printout array
+                `<span style ="text-transform: uppercase"> ${ourGame.stage} STATS</span></br>
                 <hr/>
-                LENGTH: ${ourUI.length}</br>
-                ATTEMPTS: xx</br>
+                ATTEMPTS: <span style = "float: right">xx</span><br>
+                LENGTH: <span style = "float: right">${ourUI.length}</span></br>
+                AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span></br>
                 </br>
-
                 </br>
-                FOOD LOG ........ AVE: [${stageAve.toFixed(2)}]</br>
-                [${ourUI.scoreHistory.slice().sort().reverse()}]</br>
-                TOTAL TURNS: ${ourInputScene.turns}</br>
-                CORNER TIME: ${ourInputScene.cornerTime} FRAMES</br>
+                
+                TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span></br>
+                CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span></br>
                 </br>
-                BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES</br>
-                BOOST TIME: ${ourInputScene.boostTime} FRAMES</br>
+                BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span></br>
+                BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span></br>
                 </br>
-                BONK RESETS: ${ourUI.bonks}</br>
-                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds</br>
+                BONK RESETS: <span style = "float: right">${ourUI.bonks}</span></br>
+                ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span></br>
                 </br>
-                BEST STATS - ${ourGame.stage}</br>
+                <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span></br>
                 <hr>
-                BASE SCORE: ${bestLocal}</br>
-                SPEED BONUS: ${bestBonus}</br>
+                BASE SCORE: <span style = "float: right">${bestLocal}</span></br>
+                SPEED BONUS: <span style = "float: right">${bestBonus}</span></br>
                 </br>
-                BEST SCORE: ${bestLocal + bestBonus}</br>
+                BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span></br>
                 </br>
-                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
+                AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span></br>
                 [${bestLog.slice().sort().reverse()}]`
                 
-        ).setOrigin(0,0).setVisible(false);
+        ).setOrigin(0,0).setVisible(true);
 
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
@@ -1935,7 +1937,7 @@ class ScoreScene extends Phaser.Scene {
         arrowsW.play('idle');*/
         
 
-        this.input.keyboard.on('keydown-RIGHT', function() {
+        /*this.input.keyboard.on('keydown-RIGHT', function() {
             statsCards[sIndex].setVisible(false);
             sIndex = Phaser.Math.Wrap(sIndex + 1, -1, statsCards.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
 
@@ -1947,7 +1949,7 @@ class ScoreScene extends Phaser.Scene {
             sIndex = Phaser.Math.Wrap(sIndex - 1, 0, statsCards.length); // No idea why -1 works here. But it works so leave it until it doesn't/
 
             statsCards[sIndex].setVisible(true);   
-        }, [], this);
+        }, [], this);*/
 
         //var yTargetVal = 192
         this.yTargetVal = 192;
@@ -1955,7 +1957,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-UP', function() {
             
-            if (stageStats.y >= -218 && stageStats.y < 192) {
+            /*if (stageStats.y >= -218 && stageStats.y < 192) {
             //console.log(this.yTargetVal) 
             //this.yTargetVal -=5;
                 
@@ -1964,19 +1966,18 @@ class ScoreScene extends Phaser.Scene {
             else{
             //    this.yTargetVal = 192;
                 stageStats.y = 192
-            }
+            }*/
             
         });
         this.input.keyboard.on('keydown-DOWN', function() {
-            
-            if (stageStats.y <= 192 && stageStats.y < 218) {
+            /*if (stageStats.y <= 192 && stageStats.y < 218) {
                 this.yTargetVal -= 5;
                 //console.log(yTargetVal)
                 stageStats.y -= 5;
             }
             else{
                 stageStats.y = 187
-            }
+            }*/
         });
 
         const mask = this.make.image({
