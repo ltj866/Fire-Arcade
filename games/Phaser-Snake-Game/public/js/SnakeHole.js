@@ -1767,11 +1767,11 @@ class ScoreScene extends Phaser.Scene {
                 <span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>`
         ).setOrigin(1, 0);
         
-        const stageScoreUI3 = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 19.75, this.scoreTotal.toFixed(0),
+        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 19.75, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
-        const fx1 = stageScoreUI3.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
+        const fx1 = stageScore.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
         this.tweens.add({
             targets: fx1,
             outerStrength: 2,
@@ -1869,6 +1869,7 @@ class ScoreScene extends Phaser.Scene {
                 ATTEMPTS: <span style = "float: right">xx</span><br>
                 LENGTH: <span style = "float: right">${ourUI.length}</span></br>
                 AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span></br>
+                BONKS: <span style = "float: right">${ourUI.bonks}</span></br>
                 </br>
 
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span></br>
@@ -1879,14 +1880,14 @@ class ScoreScene extends Phaser.Scene {
                 BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span></br>
                 </br>
 
-                BONK RESETS: <span style = "float: right">${ourUI.bonks}</span></br>
                 ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span></br>
                 </br>
 
                 MEDALS </br>
                 <hr/>
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span></br>
-                <hr>
+                <hr/>
+
                 BASE SCORE: <span style = "float: right">${bestLocal}</span></br>
                 SPEED BONUS: <span style = "float: right">${bestBonus}</span></br>
                 </br>
@@ -1898,6 +1899,7 @@ class ScoreScene extends Phaser.Scene {
                 
         ).setOrigin(0,0).setVisible(true);
 
+        /*
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
@@ -1936,6 +1938,7 @@ class ScoreScene extends Phaser.Scene {
                 BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
                 [${bestLog.slice().sort().reverse()}]`
         ).setOrigin(0,0).setVisible(false);
+        */
 
         var sIndex = 1 // Default Card
         var statsCards = [stageStats, extraStats, bestStats];
