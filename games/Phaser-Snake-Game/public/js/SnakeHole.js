@@ -3377,7 +3377,7 @@ class InputScene extends Phaser.Scene {
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 this.turns += 1; 
                     
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
                 
@@ -3397,7 +3397,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));   
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
                 
@@ -3417,7 +3417,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
  
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
@@ -3435,7 +3435,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
  
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
@@ -3453,7 +3453,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
@@ -3471,7 +3471,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
@@ -3489,7 +3489,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
@@ -3507,7 +3507,7 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
