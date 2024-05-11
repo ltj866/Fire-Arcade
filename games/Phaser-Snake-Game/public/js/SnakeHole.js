@@ -1685,6 +1685,7 @@ class ScoreScene extends Phaser.Scene {
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
         // #endregion
 
+        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
         //this.add.image(GRID * 17.625, - GRID * 2,'scoreScreenMask').setDepth(21).setOrigin(0,0);
         
@@ -1712,7 +1713,10 @@ class ScoreScene extends Phaser.Scene {
 
         ///////
 
+        this.add.dom(SCREEN_WIDTH/2 + GRID * 9.5, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: "white",
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size":'32px',
             'font-weight': 400,
             'text-align': 'center',
             'text-transform': 'uppercase',
@@ -1869,9 +1873,9 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line',
             'overflow-y': 'scroll',
             'scroll-behavior': 'smooth',
+            //'-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, .9),rgba(0, 0, 0, 0))'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
-
 
         const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 4, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
@@ -2068,7 +2072,10 @@ class ScoreScene extends Phaser.Scene {
                 continue_text = '[SPACE TO WIN]';
             }
             
+            var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.125,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'32px',
                 "font-family": '"Press Start 2P", system-ui',
+                "text-shadow": "4px 4px 0px #000000"
                 }
             )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
