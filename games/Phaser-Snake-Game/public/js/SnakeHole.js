@@ -1728,11 +1728,11 @@ class ScoreScene extends Phaser.Scene {
             let anim;
 
             if (i < 14) {
-                _x = (GRID * (2.1667)) + (i * 16);
+                _x = (GRID * (7.2667)) + (i * 16);
                 _y = GRID * 8.75
             }
             else {
-                _x = (-GRID * 7.1667) + (i * 16);
+                _x = (-GRID * 2.0667) + (i * 16);
                 _y = (GRID * 8.75) + 16;
             }
 
