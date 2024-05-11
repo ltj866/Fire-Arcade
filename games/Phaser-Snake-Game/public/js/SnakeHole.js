@@ -1720,7 +1720,8 @@ class ScoreScene extends Phaser.Scene {
             'font-weight': 400,
             'text-align': 'center',
             'text-transform': 'uppercase',
-            "font-family": '"Press Start 2P", system-ui'
+            "font-family": '"Press Start 2P", system-ui',
+            "animation": 'glow 1s ease-in-out infinite alternate'
             })).setHTML(
                 `${ourGame.stage} CLEAR`
         ).setOrigin(1, 0);
