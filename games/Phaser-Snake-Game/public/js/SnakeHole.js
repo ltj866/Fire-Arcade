@@ -1649,8 +1649,6 @@ class ScoreScene extends Phaser.Scene {
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
 
-
-
         
         // #region
         // Dream walls for Horizontal Wrap
@@ -1705,12 +1703,31 @@ class ScoreScene extends Phaser.Scene {
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
+
         //var stageAverage = stageScore();
         
         // Scene Background Color
         this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
         this.stageBackGround.setOrigin(0,0).setDepth(8);
 
+        // #region Atomic List
+        var atomList = bestLog.slice().sort().reverse();
+        //console.log(atomList)
+        
+        for (let index = 0; index < atomList.length; index++) {
+            const element = atomList[index];
+            if (index > 13) {
+                this.add.sprite((-GRID * 2.1667) + (index * 16), GRID * 8.75, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
+            }
+            else{
+                this.add.sprite((GRID * 7.1667) + (index * 16), (GRID * 8.75) + 16, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
+            }
+            
+        }
+
+        /*atomList.forEach(element => {
+            this.add.sprite((GRID * 4), GRID * 10, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
+        });*/
         ///////
 
         this.add.dom(SCREEN_WIDTH/2 + GRID * 9.5, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1741,7 +1758,7 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 11.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             
             })).setHTML(
@@ -1749,7 +1766,7 @@ class ScoreScene extends Phaser.Scene {
                 Speed Bonus:`
         ).setOrigin(1, 0);
 
-        const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 11.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `${baseScore}</span>
@@ -1757,7 +1774,7 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(baseScore + speedBonus)}</span>`
         ).setOrigin(1, 0);
 
-        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 15, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML(
@@ -1767,26 +1784,26 @@ class ScoreScene extends Phaser.Scene {
                 `
         ).setOrigin(1,0);
 
-        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 15, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `X ${(ourGame.stageDiffBonus + 2.4 + 0.3).toFixed(1)}%
                 <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(Math.ceil((baseScore+speedBonus) * (diffBonus + 0.024 + 0.003)))}</span>`
         ).setOrigin(1, 0);
 
-        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 17.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `No-Bonk Bonus:`
         ).setOrigin(1,0);
 
-        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 17.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `<span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>`
         ).setOrigin(1, 0);
         
-        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID *1, GRID * 20, this.scoreTotal.toFixed(0),
+        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
