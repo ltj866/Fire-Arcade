@@ -2688,6 +2688,9 @@ class UIScene extends Phaser.Scene {
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
        // Combo Sprites
+
+       this.visible = false;
+
        this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
        this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
        this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
@@ -2956,6 +2959,7 @@ class UIScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-L', e => {this.comboBounce();})
         this.input.keyboard.on('keydown-O', e => {this.comboFade();})
+        this.input.keyboard.on('keydown-I', e => {this.comboAppear();})
         
     }
     update() {
@@ -3053,35 +3057,56 @@ class UIScene extends Phaser.Scene {
         }*/
         //console.log("main combo", this.comboCounter)
 
-        //HERE
+        if (this.comboCounter > 0 && !this.visible) {
+            //console.log("actively appearing")
+            this.comboAppear();
+        }
+        else if (this.comboCounter == 0 && this.visible){
+            this.comboFade();
+        }
     }
+    
     comboBounce(){
         //bounceReady = false;
         
         var tweenC = this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
             y: { from: GRID * 4, to: GRID * 3 },
-            alpha: { from: 1, to: 0 },
+            //alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
-            duration: 400,
+            duration: 200,
             repeat: 0,
             delay: this.tweens.stagger(60),
             yoyo: true
             });
 
     }
+    comboAppear(){
+        console.log("appearing")
+        var tweenD = this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
+            //y: { from: GRID * 4, to: GRID * 3 },
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+        });
+        this.visible = true;
+    }
     comboFade(){
         console.log("fading")
-        if (this.letterC.alpha > .5) {
-            var tweenD = this.tweens.add({
-                targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
-                //y: { from: GRID * 4, to: GRID * 3 },
-                alpha: { from: 1, to: 0 },
-                ease: 'Sine.InOut',
-                duration: 300,
-                repeat: 0,
-            });
-        }
+        var tweenD = this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
+            //y: { from: GRID * 4, to: GRID * 3 },
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+        });
+        this.visible = false;
+        this.comboCounter = 0;
+        //if (this.letterC.alpha > .5) {
+        //}
     }
     /*checkCombo(currentCombo){
         //currentCombo -= 1;

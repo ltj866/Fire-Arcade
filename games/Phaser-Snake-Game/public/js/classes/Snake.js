@@ -24,6 +24,8 @@ var Snake = new Phaser.Class({
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
+
+        this.comboExpired = true;
     },
     
     grow: function (scene)
@@ -191,7 +193,13 @@ var Snake = new Phaser.Class({
             
         }
         // #endregion
-        
+        const ourUI = scene.scene.get('UIScene');
+        if (this.comboExpired) {
+            ourUI.comboFade();
+            this.comboExpired = false
+            
+            ourUI.visible = false
+        }
 
     
     // Actually Move the Snake Head
@@ -204,22 +212,23 @@ var Snake = new Phaser.Class({
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
-            const ourUI = scene.scene.get('UIScene');
+            
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
             //ourUI.checkCombo(currentCombo);
             console.log("lastplayedcombo", this.lastPlayedCombo, "currentCombo", currentCombo)
             ourUI.time.delayedCall(2500, function(){
-                if (currentCombo != this.lastPlayedCombo) {
-                    ourUI.comboFade();
-                    currentCombo = 0
+                console.log(currentCombo)
+                if (currentCombo === 0) {
+                    this.comboExpired = true;
+                    ourUI.comboCounter = 0;
                 }
-                })
+                
+            })
             //console.log("time since last fruit:", timeSinceFruit);
             
             if(timeSinceFruit > COMBO_ADD_FLOOR){
-                 
-                //console.log("combo",this.lastPlayedCombo)
+                this.comboExpired = false;
                 if (this.lastPlayedCombo > 0) {
                     ourUI.comboCounter += 1;
                     ourUI.comboBounce();
@@ -237,7 +246,7 @@ var Snake = new Phaser.Class({
             }
             else {
                 this.lastPlayedCombo = 0;
-                //ourUI.comboCounter = 0;
+                ourUI.comboCounter = 0;
             }
             
 
@@ -306,7 +315,7 @@ var Snake = new Phaser.Class({
 
         this.direction = STOP;
         gameScene.started = false;
-    }
+    },
 });
 
 export { Snake };
