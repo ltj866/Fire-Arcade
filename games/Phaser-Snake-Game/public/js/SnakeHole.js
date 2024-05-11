@@ -27,7 +27,7 @@ export const SPEEDWALK = 99; // 99 In milliseconds
 var SPEEDSPRINT = 24; // 24
 
 
-var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
+const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
@@ -1710,18 +1710,53 @@ class ScoreScene extends Phaser.Scene {
         this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
         this.stageBackGround.setOrigin(0,0).setDepth(8);
 
-        // #region Atomic List
-        var atomList = bestLog.slice().sort().reverse();
+
+        // #region Atomic Food List
+        var atomList = bestLog.slice();
+        // dead atom = 1 
+        //const BOOST_ADD_FLOOR = 100;
+        //const COMBO_ADD_FLOOR = 108;
         //console.log(atomList)
+        var count = 0;
+
         
-        for (let index = 0; index < atomList.length; index++) {
-            const element = atomList[index];
-            if (index > 13) {
-                this.add.sprite((-GRID * 2.1667) + (index * 16), GRID * 8.75, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
+        
+        for (let i = 0; i < atomList.length; i++) {
+            
+            var logTime = atomList[i];
+            let _x,_y;
+            let anim;
+
+            if (i > 13) {
+                _x = (-GRID * (2.1667)) + (i * 16);
+                _y = GRID * 8.75
             }
-            else{
-                this.add.sprite((GRID * 7.1667) + (index * 16), (GRID * 8.75) + 16, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
+            else {
+                _x = (GRID * 7.1667) + (i * 16);
+                _y = (GRID * 8.75) + 16;
             }
+
+            switch (true) {
+                case logTime > COMBO_ADD_FLOOR:
+                    console.log(logTime, "combo",i);
+                    anim = "atom01idle";
+                    if (i != 0) { // First Can't Connect
+                        this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
+                        ).setOrigin(0,0.5).setDepth(20);
+                    }
+                    break
+                case logTime > BOOST_ADD_FLOOR:
+                    console.log(logTime, "Boost", i);
+                    anim = "atom02idle";
+                    break
+                case logTime <= SCORE_FLOOR:
+                    console.log(logTime, "dud", i);
+                    anim = "atom04idle";
+                    break
+            }
+
+            this.add.sprite(_x, _y,'atomicPickup01Anim'
+            ).play(anim).setDepth(21).setScale(.5);
             
         }
 
