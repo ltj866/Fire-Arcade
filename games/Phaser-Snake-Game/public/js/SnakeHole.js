@@ -40,7 +40,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = true;
+const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -1712,7 +1712,7 @@ class ScoreScene extends Phaser.Scene {
 
 
         // #region Atomic Food List
-        var atomList = bestLog.slice();
+        var atomList = ourUI.scoreHistory.slice();
         // dead atom = 1 
         //const BOOST_ADD_FLOOR = 100;
         //const COMBO_ADD_FLOOR = 108;
@@ -1749,7 +1749,11 @@ class ScoreScene extends Phaser.Scene {
                     console.log(logTime, "Boost", i);
                     anim = "atom02idle";
                     break
-                case logTime <= SCORE_FLOOR:
+                case logTime > SCORE_FLOOR:
+                    console.log(logTime, "Boost", i);
+                    anim = "atom03idle";
+                    break
+                default:
                     console.log(logTime, "dud", i);
                     anim = "atom04idle";
                     break
@@ -1942,28 +1946,30 @@ class ScoreScene extends Phaser.Scene {
                 AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span>
                 BONKS: <span style = "float: right">${ourUI.bonks}</span>
 
-                TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span></br>
-                CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span></br>
+                TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span>
+                CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span>
 
-                BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span></br>
-                BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span></br>
+                BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span>
+                BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span>
 
-                ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span></br>
-                </br>
+                ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span>
 
-                MEDALS </br>
+                MEDALS
                 <hr/>
-                <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span></br>
+                <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
                 <hr/>
 
-                BASE SCORE: <span style = "float: right">${bestLocal}</span></br>
-                SPEED BONUS: <span style = "float: right">${bestBonus}</span></br>
+                BASE SCORE: <span style = "float: right">${bestLocal}</span>
+                SPEED BONUS: <span style = "float: right">${bestBonus}</span>
                 </br>
 
-                BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span></br>
+                BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span>
                 </br>
-                AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span></br>
+                AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span>
                 [${bestLog.slice().sort().reverse()}]
+
+                STAGE FOOD LOG:
+                [${ourUI.scoreHistory.slice().sort().reverse()}]
                 </br>
                 </br>
                 </br>`

@@ -61,8 +61,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 303,
-                "y": 343.75
+                "x": 302.5,
+                "y": 343.25
             }
         },
         "Stage-01.json#tileSheet": {
@@ -117,7 +117,7 @@
             "scale": 1.1351478494623655,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 362.0673731573027,
+                "x": 361.18643064353796,
                 "y": 363.3887869279499
             }
         },
@@ -250,7 +250,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 408,
+                "x": 407,
                 "y": 264.5
             }
         },
@@ -267,8 +267,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372,
-                "y": 372.5
+                "x": 368,
+                "y": 342.5
             }
         },
         "Stage-06.json#tileSheet": {
@@ -318,8 +318,8 @@
             "scale": 1.2436827956989247,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.2814222414353,
-                "y": 372.6834540149141
+                "x": 370.67329514751964,
+                "y": 371.0753269209986
             }
         },
         "Stage-09.json#tileSheet": {
@@ -352,8 +352,8 @@
             "scale": 0.7265456989247311,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.99787253723053,
-                "y": 372.30968458051996
+                "x": 368.8687447969661,
+                "y": 370.93330866709846
             }
         },
         "Stage-11.json#tileSheet": {
@@ -369,8 +369,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372,
-                "y": 372.5
+                "x": 369,
+                "y": 369.5
             }
         },
         "Stage-12.json#tileSheet": {
@@ -386,8 +386,8 @@
             "scale": 1,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 372,
-                "y": 372.5
+                "x": 371,
+                "y": 370.5
             }
         },
         "Stage-13.json#tileSheet": {
@@ -488,7 +488,7 @@
             "scale": 1.4799059139784947,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 365.56378002815484,
+                "x": 364.8880613959402,
                 "y": 367.2530766086917
             }
         },
