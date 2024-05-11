@@ -2076,7 +2076,9 @@ class ScoreScene extends Phaser.Scene {
             var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.125,'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize":'32px',
                 "font-family": '"Press Start 2P", system-ui',
-                "text-shadow": "4px 4px 0px #000000"
+                //"text-shadow": "4px 4px 0px #000000",
+                //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
+                "text-shadow": '4px 4px 0px #000000, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc'
                 }
             )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
