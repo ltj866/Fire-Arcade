@@ -1822,11 +1822,12 @@ class ScoreScene extends Phaser.Scene {
                 Medal +0.3%
                 `
         ).setOrigin(1,0);
+        console.log(ourGame.stageDiffBonus);
 
         const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `X ${(ourGame.stageDiffBonus + 2.4 + 0.3).toFixed(1)}%
+                `X ${Number(ourGame.stageDiffBonus + 2.4 + 0.3).toFixed(1)}%
                 <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(Math.ceil((baseScore+speedBonus) * (diffBonus + 0.024 + 0.003)))}</span>`
         ).setOrigin(1, 0);
 
