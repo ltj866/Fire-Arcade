@@ -1958,7 +1958,7 @@ class ScoreScene extends Phaser.Scene {
                 +${this.stageData.boostBonus()}`
         ).setOrigin(1, 0);
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 20 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 20 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
