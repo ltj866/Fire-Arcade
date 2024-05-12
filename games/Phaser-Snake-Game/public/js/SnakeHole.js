@@ -2458,7 +2458,15 @@ class ScoreScene extends Phaser.Scene {
 
             if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
                 ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS};text-decoration:underline;">${commaInt(ourTimeAttack.zeds)}`);
+                var zedsObj = calcZedLevel(ourTimeAttack.zeds);
+
+                ourTimeAttack.zedsUI.setHTML(
+                    `<span style ="color: limegreen;
+                    font-size: 16px;
+                    border: limegreen solid 1px;
+                    border-radius: 5px;
+                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
+                );
             }
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -2533,6 +2541,9 @@ class TimeAttackScene extends Phaser.Scene{
         var playedStages = [];
         var index = 0;
 
+        // Value passes by reference and so must pass the a value you don't want changed.
+       
+
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
 
         
@@ -2543,29 +2554,37 @@ class TimeAttackScene extends Phaser.Scene{
 
         // Is Zero if there is none.
         this.zeds = Number(JSON.parse(localStorage.getItem(`zeds`)));
+        var zedsObj = calcZedLevel(this.zeds);
+        
+         
+        
 
         calcSumOfBest(this);
 
         const styleBottomText = {
-            "font-size": '14px',
+            "font-size": '12px',
             "font-weight": 400,
             "text-align": 'right',
-        }
+        }   
 
-        this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+        this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
             styleBottomText
             )).setHTML(
-                `ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(this.zeds)}</span>`
+                `<span style ="color: limegreen;
+                font-size: 16px;
+                border: limegreen solid 1px;
+                border-radius: 5px;
+                padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
         ).setOrigin(0,0.5);
 
 
-        this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
-        this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setText(
                 `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
