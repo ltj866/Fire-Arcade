@@ -2957,9 +2957,9 @@ class UIScene extends Phaser.Scene {
 
         }, this);
 
-        this.input.keyboard.on('keydown-L', e => {this.comboBounce();})
+        /*this.input.keyboard.on('keydown-L', e => {this.comboBounce();})
         this.input.keyboard.on('keydown-O', e => {this.comboFade();})
-        this.input.keyboard.on('keydown-I', e => {this.comboAppear();})
+        this.input.keyboard.on('keydown-I', e => {this.comboAppear();})*/
         
     }
     update() {
@@ -3047,18 +3047,8 @@ class UIScene extends Phaser.Scene {
         //#endregion Boost Logic
         
         // #region Combo Logic
-        //var currentCombo = this.currentCounter;
-        /*if (this.comboCounter > 0){ //need to find a better way to check when comboCounter is reset back to 0
-            this.comboBounce();
-            this.time.delayedCall(1200, this.checkCombo(currentCombo)   
-        )}
-        else{
-            this.comboFade;
-        }*/
-        //console.log("main combo", this.comboCounter)
 
         if (this.comboCounter > 0 && !this.visible) {
-            //console.log("actively appearing")
             this.comboAppear();
         }
         else if (this.comboCounter == 0 && this.visible){
@@ -3067,12 +3057,10 @@ class UIScene extends Phaser.Scene {
     }
     
     comboBounce(){
-        //bounceReady = false;
-        
-        var tweenC = this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
             y: { from: GRID * 4, to: GRID * 3 },
-            //alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 200,
             repeat: 0,
@@ -3083,9 +3071,9 @@ class UIScene extends Phaser.Scene {
     }
     comboAppear(){
         console.log("appearing")
-        var tweenD = this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
-            //y: { from: GRID * 4, to: GRID * 3 },
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
             alpha: { from: 0, to: 1 },
             ease: 'Sine.InOut',
             duration: 300,
@@ -3095,9 +3083,9 @@ class UIScene extends Phaser.Scene {
     }
     comboFade(){
         console.log("fading")
-        var tweenD = this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, this.letterO2, this.letterExplanationPoint], 
-            //y: { from: GRID * 4, to: GRID * 3 },
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 300,
@@ -3105,19 +3093,7 @@ class UIScene extends Phaser.Scene {
         });
         this.visible = false;
         this.comboCounter = 0;
-        //if (this.letterC.alpha > .5) {
-        //}
     }
-    /*checkCombo(currentCombo){
-        //currentCombo -= 1;
-        console.log("hello")
-        
-        if (this.comboCounter === currentCombo){
-            this.comboCounter = 0;
-            this.comboFade();
-        }
-        
-    }*/
 
 end() {
 
