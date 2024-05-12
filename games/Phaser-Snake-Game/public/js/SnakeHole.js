@@ -40,7 +40,7 @@ var comboCounter = 0;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
+const SCORE_SCENE_DEBUG = true;
 
 // Game Objects
 
@@ -3106,9 +3106,19 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('saveScore', function () {
             const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
             const ourScoreScene = ourGame.scene.get('ScoreScene');
+            const ourUIScene = ourGame.scene.get('UIScene');
 
 
-            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID, ourScoreScene.scoreTotal);
+            // Building StageData for Savin
+            var stageData = new StageData(
+                ourGame.stage, 
+                this.scoreHistory, 
+                ourGame.stageUUID, 
+                ourScoreScene.scoreTotal);
+            
+            stageData.bonks = ourUIScene.bonks;
+
+            console.log(stageData.toString());
 
             var stageFound = false;
             
