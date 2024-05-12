@@ -1918,7 +1918,7 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 `${commaInt(_baseScore)}</span>
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
-                <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(_baseScore + _speedbonus)}</span>`
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
         ).setOrigin(1, 0);
         
 
@@ -1938,7 +1938,7 @@ class ScoreScene extends Phaser.Scene {
             scorePartsStyle, {
             })).setHTML(
                 `X ${Number(_bonusMult * 100).toFixed(1)}%
-                <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(Math.ceil(_postMult))}</span>`
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`
         ).setOrigin(1, 0);
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
