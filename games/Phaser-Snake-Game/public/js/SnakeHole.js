@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 // #region DEBUG OPTIONS
@@ -1639,7 +1639,7 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(stageID, stageUUID, foodLog, zedLevel, medals)
+    function StageData(stageID, stageUUID, foodLog, zeds, medals)
     {
         this.stage = stageID;
         this.uuid = stageUUID;
@@ -1647,7 +1647,8 @@ var StageData = new Phaser.Class({
         
         // Default vals
         this.diffBonus = 100;
-        this.zedLevel = zedLevel;
+        var zedOutput = calcZedLevel(zeds)
+        this.zedLevel = zedOutput.level;
         this.medals = medals;
         this.bonks = 0;
         
@@ -1661,7 +1662,6 @@ var StageData = new Phaser.Class({
 
     calcBase() {
         var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
-
         return stageScore;
     },
 
@@ -1744,15 +1744,17 @@ class ScoreScene extends Phaser.Scene {
             ourGame.stage, 
             ourGame.stageUUID, 
             ourUI.scoreHistory,
-            ourUI.zedLevel,
+            ourTimeAttack.zeds,
             ourUI.medals
         );
         
         this.stageData.bonks = ourUI.bonks;
         this.stageData.cornerTime = Math.floor(ourInputScene.cornerTime);
         this.stageData.boostFrames = ourInputScene.boostBonusTime;
+        this.stageData.moveCount = ourInputScene.moveCount;
         this.stageData.foodHistory = ourGame.foodHistory;
         this.stageData.moveHistory = ourInputScene.moveHistory;
+        
 
 
         console.log(JSON.stringify(this.stageData));
@@ -3207,15 +3209,10 @@ class UIScene extends Phaser.Scene {
 
 
             // Building StageData for Savin
-            var stageData = new StageData(
-                ourGame.stage, 
-                this.scoreHistory, 
-                ourGame.stageUUID, 
-                ourScoreScene.scoreTotal);
+            var stageData = ourScoreScene.stageData;
             
-            stageData.bonks = ourUIScene.bonks;
 
-            console.log(stageData.toString());
+            //console.log(stageData.toString());
 
             var stageFound = false;
             
@@ -3244,8 +3241,7 @@ class UIScene extends Phaser.Scene {
                 })
                 if (!stageFound) {
                     // Playing a new unlocked stage. Get one life back.
-                    this.lives += 1;
-                    ourTimeAttack.stageHistory.push(stageData);
+                    //ourTimeAttack.stageHistory.push(stageData);
                 }
             }
             else {
@@ -3259,14 +3255,16 @@ class UIScene extends Phaser.Scene {
             // #region Do Unlock Calculation of all Best Logs
             
             var historicalLog = [];
-            
-            ourTimeAttack.stageHistory.forEach( _stage => {
-                var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
-                if (stageBestLog) {
-                    historicalLog = [...historicalLog, ...stageBestLog];
-                }
-            });
-
+            if (ourTimeAttack.stageHistory.length > 1) {
+                ourTimeAttack.stageHistory.forEach( _stage => {
+                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
+                    if (stageBestLog) {
+                        historicalLog = [...historicalLog, ...stageBestLog];
+                    }
+                });
+                
+            }
+        
             // make this an event?
             ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
         
