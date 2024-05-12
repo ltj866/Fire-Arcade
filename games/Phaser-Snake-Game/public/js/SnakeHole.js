@@ -1670,7 +1670,7 @@ var StageData = new Phaser.Class({
     },
 
     zedLevelBonus() {
-        return this.zedLevel / 100;
+        return this.zedLevel / 200;
     },
 
     medalBonus() {
