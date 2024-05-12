@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 // #region DEBUG OPTIONS
@@ -1696,10 +1696,18 @@ var StageData = new Phaser.Class({
         }
     },
     
+    cornerBonus() {
+        return Math.ceil(this.cornerTime / 100) * 10;
+    },
+
+    boostBonus() {
+        return Math.ceil(this.boostFrames / 10) * 10;
+    },
+    
     scoreTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
-        return _postMult + _bonkBonus;
+        return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
     },
     
 });
@@ -1739,6 +1747,8 @@ class ScoreScene extends Phaser.Scene {
         console.log(JSON.stringify(this.stageData));
 
         this.stageData.bonks = ourUI.bonks;
+        this.stageData.cornerTime = ourInputScene.cornerTime;
+        this.stageData.boostFrames = ourInputScene.boostBonusTime;
         
 
 
@@ -1904,7 +1914,7 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(1, 0);
         
 
-        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML(
@@ -1914,27 +1924,30 @@ class ScoreScene extends Phaser.Scene {
                 `
         ).setOrigin(1,0);
         
-
-        
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
-        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `X ${Number(_bonusMult * 100).toFixed(1)}%
                 <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(Math.ceil(_postMult))}</span>`
         ).setOrigin(1, 0);
 
-        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `No-Bonk Bonus:`
+                `No-Bonk Bonus:
+                CornerTime:
+                Boost Bonus:`
         ).setOrigin(1,0);
 
-        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
+                //"font-size": '18px',
             })).setHTML(
-                `<span style="font-size:18px"> +${this.stageData.bonkBonus()}</span><br/>`
+                `+${this.stageData.bonkBonus()}
+                +${this.stageData.cornerBonus()}
+                +${this.stageData.boostBonus()}`
         ).setOrigin(1, 0);
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 20 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
