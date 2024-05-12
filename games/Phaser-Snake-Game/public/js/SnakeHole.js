@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 // #region DEBUG OPTIONS
@@ -1945,7 +1945,7 @@ class ScoreScene extends Phaser.Scene {
             scorePartsStyle, {
             })).setHTML(
                 `No-Bonk Bonus:
-                CornerTime:
+                Corner Time:
                 Boost Bonus:`
         ).setOrigin(1,0);
 
@@ -1965,7 +1965,7 @@ class ScoreScene extends Phaser.Scene {
                 "text-align": 'right',
                 //"animation": 'glow 1s ease-in-out infinite alternate'
             })).setHTML(
-                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${Math.floor(this.stageData.scoreTotal())}</span>`
+                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.scoreTotal()))}</span>`
         ).setOrigin(1, 0.5).setDepth(20);
         
         //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.scoreTotal()),
@@ -2049,7 +2049,7 @@ class ScoreScene extends Phaser.Scene {
         var cardY = 8;
         var styleCard = {
             width: '246px',
-            "font-size": '14px',
+            "font-size": '12px',
             "max-height": '236px',
             "font-weight": 300,
             "padding": '12px 12px 12px 12px',
