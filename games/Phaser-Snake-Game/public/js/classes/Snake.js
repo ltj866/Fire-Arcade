@@ -22,6 +22,8 @@ var Snake = new Phaser.Class({
         this.bonked = false;
         this.lastPlayedCombo = 0;
 
+        this.traveling = false;
+
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
     },
@@ -70,7 +72,6 @@ var Snake = new Phaser.Class({
     let y = this.head.y;
 
     var onPortal = false;
-
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
@@ -88,6 +89,7 @@ var Snake = new Phaser.Class({
             portalSound.play();
 
             scene.lastMoveTime += SPEEDWALK * 2;
+            this.traveling = true;
             var _tween = scene.tweens.add({
                 targets: this.head, 
                 x: _x,
@@ -98,6 +100,10 @@ var Snake = new Phaser.Class({
                 repeat: 0,
                 //delay: 500
             });
+            _tween.on('complete',()=>{
+                this.traveling = false;
+            });
+            
             
             scene.time.delayedCall(SPEEDWALK * 4, event => {
                 
@@ -136,7 +142,7 @@ var Snake = new Phaser.Class({
         
         // Bonk Wall
         scene.map.setLayer("Wall");
-        if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal) {
+        if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal && !this.traveling) {
             
             // Only count a wall hit ahead if not on a portal.
             //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
@@ -154,7 +160,7 @@ var Snake = new Phaser.Class({
         
     
         // #region intesect self
-        if (scene.startMoving && !onPortal && !scene.ghosting) {
+        if (scene.startMoving && !onPortal && !scene.ghosting && !this.traveling) {
         // Game Has started. Snake head has left Starting Square
             
 
@@ -202,7 +208,8 @@ var Snake = new Phaser.Class({
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
-        if(this.head.x === _atom.x && this.head.y === _atom.y){  
+        if(this.head.x === _atom.x && this.head.y === _atom.y && !this.traveling){
+            const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             //console.log("lastplayedcombo", this.lastPlayedCombo, "currentCombo", currentCombo)
 

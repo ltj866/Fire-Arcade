@@ -58,6 +58,11 @@
          "name":"UUID",
          "type":"string",
          "value":"85ce4709-0276-4138-8721-2cf0dbabda97"
+        }, 
+        {
+         "name":"diffBonus",
+         "type":"int",
+         "value":100
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

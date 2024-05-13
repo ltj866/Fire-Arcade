@@ -17,6 +17,12 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
+// #region DEBUG OPTIONS
+
+export const DEBUG = false;
+export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
+const SCORE_SCENE_DEBUG = false;
+
 
 
 // 1 frame is 16.666 milliseconds
@@ -27,7 +33,7 @@ export const SPEEDWALK = 99; // 99 In milliseconds
 var SPEEDSPRINT = 24; // 24
 
 
-var SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
+const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
@@ -35,11 +41,6 @@ const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
 
 
-// #region DEBUG OPTIONS
-
-export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -162,7 +163,7 @@ export const STOP = 10;
 // #region GLOBAL STYLES 
 const STYLE_DEFAULT = {
     color: 'white',
-    'font-size': '12px',
+    'font-size': '14px',
     'font-family': ["Sono", 'sans-serif'],
     'font-weight': '200',
     'text-align': 'center',
@@ -225,25 +226,25 @@ const STAGES_NEXT = {
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 105]],
     
-    'Stage-03a': [['Stage-04', 85]],
+    'Stage-03a': [['Stage-04', 0]],
     'Stage-03b': [['Stage-04', 85]],
     'Stage-03c': [['Stage-04', 85]],
     
-    'Stage-04': [['Stage-05', 90]],
-    'Stage-05': [['Stage-06', 95]],
-    'Stage-06': [['Stage-07', 100]],
-    'Stage-07': [['Stage-08', 100]],
-    'Stage-08': [['Stage-09', 100]],
-    'Stage-09': [['Stage-10', 100]],
-    'Stage-10': [['Stage-11', 100]],
-    'Stage-11': [['Stage-12', 100]],
+    'Stage-04': [['Stage-05', 0]],
+    'Stage-05': [['Stage-06', 0]],
+    'Stage-06': [['Stage-07', 0]],
+    'Stage-07': [['Stage-08', 0]],
+    'Stage-08': [['Stage-09', 0]],
+    'Stage-09': [['Stage-10', 0]],
+    'Stage-10': [['Stage-11', 0]],
+    'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
 }
 
 
 
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
@@ -258,9 +259,10 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('bg01', 'assets/sprites/background01.png');
 
-        this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
 
+        this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
 
@@ -273,7 +275,11 @@ class StartScene extends Phaser.Scene {
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
+        this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
+        this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
+        this.load.image('scoreScreenMask', 'assets/sprites/UI_ScoreScreenMask.png');
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -381,7 +387,7 @@ class StartScene extends Phaser.Scene {
             
 
                 ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
-                ourGame.stageDiffBonus = 200;
+                ourGame.stageDiffBonus = 140;
                 ourGame.stage = END_STAGE;
                 //END_STAGE = "Stage-01";
 
@@ -389,6 +395,11 @@ class StartScene extends Phaser.Scene {
                 ourUI.bonks = 3;
                 ourUI.length = 28;
                 ourUI.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+                ourUI.zedLevel = 77;
+                ourUI.medals = {
+                    "fast":'silver',
+                    "Rank":'gold'
+                }
 
                 ourInput.turns = 79;
                 ourInput.cornerTime = 190;
@@ -437,6 +448,7 @@ class GameScene extends Phaser.Scene {
         // #region Init Vals
         // Arrays for collision detection
         this.atoms = [];
+        this.foodHistory = [];
         this.walls = [];
         this.portals = [];
         this.dreamWalls = [];
@@ -816,9 +828,16 @@ class GameScene extends Phaser.Scene {
 
             p1.targetObject = p2;
             p2.targetObject = p1;
+
+            p1.flipX = true;
+            //var randomStart = Phaser.Math.Between(0,5);
+            //p1.setFrame(randomStart)
+            //p2.setFrame(randomStart)
         }
 
-
+        //makePair(this, [5,5],[3,3]);
+        //makePair(this, [6,5],[4,3]);
+        //makePair(this, [7,5],[5,3]);
         // Add try loop to get all Portal Layers
 
         // do while loop Portal-X
@@ -1005,7 +1024,19 @@ class GameScene extends Phaser.Scene {
         }
 
         // #endregion
-
+        this.portals.forEach(portal => {
+            this.add.particles(portal.x, portal.y, "portalParticle01", {
+                color: [ portal.tintTopLeft,0x000000, 0x000000],
+                colorEase: 'quad.out',
+                x:{steps: 2, min: -18, max: 48},
+                y:{steps: 2, min: -18, max: 48},
+                scale: {start: 1, end: .5},
+                speed: 5,
+                moveToX: 14,
+                moveToY: 14,
+                alpha:{start: 1, end: 0 },
+            }).setFrequency(332,[1]).setDepth(20);
+        });
 
         
 
@@ -1134,8 +1165,8 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, 12 - 2 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreUI.setOrigin(0,0);
+        ourUI.bestScoreUI = ourUI.add.dom(0, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        ourUI.bestScoreUI.setOrigin(0,1);
 
         // Calculate this locally
         var bestLog = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestFruitLog`));
@@ -1398,7 +1429,7 @@ class GameScene extends Phaser.Scene {
 
                         }
                     });
-                };
+                }
             } // End Closest Portal
             
             const ourUI = this.scene.get('UIScene');
@@ -1436,6 +1467,8 @@ class GameScene extends Phaser.Scene {
             // Move at last second
             if (!this.stageOver) {
                 this.snake.move(this);
+                ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
+                ourInputScene.moveCount += 1;
                 //move ghost segments here
             }
 
@@ -1599,6 +1632,88 @@ class GameScene extends Phaser.Scene {
     }
 }
 
+// #region Stage Data
+var StageData = new Phaser.Class({
+
+    initialize:
+
+    function StageData(stageID, stageUUID, foodLog, zeds, medals)
+    {
+        this.stage = stageID;
+        this.uuid = stageUUID;
+        this.foodLog = foodLog;
+        
+        // Default vals
+        this.diffBonus = 100;
+        var zedOutput = calcZedLevel(zeds)
+        this.zedLevel = zedOutput.level;
+        this.medals = medals;
+        this.bonks = 0;
+        
+        //this.newBest = newBest;
+        //this.scoreTotal = scoreTotal;
+    },
+    
+    toString(){
+        return `${this.stage}`;
+    },
+
+    calcBase() {
+        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+        return stageScore;
+    },
+
+    preAdditive() {
+        return this.calcBase() + calcBonus(this.calcBase());
+    },
+
+    zedLevelBonus() {
+        return this.zedLevel / 200;
+    },
+
+    medalBonus() {
+        return Object.values(this.medals).length / 1000;
+    },
+
+    bonusMult() {
+        var zedLevelBonus = this.zedLevelBonus();
+        var medalBonus = this.medalBonus();
+        return Number(this.diffBonus/100 + zedLevelBonus + medalBonus);
+        
+    },
+
+    postMult() {
+        return this.preAdditive() * this.bonusMult();
+    },
+    
+    bonkBonus(){
+        var _bonkBonus = Math.floor(NO_BONK_BASE / (this.bonks+1))
+
+        if (_bonkBonus > 49) {
+            return _bonkBonus;
+        }
+        else {
+            return 0;
+        }
+    },
+    
+    cornerBonus() {
+        return Math.ceil(this.cornerTime / 100) * 10;
+    },
+
+    boostBonus() {
+        return Math.ceil(this.boostFrames / 10) * 10;
+    },
+    
+    scoreTotal() {
+        var _postMult = this.postMult();
+        var _bonkBonus = this.bonkBonus();
+        return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
+    },
+    
+});
+// #endregion
+
 
 class ScoreScene extends Phaser.Scene {
 // #region ScoreScene
@@ -1610,6 +1725,7 @@ class ScoreScene extends Phaser.Scene {
         this.rollSpeed = 250;
         this.lastRollTime = 0;
         this.difficulty = 0;
+        this.stageData = {};
     }
 
     preload() {
@@ -1622,7 +1738,25 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
+        this.stageData = new StageData(
+            ourGame.stage, 
+            ourGame.stageUUID, 
+            ourUI.scoreHistory,
+            ourTimeAttack.zeds,
+            ourUI.medals
+        );
+        
+        this.stageData.bonks = ourUI.bonks;
+        this.stageData.cornerTime = Math.floor(ourInputScene.cornerTime);
+        this.stageData.boostFrames = ourInputScene.boostBonusTime;
+        this.stageData.moveCount = ourInputScene.moveCount;
+        this.stageData.foodHistory = ourGame.foodHistory;
+        this.stageData.moveHistory = ourInputScene.moveHistory;
+        
 
+
+        console.log(JSON.stringify(this.stageData));
+        
 
 
         
@@ -1653,19 +1787,19 @@ class ScoreScene extends Phaser.Scene {
         
         }
 
-
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
-
         // #endregion
 
-        // Pre Calculate needed values
-        var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
-        var stageAve = baseScore/ourUI.scoreHistory.length;
+        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
+        this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
+        //this.add.image(GRID * 17.625, - GRID * 2,'scoreScreenMask').setDepth(21).setOrigin(0,0);
+        
 
-        var speedBonus = calcBonus(baseScore);
+        // Pre Calculate needed values
+        var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
 
         var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
         var bestLocal = bestLog.reduce((a,b) => a + b, 0);
@@ -1676,53 +1810,180 @@ class ScoreScene extends Phaser.Scene {
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
+
         //var stageAverage = stageScore();
         
         // Scene Background Color
         this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
         this.stageBackGround.setOrigin(0,0).setDepth(8);
 
-        ///////
+
+        // #region Atomic Food List
+        var atomList = this.stageData.foodLog.slice();
+        // dead atom = 1 
+        //const BOOST_ADD_FLOOR = 100;
+        //const COMBO_ADD_FLOOR = 108;
+        //console.log(atomList)
+        var count = 0;
 
         
+        
+        for (let i = 0; i < atomList.length; i++) {
+            
+            var logTime = atomList[i];
+            let _x,_y;
+            let anim;
 
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',
-            {"fontSize":'48px'}
-        ).setOrigin(0.5,0).setDepth(25);
+            if (i < 14) {
+                _x = (GRID * (7.2667)) + (i * 16);
+                _y = GRID * 8.75
+            }
+            else {
+                _x = (-GRID * 2.0667) + (i * 16);
+                _y = (GRID * 8.75) + 16;
+            }
 
+            switch (true) {
+                case logTime > COMBO_ADD_FLOOR:
+                    anim = "atom01idle";
+                    if (i != 0) { // First Can't Connect
+                        this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
+                        ).setOrigin(0,0.5).setDepth(20);
+                    }
+                    break
+                case logTime > BOOST_ADD_FLOOR:
+                    console.log(logTime, "Boost", i);
+                    anim = "atom02idle";
+                    break
+                case logTime > SCORE_FLOOR:
+                    console.log(logTime, "Boost", i);
+                    anim = "atom03idle";
+                    break
+                default:
+                    console.log(logTime, "dud", i);
+                    anim = "atom04idle";
+                    break
+            }
 
-        const stageUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 2, GRID * 6.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '320px',
-            "font-size":'28px',
-            "font-weight": 600,
-            "text-align": 'right',
-        })).setText(ourGame.stage).setOrigin(1,0);
+            this.add.sprite(_x, _y,'atomicPickup01Anim'
+            ).play(anim).setDepth(21).setScale(.5);
+            
+        }
+
+        /*atomList.forEach(element => {
+            this.add.sprite((GRID * 4), GRID * 10, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
+        });*/
+        ///////
+
+        this.add.dom(SCREEN_WIDTH/2, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size":'32px',
+            'font-weight': 400,
+            'text-align': 'center',
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            })).setHTML(
+                `${this.stageData.stage} CLEAR`
+        ).setOrigin(0.5, 0);
 
         // #region Main Stats
 
         var bonkBonus = NO_BONK_BASE/(ourUI.bonks+1);
         let diffBonus = ourGame.stageDiffBonus * .01;
-        this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
+
+        const scorePartsStyle = {
+            color: "white",
+            "text-shadow": "2px 2px 4px #000000",
+            "font-size":'16px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
+        
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            
+            })).setHTML(
+                `Base Score:
+                Speed Bonus:`
+        ).setOrigin(1, 0);
+
+
+        var _baseScore = this.stageData.calcBase();
+        var _speedbonus = calcBonus(this.stageData.calcBase());
+        const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `${commaInt(_baseScore)}</span>
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
+        ).setOrigin(1, 0);
         
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 8.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            //width: '260px',
-            color: 'white',
-            "font-size":'18px',
-            'font-weight': 400,
-            'text-align': 'right',
+        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                "font-size":'12px'
             })).setHTML(
-                `Base Score: ${baseScore}</br>
-                Speed Bonus: <span style="color:${COLOR_FOCUS};font-weight:600;">+ ${commaInt(speedBonus)}</span></br>
-                <span style="font-size:12px">Difficulty Bonus %${ourGame.stageDiffBonus} = ${(baseScore+speedBonus) * diffBonus}</span><br/>
-                <span style="font-size:12px">No-Bonk Bonus: + ${bonkBonus.toFixed(0)}</span><br/>
-                <hr/>
-                <span style="font-size:28px;padding-bottom:10px;">Score: ${this.scoreTotal.toFixed(0)}</span></br>`
+                `Difficulty +${this.stageData.diffBonus}%
+                Zed Lvl +${Number(this.stageData.zedLevelBonus() * 100).toFixed(1)}%
+                Medal +${this.stageData.medalBonus() * 100}%
+                `
+        ).setOrigin(1,0);
+        
+        var _bonusMult = this.stageData.bonusMult();
+        var _postMult = this.stageData.postMult();
+        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `X ${Number(_bonusMult * 100).toFixed(1)}%
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`
         ).setOrigin(1, 0);
+
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `No-Bonk Bonus:
+                Corner Time:
+                Boost Bonus:`
+        ).setOrigin(1,0);
+
+        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                //"font-size": '18px',
+            })).setHTML(
+                `+${this.stageData.bonkBonus()}
+                +${this.stageData.cornerBonus()}
+                +${this.stageData.boostBonus()}`
+        ).setOrigin(1, 0);
+
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 20 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
+            {
+                "font-style": 'bold',
+                "font-size": "28px",
+                "text-align": 'right',
+                //"animation": 'glow 1s ease-in-out infinite alternate'
+            })).setHTML(
+                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.scoreTotal()))}</span>`
+        ).setOrigin(1, 0.5).setDepth(20);
+        
+        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.scoreTotal()),
+        //{ fontFamily: "Sono", fontStyle: 'bold',
+        //fontSize: 28, color: '#ffff00', align: 'right' })
+        //.setOrigin(0.5, 0.5).setDepth(20);
+
+        //const fx1 = stageScore.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
+        /*this.tweens.add({
+            targets: fx1,
+            outerStrength: 2,
+            yoyo: true,
+            loop: -1,
+            ease: 'sine.inout'
+        });*/
+
 
         // #region Rank Sprites
         
-        const medianScore = 8000;
+        const medianSpeedBonus = 6000;
 
         const COPPER = 0;
         const BRONZE = 1;
@@ -1731,29 +1992,30 @@ class ScoreScene extends Phaser.Scene {
         const PLATINUM = 4;
 
         let rank;
+        let bonusScore = calcBonus(this.stageData.baseScore)
 
         switch (true) {
-            case this.scoreTotal > medianScore * 2:
+            case bonusScore > medianSpeedBonus * 2:
                 rank = PLATINUM;
                 break;
-            case this.scoreTotal > medianScore * 1.5:
+            case bonusScore > medianSpeedBonus * 1.5:
                 rank = GOLD;
                 break;
-            case this.scoreTotal > medianScore:
+            case bonusScore > medianSpeedBonus:
                 rank = SILVER;
                 break;
-            case this.scoreTotal > medianScore * .5:
+            case bonusScore > medianSpeedBonus * .5:
                 rank = BRONZE;
                 break;
             default:
                 rank = COPPER;
         }
 
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 6,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
         if(rank >= SILVER){
-            this.add.particles(GRID * 4, GRID * 6, "twinkle01Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -1761,7 +2023,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            this.add.particles(GRID * 4, GRID * 6, "twinkle02Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -1769,7 +2031,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            this.add.particles(GRID * 4, GRID * 6, "twinkle03Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -1782,36 +2044,68 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Stat Cards
-        var cardY = 6;
+        var cardY = 8;
         var styleCard = {
             width: '246px',
-            "max-height": '290px',
-            outline: 'solid',
-            //"font-size": '10px',
+            "font-size": '12px',
+            "max-height": '236px',
             "font-weight": 300,
-            "padding": '12px 12px 6px 12px',
-            "text-align": 'left',
-            "word-wrap": 'break-word'
-
+            "padding": '12px 12px 12px 12px',
+            "text-align": 'left', 
+            "word-wrap": 'break-word',
+            "white-space": 'pre-line',
+            'overflow-y': 'scroll',
+            'scroll-behavior': 'smooth',
+            //'-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, .9),rgba(0, 0, 0, 0))'
+            //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
-        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 4, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
-                `----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
-                </br>
-                STAGE STATS - ${ourGame.stage}</br>
-                <hr/>
-                LENGTH: ${ourUI.length}</br>
-                ATTEMPTS: xx</br>
-                </br>
-                BETA: ${GAME_VERSION}</br>
-                </br>
-                FOOD LOG ........... AVE: [${stageAve.toFixed(2)}]</br>
-                [${ourUI.scoreHistory.slice().sort().reverse()}]</br>`
-        ).setOrigin(0,0).setVisible(false);
+                //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
+                //</br>
+                //[${ourUI.scoreHistory.slice().sort().reverse()}]</br> individual food score printout array
+                `<span style ="text-transform: uppercase"> ${ourGame.stage} STATS</span>
+                <hr style="font-size:6px"/>ATTEMPTS: <span style = "float: right">xx</span>
+                LENGTH: <span style = "float: right">${ourUI.length}</span>
+                AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span>
+                BONKS: <span style = "float: right">${ourUI.bonks}</span>
 
-        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+                MOVE COUNT: <span style="float: right">${ourInputScene.moveCount}</span>
+                MOVE VERIFY: <span style="float: right">${ourInputScene.moveHistory.length}</span>
+                TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span>
+                CORNER TIME: <span style = "float: right">${Math.ceil(ourInputScene.cornerTime)} FRAMES</span>
+
+                BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span>
+                BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span>
+
+                ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span>
+
+                MEDALS
+                <hr/>
+                <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
+                <hr/>
+
+                BASE SCORE: <span style = "float: right">${bestLocal}</span>
+                SPEED BONUS: <span style = "float: right">${bestBonus}</span>
+                </br>
+
+                BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span>
+                </br>
+                AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span>
+                [${bestLog.slice().sort().reverse()}]
+
+                STAGE FOOD LOG:
+                [${ourUI.scoreHistory.slice().sort().reverse()}]
+                </br>
+                </br>
+                </br>`
+                
+        ).setOrigin(0,0).setVisible(true);
+
+        /*
+        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
             })).setHTML(
@@ -1833,7 +2127,7 @@ class ScoreScene extends Phaser.Scene {
 
 
         
-        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID *2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
 
             })).setHTML(
@@ -1849,21 +2143,23 @@ class ScoreScene extends Phaser.Scene {
                 BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
                 [${bestLog.slice().sort().reverse()}]`
         ).setOrigin(0,0).setVisible(false);
+        */
 
         var sIndex = 1 // Default Card
-        var statsCards = [stageStats, extraStats, bestStats];
+        var statsCards = [stageStats];
 
-        statsCards[sIndex].setVisible(true);
-        var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
+        //statsCards[sIndex].setVisible(true);
+        //this.statCards.setMask(ourScoreScene.mask)
+        /*var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsE.angle = 90;
         arrowsE.play('idle');
 
         var arrowsW = this.add.sprite(GRID * 15, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsW.angle = 270;
-        arrowsW.play('idle');
+        arrowsW.play('idle');*/
         
 
-        this.input.keyboard.on('keydown-RIGHT', function() {
+        /*this.input.keyboard.on('keydown-RIGHT', function() {
             statsCards[sIndex].setVisible(false);
             sIndex = Phaser.Math.Wrap(sIndex + 1, -1, statsCards.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
 
@@ -1875,16 +2171,53 @@ class ScoreScene extends Phaser.Scene {
             sIndex = Phaser.Math.Wrap(sIndex - 1, 0, statsCards.length); // No idea why -1 works here. But it works so leave it until it doesn't/
 
             statsCards[sIndex].setVisible(true);   
-        }, [], this);
+        }, [], this);*/
 
-        // #endregion
+        //var yTargetVal = 192
+        this.yTargetVal = 192;
+        //console.log(stageStats.y)
+
+        this.input.keyboard.on('keydown-UP', function() {
+            
+            /*if (stageStats.y >= -218 && stageStats.y < 192) {
+            //console.log(this.yTargetVal) 
+            //this.yTargetVal -=5;
+                
+                stageStats.y += 5;
+            }
+            else{
+            //    this.yTargetVal = 192;
+                stageStats.y = 192
+            }*/
+            
+        });
+        this.input.keyboard.on('keydown-DOWN', function() {
+            /*if (stageStats.y <= 192 && stageStats.y < 218) {
+                this.yTargetVal -= 5;
+                //console.log(yTargetVal)
+                stageStats.y -= 5;
+            }
+            else{
+                stageStats.y = 187
+            }*/
+        });
+
+        const mask = this.make.image({
+            x: GRID * 17.625,
+            y: 500,
+            key: 'scoreScreenMask',
+            add: false
+        });
+        stageStats.mask = new Phaser.Display.Masks.BitmapMask(this, mask);
+        stageStats.mask.invertAlpha = true;
+
 
         
 
         // #region Hash Display Code
-        this.foodLogSeed = ourUI.scoreHistory.slice();
+        this.foodLogSeed = this.stageData.foodLog.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(this.scoreTotal.toFixed(0));
+        this.foodLogSeed.push(Math.floor(this.stageData.scoreTotal));
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -1892,28 +2225,30 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 16 - 6, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
             })).setOrigin(0.5, 0);
 
         // #region Help Card
-        var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
+        /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
         card.setOrigin(0.5,0); 
-        card.displayHeight = 108;
+        card.displayHeight = 108;*/
 
-        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*23.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             color: COLOR_SCORE,
             "font-size":'28px',
             'font-weight': 500,
-        })).setText(`Current Score: ${commaInt(ourUI.score + speedBonus)}`).setOrigin(0.5,0).setDepth(60);
+        })).setText(
+            `Current Score: ${commaInt(ourUI.score + this.stageData.scoreTotal - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+        ).setOrigin(0.5,0).setDepth(60);
 
-
-        const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
+        // #endregion
+        /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             'font-size':'22px',
             'font-weight': 400,
-        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);
+        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
         this.prevZeds = ourTimeAttack.zeds;
@@ -1926,9 +2261,14 @@ class ScoreScene extends Phaser.Scene {
                 continue_text = '[SPACE TO WIN]';
             }
             
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26.75,'', 
-                {"fontSize":'48px'}
-            ).setText(continue_text).setOrigin(0.5,0).setDepth(25);
+            var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.125,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'32px',
+                "font-family": '"Press Start 2P", system-ui',
+                //"text-shadow": "4px 4px 0px #000000",
+                //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
+                "text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
+                }
+            )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
             this.tweens.add({
@@ -2057,6 +2397,18 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
+        const ourScoreScene = this.scene.get('ScoreScene');
+        //console.log(ourScoreScene.yTargetVal)
+        //this.stageStats.y = Phaser.Math.Interpolation.Linear([ourScoreScene.yTargetVal], .1)
+        /*this.tweens.add({
+            targets: this.stageStats,
+            y: [this.yTargetVal],
+            duration: 1000,
+            repeat: -1,
+            hold: 500,
+            repeatDelay: 500,
+            ease: 'linear'
+        })*/
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -2104,7 +2456,15 @@ class ScoreScene extends Phaser.Scene {
 
             if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
                 ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS};text-decoration:underline;">${commaInt(ourTimeAttack.zeds)}`);
+                var zedsObj = calcZedLevel(ourTimeAttack.zeds);
+
+                ourTimeAttack.zedsUI.setHTML(
+                    `<span style ="color: limegreen;
+                    font-size: 16px;
+                    border: limegreen solid 1px;
+                    border-radius: 5px;
+                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
+                );
             }
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -2136,40 +2496,6 @@ const ROLL_SPEED = [
 console.log("ROLL LENGTH", ROLL_SPEED.length);
 
 
-// #region Stage Data
-var StageData = new Phaser.Class({
-
-    initialize:
-
-    function StageData(stageID, foodLog, stageUUID, scoreTotal, newBest = false)
-    {
-        this.stage = stageID;
-        this.foodLog = foodLog;
-        this.newBest = newBest;
-        this.uuid = stageUUID;
-        this.scoreTotal = scoreTotal;
-    },
-    
-    toString(){
-        return `${this.stage}`
-    },
-
-    calcScore() {
-        //var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
-        //var bonusScore = calcBonus(stageScore);
-
-        //return stageScore + bonusScore;
-        return this.scoreTotal;
-    },
-
-    calcBase() {
-        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
-
-        return stageScore;
-    },
-    
-});
-// #endregion
 
 class TimeAttackScene extends Phaser.Scene{
     // #region TimeAttackScene
@@ -2213,6 +2539,9 @@ class TimeAttackScene extends Phaser.Scene{
         var playedStages = [];
         var index = 0;
 
+        // Value passes by reference and so must pass the a value you don't want changed.
+       
+
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
 
         
@@ -2223,29 +2552,37 @@ class TimeAttackScene extends Phaser.Scene{
 
         // Is Zero if there is none.
         this.zeds = Number(JSON.parse(localStorage.getItem(`zeds`)));
+        var zedsObj = calcZedLevel(this.zeds);
+        
+         
+        
 
         calcSumOfBest(this);
 
         const styleBottomText = {
-            "font-size": '14px',
+            "font-size": '12px',
             "font-weight": 400,
             "text-align": 'right',
-        }
+        }   
 
-        this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+        this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
             styleBottomText
             )).setHTML(
-                `ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(this.zeds)}</span>`
+                `<span style ="color: limegreen;
+                font-size: 16px;
+                border: limegreen solid 1px;
+                border-radius: 5px;
+                padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
         ).setOrigin(0,0.5);
 
 
-        this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
-        this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setText(
                 `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
@@ -2637,14 +2974,15 @@ class UIScene extends Phaser.Scene {
         this.score = score;
         this.stageStartScore = score;
         
-
         this.length = 0;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
         this.bonks = 0;
+        this.medals = {};
+        this.zedLevel = 0;
 
-        var {lives = STARTING_ATTEMPTS } = props
+        var {lives = STARTING_ATTEMPTS } = props;
         this.lives = lives;
 
         this.scoreHistory = [];
@@ -2666,22 +3004,23 @@ class UIScene extends Phaser.Scene {
 
 
        // UI Icons
-       this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
-       this.add.sprite(GRID * 25.5, GRID * 1, 'snakeDefault', 1).setOrigin(0,0).setDepth(50);      // Snake Body
-       this.add.sprite(GRID * 29.5 - 4, GRID * 1, 'ui-blocks', 3).setOrigin(0,0).setDepth(50); // Tried to center flag
+       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
+       this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.25,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+
 
        this.mask = this.make.image({
            x: SCREEN_WIDTH/2,
-           y: GRID*.25,
+           y: GRID,
            key: 'mask',
            add: false
-       }).setOrigin(0.5,0);
+       }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID).setOrigin(0.5,0.5);
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
@@ -2713,24 +3052,35 @@ class UIScene extends Phaser.Scene {
         
         
         // Score Text
-        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`Stage: 0`).setOrigin(0,1);
+        this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`Stage: 0`).setOrigin(0,0);
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`x ${this.lives}`).setOrigin(0,1);
+        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //).setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+
+        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)      // Snake Body
+        var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
+ 
+        snakeBody.scale = .667;
+        flagGoal.scale = .667;
         
         
         var length = `${this.length}`;
         if (LENGTH_GOAL != 0) {
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`).setOrigin(0,1);
+            this.lengthGoalUI.setHTML(
+                `${length.padStart(2, "0")}<br/>
+                <hr style="font-size:3px"/>
+                ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            ).setOrigin(0,0.5);
         }
         else {
+            // Special Level
             this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,1);
             this.lengthGoalUI.x = GRID * 27
         }
@@ -2749,17 +3099,26 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
             padding: '1px 5px',
-            'border-radius': '4px',
-            outline: 'solid',
-            "outline-color": 'white',
+            //'border-radius': '4px',
+            //outline: 'solid',
+            //"outline-color": 'white',
             })).setText(
                 countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0);
+        ).setOrigin(1,0.5);
+
+        
+        this.deltaScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `LastΔ: +0 `
+        ).setOrigin(0,1);
+        
+        this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `Score: ${commaInt(this.score.toString())}`
+        ).setOrigin(0,0);
         
 
         
@@ -2825,8 +3184,19 @@ class UIScene extends Phaser.Scene {
             var lastHistory = this.scoreHistory.slice();
             lastHistory.pop();
             var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
-            console.log("Current Score:", this.score + calcBonus(baseScore), "Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
 
+            var runningScore = this.score + calcBonus(baseScore);
+            var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
+
+            this.deltaScoreUI.setText(
+                `LastΔ: +${deltaScore}`
+            )
+            
+            this.runningScoreUI.setText(
+                `Score: ${commaInt(runningScore.toString())}`
+            );
+            
 
 
             // Update UI
@@ -2840,7 +3210,11 @@ class UIScene extends Phaser.Scene {
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
-                this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL}`);
+                this.lengthGoalUI.setHTML(
+                    `${length.padStart(2, "0")}<br/>
+                    <hr style="font-size:3px"/>
+                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
+                )
             }
             else {
                 this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
@@ -2863,9 +3237,14 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('saveScore', function () {
             const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
             const ourScoreScene = ourGame.scene.get('ScoreScene');
+            const ourUIScene = ourGame.scene.get('UIScene');
 
 
-            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID, ourScoreScene.scoreTotal);
+            // Building StageData for Savin
+            var stageData = ourScoreScene.stageData;
+            
+
+            //console.log(stageData.toString());
 
             var stageFound = false;
             
@@ -2894,8 +3273,7 @@ class UIScene extends Phaser.Scene {
                 })
                 if (!stageFound) {
                     // Playing a new unlocked stage. Get one life back.
-                    this.lives += 1;
-                    ourTimeAttack.stageHistory.push(stageData);
+                    //ourTimeAttack.stageHistory.push(stageData);
                 }
             }
             else {
@@ -2909,14 +3287,16 @@ class UIScene extends Phaser.Scene {
             // #region Do Unlock Calculation of all Best Logs
             
             var historicalLog = [];
-            
-            ourTimeAttack.stageHistory.forEach( _stage => {
-                var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
-                if (stageBestLog) {
-                    historicalLog = [...historicalLog, ...stageBestLog];
-                }
-            });
-
+            if (ourTimeAttack.stageHistory.length > 1) {
+                ourTimeAttack.stageHistory.forEach( _stage => {
+                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
+                    if (stageBestLog) {
+                        historicalLog = [...historicalLog, ...stageBestLog];
+                    }
+                });
+                
+            }
+        
             // make this an event?
             ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
         
@@ -3114,6 +3494,8 @@ class InputScene extends Phaser.Scene {
         this.boostTime = 0; // Sum of all boost pressed
         this.boostBonusTime = 0; // Sum of boost during boost bonuse time.
         this.cornerTime = 0; // Frames saved when cornering before the next Move Time.
+        this.moveHistory = [];
+        this.moveCount = 0;
     }
 
     preload() {
@@ -3272,8 +3654,9 @@ class InputScene extends Phaser.Scene {
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 this.turns += 1; 
                     
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
                 
             }
@@ -3292,8 +3675,9 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));   
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
                 
             }
@@ -3312,8 +3696,9 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
  
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3330,8 +3715,9 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
  
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3348,8 +3734,10 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3366,8 +3754,10 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3384,8 +3774,10 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3402,8 +3794,10 @@ class InputScene extends Phaser.Scene {
                 this.turns += 1;
                 this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
-                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3442,6 +3836,12 @@ class InputScene extends Phaser.Scene {
 
  // #region Animations
 function loadAnimations(scene) {
+    scene.anims.create({
+        key: 'portalIdle',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    })
     scene.anims.create({
         key: 'twinkle01',
         frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
@@ -3650,12 +4050,12 @@ var config = {
     },
     fx: {
         glow: {
-            distance: 32,
-            quality: 0.1
+            distance: 36,
+            quality: .1
         }
     },
     dom: {
-        createContainer: true
+        createContainer: true,
     },
     //scene: [ StartScene, InputScene]
     scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
