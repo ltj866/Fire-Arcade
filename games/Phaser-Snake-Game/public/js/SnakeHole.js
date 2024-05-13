@@ -3088,7 +3088,7 @@ class UIScene extends Phaser.Scene {
                 this.letterO2, this.letterExplanationPoint], 
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
-            duration: 300,
+            duration: 500,
             repeat: 0,
         });
         this.visible = false;

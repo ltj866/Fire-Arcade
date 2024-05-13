@@ -24,8 +24,6 @@ var Snake = new Phaser.Class({
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
-
-        this.comboExpired = true;
     },
     
     grow: function (scene)
@@ -211,14 +209,12 @@ var Snake = new Phaser.Class({
             ourUI.time.delayedCall(2500, function(){
                 console.log(currentCombo)
                 if (currentCombo === 0) {
-                    this.comboExpired = true;
                     ourUI.comboCounter = 0;
                 }
             })
             //console.log("time since last fruit:", timeSinceFruit);
 
             if(timeSinceFruit > COMBO_ADD_FLOOR){
-                this.comboExpired = false;
                 if (this.lastPlayedCombo > 0) {
                     ourUI.comboCounter += 1;
                     ourUI.comboBounce();
