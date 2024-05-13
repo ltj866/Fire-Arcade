@@ -405,7 +405,6 @@ class StartScene extends Phaser.Scene {
 
                 ourInput.turns = 79;
                 ourInput.cornerTime = 190;
-                ourInput.boostBonusTime = 436;
                 ourInput.boostTime = 400;
 
                 var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
@@ -1751,7 +1750,7 @@ class ScoreScene extends Phaser.Scene {
         
         this.stageData.bonks = ourUI.bonks;
         this.stageData.cornerTime = Math.floor(ourInputScene.cornerTime);
-        this.stageData.boostFrames = ourInputScene.boostBonusTime;
+        this.stageData.boostFrames = ourInputScene.boostTime;
         this.stageData.moveCount = ourInputScene.moveCount;
         this.stageData.foodHistory = ourGame.foodHistory;
         this.stageData.moveHistory = ourInputScene.moveHistory;
@@ -2080,7 +2079,6 @@ class ScoreScene extends Phaser.Scene {
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span>
                 CORNER TIME: <span style = "float: right">${Math.ceil(ourInputScene.cornerTime)} FRAMES</span>
 
-                BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span>
                 BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span>
 
                 ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span>
@@ -2119,7 +2117,6 @@ class ScoreScene extends Phaser.Scene {
                 TOTAL TURNS: ${ourInputScene.turns}</br>
                 CORNER TIME: ${ourInputScene.cornerTime} FRAMES</br>
                 </br>
-                BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES</br>
                 BOOST TIME: ${ourInputScene.boostTime} FRAMES</br>
                 </br>
                 BETA: ${GAME_VERSION}</br>
@@ -3384,6 +3381,9 @@ class UIScene extends Phaser.Scene {
             if(this.energyAmount > 1){
                 //CREATE BOOST ELECTRICITY HERE
                 this.scene.get('GameScene').moveInterval = SPEEDSPRINT;
+                
+                // Boost Stats
+                ourInputScene.boostTime += 1;
             }
             else{
                 //DISSIPATE LIVE ELECTRICITY
@@ -3392,14 +3392,7 @@ class UIScene extends Phaser.Scene {
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount -= 1;
             
-            // Boost Stats
-            if (timeTick >= BOOST_ADD_FLOOR ) { 
-                // Don't add boost time after 20 seconds
-                ourInputScene.boostBonusTime += 1;
-                ourInputScene.boostTime += 1;
-            } else {
-                ourInputScene.boostTime += 1;
-            }
+
         }
 
         // Reset Energy if out of bounds.
@@ -3433,7 +3426,6 @@ class InputScene extends Phaser.Scene {
         this.inputSet = [];
         this.turns = 0; // Total turns per live.
         this.boostTime = 0; // Sum of all boost pressed
-        this.boostBonusTime = 0; // Sum of boost during boost bonuse time.
         this.cornerTime = 0; // Frames saved when cornering before the next Move Time.
         this.moveHistory = [];
         this.moveCount = 0;
