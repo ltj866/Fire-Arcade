@@ -2046,6 +2046,17 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Stat Cards
+        var cornerTimeSec = ourInputScene.cornerTime.toFixed(0) /1000
+        var boostTimeSec = ourInputScene.boostTime.toFixed(0) /1000
+
+        var dateObj = new Date(Math.round(ourInputScene.time.now));
+        var hours = dateObj.getUTCHours();
+        var minutes = dateObj.getUTCMinutes();
+        var seconds = dateObj.getSeconds();
+        var timeString = hours.toString().padStart(2, '0') + ':' + 
+            minutes.toString().padStart(2, '0') + ':' + 
+            seconds.toString().padStart(2, '0');
+
         var cardY = 8;
         var styleCard = {
             width: '246px',
@@ -2077,11 +2088,11 @@ class ScoreScene extends Phaser.Scene {
                 MOVE COUNT: <span style="float: right">${ourInputScene.moveCount}</span>
                 MOVE VERIFY: <span style="float: right">${ourInputScene.moveHistory.length}</span>
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span>
-                CORNER TIME: <span style = "float: right">${Math.ceil(ourInputScene.cornerTime)} FRAMES</span>
+                CORNER TIME: <span style = "float: right">${cornerTimeSec} SEC</span>
 
-                BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span>
+                BOOST TIME: <span style = "float: right">${boostTimeSec} SEC</span>
 
-                ELAPSED TIME: <span style = "float: right">${Math.round(ourInputScene.time.now/1000)} SECONDS</span>
+                ELAPSED TIME: <span style = "float: right">${timeString}</span>
 
                 MEDALS
                 <hr/>
