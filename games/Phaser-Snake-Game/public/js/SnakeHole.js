@@ -72,13 +72,12 @@ var calcSumOfBest = function(scene) {
     entries.forEach(entry => {
         
         var key = entry[0].split("-");
-        if (key[key.length - 1] === "bestFruitLog") {
+        if (key[key.length - 1] === "bestStageData") {
             scene.stagesComplete += 1
 
-            var levelLog = JSON.parse(entry[1]);
-            var _levelSum = levelLog.reduce((a,b) => a + b, 0);
-            var _speedBonus = calcBonus(_levelSum);
-            scene.sumOfBest += _levelSum + _speedBonus;
+            var levelLog = new StageData(JSON.parse(entry[1]));
+            var _scoreTotal = levelLog.calcTotal();
+            scene.sumOfBest += _scoreTotal;
         }
 
     })
@@ -1866,7 +1865,7 @@ class ScoreScene extends Phaser.Scene {
 
         
         var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
-        if (bestLog) {
+        if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
             var bestLocal = bestLog.calcTotal();
@@ -1886,8 +1885,8 @@ class ScoreScene extends Phaser.Scene {
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             calcSumOfBest(ourStartScene);
-            this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourTimeAttack.sumOfBest)}`);
-            this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
+            this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
+            this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
 
         // #endregion
@@ -2358,7 +2357,7 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
             })).setOrigin(0.5, 0);
 
@@ -2384,7 +2383,7 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
-        this.prevZeds = ourTimeAttack.zeds;
+        this.prevZeds = this.scene.get("PlayerDataScene").zeds;
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -2526,7 +2525,7 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        const ourScoreScene = this.scene.get('ScoreScene');
+        const ourPlayerData = this.scene.get('PlayerDataScene');
         //console.log(ourScoreScene.yTargetVal)
         //this.stageStats.y = Phaser.Math.Interpolation.Linear([ourScoreScene.yTargetVal], .1)
         /*this.tweens.add({
@@ -2583,11 +2582,11 @@ class ScoreScene extends Phaser.Scene {
                 You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
-            if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
-                ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                var zedsObj = calcZedLevel(ourTimeAttack.zeds);
+            if (this.prevZeds + this.difficulty > ourPlayerData.zeds) {
+                ourPlayerData.zeds = this.prevZeds + this.difficulty;
+                var zedsObj = calcZedLevel(ourPlayerData.zeds);
 
-                ourTimeAttack.zedsUI.setHTML(
+                ourPlayerData.zedsUI.setHTML(
                     `<span style ="color: limegreen;
                     font-size: 16px;
                     border: limegreen solid 1px;
