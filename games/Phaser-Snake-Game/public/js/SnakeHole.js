@@ -1267,7 +1267,6 @@ class GameScene extends Phaser.Scene {
                 console.log("SPACE LONG ENOUGH BRO");
  
                 this.events.off('addScore');
-                this.events.off('saveScore');
 
                 const ourUI = this.scene.get('UIScene');
  
@@ -1287,7 +1286,6 @@ class GameScene extends Phaser.Scene {
             if (DEBUG) { console.log("DEAD"); }
             
             // DO THIS ON REAL RESET DEATH
-            //this.events.emit('saveScore');
             
             ourUI.bonks += 1;
             //ourUI.livesUI.setText(`x ${ourUI.bonks}`);
@@ -1353,12 +1351,9 @@ class GameScene extends Phaser.Scene {
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
             //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-            this.events.emit('saveScore');
             
 
             ourUI.scene.pause();
-            
-
             ourUI.scene.start('ScoreScene');
             
         }
@@ -2288,7 +2283,6 @@ class ScoreScene extends Phaser.Scene {
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and is why I did it. - James
                 ourGame.events.off('addScore');
-                ourGame.events.off('saveScore');
 
                 ourInputScene.scene.restart();
 
@@ -3335,7 +3329,6 @@ class UIScene extends Phaser.Scene {
 
             this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             this.bestScoreUI.setText(`Best :  ${this.score}`);
-            this.scene.get("GameScene").events.emit('saveScore');
 
             this.scene.pause();
 
