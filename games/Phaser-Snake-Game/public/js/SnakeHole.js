@@ -1895,7 +1895,7 @@ class ScoreScene extends Phaser.Scene {
 
         const scorePartsStyle = {
             color: "white",
-            "text-shadow": "2px 2px 4px #000000",
+            //"text-shadow": "2px 2px 4px #000000",
             "font-size":'16px',
             "font-weight": 400,
             "text-align": 'right',
@@ -1906,8 +1906,8 @@ class ScoreScene extends Phaser.Scene {
             scorePartsStyle, {
             
             })).setHTML(
-                `Base Score:
-                Speed Bonus:`
+                `BASE SCORE:
+                SPEED BONUS:`
         ).setOrigin(1, 0);
 
 
@@ -1922,13 +1922,13 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(1, 0);
         
 
-        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML(
-                `Difficulty +${this.stageData.diffBonus}%
-                Zed Lvl +${Number(this.stageData.zedLevelBonus() * 100).toFixed(1)}%
-                Medal +${this.stageData.medalBonus() * 100}%
+                `DIFFICULTY +${this.stageData.diffBonus}%
+                ZED LVL +${Number(this.stageData.zedLevelBonus() * 100).toFixed(1)}%
+                MEDAL +${this.stageData.medalBonus() * 100}%
                 `
         ).setOrigin(1,0);
         
@@ -1937,25 +1937,25 @@ class ScoreScene extends Phaser.Scene {
         const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `X ${Number(_bonusMult * 100).toFixed(1)}%
+                `x ${Number(_bonusMult * 100).toFixed(1)}%
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`
         ).setOrigin(1, 0);
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `No-Bonk Bonus:
-                Corner Time:
-                Boost Bonus:`
+                `CORNER TIME:
+                BOOST BONUS:
+                NO-BONK BONUS:`
         ).setOrigin(1,0);
 
         const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
-                `+${this.stageData.bonkBonus()}
-                +${this.stageData.cornerBonus()}
-                +${this.stageData.boostBonus()}`
+                `+${this.stageData.cornerBonus()}
+                +${this.stageData.boostBonus()}
+                +${this.stageData.bonkBonus()}`
         ).setOrigin(1, 0);
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 20 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -2061,7 +2061,7 @@ class ScoreScene extends Phaser.Scene {
         var cardY = 8;
         var styleCard = {
             width: '246px',
-            "font-size": '12px',
+            "font-size": '14px',
             "max-height": '236px',
             "font-weight": 300,
             "padding": '12px 12px 12px 12px',
@@ -3681,6 +3681,7 @@ class InputScene extends Phaser.Scene {
 
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                //console.log(this.cornerTime) //this highlights a bug when pressing direction from stationary
                 this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
                 this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
