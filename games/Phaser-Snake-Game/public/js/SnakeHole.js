@@ -72,13 +72,12 @@ var calcSumOfBest = function(scene) {
     entries.forEach(entry => {
         
         var key = entry[0].split("-");
-        if (key[key.length - 1] === "bestFruitLog") {
+        if (key[key.length - 1] === "bestStageData") {
             scene.stagesComplete += 1
 
-            var levelLog = JSON.parse(entry[1]);
-            var _levelSum = levelLog.reduce((a,b) => a + b, 0);
-            var _speedBonus = calcBonus(_levelSum);
-            scene.sumOfBest += _levelSum + _speedBonus;
+            var levelLog = new StageData(JSON.parse(entry[1]));
+            var _scoreTotal = levelLog.calcTotal();
+            scene.sumOfBest += _scoreTotal;
         }
 
     })
@@ -241,17 +240,23 @@ const STAGES_NEXT = {
     'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
 }
-
-
-
 // #region START STAGE
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
+
+
+
+
 
 
 class StartScene extends Phaser.Scene {
     constructor () {
         super({key: 'StartScene', active: true});
+    }
+    init() {
+        // #region StartScene()
+        this.attempts = 1;
+        this.stageHistory = [];
     }
 
     preload() {
@@ -342,8 +347,7 @@ class StartScene extends Phaser.Scene {
     create() {
         /// Start Inital Game Settings
 
-        var ourTimeAttack = this.scene.get('TimeAttackScene');
-        ourTimeAttack.stageHistory = [];
+        const ourTimeAttack = this.scene.get('TimeAttackScene');
 
 
         ///
@@ -385,7 +389,6 @@ class StartScene extends Phaser.Scene {
                 var ourUI = this.scene.get("UIScene");
                 var ourGame = this.scene.get("GameScene");
                 var ourInput = this.scene.get("InputScene");
-                var ourTimeAttack = this.scene.get("TimeAttackScene");
             
 
                 ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
@@ -411,7 +414,7 @@ class StartScene extends Phaser.Scene {
                 var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
                 var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
 
-                ourTimeAttack.stageHistory = [stage01, stage02, stage03];
+                this.stageHistory = [stage01, stage02, stage03];
                 this.scene.start('ScoreScene');
             }
             else {
@@ -419,10 +422,7 @@ class StartScene extends Phaser.Scene {
                 this.scene.launch('GameScene');
                 //var ourGameScene = this.scene.get("GameScene");
                 //console.log(e)
-
             }
-
-            
             this.scene.stop();
         })
     }
@@ -430,11 +430,82 @@ class StartScene extends Phaser.Scene {
     end() {
 
     }
-
-
 }
 
+class PlayerDataScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'PlayerDataScene', active: true});
+    }
 
+    init() {
+        this.zeds = 0;
+        this.sumOfBest = 0;
+        this.stagesComplete = 0;
+    }
+    
+    preload(){
+
+    }
+    
+    create() {
+
+    // #region Bottom Bar
+
+    // Is Zero if there is none.
+
+    var rawZeds = localStorage.getItem(`zeds`);
+    // Catch if any reason undefined gets saved to localstorage
+    if (rawZeds === 'undefined') {
+        rawZeds = 0;
+    }
+    
+    this.zeds = Number(JSON.parse(rawZeds));
+    var zedsObj = calcZedLevel(this.zeds);
+    
+    calcSumOfBest(this);
+
+    const styleBottomText = {
+        "font-size": '12px',
+        "font-weight": 400,
+        "text-align": 'right',
+    }   
+
+    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+        styleBottomText
+        )).setHTML(
+            `<span style ="color: limegreen;
+            font-size: 16px;
+            border: limegreen solid 1px;
+            border-radius: 5px;
+            padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
+    ).setOrigin(0,0.5);
+
+
+    this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        styleBottomText    
+        )).setHTML(
+            `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
+    ).setOrigin(0,0.5);
+
+    this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        styleBottomText    
+        )).setText(
+            `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
+    ).setOrigin(0,0.5);
+
+    const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+        'font-size': '10px',
+        })).setText(
+            `snakehole.${GAME_VERSION}`
+    ).setOrigin(1,1);
+
+
+    }
+    update() {
+
+    }
+
+}
 
 class GameScene extends Phaser.Scene {
     // #region GameScene
@@ -504,12 +575,15 @@ class GameScene extends Phaser.Scene {
 
     create () {
 
-        var ourInputScene = this.scene.get('InputScene');
-        var ourGameScene = this.scene.get('GameScene');
+        const ourInputScene = this.scene.get('InputScene');
+        const ourGameScene = this.scene.get('GameScene');
+        const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
+
+        
 
 
         // a = Global average best score + minScore 
@@ -1171,19 +1245,20 @@ class GameScene extends Phaser.Scene {
         ourUI.bestScoreUI.setOrigin(0,1);
 
         // Calculate this locally
-        var bestLog = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestFruitLog`));
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));
+        var bestLog = new StageData(bestLogJSON);
 
         if (bestLog) {
             // is false if best log has never existed
-            var bestLocal = bestLog.reduce((a,b) => a + b, 0);
+            var bestBase = bestLog.calcBase();
         }
         else {
-            var bestLocal = 0;
+            var bestBase = 0;
         }
 
 
 
-        ourUI.bestScoreUI.setText(`Best : ${bestLocal}`);
+        ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
 
@@ -1267,7 +1342,6 @@ class GameScene extends Phaser.Scene {
                 console.log("SPACE LONG ENOUGH BRO");
  
                 this.events.off('addScore');
-                this.events.off('saveScore');
 
                 const ourUI = this.scene.get('UIScene');
  
@@ -1287,7 +1361,6 @@ class GameScene extends Phaser.Scene {
             if (DEBUG) { console.log("DEAD"); }
             
             // DO THIS ON REAL RESET DEATH
-            //this.events.emit('saveScore');
             
             ourUI.bonks += 1;
             //ourUI.livesUI.setText(`x ${ourUI.bonks}`);
@@ -1353,12 +1426,9 @@ class GameScene extends Phaser.Scene {
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
             //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-            this.events.emit('saveScore');
             
 
             ourUI.scene.pause();
-            
-
             ourUI.scene.start('ScoreScene');
             
         }
@@ -1639,21 +1709,24 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(stageID, stageUUID, foodLog, zeds, medals)
+    function StageData(props)
     {
-        this.stage = stageID;
-        this.uuid = stageUUID;
-        this.foodLog = foodLog;
-        
-        // Default vals
-        this.diffBonus = 100;
-        var zedOutput = calcZedLevel(zeds)
-        this.zedLevel = zedOutput.level;
-        this.medals = medals;
-        this.bonks = 0;
-        
-        //this.newBest = newBest;
-        //this.scoreTotal = scoreTotal;
+        // this is the order you'll see printed in the console.
+        this.stage = props.stage;
+
+        this.bonks = props.bonks;
+        this.boostFrames = props.boostFrames;
+        this.cornerTime = props.cornerTime;
+        this.diffBonus = props.diffBonus;
+        this.foodLog = props.foodLog;
+        this.medals = props.medals;
+        this.moveCount = props.moveCount;
+        this.zedLevel = props.zedLevel;
+
+        this.uuid = props.uuid;
+        this.foodHistory = props.foodHistory;
+        this.moveHistory = props.moveHistory;
+
     },
     
     toString(){
@@ -1663,6 +1736,10 @@ var StageData = new Phaser.Class({
     calcBase() {
         var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
         return stageScore;
+    },
+    
+    calcBonus() {
+        return calcBonus(this.calcBase);
     },
 
     preAdditive() {
@@ -1707,7 +1784,7 @@ var StageData = new Phaser.Class({
         return Math.ceil(this.boostFrames / 10) * 10;
     },
     
-    scoreTotal() {
+    calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
         return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
@@ -1739,25 +1816,80 @@ class ScoreScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
+        const ourStartScene = this.scene.get('StartScene');
 
-        this.stageData = new StageData(
-            ourGame.stage, 
-            ourGame.stageUUID, 
-            ourUI.scoreHistory,
-            ourTimeAttack.zeds,
-            ourUI.medals
-        );
+        var stageDataJSON = {
+            bonks: ourUI.bonks,
+            boostFrames: ourInputScene.boostTime,
+            cornerTime: Math.floor(ourInputScene.cornerTime),
+            diffBonus: ourGame.stageDiffBonus,
+            foodHistory: ourGame.foodHistory,
+            foodLog: ourUI.scoreHistory,
+            medals: ourUI.medals,
+            moveCount: ourInputScene.moveCount,
+            moveHistory: ourInputScene.moveHistory,
+            stage:ourGame.stage,
+            uuid:ourGame.stageUUID,
+            zedLevel: calcZedLevel(ourTimeAttack.zeds).level,
+        }
+
+        this.stageData = new StageData(stageDataJSON);
+
         
-        this.stageData.bonks = ourUI.bonks;
-        this.stageData.cornerTime = Math.floor(ourInputScene.cornerTime);
-        this.stageData.boostFrames = ourInputScene.boostTime;
-        this.stageData.moveCount = ourInputScene.moveCount;
-        this.stageData.foodHistory = ourGame.foodHistory;
-        this.stageData.moveHistory = ourInputScene.moveHistory;
-        
-
-
         console.log(JSON.stringify(this.stageData));
+
+        // #region Time Attack Compare
+        if (ourTimeAttack.inTimeAttack) {
+            ourStartScene.stageHistory.some( _stageData => {
+
+                if (ourGame.stage === _stageData.stage) {
+                    var oldScore = _stageData.calcTotal();
+                    var newScore = this.stageData.calcTotal();
+                    
+                    if (newScore > oldScore) {
+                        console.log("YEAH YOU DID BETTER", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
+                        _stageData = this.stageData; 
+                    }
+                    else {
+                        console.log("SORRY TRY AGAIN", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
+                    }
+                }
+            })
+        }
+        else {
+            //// Push New Stage Data
+            ourStartScene.stageHistory.push(this.stageData);
+        }
+
+        // #region Save Best To Local.
+
+        
+        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        if (bestLogRaw) {
+            // is false if best log has never existed
+            var bestLog = new StageData(bestLogRaw);
+            var bestLocal = bestLog.calcTotal();
+        }
+        else {
+            var bestLocal = 0;
+        }
+
+        var currentLocal = this.stageData.calcTotal()
+        if (currentLocal > bestLocal) {
+            console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
+            bestLocal = currentLocal;
+            ourUI.bestScoreUI.setText(`Best : ${this.stageData.calcBase()}`);
+
+            this.stageData.newBest = true;
+            
+            localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+            
+            calcSumOfBest(ourStartScene); // Note: This really should be an event.
+            this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
+            this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
+        }
+
+        // #endregion
         
 
 
@@ -1803,12 +1935,12 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
 
-        var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
-        var bestLocal = bestLog.reduce((a,b) => a + b, 0);
-        var bestAve = bestLocal/bestLog.length;
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        var bestLog = new StageData(bestLogJSON);
 
+        var bestLocal = bestLog.calcBase();
+        var bestAve = bestLocal/bestLog.foodLog.length;
 
-        var bestBonus = calcBonus(bestLocal);
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
@@ -1965,10 +2097,10 @@ class ScoreScene extends Phaser.Scene {
                 "text-align": 'right',
                 //"animation": 'glow 1s ease-in-out infinite alternate'
             })).setHTML(
-                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.scoreTotal()))}</span>`
+                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
         ).setOrigin(1, 0.5).setDepth(20);
         
-        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.scoreTotal()),
+        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.calcTotal()),
         //{ fontFamily: "Sono", fontStyle: 'bold',
         //fontSize: 28, color: '#ffff00', align: 'right' })
         //.setOrigin(0.5, 0.5).setDepth(20);
@@ -2100,14 +2232,14 @@ class ScoreScene extends Phaser.Scene {
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
                 <hr/>
 
-                BASE SCORE: <span style = "float: right">${bestLocal}</span>
-                SPEED BONUS: <span style = "float: right">${bestBonus}</span>
+                BASE SCORE: <span style = "float: right">${bestLog.calcBase()}</span>
+                SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
                 </br>
 
-                BEST SCORE: <span style = "float: right">${bestLocal + bestBonus}</span>
+                BEST SCORE: <span style = "float: right">${bestLog.calcTotal()}</span>
                 </br>
                 AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span>
-                [${bestLog.slice().sort().reverse()}]
+                [${bestLog.foodLog.slice().sort().reverse()}]
 
                 STAGE FOOD LOG:
                 [${ourUI.scoreHistory.slice().sort().reverse()}]
@@ -2229,7 +2361,7 @@ class ScoreScene extends Phaser.Scene {
         // #region Hash Display Code
         this.foodLogSeed = this.stageData.foodLog.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(Math.floor(this.stageData.scoreTotal));
+        this.foodLogSeed.push(Math.floor(this.stageData.calcTotal()));
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -2237,7 +2369,7 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'18px',
             })).setOrigin(0.5, 0);
 
@@ -2252,7 +2384,7 @@ class ScoreScene extends Phaser.Scene {
             "font-size":'28px',
             'font-weight': 500,
         })).setText(
-            `Current Score: ${commaInt(ourUI.score + this.stageData.scoreTotal - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+            `Current Score: ${commaInt(ourUI.score + this.stageData.calcTotal() - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
         ).setOrigin(0.5,0).setDepth(60);
 
         // #endregion
@@ -2263,7 +2395,7 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
-        this.prevZeds = ourTimeAttack.zeds;
+        this.prevZeds = this.scene.get("PlayerDataScene").zeds;
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -2300,7 +2432,6 @@ class ScoreScene extends Phaser.Scene {
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and is why I did it. - James
                 ourGame.events.off('addScore');
-                ourGame.events.off('saveScore');
 
                 ourInputScene.scene.restart();
 
@@ -2308,6 +2439,7 @@ class ScoreScene extends Phaser.Scene {
                     
                     // Go back to time attack scene
                     ourGame.scene.stop();
+                    debugger
                     ourScoreScene.scene.switch('TimeAttackScene');
                     
                 }
@@ -2315,11 +2447,10 @@ class ScoreScene extends Phaser.Scene {
                     if (ourGame.stage != END_STAGE) {
                 
                         var nextScore = 0;
-                        var currentBase = 0;
-                        ourGame.scene.get("TimeAttackScene").stageHistory.forEach ( _stage => {
-                            var baseScore = _stage.foodLog.reduce((a,b) => a + b, 0);
-                            currentBase += baseScore
-                            nextScore += baseScore + calcBonus(baseScore)
+                        var sumOfBase = 0;
+                        ourStartScene.stageHistory.forEach ( _stage => {
+                            sumOfBase += _stage.calcBase();
+                            nextScore += _stage.calcTotal();
                         });
     
                         var nextStages = STAGES_NEXT[ourGame.stage];
@@ -2329,25 +2460,25 @@ class ScoreScene extends Phaser.Scene {
                         console.log("CHECK NEXT STAGES");
                         nextStages.forEach( _stage => {
     
-                            var goalSum = _stage[1] * ourTimeAttack.stageHistory.length * 28
+                            var goalSum = _stage[1] * ourStartScene.stageHistory.length * 28
                             console.log(
                                 _stage[0], 
                                 "histSum:", ourTimeAttack.histSum, 
                                 "targetSum", goalSum, 
                                 "unlocked=", ourTimeAttack.histSum > goalSum,
-                                "currentBase=", currentBase,
-                                "newUnlocked=", (currentBase > goalSum && ourTimeAttack.histSum < goalSum)
+                                "currentBase=", sumOfBase,
+                                "newUnlocked=", (sumOfBase > goalSum && ourTimeAttack.histSum < goalSum)
                             )
                             if (ourTimeAttack.histSum >= goalSum) {
                                 unlockedStages.push(_stage);
                             }
 
-                            if (currentBase > goalSum && ourTimeAttack.histSum < goalSum) {
+                            if (sumOfBase > goalSum && ourTimeAttack.histSum < goalSum) {
                                 if (ourTimeAttack.newUnlocked) {
                                     ourTimeAttack.newUnlocked.push(_stage);
                                 }
                                 else {
-                                    var currentAve = currentBase / (ourTimeAttack.stageHistory.length * 28);
+                                    var currentAve = sumOfBase / (ourStartScene.stageHistory.length * 28);
                                     ourTimeAttack.newUnlocked = [
                                         _stage[0], // Stage Name
                                         _stage[1], // Requirement Average
@@ -2375,6 +2506,7 @@ class ScoreScene extends Phaser.Scene {
     
                             
                             ourGame.scene.stop();
+                            debugger
                             ourScoreScene.scene.switch('TimeAttackScene');
                         }
                         
@@ -2382,9 +2514,7 @@ class ScoreScene extends Phaser.Scene {
                     }
                     else {
                         // Start From The beginning. Must force reset values or it won't reset.
-                        
-                
-                        
+
                         ourGame.scene.stop();
                         ourScoreScene.scene.switch('TimeAttackScene');
                         
@@ -2397,8 +2527,8 @@ class ScoreScene extends Phaser.Scene {
                 }
 
                 // Maybe should only have this in the TimeAttackScene
-                if (bestrun < ourUI.score + speedBonus) {
-                    localStorage.setItem('BestFinalScore', ourUI.score + speedBonus);
+                if (bestrun < ourUI.score + ourScoreScene.stageData.calcTotal()) {
+                    localStorage.setItem('BestFinalScore', ourUI.score + ourScoreScene.stageData.calcTotal());
                 }
                 
                 
@@ -2409,7 +2539,7 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        const ourScoreScene = this.scene.get('ScoreScene');
+        const ourPlayerData = this.scene.get('PlayerDataScene');
         //console.log(ourScoreScene.yTargetVal)
         //this.stageStats.y = Phaser.Math.Interpolation.Linear([ourScoreScene.yTargetVal], .1)
         /*this.tweens.add({
@@ -2466,11 +2596,11 @@ class ScoreScene extends Phaser.Scene {
                 You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
-            if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
-                ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                var zedsObj = calcZedLevel(ourTimeAttack.zeds);
+            if (this.prevZeds + this.difficulty > ourPlayerData.zeds) {
+                ourPlayerData.zeds = this.prevZeds + this.difficulty;
+                var zedsObj = calcZedLevel(ourPlayerData.zeds);
 
-                ourTimeAttack.zedsUI.setHTML(
+                ourPlayerData.zedsUI.setHTML(
                     `<span style ="color: limegreen;
                     font-size: 16px;
                     border: limegreen solid 1px;
@@ -2512,7 +2642,7 @@ console.log("ROLL LENGTH", ROLL_SPEED.length);
 class TimeAttackScene extends Phaser.Scene{
     // #region TimeAttackScene
     constructor () {
-        super({ key: 'TimeAttackScene', active: true });
+        super({ key: 'TimeAttackScene', active: false });
     }
 
     init () {
@@ -2526,15 +2656,13 @@ class TimeAttackScene extends Phaser.Scene{
     preload () {
 
     }
-    calcSumOfBest () {
-
-    }
     create() {
         // Sets first time as an empty list. After this it will not be set again
         // Remember to reset manually on full game restart.
         const ourGame = this.scene.get('GameScene');
         const ourUI = this.scene.get('UIScene');
         const ourTimeAttack = this.scene.get("TimeAttackScene");
+        const ourStartScene = this.scene.get('StartScene');
 
 
         console.log("Time Attack Stage Manager is Live");
@@ -2560,65 +2688,16 @@ class TimeAttackScene extends Phaser.Scene{
         var _i = 0;
         var lowestScore = 9999999999;
 
-        // #region Bottom Bar
 
-        // Is Zero if there is none.
-        this.zeds = Number(JSON.parse(localStorage.getItem(`zeds`)));
-        var zedsObj = calcZedLevel(this.zeds);
         
-         
-        
-
-        calcSumOfBest(this);
-
-        const styleBottomText = {
-            "font-size": '12px',
-            "font-weight": 400,
-            "text-align": 'right',
-        }   
-
-        this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
-            styleBottomText
-            )).setHTML(
-                `<span style ="color: limegreen;
-                font-size: 16px;
-                border: limegreen solid 1px;
-                border-radius: 5px;
-                padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
-        ).setOrigin(0,0.5);
-
-
-        this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
-            styleBottomText    
-            )).setHTML(
-                `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
-        ).setOrigin(0,0.5);
-
-        this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
-            styleBottomText    
-            )).setText(
-                `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
-        ).setOrigin(0,0.5);
-
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-            'font-size': '10px',
-            })).setText(
-                `snakehole.${GAME_VERSION}`
-        ).setOrigin(1,1);
-        
-            
-        
-        
-        // Only loads the UI to the scene if you have played a level. 
-        // Allows this scene to start at the beginning without displaying anything, but when you restart the scene it plays correctly.
-
-        if (this.stageHistory) {
+    
+        if (ourStartScene.stageHistory) {
             this.inTimeAttack = true;
 
-            this.stageHistory.forEach(_stageData => {
+            ourStartScene.stageHistory.forEach(_stageData => {
 
                 var baseScore = _stageData.calcBase();
-                var realScore = _stageData.calcScore();
+                var realScore = _stageData.calcTotal();
                 var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
 
                 
@@ -2627,7 +2706,7 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 var logWrapLenth = 8;
-                //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
+                //var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
                 //var bestScore;
                 var bestChar;
 
@@ -2755,10 +2834,10 @@ class TimeAttackScene extends Phaser.Scene{
             var runScore = 0;
             var baseScore = 0;
 
-            if (this.stageHistory) {
-                this.stageHistory.forEach(_stageData => {
+            if (ourStartScene.stageHistory) {
+                ourStartScene.stageHistory.forEach(_stageData => {
                 
-                    runScore += _stageData.calcScore();
+                    runScore += _stageData.calcTotal();
                     baseScore += _stageData.calcBase();
 
                 });
@@ -2787,11 +2866,11 @@ class TimeAttackScene extends Phaser.Scene{
                 
                 var unlockStage;
                 var goalSum; // Use sum instead of average to keep from unlocking stages early.
-                var foodToNow = this.stageHistory.length * 28; // Calculated value of how many total fruit collect by this stage
+                var foodToNow = ourStartScene.stageHistory.length * 28; // Calculated value of how many total fruit collect by this stage
                 stageY = stageY + GRID * 2;
                 
 
-                var lastStage = this.stageHistory.slice(-1);
+                var lastStage = ourStartScene.stageHistory.slice(-1);
 
                 // Allows levels with no stage afterwards.
                 if (STAGES_NEXT[lastStage[0].stage]) {
@@ -3235,6 +3314,7 @@ class UIScene extends Phaser.Scene {
             const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
             const ourScoreScene = ourGame.scene.get('ScoreScene');
             const ourUIScene = ourGame.scene.get('UIScene');
+            const ourStartScene = this.scene.get('StartScene');
 
 
             // Building StageData for Savin
@@ -3245,48 +3325,14 @@ class UIScene extends Phaser.Scene {
 
             var stageFound = false;
             
-            if (ourTimeAttack.inTimeAttack) {
-                ourTimeAttack.stageHistory.some( _stageData => {
-
-                    if (ourGame.stage === _stageData.stage) {
-                        var oldScore = _stageData.foodLog.reduce((a,b) => a + b, 0);
-                        var newScore = this.scoreHistory.reduce((a,b) => a + b, 0);
-
-                        oldScore = oldScore + calcBonus(oldScore);
-                        newScore = newScore + calcBonus(newScore);
-                        
-                        if (newScore > oldScore) {
-                            console.log("YEAH YOU DID BETTER", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
-                            _stageData.foodLog = this.scoreHistory; 
-                        }
-                        else {
-                            console.log("SORRY TRY AGAIN", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
-                        }
-
-                        stageFound = true;
-                    }
-
-
-                })
-                if (!stageFound) {
-                    // Playing a new unlocked stage. Get one life back.
-                    //ourTimeAttack.stageHistory.push(stageData);
-                }
-            }
-            else {
-                //// Push New Stage Data
-                ourTimeAttack.stageHistory.push(stageData);
-
-            }
-            
             var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
             
             // #region Do Unlock Calculation of all Best Logs
             
             var historicalLog = [];
-            if (ourTimeAttack.stageHistory.length > 1) {
-                ourTimeAttack.stageHistory.forEach( _stage => {
-                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
+            if (ourStartScene.stageHistory.length > 1) {
+                ourStartScene.stageHistory.forEach( _stage => {
+                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestStageData`));
                     if (stageBestLog) {
                         historicalLog = [...historicalLog, ...stageBestLog];
                     }
@@ -3299,33 +3345,6 @@ class UIScene extends Phaser.Scene {
         
             // #endregion
 
-
-
-            // #region Save Best To Local.
-            var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
-
-            if (bestLog) {
-                // is false if best log has never existed
-                var bestLocal = bestLog.reduce((a,b) => a + b, 0);
-            }
-            else {
-                var bestLocal = 0;
-            }
-
-            if (stage_score > bestLocal) {
-                console.log(`NEW BEST YAY! ${stage_score} (needs more screen juice)`);
-                bestLocal = stage_score;
-                this.bestScoreUI.setText(`Best : ${bestLocal}`);
-
-                stageData.newBest = true;
-                
-                localStorage.setItem(`${ourGame.stageUUID}-bestFruitLog`, `[${this.scoreHistory}]`);
-                calcSumOfBest(ourTimeAttack);
-                ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourTimeAttack.sumOfBest)}`);
-                ourTimeAttack.stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
-            }
-
-            // #endregion
             
 
             
@@ -3347,7 +3366,6 @@ class UIScene extends Phaser.Scene {
 
             this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             this.bestScoreUI.setText(`Best :  ${this.score}`);
-            this.scene.get("GameScene").events.emit('saveScore');
 
             this.scene.pause();
 
@@ -4010,7 +4028,7 @@ var config = {
         createContainer: true,
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, PlayerDataScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 
 };
 
