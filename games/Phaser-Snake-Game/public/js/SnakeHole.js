@@ -1884,7 +1884,7 @@ class ScoreScene extends Phaser.Scene {
             
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
-            calcSumOfBest(ourStartScene); // This really should be an event.
+            calcSumOfBest(ourStartScene); // Note: This really should be an event.
             this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
             this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
@@ -2427,6 +2427,7 @@ class ScoreScene extends Phaser.Scene {
                     
                     // Go back to time attack scene
                     ourGame.scene.stop();
+                    debugger
                     ourScoreScene.scene.switch('TimeAttackScene');
                     
                 }
@@ -2493,6 +2494,7 @@ class ScoreScene extends Phaser.Scene {
     
                             
                             ourGame.scene.stop();
+                            debugger
                             ourScoreScene.scene.switch('TimeAttackScene');
                         }
                         
@@ -2513,8 +2515,8 @@ class ScoreScene extends Phaser.Scene {
                 }
 
                 // Maybe should only have this in the TimeAttackScene
-                if (bestrun < ourUI.score + this.stageData.calcTotal()) {
-                    localStorage.setItem('BestFinalScore', ourUI.score + this.stageData.calcTotal());
+                if (bestrun < ourUI.score + ourScoreScene.stageData.calcTotal()) {
+                    localStorage.setItem('BestFinalScore', ourUI.score + ourScoreScene.stageData.calcTotal());
                 }
                 
                 
@@ -2676,19 +2678,14 @@ class TimeAttackScene extends Phaser.Scene{
 
 
         
-            
-        
-        
-        // Only loads the UI to the scene if you have played a level. 
-        // Allows this scene to start at the beginning without displaying anything, but when you restart the scene it plays correctly.
-
+    
         if (ourStartScene.stageHistory) {
             this.inTimeAttack = true;
 
             ourStartScene.stageHistory.forEach(_stageData => {
 
                 var baseScore = _stageData.calcBase();
-                var realScore = _stageData.calcScore();
+                var realScore = _stageData.calcTotal();
                 var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
 
                 
@@ -2826,9 +2823,10 @@ class TimeAttackScene extends Phaser.Scene{
             var baseScore = 0;
 
             if (ourStartScene.stageHistory) {
+                debugger
                 ourStartScene.stageHistory.forEach(_stageData => {
                 
-                    runScore += _stageData.calcScore();
+                    runScore += _stageData.calcTotal();
                     baseScore += _stageData.calcBase();
 
                 });
