@@ -1246,7 +1246,9 @@ class GameScene extends Phaser.Scene {
 
         // Calculate this locally
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));
-        var bestLog = new StageData(bestLogJSON);
+        
+        // BELOW CODE ERRORS GAME
+        /*var bestLog = new StageData(bestLogJSON);
 
         if (bestLog) {
             // is false if best log has never existed
@@ -1254,11 +1256,11 @@ class GameScene extends Phaser.Scene {
         }
         else {
             var bestBase = 0;
-        }
+        }*/
 
 
 
-        ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
+        //ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
 
@@ -1929,7 +1931,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
-        this.add.sprite(GRID * 22.5, GRID * 18.5,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
+        var scrollArrowDown = this.add.sprite(GRID * 22.5, GRID * 18.75,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
         
 
         // Pre Calculate needed values
@@ -2095,9 +2097,8 @@ class ScoreScene extends Phaser.Scene {
                 "font-style": 'bold',
                 "font-size": "28px",
                 "text-align": 'right',
-                //"animation": 'glow 1s ease-in-out infinite alternate'
             })).setHTML(
-                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                `STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
         ).setOrigin(1, 0.5).setDepth(20);
         
         //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.calcTotal()),
@@ -2243,12 +2244,22 @@ class ScoreScene extends Phaser.Scene {
 
                 STAGE FOOD LOG:
                 [${ourUI.scoreHistory.slice().sort().reverse()}]
-                </br>
-                </br>
                 </br>`
+                
                 
         ).setOrigin(0,0).setVisible(true);
 
+        stageStats.addListener('scroll');
+        stageStats.on('scroll', () =>  {
+            //console.log(stageStats.node.scrollTop)
+            if(stageStats.node.scrollTop === (stageStats.node.scrollHeight 
+                - stageStats.node.offsetHeight)){
+                scrollArrowDown.setVisible(false);
+            }
+            else{
+                scrollArrowDown.setVisible(true);
+            }
+        })
         /*
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
@@ -2506,7 +2517,6 @@ class ScoreScene extends Phaser.Scene {
     
                             
                             ourGame.scene.stop();
-                            debugger
                             ourScoreScene.scene.switch('TimeAttackScene');
                         }
                         
