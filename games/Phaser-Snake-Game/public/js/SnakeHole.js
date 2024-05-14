@@ -423,10 +423,7 @@ class StartScene extends Phaser.Scene {
                 this.scene.launch('GameScene');
                 //var ourGameScene = this.scene.get("GameScene");
                 //console.log(e)
-
             }
-
-            
             this.scene.stop();
         })
     }
@@ -1788,7 +1785,7 @@ var StageData = new Phaser.Class({
         return Math.ceil(this.boostFrames / 10) * 10;
     },
     
-    scoreTotal() {
+    calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
         return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
@@ -1847,8 +1844,8 @@ class ScoreScene extends Phaser.Scene {
             ourStartScene.stageHistory.some( _stageData => {
 
                 if (ourGame.stage === _stageData.stage) {
-                    var oldScore = _stageData.scoreTotal();
-                    var newScore = this.stageData.scoreTotal();
+                    var oldScore = _stageData.calcTotal();
+                    var newScore = this.stageData.calcTotal();
                     
                     if (newScore > oldScore) {
                         console.log("YEAH YOU DID BETTER", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
@@ -1872,13 +1869,13 @@ class ScoreScene extends Phaser.Scene {
         if (bestLog) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
-            var bestLocal = bestLog.scoreTotal();
+            var bestLocal = bestLog.calcTotal();
         }
         else {
             var bestLocal = 0;
         }
 
-        var currentLocal = this.stageData.scoreTotal()
+        var currentLocal = this.stageData.calcTotal()
         if (currentLocal > bestLocal) {
             console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
             bestLocal = currentLocal;
@@ -2101,10 +2098,10 @@ class ScoreScene extends Phaser.Scene {
                 "text-align": 'right',
                 //"animation": 'glow 1s ease-in-out infinite alternate'
             })).setHTML(
-                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.scoreTotal()))}</span>`
+                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
         ).setOrigin(1, 0.5).setDepth(20);
         
-        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.scoreTotal()),
+        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.calcTotal()),
         //{ fontFamily: "Sono", fontStyle: 'bold',
         //fontSize: 28, color: '#ffff00', align: 'right' })
         //.setOrigin(0.5, 0.5).setDepth(20);
@@ -2228,7 +2225,7 @@ class ScoreScene extends Phaser.Scene {
                 SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
                 </br>
 
-                BEST SCORE: <span style = "float: right">${bestLog.preAdditive()}</span>
+                BEST SCORE: <span style = "float: right">${bestLog.calcTotal()}</span>
                 </br>
                 AVERAGE: <span style = "float: right">${bestAve.toFixed(2)}</span>
                 [${bestLog.foodLog.slice().sort().reverse()}]
@@ -2353,7 +2350,7 @@ class ScoreScene extends Phaser.Scene {
         // #region Hash Display Code
         this.foodLogSeed = this.stageData.foodLog.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(Math.floor(this.stageData.scoreTotal));
+        this.foodLogSeed.push(Math.floor(this.stageData.calcTotal()));
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -2376,7 +2373,7 @@ class ScoreScene extends Phaser.Scene {
             "font-size":'28px',
             'font-weight': 500,
         })).setText(
-            `Current Score: ${commaInt(ourUI.score + this.stageData.scoreTotal - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+            `Current Score: ${commaInt(ourUI.score + this.stageData.calcTotal() - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
         ).setOrigin(0.5,0).setDepth(60);
 
         // #endregion
@@ -2441,7 +2438,7 @@ class ScoreScene extends Phaser.Scene {
                         var sumOfBase = 0;
                         ourStartScene.stageHistory.forEach ( _stage => {
                             sumOfBase += _stage.calcBase();
-                            nextScore += _stage.scoreTotal();
+                            nextScore += _stage.calcTotal();
                         });
     
                         var nextStages = STAGES_NEXT[ourGame.stage];
@@ -2504,9 +2501,7 @@ class ScoreScene extends Phaser.Scene {
                     }
                     else {
                         // Start From The beginning. Must force reset values or it won't reset.
-                        
-                
-                        
+
                         ourGame.scene.stop();
                         ourScoreScene.scene.switch('TimeAttackScene');
                         
@@ -2519,8 +2514,8 @@ class ScoreScene extends Phaser.Scene {
                 }
 
                 // Maybe should only have this in the TimeAttackScene
-                if (bestrun < ourUI.score + this.stageData.scoreTotal()) {
-                    localStorage.setItem('BestFinalScore', ourUI.score + this.stageData.scoreTotal());
+                if (bestrun < ourUI.score + this.stageData.calcTotal()) {
+                    localStorage.setItem('BestFinalScore', ourUI.score + this.stageData.calcTotal());
                 }
                 
                 
