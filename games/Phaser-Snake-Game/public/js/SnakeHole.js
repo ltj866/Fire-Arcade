@@ -2823,7 +2823,6 @@ class TimeAttackScene extends Phaser.Scene{
             var baseScore = 0;
 
             if (ourStartScene.stageHistory) {
-                debugger
                 ourStartScene.stageHistory.forEach(_stageData => {
                 
                     runScore += _stageData.calcTotal();
