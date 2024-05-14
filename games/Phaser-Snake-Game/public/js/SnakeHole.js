@@ -1884,7 +1884,7 @@ class ScoreScene extends Phaser.Scene {
             
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
-            calcSumOfBest(ourStartScene);
+            calcSumOfBest(ourStartScene); // This really should be an event.
             this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
             this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
