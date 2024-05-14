@@ -241,6 +241,7 @@ const STAGES_NEXT = {
     'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
 }
+// #region START STAGE
 const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
@@ -435,9 +436,9 @@ class StartScene extends Phaser.Scene {
     }
 }
 
-class PlayerInfoScene extends Phaser.Scene {
+class PlayerDataScene extends Phaser.Scene {
     constructor () {
-        super({key: 'PlayerInfoScene', active: true});
+        super({key: 'PlayerDataScene', active: true});
     }
 
     init() {
@@ -1825,7 +1826,7 @@ class ScoreScene extends Phaser.Scene {
             bonks: ourUI.bonks,
             boostFrames: ourInputScene.boostTime,
             cornerTime: Math.floor(ourInputScene.cornerTime),
-            diffBonus: ourGame.diffBonus,
+            diffBonus: ourGame.stageDiffBonus,
             foodHistory: ourGame.foodHistory,
             foodLog: ourUI.scoreHistory,
             medals: ourUI.medals,
@@ -1888,8 +1889,8 @@ class ScoreScene extends Phaser.Scene {
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             calcSumOfBest(ourStartScene);
-            ourTimeAttack.sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourTimeAttack.sumOfBest)}`);
-            ourTimeAttack.stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
+            this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourTimeAttack.sumOfBest)}`);
+            this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourTimeAttack.stagesComplete}`);
         }
 
         // #endregion
@@ -4023,7 +4024,7 @@ var config = {
         createContainer: true,
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, PlayerInfoScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, PlayerDataScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 
 };
 
