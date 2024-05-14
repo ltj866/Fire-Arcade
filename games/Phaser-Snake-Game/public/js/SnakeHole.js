@@ -2260,6 +2260,12 @@ class ScoreScene extends Phaser.Scene {
                 scrollArrowDown.setVisible(true);
             }
         })
+        this.input.keyboard.on('keydown-DOWN', function() {
+            stageStats.node.scrollTop += 100;
+        })
+        this.input.keyboard.on('keydown-UP', function() {
+            stageStats.node.scrollTop -= 100;
+        })
         /*
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
@@ -2327,35 +2333,6 @@ class ScoreScene extends Phaser.Scene {
 
             statsCards[sIndex].setVisible(true);   
         }, [], this);*/
-
-        //var yTargetVal = 192
-        this.yTargetVal = 192;
-        //console.log(stageStats.y)
-
-        this.input.keyboard.on('keydown-UP', function() {
-            
-            /*if (stageStats.y >= -218 && stageStats.y < 192) {
-            //console.log(this.yTargetVal) 
-            //this.yTargetVal -=5;
-                
-                stageStats.y += 5;
-            }
-            else{
-            //    this.yTargetVal = 192;
-                stageStats.y = 192
-            }*/
-            
-        });
-        this.input.keyboard.on('keydown-DOWN', function() {
-            /*if (stageStats.y <= 192 && stageStats.y < 218) {
-                this.yTargetVal -= 5;
-                //console.log(yTargetVal)
-                stageStats.y -= 5;
-            }
-            else{
-                stageStats.y = 187
-            }*/
-        });
 
         const mask = this.make.image({
             x: GRID * 17.625,
@@ -2550,17 +2527,7 @@ class ScoreScene extends Phaser.Scene {
     // #region Score - Update
     update(time) {
         const ourPlayerData = this.scene.get('PlayerDataScene');
-        //console.log(ourScoreScene.yTargetVal)
-        //this.stageStats.y = Phaser.Math.Interpolation.Linear([ourScoreScene.yTargetVal], .1)
-        /*this.tweens.add({
-            targets: this.stageStats,
-            y: [this.yTargetVal],
-            duration: 1000,
-            repeat: -1,
-            hold: 500,
-            repeatDelay: 500,
-            ease: 'linear'
-        })*/
+
         var scoreCountDown = this.foodLogSeed.slice(-1);
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
