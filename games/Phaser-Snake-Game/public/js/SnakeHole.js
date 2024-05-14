@@ -2046,9 +2046,10 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Stat Cards
-        var cornerTimeSec = ourInputScene.cornerTime.toFixed(0) /1000
-        var boostTimeSec = ourInputScene.boostTime.toFixed(0) /1000
-
+        var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
+        console.log(ourInputScene.cornerTime)
+        var boostTimeSec = (ourInputScene.boostTime * 0.01666).toFixed(3)
+        console.log(ourInputScene.boostTime)
         var dateObj = new Date(Math.round(ourInputScene.time.now));
         var hours = dateObj.getUTCHours();
         var minutes = dateObj.getUTCMinutes();
