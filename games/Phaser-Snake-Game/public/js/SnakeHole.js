@@ -285,7 +285,7 @@ class StartScene extends Phaser.Scene {
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
-        this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -2114,7 +2114,20 @@ class ScoreScene extends Phaser.Scene {
 
 
         // #region Rank Sprites
-        
+        //var tilesprite = this.add.tileSprite(400, 300, 800, 600, 'brick').setPipeline('Light2D');
+
+        this.lights.enable();
+        this.lights.setAmbientColor(0xFFFFFF);
+
+        var spotlight = this.lights.addLight(400, 300, 280, 0xFF52FF).setIntensity(2);
+
+        this.input.on('pointermove', function (pointer) {
+
+            spotlight.x = pointer.x;
+            spotlight.y = pointer.y;
+
+        });
+
         const medianSpeedBonus = 6000;
 
         const COPPER = 0;
@@ -2143,7 +2156,7 @@ class ScoreScene extends Phaser.Scene {
                 rank = COPPER;
         }
 
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0).setPipeline('Light2D');;
         
         // region Particle Emitter
         if(rank >= SILVER){
