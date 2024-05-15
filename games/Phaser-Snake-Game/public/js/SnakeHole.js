@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 // #region DEBUG OPTIONS
@@ -1245,17 +1245,15 @@ class GameScene extends Phaser.Scene {
 
         // Calculate this locally
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));
-        
-        // BELOW CODE ERRORS GAME
-        /*var bestLog = new StageData(bestLogJSON);
 
         if (bestLog) {
             // is false if best log has never existed
+            var bestLog = new StageData(bestLogJSON);
             var bestBase = bestLog.calcBase();
         }
         else {
             var bestBase = 0;
-        }*/
+        }
 
 
 
