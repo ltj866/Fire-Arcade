@@ -1930,7 +1930,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
-        var scrollArrowDown = this.add.sprite(GRID * 22.5, GRID * 18.75,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
+        var scrollArrowDown = this.add.sprite(GRID * 22.5, GRID * 19,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
         
 
         // Pre Calculate needed values
@@ -2363,7 +2363,7 @@ class ScoreScene extends Phaser.Scene {
             "font-size":'28px',
             'font-weight': 500,
         })).setText(
-            `Current Score: ${commaInt(ourUI.score + this.stageData.calcTotal() - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+            `TOTAL SCORE: ${commaInt(ourUI.score + this.stageData.calcTotal() - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
         ).setOrigin(0.5,0).setDepth(60);
 
         // #endregion
