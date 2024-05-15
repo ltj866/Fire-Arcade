@@ -547,7 +547,7 @@ class GameScene extends Phaser.Scene {
         this.startMoving = false;
         this.stageOver = false;
 
-        const { stage = START_STAGE } = props
+        const { stage = START_STAGE } = props 
         this.stage = stage;
         
 
@@ -1244,9 +1244,10 @@ class GameScene extends Phaser.Scene {
         ourUI.bestScoreUI.setOrigin(0,1);
 
         // Calculate this locally
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
 
-        if (bestLog) {
+        if (bestLogJSON) {
+            
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
             var bestBase = bestLog.calcBase();
@@ -1255,9 +1256,8 @@ class GameScene extends Phaser.Scene {
             var bestBase = 0;
         }
 
-
-
-        //ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
+        ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
+        
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
 
