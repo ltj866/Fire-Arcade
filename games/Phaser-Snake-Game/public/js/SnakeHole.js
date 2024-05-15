@@ -285,7 +285,6 @@ class StartScene extends Phaser.Scene {
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
-        this.load.image('scoreScreenMask', 'assets/sprites/UI_ScoreScreenMask.png');
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -2202,8 +2201,8 @@ class ScoreScene extends Phaser.Scene {
             "word-wrap": 'break-word',
             "white-space": 'pre-line',
             'overflow-y': 'scroll',
-            'scroll-behavior': 'smooth',
-            //'-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, .9),rgba(0, 0, 0, 0))'
+            //'scroll-behavior': 'smooth', smooth scroll stutters when arrow key down/up is held
+            //'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
@@ -2261,10 +2260,11 @@ class ScoreScene extends Phaser.Scene {
             }
         })
         this.input.keyboard.on('keydown-DOWN', function() {
-            stageStats.node.scrollTop += 100;
+            stageStats.node.scrollTop += 36;
+            //debugger
         })
         this.input.keyboard.on('keydown-UP', function() {
-            stageStats.node.scrollTop -= 100;
+            stageStats.node.scrollTop -= 36;
         })
         /*
         const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
@@ -2333,15 +2333,6 @@ class ScoreScene extends Phaser.Scene {
 
             statsCards[sIndex].setVisible(true);   
         }, [], this);*/
-
-        const mask = this.make.image({
-            x: GRID * 17.625,
-            y: 500,
-            key: 'scoreScreenMask',
-            add: false
-        });
-        stageStats.mask = new Phaser.Display.Masks.BitmapMask(this, mask);
-        stageStats.mask.invertAlpha = true;
 
 
         
@@ -2427,7 +2418,6 @@ class ScoreScene extends Phaser.Scene {
                     
                     // Go back to time attack scene
                     ourGame.scene.stop();
-                    debugger
                     ourScoreScene.scene.switch('TimeAttackScene');
                     
                 }
