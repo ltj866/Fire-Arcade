@@ -2124,7 +2124,7 @@ class ScoreScene extends Phaser.Scene {
         const PLATINUM = 4;
 
         let rank;
-        let bonusScore = calcBonus(this.stageData.baseScore)
+        let bonusScore = calcBonus(_baseScore) //doesn't use this.stageData.baseScore yet, need to figure out how still
 
         switch (true) {
             case bonusScore > medianSpeedBonus * 2:
