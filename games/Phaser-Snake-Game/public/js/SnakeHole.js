@@ -2118,14 +2118,22 @@ class ScoreScene extends Phaser.Scene {
 
         this.lights.enable();
         this.lights.setAmbientColor(0xFFFFFF);
-
-        var spotlight = this.lights.addLight(400, 300, 280, 0xFF52FF).setIntensity(2);
-
-        this.input.on('pointermove', function (pointer) {
-
-            spotlight.x = pointer.x;
-            spotlight.y = pointer.y;
-
+        
+        var lightColor = 0xFFFFFF;
+        const platLightColor = 0xFF52FF;
+        const goldLightColor = 0xE2492B;
+        const silverLightColor = 0xDAD9D1;
+        const bronzeLightColor = 0xB59051;
+        
+        
+        
+        this.path = { t: 0, vec: new Phaser.Math.Vector2() };
+        this.tweens.add({
+            targets: this.path,
+            t: 1,
+            ease: 'Linear',
+            duration: 4000,
+            repeat: -1
         });
 
         const medianSpeedBonus = 6000;
@@ -2157,9 +2165,12 @@ class ScoreScene extends Phaser.Scene {
         }
 
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0).setPipeline('Light2D');;
-        
+        this.curve = new Phaser.Curves.Ellipse(letterRank.x, letterRank.y, 96);
         // region Particle Emitter
         if(rank >= SILVER){
+            lightColor = silverLightColor
+            console.log(lightColor)
+            debugger
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -2168,6 +2179,9 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
+            lightColor = goldLightColor
+            console.log(lightColor)
+            debugger
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -2176,6 +2190,9 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
+            lightColor = platLightColor
+            console.log(lightColor)
+            debugger
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
@@ -2187,6 +2204,8 @@ class ScoreScene extends Phaser.Scene {
                 gravityY: -5,
             }).setFrequency(667,[1]).setDepth(20);
         }
+
+        this.spotlight = this.lights.addLight(0, 0, 400, lightColor).setIntensity(2);
 
         // #region Stat Cards
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
@@ -2530,6 +2549,12 @@ class ScoreScene extends Phaser.Scene {
         const ourPlayerData = this.scene.get('PlayerDataScene');
 
         var scoreCountDown = this.foodLogSeed.slice(-1);
+
+        this.curve.getPoint(this.path.t, this.path.vec);
+
+        this.spotlight.x = this.path.vec.x;
+        this.spotlight.y = this.path.vec.y;
+
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
             const ourTimeAttack = this.scene.get("TimeAttackScene");
