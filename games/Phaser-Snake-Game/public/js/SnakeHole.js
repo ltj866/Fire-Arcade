@@ -266,7 +266,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('bg01', 'assets/sprites/background01.png');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
@@ -650,7 +650,10 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
-    
+        this.lights.enable();
+        this.lights.setAmbientColor(0xF6F6F6);
+        
+        var lightColor = 0xFFFFFF;
 
         //wrapBlock03.play("wrapBlock03")
         //wrapBlock06.play("wrapBlock06")
@@ -1100,6 +1103,7 @@ class GameScene extends Phaser.Scene {
 
         // #endregion
         this.portals.forEach(portal => {
+            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portal.tintTopLeft).setIntensity(1);
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
@@ -2117,7 +2121,7 @@ class ScoreScene extends Phaser.Scene {
         //var tilesprite = this.add.tileSprite(400, 300, 800, 600, 'brick').setPipeline('Light2D');
 
         this.lights.enable();
-        this.lights.setAmbientColor(0xFFFFFF);
+        this.lights.setAmbientColor(0xDADADA);
         
         var lightColor = 0xFFFFFF;
         const platLightColor = 0xFF52FF;
@@ -2125,14 +2129,14 @@ class ScoreScene extends Phaser.Scene {
         const silverLightColor = 0xDAD9D1;
         const bronzeLightColor = 0xB59051;
         
-        
+        this.graphics = this.add.graphics();
         
         this.path = { t: 0, vec: new Phaser.Math.Vector2() };
         this.tweens.add({
             targets: this.path,
             t: 1,
             ease: 'Linear',
-            duration: 4000,
+            duration: 2000,
             repeat: -1
         });
 
@@ -2165,12 +2169,11 @@ class ScoreScene extends Phaser.Scene {
         }
 
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0).setPipeline('Light2D');;
-        this.curve = new Phaser.Curves.Ellipse(letterRank.x, letterRank.y, 96);
+        this.curve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 36, 96);
         // region Particle Emitter
         if(rank >= SILVER){
             lightColor = silverLightColor
             console.log(lightColor)
-            debugger
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -2181,7 +2184,6 @@ class ScoreScene extends Phaser.Scene {
         if(rank === GOLD){
             lightColor = goldLightColor
             console.log(lightColor)
-            debugger
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -2192,7 +2194,6 @@ class ScoreScene extends Phaser.Scene {
         if(rank === PLATINUM){
             lightColor = platLightColor
             console.log(lightColor)
-            debugger
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
@@ -2205,7 +2206,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(667,[1]).setDepth(20);
         }
 
-        this.spotlight = this.lights.addLight(0, 0, 400, lightColor).setIntensity(2);
+        this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5);
 
         // #region Stat Cards
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
@@ -2554,6 +2555,13 @@ class ScoreScene extends Phaser.Scene {
 
         this.spotlight.x = this.path.vec.x;
         this.spotlight.y = this.path.vec.y;
+
+        //this.graphics.clear(); //Used to debug where light is
+        //this.graphics.lineStyle(2, 0xffffff, 1);
+        //this.curve.draw(this.graphics, 64);
+        //this.graphics.fillStyle(0xff0000, 1);
+        //this.graphics.fillCircle(this.path.vec.x, this.path.vec.y, 8).setDepth(30);
+
 
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -3823,7 +3831,7 @@ function loadAnimations(scene) {
     })
     scene.anims.create({
         key: 'twinkle02',
-        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6 ,7]}),
+        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3, 4, 5, 6]}),
         frameRate: 6,
         repeat: 0
     })
