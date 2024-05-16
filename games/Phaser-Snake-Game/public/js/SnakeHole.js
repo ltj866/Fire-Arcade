@@ -242,7 +242,7 @@ const STAGES_NEXT = {
 }
 // #region START STAGE
 const START_STAGE = 'Stage-01';
-var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
+var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
 
@@ -257,6 +257,7 @@ class StartScene extends Phaser.Scene {
         // #region StartScene()
         this.attempts = 1;
         this.stageHistory = [];
+        this.globalFoodLog = [];
     }
 
     preload() {
@@ -1838,6 +1839,9 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
+
+
+
         
         console.log(JSON.stringify(this.stageData));
 
@@ -1893,6 +1897,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #endregion
+
         
 
 
@@ -2448,6 +2453,7 @@ class ScoreScene extends Phaser.Scene {
                 if (ourTimeAttack.inTimeAttack) {
                     
                     // Go back to time attack scene
+                    debugger
                     ourGame.scene.stop();
                     ourScoreScene.scene.switch('TimeAttackScene');
                     
@@ -2455,12 +2461,22 @@ class ScoreScene extends Phaser.Scene {
                 else {
                     if (ourGame.stage != END_STAGE) {
                 
+                        
                         var nextScore = 0;
                         var sumOfBase = 0;
-                        ourStartScene.stageHistory.forEach ( _stage => {
+                        var _histLog = [];
+                        
+                        ourStartScene.stageHistory.forEach( _stage => {
+                            _histLog = [ ..._histLog, ..._stage.foodLog];
                             sumOfBase += _stage.calcBase();
                             nextScore += _stage.calcTotal();
+
                         });
+                        ourStartScene.globalFoodLog = _histLog;
+                        
+                        var histBaseScore = ourStartScene.globalFoodLog.reduce((a,b) => a + b, 0);
+                        var currentAve = histBaseScore / ourStartScene.globalFoodLog.length;
+
     
                         var nextStages = STAGES_NEXT[ourGame.stage];
                         var unlockedStages = [];
@@ -2472,22 +2488,21 @@ class ScoreScene extends Phaser.Scene {
                             var goalSum = _stage[1] * ourStartScene.stageHistory.length * 28
                             console.log(
                                 _stage[0], 
-                                "histSum:", ourTimeAttack.histSum, 
+                                "histSum:", histBaseScore, 
                                 "targetSum", goalSum, 
-                                "unlocked=", ourTimeAttack.histSum > goalSum,
+                                "unlocked=", histBaseScore  > goalSum,
                                 "currentBase=", sumOfBase,
-                                "newUnlocked=", (sumOfBase > goalSum && ourTimeAttack.histSum < goalSum)
+                                "newUnlocked=", (sumOfBase > goalSum && histBaseScore < goalSum)
                             )
-                            if (ourTimeAttack.histSum >= goalSum) {
+                            if (histBaseScore >= goalSum) {
                                 unlockedStages.push(_stage);
                             }
 
-                            if (sumOfBase > goalSum && ourTimeAttack.histSum < goalSum) {
+                            if (sumOfBase > goalSum && histBaseScore < goalSum) {
                                 if (ourTimeAttack.newUnlocked) {
                                     ourTimeAttack.newUnlocked.push(_stage);
                                 }
                                 else {
-                                    var currentAve = sumOfBase / (ourStartScene.stageHistory.length * 28);
                                     ourTimeAttack.newUnlocked = [
                                         _stage[0], // Stage Name
                                         _stage[1], // Requirement Average
