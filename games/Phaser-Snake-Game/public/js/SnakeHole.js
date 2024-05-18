@@ -1704,6 +1704,12 @@ class GameScene extends Phaser.Scene {
     }
 }
 
+const COPPER = 0;
+const BRONZE = 1;
+const SILVER = 2;
+const GOLD = 3;
+const PLATINUM = 4;
+
 // #region Stage Data
 var StageData = new Phaser.Class({
 
@@ -1727,8 +1733,10 @@ var StageData = new Phaser.Class({
         this.foodHistory = props.foodHistory;
         this.moveHistory = props.moveHistory;
 
+        this.medianSpeedBonus = 6000;
+
     },
-    
+
     toString(){
         return `${this.stage}`;
     },
@@ -1739,7 +1747,33 @@ var StageData = new Phaser.Class({
     },
     
     calcBonus() {
-        return calcBonus(this.calcBase);
+        var base = this.calcBase()
+        return calcBonus(base);
+    },
+
+    stageRank() {
+        let rank;
+        let bonusScore = this.calcBonus();
+
+        switch (true) {
+            case bonusScore > this.medianSpeedBonus * 2:
+                rank = PLATINUM;
+                break;
+            case bonusScore > this.medianSpeedBonus * 1.5:
+                rank = GOLD;
+                break;
+            case bonusScore > this.medianSpeedBonus:
+                rank = SILVER;
+                break;
+            case bonusScore > this.medianSpeedBonus * .5:
+                rank = BRONZE;
+                break;
+            default:
+                rank = COPPER;
+        }
+
+        return rank;
+
     },
 
     preAdditive() {
@@ -2120,35 +2154,11 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Rank Sprites
         
-        const medianSpeedBonus = 6000;
-
-        const COPPER = 0;
-        const BRONZE = 1;
-        const SILVER = 2;
-        const GOLD = 3;
-        const PLATINUM = 4;
-
-        let rank;
-        let bonusScore = calcBonus(_baseScore) //doesn't use this.stageData.baseScore yet, need to figure out how still
-
-        switch (true) {
-            case bonusScore > medianSpeedBonus * 2:
-                rank = PLATINUM;
-                break;
-            case bonusScore > medianSpeedBonus * 1.5:
-                rank = GOLD;
-                break;
-            case bonusScore > medianSpeedBonus:
-                rank = SILVER;
-                break;
-            case bonusScore > medianSpeedBonus * .5:
-                rank = BRONZE;
-                break;
-            default:
-                rank = COPPER;
-        }
-
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        let rank = this.stageData.stageRank()
+        
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",
+            rank
+        ).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
         if(rank >= SILVER){

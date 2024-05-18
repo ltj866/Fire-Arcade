@@ -1,5 +1,5 @@
 {
-    "activeFile": "testing.json",
+    "activeFile": "Stage-02a.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -595,23 +595,24 @@
         "testing.json",
         "Bonus-Stage-x1.json",
         "Stage-02c.json",
-        "Stage-02d.json"
+        "Stage-02d.json",
+        "Bonus-Stage-x2.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "int",
     "recentFiles": [
-        "Stage-02d.json",
-        "Stage-02c.json",
-        "Bonus-Stage-x1.json",
-        "testing.json",
-        "Stage-x8.json",
-        "Stage-03b.json",
-        "Stage-03a.json",
-        "Stage-02e.json",
-        "Stage-02b.json",
-        "Stage-02a.json",
-        "Stage-01.json",
-        "Stage-AA.json"
+        "Stage-08.json",
+        "Stage-05.json",
+        "Stage-13.json",
+        "Stage-07.json",
+        "Stage-04.json",
+        "Stage-03c.json",
+        "Stage-09.json",
+        "Stage-10.json",
+        "Stage-11.json",
+        "snakeMap.tmx",
+        "Stage-06.json",
+        "Stage-12.json"
     ],
     "resizeMap.removeObjects": true,
     "tileset.embedInMap": true,
