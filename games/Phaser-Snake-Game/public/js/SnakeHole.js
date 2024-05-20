@@ -271,7 +271,7 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
-        this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
+        this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
 
 
 
@@ -617,7 +617,7 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.wallLayer = this.map.createLayer('Wall', [this.tileset]);
+        this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
         
         
