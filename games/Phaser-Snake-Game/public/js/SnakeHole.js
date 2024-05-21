@@ -652,7 +652,7 @@ class GameScene extends Phaser.Scene {
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
         this.lights.enable();
-        this.lights.setAmbientColor(0xC9C9C9);
+        this.lights.setAmbientColor(0xE4E4E4);
         
 
         //wrapBlock03.play("wrapBlock03")
@@ -1133,7 +1133,7 @@ class GameScene extends Phaser.Scene {
                     console.log("default portal color break")
                     break;
             }
-            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1);
+            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
