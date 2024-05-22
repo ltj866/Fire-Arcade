@@ -1109,28 +1109,28 @@ class GameScene extends Phaser.Scene {
         this.portals.forEach(portal => {
             var portalLightColor = 0xFFFFFF;
             switch (portal.tintTopLeft) {
-                case 0xFF0000:
+                case 0xFF0000: // RED
                     portalLightColor = 0xFF0000;
                     break;
-                case 0xff9900:
+                case 0xff9900: // ORANGE
                     portalLightColor = 0xC05D00;
                     break;
-                case 0xffff00:
-                    portalLightColor = 0xC5C500;
+                case 0xffff00: // YELLOW
+                    portalLightColor = 0xACAC04;
                     break;
-                case 0x00ff00:
-                    portalLightColor = 0x00ff00;
+                case 0x00ff00: // GREEN
+                    portalLightColor = 0x00B000;
                     break;
-                case 0x00ffff:
+                case 0x00ffff: // CYAN
                     portalLightColor = 0x00FFFF;
                     break;   
-                case 0x4a86e8:
+                case 0x4a86e8: // BLUE
                     portalLightColor = 0x074FEA;
                     break;        
-                case 0x9900ff:
+                case 0x9900ff: // VIOLET
                     portalLightColor = 0x9900FF;
                     break;
-                case 0xff00ff:
+                case 0xff00ff: //FUCHSIA
                     portalLightColor = 0xFF00FF;
                     break; 
                 default:
