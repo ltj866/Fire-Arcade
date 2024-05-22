@@ -738,7 +738,7 @@ class GameScene extends Phaser.Scene {
                     var boostOutline = this.add.sprite(
                         this.snake.head.x, 
                         this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(15);
+                    ).setOrigin(.083333,.083333).setDepth(8);
                     
                     boostOutline.play("snakeOutlineAnim");
                     this.boostOutlinesBody.push(boostOutline);
@@ -768,7 +768,7 @@ class GameScene extends Phaser.Scene {
                 var boostOutline = this.add.sprite(
                     this.snake.body[index].x, 
                     this.snake.body[index].y
-                ).setOrigin(.083333,.083333).setDepth(15);
+                ).setOrigin(.083333,.083333).setDepth(8);
                 boostOutline.alpha = 0;
                 var fadeinTween = this.tweens.add({
                     targets: boostOutline,
@@ -3079,7 +3079,6 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
-
        // UI Icons
        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
 
@@ -3459,7 +3458,8 @@ class UIScene extends Phaser.Scene {
             delay: this.tweens.stagger(60),
             yoyo: true
             });
-
+            
+        
     }
     comboAppear(){
         console.log("appearing")
@@ -3472,7 +3472,7 @@ class UIScene extends Phaser.Scene {
             repeat: 0,
         });
         this.visible = true;
-    }
+        }
     comboFade(){
         console.log("fading")
         this.tweens.add({

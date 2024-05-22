@@ -204,23 +204,20 @@ var Snake = new Phaser.Class({
         }
     }
     
-    var currentCombo = this.lastPlayedCombo;
+    //var currentCombo = this.lastPlayedCombo;
+    //console.log(currentCombo)
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y && !this.traveling){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            //console.log("lastplayedcombo", this.lastPlayedCombo, "currentCombo", currentCombo)
-
-            ourUI.time.delayedCall(2500, function(){
-                console.log(currentCombo)
+            /*ourUI.time.delayedCall(2500, function(){
                 if (currentCombo === 0) {
+                    //this.lastPlayedCombo = 0;
                     ourUI.comboCounter = 0;
                 }
-            })
-            //console.log("time since last fruit:", timeSinceFruit);
-
+            })*/
             if(timeSinceFruit > COMBO_ADD_FLOOR){
                 if (this.lastPlayedCombo > 0) {
                     ourUI.comboCounter += 1;
