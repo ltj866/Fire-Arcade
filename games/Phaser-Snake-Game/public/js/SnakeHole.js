@@ -630,6 +630,8 @@ class GameScene extends Phaser.Scene {
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
+        
+
         this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
@@ -653,6 +655,8 @@ class GameScene extends Phaser.Scene {
         
         this.lights.enable();
         this.lights.setAmbientColor(0xE4E4E4);
+
+        
         
 
         //wrapBlock03.play("wrapBlock03")
