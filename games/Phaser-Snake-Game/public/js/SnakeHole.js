@@ -656,7 +656,7 @@ class GameScene extends Phaser.Scene {
         this.lights.enable();
         this.lights.setAmbientColor(0xE4E4E4);
 
-        
+        this.staggerMagnitude = 30
         
 
         //wrapBlock03.play("wrapBlock03")
@@ -1300,7 +1300,20 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
+        this.graphics = this.add.graphics();
 
+        this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
+        this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, 260);
+        this.tweens.add({
+            targets: this.pathRegroup,
+            t: 1,
+            ease: 'Linear',
+            duration: 4000,
+            repeat: -1
+        });
+
+       
+        
     }
     
     chooseAreaPair (scene, groups) {
@@ -1365,6 +1378,29 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    vortexIn(){
+        this.tweens.add({
+            targets: this.curveRegroup,
+            xRadius: 0,
+            yRadius: 0,
+            ease: 'Sine.easeOutIn',
+            duration: 1000,
+            yoyo: false,
+            repeat: 0
+        });
+    }
+    vortexOut(){
+        this.tweens.add({
+            targets: this.curveRegroup,
+            xRadius: 260,
+            yRadius: 260,
+            ease: 'Linear',
+            duration: 20,
+            yoyo: false,
+            repeat: 0
+        });
+    }
+
     // #region Game Update
     update (time, delta) {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
@@ -1372,8 +1408,41 @@ class GameScene extends Phaser.Scene {
 
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
+        console.log(this.staggerMagnitude)
+        if (this.staggerMagnitude < 10){
+            this.staggerMagnitude = 10;
+        }
         // console.log("update -- time=" + time + " delta=" + delta);
 
+        if (this.snake.alive) {
+            this.staggerMagnitude = 30
+            //this.curveRegroup.x = this.snake.head.x
+            //this.curveRegroup.y = this.snake.head.y
+        }
+
+
+        this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
+
+        this.graphics.clear();
+        this.graphics.fillStyle(0xff0000, 1);
+        this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
+    
+        if (!this.snake.alive) {
+            this.staggerMagnitude -= 0.5
+            //this.curveRegroup.x = GRID * 15
+            //this.curveRegroup.y = GRID * 15
+            this.tween = this.tweens.add({
+                targets: this.snake.body, 
+                x: this.pathRegroup.vec.x,
+                y: this.pathRegroup.vec.y,
+                yoyo: false,
+                duration: 500,
+                ease: 'Sine.easeOutIn',
+                repeat: 0,
+                delay: this.tweens.stagger(this.staggerMagnitude)
+            });
+        }
+        
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
@@ -1426,18 +1495,14 @@ class GameScene extends Phaser.Scene {
             this.snake.regrouping = true;
             this.move_pause = true;
             
-            var tween = this.tweens.add({
-                targets: this.snake.body, 
-                x: GRID * 15,
-                y: GRID * 15,
-                yoyo: false,
-                duration: 1000,
-                ease: 'Sine.easeOutIn',
-                repeat: 0,
-                delay: 500
-            });
+            this.vortexIn();
+           
+            
 
-            tween.on('complete', test => {
+            this.tween.on('complete', test => {
+                this.vortexOut();
+                this.curveRegroup.x = GRID * 15
+                this.curveRegroup.y = GRID * 15
                 //console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
                 this.snake.alive = true;
