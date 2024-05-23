@@ -3445,6 +3445,10 @@ class UIScene extends Phaser.Scene {
         else if (this.comboCounter == 0 && this.visible){
             this.comboFade();
         }
+
+        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.visible) {
+            this.comboFade();
+        }
     }
     
     comboBounce(){
