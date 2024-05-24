@@ -1381,7 +1381,7 @@ class GameScene extends Phaser.Scene {
             xRadius: 0,
             yRadius: 0,
             ease: 'Sine.easeOutIn',
-            duration: 1000,
+            duration: 500,
             yoyo: false,
             repeat: 0
         });
