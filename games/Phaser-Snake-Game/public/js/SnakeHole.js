@@ -1419,9 +1419,9 @@ class GameScene extends Phaser.Scene {
 
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
-        this.graphics.clear();
-        this.graphics.fillStyle(0xff0000, 1);
-        this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
+        //this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
+        //this.graphics.fillStyle(0xff0000, 1);
+        //this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
     
         if (!this.snake.alive) {
             this.staggerMagnitude -= 0.5
