@@ -1300,7 +1300,7 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
-        this.graphics = this.add.graphics();
+        //this.graphics = this.add.graphics();
 
         this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
         this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, 260);
@@ -1311,9 +1311,6 @@ class GameScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
-
-       
-        
     }
     
     chooseAreaPair (scene, groups) {
@@ -1405,14 +1402,13 @@ class GameScene extends Phaser.Scene {
     update (time, delta) {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
-
+        // console.log("update -- time=" + time + " delta=" + delta);
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
-        console.log(this.staggerMagnitude)
         if (this.staggerMagnitude < 10){
             this.staggerMagnitude = 10;
         }
-        // console.log("update -- time=" + time + " delta=" + delta);
+        
 
         if (this.snake.alive) {
             this.staggerMagnitude = 30
@@ -1497,8 +1493,6 @@ class GameScene extends Phaser.Scene {
             
             this.vortexIn();
            
-            
-
             this.tween.on('complete', test => {
                 this.vortexOut();
                 this.curveRegroup.x = GRID * 15
@@ -1514,9 +1508,7 @@ class GameScene extends Phaser.Scene {
                 this.startingArrowsAnimN.setVisible(true);
                 this.startingArrowsAnimS.setVisible(true);
                 this.startingArrowsAnimE.setVisible(true);
-                this.startingArrowsAnimW.setVisible(true);
-
-                
+                this.startingArrowsAnimW.setVisible(true);   
             });
         }
         
