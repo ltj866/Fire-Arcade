@@ -3352,10 +3352,6 @@ class UIScene extends Phaser.Scene {
             
 
         }, this);
-
-        /*this.input.keyboard.on('keydown-L', e => {this.comboBounce();})
-        this.input.keyboard.on('keydown-O', e => {this.comboFade();})
-        this.input.keyboard.on('keydown-I', e => {this.comboAppear();})*/
         
     }
     update() {
@@ -3375,8 +3371,6 @@ class UIScene extends Phaser.Scene {
             this.scene.start('ScoreScene');
         }
         // #endregion
-
-        
         
         if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
@@ -3445,7 +3439,6 @@ class UIScene extends Phaser.Scene {
         else if (this.comboCounter == 0 && this.visible){
             this.comboFade();
         }
-
         if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.visible) {
             this.comboFade();
         }
@@ -3462,8 +3455,6 @@ class UIScene extends Phaser.Scene {
             delay: this.tweens.stagger(60),
             yoyo: true
             });
-            
-        
     }
     comboAppear(){
         console.log("appearing")

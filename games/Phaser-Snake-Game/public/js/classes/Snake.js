@@ -203,21 +203,13 @@ var Snake = new Phaser.Class({
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
     }
-    
-    //var currentCombo = this.lastPlayedCombo;
-    //console.log(currentCombo)
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y && !this.traveling){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            /*ourUI.time.delayedCall(2500, function(){
-                if (currentCombo === 0) {
-                    //this.lastPlayedCombo = 0;
-                    ourUI.comboCounter = 0;
-                }
-            })*/
+
             if(timeSinceFruit > COMBO_ADD_FLOOR){
                 if (this.lastPlayedCombo > 0) {
                     ourUI.comboCounter += 1;
