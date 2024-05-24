@@ -1269,7 +1269,7 @@ class GameScene extends Phaser.Scene {
         var atom = new Food(this);
         var atom = new Food(this);
 
-
+        this.dist = 260
 
         // #endregion
 
@@ -1300,10 +1300,10 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
-        //this.graphics = this.add.graphics();
+        this.graphics = this.add.graphics();
 
         this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
-        this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, 260);
+        this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, this.dist);
         this.tweens.add({
             targets: this.pathRegroup,
             t: 1,
@@ -1386,17 +1386,6 @@ class GameScene extends Phaser.Scene {
             repeat: 0
         });
     }
-    vortexOut(){
-        this.tweens.add({
-            targets: this.curveRegroup,
-            xRadius: 260,
-            yRadius: 260,
-            ease: 'Linear',
-            duration: 20,
-            yoyo: false,
-            repeat: 0
-        });
-    }
 
     // #region Game Update
     update (time, delta) {
@@ -1404,6 +1393,24 @@ class GameScene extends Phaser.Scene {
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
+
+        var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
+
+        this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
+        console.log(this.dist)
+
+        if (this.snake.alive) {
+            this.tweens.add({
+                targets: this.curveRegroup,
+                xRadius: this.dist,
+                yRadius: this.dist,
+                ease: 'Linear',
+                duration: 20,
+                yoyo: false,
+                repeat: 0
+            });
+        }
+
 
         if (this.staggerMagnitude < 10){
             this.staggerMagnitude = 10;
@@ -1419,8 +1426,8 @@ class GameScene extends Phaser.Scene {
 
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
-        //this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
-        //this.graphics.fillStyle(0xff0000, 1);
+        this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
+        this.graphics.fillStyle(0xff0000, 1);
         //this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
     
         if (!this.snake.alive) {
@@ -1494,7 +1501,7 @@ class GameScene extends Phaser.Scene {
             this.vortexIn();
            
             this.tween.on('complete', test => {
-                this.vortexOut();
+                //this.vortexOut();
                 this.curveRegroup.x = GRID * 15
                 this.curveRegroup.y = GRID * 15
                 //console.log("COMPLETE AND SET ALIVE")
