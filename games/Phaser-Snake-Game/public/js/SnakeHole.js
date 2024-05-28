@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 // #region DEBUG OPTIONS
@@ -2261,16 +2261,46 @@ class ScoreScene extends Phaser.Scene {
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",
             rank
-        ).setDepth(20).setOrigin(0,0);
+        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
         
-        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x, letterRank.y, 96);
+        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
         this.letterRankPath2 = { t: .5, vec: new Phaser.Math.Vector2() };
 
+
+        var lightColor = 0xFFFFFF;
+        var lightColor2 = 0xFFFFFF;
+        const platLightColor = 0xEEA8EE;
+        const platLightColor2 = 0x25DD19;
+        const goldLightColor = 0xE7C1BB;
+        const goldLightColor2 = 0xE9FF5E;
+        const silverLightColor = 0xABCADA;
+        const silverLightColor2 = 0xABDADA;
+        const bronzeLightColor = 0xE8C350;
+        const bronzeLightColor2 = 0xE8C350;
+        const copperLightColor = 0xB59051;
+        const copperLightColor2 = 0xB59051;
+
+        this.tweens.add({
+            targets: this.letterRankPath,
+            t: 1,
+            ease: 'Linear',
+            duration: 4000,
+            repeat: -1
+        });
+        
+        this.tweens.add({
+            targets: this.letterRankPath2,
+            t: 1.5,
+            ease: 'Linear',
+            duration: 4000,
+            repeat: -1
+        });
+
         // region Particle Emitter
         if(rank >= SILVER){
-            lightColor = 0xFFFFFF//silverLightColor
-            lightColor2 = 0xFFFFFF//goldLightColor
+            lightColor = silverLightColor
+            lightColor2 = goldLightColor
             console.log(lightColor)
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
@@ -2280,8 +2310,8 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            lightColor = 0xFFFFFF//goldLightColor
-            lightColor2 = 0xFFFFFF//goldLightColor
+            lightColor = goldLightColor
+            lightColor2 = goldLightColor
             console.log(lightColor)
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
@@ -2291,8 +2321,8 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            lightColor = 0xFFFFFF//platLightColor
-            lightColor2 = 0xFFFFFF//goldLightColor
+            lightColor = platLightColor
+            lightColor2 = goldLightColor
             console.log(lightColor)
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
@@ -2306,8 +2336,8 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(667,[1]).setDepth(20);
         }
 
-        this.spotlight = this.lights.addLight(0, 0, 500, 0xFFFFFF).setIntensity(1.5); //lightcolor
-        this.spotlight2 = this.lights.addLight(0, 0, 500, 0xFFFFFF).setIntensity(1.5); //lightcolor2
+        this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
+        this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
         // #region Stat Cards
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
         console.log(ourInputScene.cornerTime)
@@ -2653,6 +2683,7 @@ class ScoreScene extends Phaser.Scene {
 
             });
         }, [], this);
+        //this.graphics = this.add.graphics();
     }
 
     // #region Score - Update
@@ -2661,8 +2692,8 @@ class ScoreScene extends Phaser.Scene {
 
         var scoreCountDown = this.foodLogSeed.slice(-1);
 
-        this.letterRankCurve .getPoint(this.letterRankPath.t, this.letterRankPath.vec);
-        this.letterRankCurve .getPoint(this.letterRankPath2.t, this.letterRankPath2.vec);
+        this.letterRankCurve.getPoint(this.letterRankPath.t, this.letterRankPath.vec);
+        this.letterRankCurve.getPoint(this.letterRankPath2.t, this.letterRankPath2.vec);
 
         this.spotlight.x = this.letterRankPath.vec.x;
         this.spotlight.y = this.letterRankPath.vec.y;
@@ -2672,10 +2703,10 @@ class ScoreScene extends Phaser.Scene {
 
         /*this.graphics.clear(); //Used to debug where light is
         this.graphics.lineStyle(2, 0xffffff, 1);
-        this.curve.draw(this.graphics, 64);
+        this.letterRankCurve.draw(this.graphics, 64);
         this.graphics.fillStyle(0xff0000, 1);
-        this.graphics.fillCircle(this.path.vec.x, this.path.vec.y, 8).setDepth(30);
-        this.graphics.fillCircle(this.path2.vec.x, this.path2.vec.y, 8).setDepth(30);*/
+        this.graphics.fillCircle(this.letterRankPath.vec.x, this.letterRankPath.vec.y, 8).setDepth(30);
+        this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);*/
 
 
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
