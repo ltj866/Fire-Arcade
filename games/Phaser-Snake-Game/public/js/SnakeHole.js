@@ -1296,7 +1296,7 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
-        this.graphics = this.add.graphics();
+        //this.graphics = this.add.graphics();
 
         this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
         this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, this.dist);
@@ -1381,6 +1381,16 @@ class GameScene extends Phaser.Scene {
             yoyo: false,
             repeat: 0
         });
+        this.tweenRespawn = this.tweens.add({
+            targets: this.snake.body, 
+            x: GRID * 15, //this.pathRegroup.vec.x,
+            y: GRID * 15, //this.pathRegroup.vec.y,
+            yoyo: false,
+            duration: 500,
+            ease: 'Sine.easeOutIn',
+            repeat: 0,
+            delay: this.tweens.stagger(this.staggerMagnitude)
+        });
     }
 
     // #region Game Update
@@ -1393,7 +1403,7 @@ class GameScene extends Phaser.Scene {
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
         this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
-        console.log(this.dist)
+        //console.log(this.dist)
 
         if (this.snake.alive) {
             this.tweens.add({
@@ -1422,24 +1432,15 @@ class GameScene extends Phaser.Scene {
 
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
-        this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
-        this.graphics.fillStyle(0xff0000, 1);
+        //this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
+        //this.graphics.fillStyle(0xff0000, 1);
         //this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
-    
+
         if (!this.snake.alive) {
             this.staggerMagnitude -= 0.5
             //this.curveRegroup.x = GRID * 15
             //this.curveRegroup.y = GRID * 15
-            this.tween = this.tweens.add({
-                targets: this.snake.body, 
-                x: this.pathRegroup.vec.x,
-                y: this.pathRegroup.vec.y,
-                yoyo: false,
-                duration: 500,
-                ease: 'Sine.easeOutIn',
-                repeat: 0,
-                delay: this.tweens.stagger(this.staggerMagnitude)
-            });
+            
         }
         
         // #region Hold Reset
@@ -1496,7 +1497,7 @@ class GameScene extends Phaser.Scene {
             
             this.vortexIn();
            
-            this.tween.on('complete', test => {
+            this.tweenRespawn.on('complete', () => {
                 //this.vortexOut();
                 this.curveRegroup.x = GRID * 15
                 this.curveRegroup.y = GRID * 15
@@ -4225,6 +4226,9 @@ var config = {
     width: 744,
     height: 744,
     //seed: 1,
+    scale: {
+        zoom: Phaser.Scale.MAX_ZOOM,
+    },
     parent: 'phaser-example',
     physics: {
         default: 'arcade',
@@ -4241,6 +4245,7 @@ var config = {
     dom: {
         createContainer: true,
     },
+    
     //scene: [ StartScene, InputScene]
     scene: [ StartScene, PlayerDataScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 
