@@ -1304,9 +1304,13 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5,0.5);
  
         this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
-        //this.map.mask.invertAlpha = true;
+        this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
     }
     
+    applyMask(){
+        this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
+    }
+
     chooseAreaPair (scene, groups) {
         // Random group where there is less than 3 portals already.
         var groupPair = scene.chooseSpawnableLanes(scene, groups.slice(), 3)

@@ -60,11 +60,9 @@ var Snake = new Phaser.Class({
             
         }
         this.body.push(newPart);
+        scene.applyMask();
 
 
-
-        
-        
     },
     
     
