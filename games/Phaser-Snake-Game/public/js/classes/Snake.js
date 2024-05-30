@@ -27,7 +27,11 @@ var Snake = new Phaser.Class({
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
 
-        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, 96, 0xAF67FF).setIntensity(1);
+        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
+        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
+        this.snakeLightE = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
+        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
+        this.snakeLightW = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
     },
     
     grow: function (scene)
@@ -59,11 +63,9 @@ var Snake = new Phaser.Class({
             
         }
         this.body.push(newPart);
+        scene.applyMask();
 
 
-
-        
-        
     },
     
     
@@ -75,6 +77,18 @@ var Snake = new Phaser.Class({
 
     this.snakeLight.x = x + GRID/2;
     this.snakeLight.y = y + GRID/2;
+
+    this.snakeLightN.x = x
+    this.snakeLightN.y = y + SCREEN_HEIGHT
+
+    this.snakeLightE.x = x + SCREEN_WIDTH
+    this.snakeLightE.y = y
+
+    this.snakeLightS.x = x
+    this.snakeLightS.y = y - SCREEN_HEIGHT
+
+    this.snakeLightW.x = x - SCREEN_WIDTH
+    this.snakeLightW.y = y
 
     var onPortal = false;
     
