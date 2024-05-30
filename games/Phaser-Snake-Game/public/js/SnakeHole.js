@@ -238,9 +238,10 @@ const STAGES_NEXT = {
     'Stage-10': [['Stage-11', 0]],
     'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
+    'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'testing04';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -291,6 +292,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
+
+        this.load.image("snakeMask", "assets/sprites/snakeMask.png");
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -650,29 +653,9 @@ class GameScene extends Phaser.Scene {
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
         this.lights.enable();
-        this.lights.setAmbientColor(0xE4E4E4);
+        //this.lights.setAmbientColor(0xE4E4E4);
 
         this.staggerMagnitude = 30
-        
-
-        //wrapBlock03.play("wrapBlock03")
-        //wrapBlock06.play("wrapBlock06")
-        //wrapBlock08.play("wrapBlock08")
-        //this.mask = shape.createBitmapMask();
-        //boostMeter.setMask(this.mask); // image.mask = mask;
-        //boostMeter.mask.invertAlpha = true;
-
-        /*this.anims.create({ // will mostlikely remove later -Holden
-            key: 'spawn',
-            frames: this.anims.generateFrameNumbers('fruitAppearSmokeAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }),
-            frameRate: 16,
-            repeat: 0
-        });*/
-        var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
-        //var smokePoofAnim = smokePoof.play("spawn")
-
-        // Dream Wall Shimmer
-
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
@@ -825,6 +808,9 @@ class GameScene extends Phaser.Scene {
             this.spaceWhileReGrouping = false;
         });
 
+        this.input.keyboard.on('keydown-M', e => {
+            console.log("working")
+        });
         this.frameIndex = 0
 
         // #endregion
@@ -1307,6 +1293,18 @@ class GameScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
+        //const cloud2 = this.add.image(400, 300 + 100, "snakeMask");
+
+        // Snake Mask
+        this.snakeMask = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+ 
+        this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
+        //this.map.mask.invertAlpha = true;
     }
     
     chooseAreaPair (scene, groups) {
@@ -1395,6 +1393,7 @@ class GameScene extends Phaser.Scene {
 
     // #region Game Update
     update (time, delta) {
+
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
@@ -1546,6 +1545,8 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
+            this.snakeMask.x = this.snake.head.x
+            this.snakeMask.y = this.snake.head.y
             //Phaser.Math.Between(0, 9);
 
             this.lastMoveTime = time;

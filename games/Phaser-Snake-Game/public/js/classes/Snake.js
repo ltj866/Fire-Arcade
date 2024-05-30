@@ -27,7 +27,8 @@ var Snake = new Phaser.Class({
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
 
-        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, 96, 0xAF67FF).setIntensity(1);
+        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
+        
     },
     
     grow: function (scene)
