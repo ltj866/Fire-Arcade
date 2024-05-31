@@ -1349,7 +1349,7 @@ class GameScene extends Phaser.Scene {
     }
     
     applyMask(){
-        this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
+        this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
     }
 
     chooseAreaPair (scene, groups) {
