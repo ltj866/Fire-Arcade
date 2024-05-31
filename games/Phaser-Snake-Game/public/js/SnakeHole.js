@@ -294,6 +294,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
 
         this.load.image("snakeMask", "assets/sprites/snakeMask.png");
+        this.load.image("portalMask", "assets/sprites/portalMask.png");
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -652,6 +653,7 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
+        this.lights_mask = this.make.container(0, 0);
         this.lights.enable();
         //this.lights.setAmbientColor(0xE4E4E4);
 
@@ -1086,7 +1088,7 @@ class GameScene extends Phaser.Scene {
             layerIndex ++; 
  
         }
-
+        this.lightMasks = [];
         // #endregion
         this.portals.forEach(portal => {
             var portalLightColor = 0xFFFFFF;
@@ -1131,8 +1133,18 @@ class GameScene extends Phaser.Scene {
                 moveToY: 14,
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
+            
+            this.portalMask = this.make.image({
+                x: portal.x,
+                y: portal.y,
+                key: 'portalMask',
+                add: false,
+            });
+            this.lightMasks.push(this.portalMask)
+            
         });
 
+        
         
 
         
@@ -1302,9 +1314,38 @@ class GameScene extends Phaser.Scene {
             key: 'snakeMask',
             add: false
         }).setOrigin(0.5,0.5);
- 
-        this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
-        this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.snakeMask);
+        this.snakeMaskN = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskE = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskS = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskW = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
+
+        this.lights_mask.add ( this.lightMasks);
+        this.lights_mask.setVisible(false);
+        this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+        
+
+        this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
     }
     
     applyMask(){
@@ -1551,6 +1592,18 @@ class GameScene extends Phaser.Scene {
             
             this.snakeMask.x = this.snake.head.x
             this.snakeMask.y = this.snake.head.y
+
+            this.snakeMaskN.x = this.snake.head.x
+            this.snakeMaskN.y = this.snake.head.y + SCREEN_HEIGHT
+
+            this.snakeMaskE.x = this.snake.head.x + SCREEN_WIDTH
+            this.snakeMaskE.y = this.snake.head.y
+
+            this.snakeMaskS.x = this.snake.head.x
+            this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT
+
+            this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
+            this.snakeMaskW.y = this.snake.head.y
             //Phaser.Math.Between(0, 9);
 
             this.lastMoveTime = time;
