@@ -270,6 +270,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('bg02_2', 'assets/sprites/background02_2.png');
         this.load.image('bg02_3', 'assets/sprites/background02_3.png');
         this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
+        this.load.image('bg02_4', 'assets/sprites/background02_4.png');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
@@ -628,18 +629,27 @@ class GameScene extends Phaser.Scene {
         
     
         // add background
+
+        // Furthest BG Object
+        this.bg0 = this.add.sprite(0, GRID*2,'bg02_4').setDepth(-4).setOrigin(0,0); 
+        this.bg0.scale = 3
+
+        // Scrolling BG1
         this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
-        this.bg.tileScaleX = 3;
-        this.bg.tileScaleY = 3;
+        this.bg.tileScaleX = 2;
+        this.bg.tileScaleY = 2;
 
+        
+        // Scrolling BG2 Planets
         this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
-        this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
-
         this.bg2.tileScaleX = 3;
         this.bg2.tileScaleY = 3;
-
+        
+        // Scrolling BG3 Stars (depth is behind planets)
+        this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
         this.bg3.tileScaleX = 3;
         this.bg3.tileScaleY = 3;
+
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
@@ -667,9 +677,9 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
-        this.lights_mask = this.make.container(0, 0);
+        this.lightMasksContainer = this.make.container(0, 0);
         this.lights.enable();
-        if (!DARK_MODE) {
+        if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
             this.lights.setAmbientColor(0xE4E4E4);
         }
         
@@ -1111,9 +1121,9 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        this.portals.forEach(portal => {
+        this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
-            switch (portal.tintTopLeft) {
+            switch (portal.tintTopLeft) { // checks each portal color and changes its light color
                 case 0xFF0000: // RED
                     portalLightColor = 0xFF0000;
                     break;
@@ -1142,7 +1152,9 @@ class GameScene extends Phaser.Scene {
                     console.log("default portal color break")
                     break;
             }
+            
             this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
+            
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
@@ -1162,14 +1174,7 @@ class GameScene extends Phaser.Scene {
                 add: false,
             });
             this.lightMasks.push(this.portalMask)
-            
         });
-
-        
-        
-
-        
-    
 
         //Phaser.Math.RND.pick(nextGroup)
        
@@ -1315,7 +1320,8 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
-        //this.graphics = this.add.graphics();
+        
+        //this.graphics = this.add.graphics(); //temporarily used to debug graphics
 
         this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
         this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, this.dist);
@@ -1328,7 +1334,7 @@ class GameScene extends Phaser.Scene {
         });
         //const cloud2 = this.add.image(400, 300 + 100, "snakeMask");
 
-        // Snake Mask
+        // Snake Masks, one is added for each cardinal direction so screen wraps look cleaner
         this.snakeMask = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
@@ -1359,20 +1365,22 @@ class GameScene extends Phaser.Scene {
             key: 'snakeMask',
             add: false
         }).setOrigin(0.5,0.5);
+
+
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
 
-        this.lights_mask.add ( this.lightMasks);
-        this.lights_mask.setVisible(false);
+        this.lightMasksContainer.add ( this.lightMasks);
+        this.lightMasksContainer.setVisible(false);
         if (DARK_MODE) {
-            this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
-            this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+            this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
+            this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
         
     }
     
     applyMask(){
         if (DARK_MODE) {
-            this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+            this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
     }
 
