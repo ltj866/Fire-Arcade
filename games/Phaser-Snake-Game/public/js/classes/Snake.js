@@ -29,7 +29,7 @@ var Snake = new Phaser.Class({
 
 
 
-        debugger
+
         if (scene.DARK_MODE) {
             this.lightIntensity = 1.5
             this.lightDiameter = 192
