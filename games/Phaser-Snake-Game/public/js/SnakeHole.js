@@ -660,7 +660,7 @@ class GameScene extends Phaser.Scene {
 
         this.scrollFactorX = 0
         this.scrollFactorY = 0
-        this.bgCoords = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
+        this.bgCoords = new Phaser.Math.Vector2(0,0)
 
         this.staggerMagnitude = 30
         // Dream wall corners 
