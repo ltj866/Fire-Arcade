@@ -238,6 +238,7 @@ const STAGES_NEXT = {
     'Stage-10': [['Stage-11', 0]],
     'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
+    'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
 const START_STAGE = 'Stage-01';
@@ -264,6 +265,11 @@ class StartScene extends Phaser.Scene {
         this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
 
         this.load.image('bg01', 'assets/sprites/background01.png');
+        this.load.image('bg02', 'assets/sprites/background02.png');
+        this.load.image('bg02_2', 'assets/sprites/background02_2.png');
+        this.load.image('bg02_3', 'assets/sprites/background02_3.png');
+        this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
+        this.load.image('bg02_4', 'assets/sprites/background02_4.png');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
@@ -291,6 +297,9 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
+
+        this.load.image("snakeMask", "assets/sprites/snakeMask.png");
+        this.load.image("portalMask", "assets/sprites/portalMask.png");
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -560,7 +569,9 @@ class GameScene extends Phaser.Scene {
         // special flags
         this.ghosting = false;
         this.bonkable = true;
+        this.lightMasks = [];
 
+        this.DARK_MODE = DARK_MODE;
     }
     
     
@@ -619,8 +630,26 @@ class GameScene extends Phaser.Scene {
         
     
         // add background
-        this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
 
+        // Furthest BG Object
+        this.bg0 = this.add.sprite(0, GRID*2,'bg02_4').setDepth(-4).setOrigin(0,0); 
+        this.bg0.scale = 3
+
+        // Scrolling BG1
+        this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
+        this.bg.tileScaleX = 2;
+        this.bg.tileScaleY = 2;
+
+        
+        // Scrolling BG2 Planets
+        this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
+        this.bg2.tileScaleX = 3;
+        this.bg2.tileScaleY = 3;
+        
+        // Scrolling BG3 Stars (depth is behind planets)
+        this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
+        this.bg3.tileScaleX = 3;
+        this.bg3.tileScaleY = 3;
 
 
         let _x = this.snake.head.x;
@@ -649,30 +678,18 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
+        this.lightMasksContainer = this.make.container(0, 0);
         this.lights.enable();
-        this.lights.setAmbientColor(0xE4E4E4);
-
-        this.staggerMagnitude = 30
+        if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            this.lights.setAmbientColor(0xE4E4E4);
+        }
         
 
-        //wrapBlock03.play("wrapBlock03")
-        //wrapBlock06.play("wrapBlock06")
-        //wrapBlock08.play("wrapBlock08")
-        //this.mask = shape.createBitmapMask();
-        //boostMeter.setMask(this.mask); // image.mask = mask;
-        //boostMeter.mask.invertAlpha = true;
+        this.scrollFactorX = 0
+        this.scrollFactorY = 0
+        this.bgCoords = new Phaser.Math.Vector2(0,0)
 
-        /*this.anims.create({ // will mostlikely remove later -Holden
-            key: 'spawn',
-            frames: this.anims.generateFrameNumbers('fruitAppearSmokeAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }),
-            frameRate: 16,
-            repeat: 0
-        });*/
-        var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
-        //var smokePoofAnim = smokePoof.play("spawn")
-
-        // Dream Wall Shimmer
-
+        this.staggerMagnitude = 30
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
@@ -825,6 +842,9 @@ class GameScene extends Phaser.Scene {
             this.spaceWhileReGrouping = false;
         });
 
+        this.input.keyboard.on('keydown-M', e => {
+            this.bg3.setTexture('bg02_3_2')
+        });
         this.frameIndex = 0
 
         // #endregion
@@ -1100,11 +1120,11 @@ class GameScene extends Phaser.Scene {
             layerIndex ++; 
  
         }
-
+        
         // #endregion
-        this.portals.forEach(portal => {
+        this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
-            switch (portal.tintTopLeft) {
+            switch (portal.tintTopLeft) { // checks each portal color and changes its light color
                 case 0xFF0000: // RED
                     portalLightColor = 0xFF0000;
                     break;
@@ -1133,7 +1153,9 @@ class GameScene extends Phaser.Scene {
                     console.log("default portal color break")
                     break;
             }
+            
             this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
+            
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
@@ -1145,12 +1167,15 @@ class GameScene extends Phaser.Scene {
                 moveToY: 14,
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
+            
+            this.portalMask = this.make.image({
+                x: portal.x,
+                y: portal.y,
+                key: 'portalMask',
+                add: false,
+            });
+            this.lightMasks.push(this.portalMask)
         });
-
-        
-
-        
-    
 
         //Phaser.Math.RND.pick(nextGroup)
        
@@ -1296,7 +1321,8 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
-        //this.graphics = this.add.graphics();
+        
+        //this.graphics = this.add.graphics(); //temporarily used to debug graphics
 
         this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
         this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, this.dist);
@@ -1307,8 +1333,58 @@ class GameScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
+        //const cloud2 = this.add.image(400, 300 + 100, "snakeMask");
+
+        // Snake Masks, one is added for each cardinal direction so screen wraps look cleaner
+        this.snakeMask = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskN = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskE = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskS = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.snakeMaskW = this.make.image({
+            x: GRID * 0,
+            y: GRID * 0,
+            key: 'snakeMask',
+            add: false
+        }).setOrigin(0.5,0.5);
+
+
+        this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
+
+        this.lightMasksContainer.add ( this.lightMasks);
+        this.lightMasksContainer.setVisible(false);
+        if (DARK_MODE) {
+            this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
+            this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
+        }
+        
     }
     
+    applyMask(){
+        if (DARK_MODE) {
+            this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
+        }
+    }
+
     chooseAreaPair (scene, groups) {
         // Random group where there is less than 3 portals already.
         var groupPair = scene.chooseSpawnableLanes(scene, groups.slice(), 3)
@@ -1395,6 +1471,7 @@ class GameScene extends Phaser.Scene {
 
     // #region Game Update
     update (time, delta) {
+
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
@@ -1429,6 +1506,12 @@ class GameScene extends Phaser.Scene {
             //this.curveRegroup.y = this.snake.head.y
         }
 
+        /*this.time.delayedCall(900, function() {
+            console.log("working")
+            /*if (this.bg3.key = 'bg02_3'){
+                this.bg3.setTexture('bg02_3_2')
+            }
+        });*/
 
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
@@ -1443,6 +1526,20 @@ class GameScene extends Phaser.Scene {
             
         }
         
+        this.scrollFactorX += .025;
+        this.scrollFactorY += .025;
+
+        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
+        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
+
+        this.bg.tilePositionX = Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05);
+        this.bg.tilePositionY = Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05);
+
+        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * .75;
+        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * .75;
+
+        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.67;
+        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.67;
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
@@ -1546,6 +1643,20 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
+            this.snakeMask.x = this.snake.head.x
+            this.snakeMask.y = this.snake.head.y
+
+            this.snakeMaskN.x = this.snake.head.x
+            this.snakeMaskN.y = this.snake.head.y + SCREEN_HEIGHT
+
+            this.snakeMaskE.x = this.snake.head.x + SCREEN_WIDTH
+            this.snakeMaskE.y = this.snake.head.y
+
+            this.snakeMaskS.x = this.snake.head.x
+            this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT
+
+            this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
+            this.snakeMaskW.y = this.snake.head.y
             //Phaser.Math.Between(0, 9);
 
             this.lastMoveTime = time;
