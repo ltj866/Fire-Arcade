@@ -27,11 +27,21 @@ var Snake = new Phaser.Class({
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
 
-        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
-        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
-        this.snakeLightE = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
-        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
-        this.snakeLightW = scene.lights.addLight(this.head.x, this.head.y, 128, 0xAF67FF).setIntensity(1.5);
+
+        if (this.DARK_MODE) {
+            this.lightIntensity = 1.5
+            this.lightDiameter = 192
+        }
+        else{
+            this.lightIntensity = .75
+            this.lightDiameter = 92
+        }
+
+        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightE = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightW = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
     },
     
     grow: function (scene)
@@ -145,22 +155,22 @@ var Snake = new Phaser.Class({
         if (this.direction === LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
-            scene.bgCoords.x -= .5;
+            //scene.bgCoords.x -= .25;
         }
         else if (this.direction === RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
-            scene.bgCoords.x += .5;
+            //scene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
-            scene.bgCoords.y -= .5;
+            //scene.bgCoords.y -= .25;
         }
         else if (this.direction === DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
-            scene.bgCoords.y += .5;
+            //scene.bgCoords.y += .25;
         }
         
         // Bonk Wall
