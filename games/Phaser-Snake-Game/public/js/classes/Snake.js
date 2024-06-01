@@ -79,13 +79,13 @@ var Snake = new Phaser.Class({
     this.snakeLight.y = y + GRID/2;
 
     this.snakeLightN.x = x
-    this.snakeLightN.y = y + SCREEN_HEIGHT
+    this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3)
 
     this.snakeLightE.x = x + SCREEN_WIDTH
     this.snakeLightE.y = y
 
     this.snakeLightS.x = x
-    this.snakeLightS.y = y - SCREEN_HEIGHT
+    this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)
 
     this.snakeLightW.x = x - SCREEN_WIDTH
     this.snakeLightW.y = y
@@ -145,18 +145,22 @@ var Snake = new Phaser.Class({
         if (this.direction === LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
+            scene.bgCoords.x -= .5;
         }
         else if (this.direction === RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+            scene.bgCoords.x += .5;
         }
         else if (this.direction === UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+            scene.bgCoords.y -= .5;
         }
         else if (this.direction === DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
+            scene.bgCoords.y += .5;
         }
         
         // Bonk Wall

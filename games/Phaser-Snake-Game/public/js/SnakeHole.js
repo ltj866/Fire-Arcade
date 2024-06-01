@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 // #region DEBUG OPTIONS
@@ -265,6 +265,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
 
         this.load.image('bg01', 'assets/sprites/background01.png');
+        this.load.image('bg02', 'assets/sprites/background02.png');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
@@ -564,7 +565,7 @@ class GameScene extends Phaser.Scene {
         // special flags
         this.ghosting = false;
         this.bonkable = true;
-
+        this.lightMasks = [];
     }
     
     
@@ -623,7 +624,7 @@ class GameScene extends Phaser.Scene {
         
     
         // add background
-        this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
+        this.bg = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02').setDepth(-1).setOrigin(0,0);
 
 
 
@@ -656,6 +657,10 @@ class GameScene extends Phaser.Scene {
         this.lights_mask = this.make.container(0, 0);
         this.lights.enable();
         //this.lights.setAmbientColor(0xE4E4E4);
+
+        this.scrollFactorX = 0
+        this.scrollFactorY = 0
+        this.bgCoords = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
 
         this.staggerMagnitude = 30
         // Dream wall corners 
@@ -1088,7 +1093,7 @@ class GameScene extends Phaser.Scene {
             layerIndex ++; 
  
         }
-        this.lightMasks = [];
+        
         // #endregion
         this.portals.forEach(portal => {
             var portalLightColor = 0xFFFFFF;
@@ -1487,6 +1492,16 @@ class GameScene extends Phaser.Scene {
             
         }
         
+        this.scrollFactorX += .025;
+        this.scrollFactorY += .025;
+
+        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
+        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
+
+        this.bg.tilePositionX = Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05);
+        this.bg.tilePositionY = Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05);
+
+
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
