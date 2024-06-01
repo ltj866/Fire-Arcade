@@ -28,7 +28,9 @@ var Snake = new Phaser.Class({
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
 
 
-        if (this.DARK_MODE) {
+
+        debugger
+        if (scene.DARK_MODE) {
             this.lightIntensity = 1.5
             this.lightDiameter = 192
         }
