@@ -14,8 +14,9 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
+const DARK_MODE = false;
 
 // #region DEBUG OPTIONS
 
@@ -241,7 +242,7 @@ const STAGES_NEXT = {
     'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
-const START_STAGE = 'testing04';
+const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -266,6 +267,9 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
+        this.load.image('bg02_2', 'assets/sprites/background02_2.png');
+        this.load.image('bg02_3', 'assets/sprites/background02_3.png');
+        this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
@@ -624,9 +628,18 @@ class GameScene extends Phaser.Scene {
         
     
         // add background
-        this.bg = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02').setDepth(-1).setOrigin(0,0);
+        this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
+        this.bg.tileScaleX = 3;
+        this.bg.tileScaleY = 3;
 
+        this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
+        this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
 
+        this.bg2.tileScaleX = 3;
+        this.bg2.tileScaleY = 3;
+
+        this.bg3.tileScaleX = 3;
+        this.bg3.tileScaleY = 3;
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
@@ -656,7 +669,10 @@ class GameScene extends Phaser.Scene {
         
         this.lights_mask = this.make.container(0, 0);
         this.lights.enable();
-        //this.lights.setAmbientColor(0xE4E4E4);
+        if (!DARK_MODE) {
+            this.lights.setAmbientColor(0xE4E4E4);
+        }
+        
 
         this.scrollFactorX = 0
         this.scrollFactorY = 0
@@ -816,7 +832,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-M', e => {
-            console.log("working")
+            this.bg3.setTexture('bg02_3_2')
         });
         this.frameIndex = 0
 
@@ -1347,14 +1363,17 @@ class GameScene extends Phaser.Scene {
 
         this.lights_mask.add ( this.lightMasks);
         this.lights_mask.setVisible(false);
-        this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+        if (DARK_MODE) {
+            this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+            this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+        }
         
-
-        this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
     }
     
     applyMask(){
-        this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+        if (DARK_MODE) {
+            this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lights_mask);
+        }
     }
 
     chooseAreaPair (scene, groups) {
@@ -1478,6 +1497,12 @@ class GameScene extends Phaser.Scene {
             //this.curveRegroup.y = this.snake.head.y
         }
 
+        /*this.time.delayedCall(900, function() {
+            console.log("working")
+            /*if (this.bg3.key = 'bg02_3'){
+                this.bg3.setTexture('bg02_3_2')
+            }
+        });*/
 
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
@@ -1501,7 +1526,11 @@ class GameScene extends Phaser.Scene {
         this.bg.tilePositionX = Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05);
         this.bg.tilePositionY = Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05);
 
+        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * .75;
+        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * .75;
 
+        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.67;
+        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.67;
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
