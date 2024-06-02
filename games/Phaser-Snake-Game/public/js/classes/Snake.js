@@ -33,7 +33,7 @@ var Snake = new Phaser.Class({
             this.lightDiameter = 192
         }
         else{
-            this.lightIntensity = .75
+            this.lightIntensity = .5
             this.lightDiameter = 92
         }
 

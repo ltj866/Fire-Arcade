@@ -305,7 +305,7 @@ class StartScene extends Phaser.Scene {
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
-        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
@@ -660,18 +660,37 @@ class GameScene extends Phaser.Scene {
         
         
 
-        this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
-        this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
-        this.startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
-        this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
+            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN.play('idle');
+        }
+        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
+            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS.flipY = true;
+            this.startingArrowsAnimS.play('idle');
+        }
+        if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
+            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE.angle = 90;
+            this.startingArrowsAnimE.play('idle');
+        }
+        if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
+            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW.angle = 270;
+            this.startingArrowsAnimW.play('idle');
+        }
         
-        this.startingArrowsAnimS.flipY = true;
-        this.startingArrowsAnimE.angle = 90;
-        this.startingArrowsAnimW.angle = 270;
-        this.startingArrowsAnimN.play('idle');
-        this.startingArrowsAnimS.play('idle');
-        this.startingArrowsAnimE.play('idle');
-        this.startingArrowsAnimW.play('idle');
+        
+        
+        
+        
+        
+        
+        
+ 
+        
+        
+        
 
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
@@ -4361,6 +4380,7 @@ var config = {
     width: 744,
     height: 744,
     //seed: 1,
+    autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
     },
