@@ -16,7 +16,7 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
-
+const DARK_MODE = false;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -631,14 +631,16 @@ class GameScene extends Phaser.Scene {
     
         // add background
 
+        this.bgTimer = 0;
+
         // Furthest BG Object
         this.bg0 = this.add.sprite(0, GRID*2,'bg02_4').setDepth(-4).setOrigin(0,0); 
         this.bg0.scale = 3
 
         // Scrolling BG1
         this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
-        this.bg.tileScaleX = 2;
-        this.bg.tileScaleY = 2;
+        this.bg.tileScaleX = 3;
+        this.bg.tileScaleY = 3;
 
         
         // Scrolling BG2 Planets
@@ -1483,7 +1485,8 @@ class GameScene extends Phaser.Scene {
         //console.log(this.dist)
 
         if (this.snake.alive) {
-            this.tweens.add({
+            this.staggerMagnitude = 30
+            /*this.tweens.add({
                 targets: this.curveRegroup,
                 xRadius: this.dist,
                 yRadius: this.dist,
@@ -1491,19 +1494,14 @@ class GameScene extends Phaser.Scene {
                 duration: 20,
                 yoyo: false,
                 repeat: 0
-            });
+            });*/
         }
-
-
         if (this.staggerMagnitude < 10){
             this.staggerMagnitude = 10;
         }
         
 
         if (this.snake.alive) {
-            this.staggerMagnitude = 30
-            //this.curveRegroup.x = this.snake.head.x
-            //this.curveRegroup.y = this.snake.head.y
         }
 
         /*this.time.delayedCall(900, function() {
@@ -1520,26 +1518,37 @@ class GameScene extends Phaser.Scene {
         //this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
 
         if (!this.snake.alive) {
+            
+            this.snake.snakeLight.x = this.snake.head.x
+            this.snake.snakeLight.y = this.snake.head.y
+
             this.staggerMagnitude -= 0.5
             //this.curveRegroup.x = GRID * 15
             //this.curveRegroup.y = GRID * 15
             
         }
         
-        this.scrollFactorX += .025;
-        this.scrollFactorY += .025;
+        //this.scrollFactorX += .025;
+        //this.scrollFactorY += .025;
 
         //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
         //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
 
-        this.bg.tilePositionX = Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05);
-        this.bg.tilePositionY = Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05);
+        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 1;
+        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 1;
 
-        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * .75;
-        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * .75;
+        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 2;
+        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 2;
 
-        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.67;
-        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.67;
+        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.5;
+        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.5;
+       
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
@@ -1640,6 +1649,18 @@ class GameScene extends Phaser.Scene {
         //else{
         //    this.frameIndex = 0;
         //}
+
+        this.bgTimer += delta;
+
+        if(this.bgTimer >= 1000){
+            this.bg3.setTexture('bg02_3_2') 
+            if (this.bgTimer >= 2000) {
+                this.bg3.setTexture('bg02_3') 
+                this.bgTimer = 0
+            }   
+        }
+        
+        
 
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
@@ -2690,7 +2711,7 @@ class ScoreScene extends Phaser.Scene {
                 if (ourTimeAttack.inTimeAttack) {
                     
                     // Go back to time attack scene
-                    debugger
+                    //debugger
                     ourGame.scene.stop();
                     ourScoreScene.scene.switch('TimeAttackScene');
                     
