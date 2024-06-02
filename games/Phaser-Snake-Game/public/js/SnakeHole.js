@@ -266,6 +266,7 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
+        this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
         this.load.image('bg02_2', 'assets/sprites/background02_2.png');
         this.load.image('bg02_3', 'assets/sprites/background02_3.png');
         this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
@@ -1654,8 +1655,10 @@ class GameScene extends Phaser.Scene {
 
         if(this.bgTimer >= 1000){
             this.bg3.setTexture('bg02_3_2') 
+            this.bg.setTexture('bg02frame2') 
             if (this.bgTimer >= 2000) {
-                this.bg3.setTexture('bg02_3') 
+                this.bg3.setTexture('bg02_3')
+                this.bg.setTexture('bg02') 
                 this.bgTimer = 0
             }   
         }
