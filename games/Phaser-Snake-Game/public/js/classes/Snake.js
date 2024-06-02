@@ -317,6 +317,7 @@ var Snake = new Phaser.Class({
     });
     },
     death: function (gameScene) {
+        gameScene.cameras.main.shake(300, .00625);
         this.alive = false;
         this.hold_move = true;
         gameScene.move_pause = true;
