@@ -214,6 +214,16 @@ var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
 
+const GState = Object.freeze({ 
+    START_WAIT: 1, 
+    PLAY: 2, 
+    PORTAL: 3, 
+    BONK: 4, 
+    WAIT_FOR_INPUT: 5,
+    TRANSITION: 6
+}); 
+
+
 const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
@@ -656,12 +666,11 @@ class GameScene extends Phaser.Scene {
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
-        
-
         this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
+        
         
         this.startingArrowsAnimS.flipY = true;
         this.startingArrowsAnimE.angle = 90;
@@ -1747,7 +1756,7 @@ class GameScene extends Phaser.Scene {
             }
             
             // Move at last second
-            if (!this.stageOver) {
+            if (this.gState === GState.PLAY &&!this.stageOver) {
                 this.snake.move(this);
                 ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
@@ -3452,7 +3461,7 @@ class UIScene extends Phaser.Scene {
 
         this.scoreTimer = this.time.addEvent({
             delay: MAX_SCORE *100,
-            paused: false
+            paused: true
          });
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
