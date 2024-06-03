@@ -156,22 +156,22 @@ var Snake = new Phaser.Class({
         if (this.direction === LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
-            scene.bgCoords.x -= .125;
+            scene.bgCoords.x -= .25;
         }
         else if (this.direction === RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
-            scene.bgCoords.x += .125;
+            scene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
-            scene.bgCoords.y -= .125;
+            scene.bgCoords.y -= .25;
         }
         else if (this.direction === DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
-            scene.bgCoords.y += .125;
+            scene.bgCoords.y += .25;
         }
         
         // Bonk Wall
@@ -317,7 +317,7 @@ var Snake = new Phaser.Class({
     });
     },
     death: function (gameScene) {
-        gameScene.cameras.main.shake(300, .00625);
+        gameScene.screenShake();
         this.alive = false;
         this.hold_move = true;
         gameScene.move_pause = true;

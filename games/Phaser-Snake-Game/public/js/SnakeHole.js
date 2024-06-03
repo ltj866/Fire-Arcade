@@ -16,7 +16,7 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
-const DARK_MODE = true;
+const DARK_MODE = false;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -673,11 +673,11 @@ class GameScene extends Phaser.Scene {
         let _y = this.snake.head.y;
         
 
-        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
+        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
         }
-        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
+        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
@@ -1406,6 +1406,16 @@ class GameScene extends Phaser.Scene {
         }
         
     }
+
+    screenShake(){
+        if (this.moveInterval === SPEEDSPRINT) {
+            this.cameras.main.shake(400, .01);
+        }
+        else if (this.moveInterval === SPEEDWALK){
+            this.cameras.main.shake(300, .00625);
+        }
+        
+    }
     
     applyMask(){
         if (DARK_MODE) {
@@ -1566,29 +1576,29 @@ class GameScene extends Phaser.Scene {
         // not all of these need to be interpolated; wastes processing
 
         this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.05)) * -1;
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
         this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.05)) * -1;
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
 
         this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.25;
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
         this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.25;
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
 
         this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 1;
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
         this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 1;
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
             
         this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 2;
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
         this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 2;
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
 
         this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.5;
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
         this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.5;
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
 
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
@@ -4404,6 +4414,7 @@ var config = {
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
+        //mode: Phaser.Scale.FIT,
     },
     parent: 'phaser-example',
     physics: {
