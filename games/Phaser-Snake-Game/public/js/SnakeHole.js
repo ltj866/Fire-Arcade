@@ -287,8 +287,8 @@ class StartScene extends Phaser.Scene {
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
-        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
-        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
+        this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
