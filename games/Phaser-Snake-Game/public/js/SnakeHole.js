@@ -16,7 +16,7 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
-const DARK_MODE = false;
+const DARK_MODE = true;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -266,6 +266,7 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
+        this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
         this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
         this.load.image('bg02_2', 'assets/sprites/background02_2.png');
         this.load.image('bg02_3', 'assets/sprites/background02_3.png');
@@ -632,6 +633,7 @@ class GameScene extends Phaser.Scene {
     
         // add background
 
+        // for changing bg sprites
         this.bgTimer = 0;
 
         // Furthest BG Object
@@ -643,7 +645,18 @@ class GameScene extends Phaser.Scene {
         this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
         this.bg.tileScaleX = 3;
         this.bg.tileScaleY = 3;
-
+        
+        // BG Mask
+        this.mask = this.make.tileSprite({
+            x: SCREEN_WIDTH/2,
+            y: SCREEN_HEIGHT/2,
+            key: 'bg02mask',
+            add: false
+        }).setOrigin(.5,.5);
+        
+        const mask = this.mask
+        mask.scale = 3
+        this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
         
         // Scrolling BG2 Planets
         this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
@@ -658,7 +671,6 @@ class GameScene extends Phaser.Scene {
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
-        
         
 
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
@@ -686,13 +698,6 @@ class GameScene extends Phaser.Scene {
         
         
         
-        
-        
- 
-        
-        
-        
-
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -1558,16 +1563,23 @@ class GameScene extends Phaser.Scene {
         //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
         //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
 
-        
+        // not all of these need to be interpolated; wastes processing
+
+        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.05)) * -1;
+        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.05)) * -1;
+
         this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.25;
         this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.25;
+
         this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.05)) * 1;
         this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.05)) * 1;
-
+            
         this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.05)) * 2;
         this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
