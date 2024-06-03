@@ -241,7 +241,7 @@ const STAGES_NEXT = {
     'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-04';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -635,8 +635,9 @@ class GameScene extends Phaser.Scene {
         this.bgTimer = 0;
 
         // Furthest BG Object
-        this.bg0 = this.add.sprite(0, GRID*2,'bg02_4').setDepth(-4).setOrigin(0,0); 
-        this.bg0.scale = 3
+        this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
+        this.bg0.tileScaleX = 3
+        this.bg0.tileScaleY = 3
 
         // Scrolling BG1
         this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
@@ -1554,6 +1555,11 @@ class GameScene extends Phaser.Scene {
         //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
         //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
 
+        
+        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.25;
+        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.25;
         this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.05)) * 1;
         this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
@@ -1568,7 +1574,7 @@ class GameScene extends Phaser.Scene {
             (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.5;
         this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.5;
-       
+
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");

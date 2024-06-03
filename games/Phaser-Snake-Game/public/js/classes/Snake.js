@@ -85,7 +85,7 @@ var Snake = new Phaser.Class({
     let x = this.head.x;
     let y = this.head.y;
 
-    if (this.alive) {
+    if (this.alive && !this.traveling) {
         this.snakeLight.x = x + GRID/2;
         this.snakeLight.y = y + GRID/2;
     
