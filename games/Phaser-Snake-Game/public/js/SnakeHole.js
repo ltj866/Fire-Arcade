@@ -16,7 +16,7 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
-const DARK_MODE = true;
+const DARK_MODE = false;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -241,7 +241,7 @@ const STAGES_NEXT = {
     'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-04';
+const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -1542,6 +1542,9 @@ class GameScene extends Phaser.Scene {
             
             this.snake.snakeLight.x = this.snake.head.x
             this.snake.snakeLight.y = this.snake.head.y
+
+            this.snakeMask.x = this.snake.head.x
+            this.snakeMask.y = this.snake.head.y
 
             this.staggerMagnitude -= 0.5
             //this.curveRegroup.x = GRID * 15
