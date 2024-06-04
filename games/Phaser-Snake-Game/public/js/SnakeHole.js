@@ -163,7 +163,7 @@ export const STOP = 10;
 const STYLE_DEFAULT = {
     color: 'white',
     'font-size': '14px',
-    'font-family': ["Sono", 'sans-serif'],
+    'font-family': 'Oxanium',
     'font-weight': '200',
     'text-align': 'center',
 }
@@ -491,20 +491,20 @@ class PlayerDataScene extends Phaser.Scene {
     ).setOrigin(0,0.5);
 
 
-    this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+    /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
         styleBottomText    
         )).setHTML(
             `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
-    ).setOrigin(0,0.5);
+    ).setOrigin(0,0.5);*/
 
-    this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+    /*this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
         styleBottomText    
         )).setText(
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
-    ).setOrigin(0,0.5);
+    ).setOrigin(0,0.5);*/
 
-    const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '10px',
+    const gameVersionUI = this.add.dom(SCREEN_WIDTH -4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+        'font-size': '12px',
         })).setText(
             `snakehole.${GAME_VERSION}`
     ).setOrigin(1,1);
@@ -1343,7 +1343,7 @@ class GameScene extends Phaser.Scene {
             var bestBase = 0;
         }
 
-        ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
+        ourUI.bestScoreUI.setText(`BEST : ${bestBase}`);
         
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
@@ -1828,7 +1828,7 @@ class GameScene extends Phaser.Scene {
             }
 
             //var boosting
-            
+                   
             //this.spaceKey.isDown
 
 
@@ -1842,7 +1842,7 @@ class GameScene extends Phaser.Scene {
                     var boostOutline = this.add.sprite(
                         this.snake.head.x, 
                         this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(15);
+                    ).setOrigin(.083333,.083333).setDepth(8);
                     
                     boostOutline.play("snakeOutlineAnim");
                     this.boostOutlinesBody.push(boostOutline);
@@ -2549,7 +2549,7 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line',
             'overflow-y': 'scroll',
             //'scroll-behavior': 'smooth', smooth scroll stutters when arrow key down/up is held
-            //'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
+            'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
@@ -3486,7 +3486,7 @@ class UIScene extends Phaser.Scene {
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`Stage: 0`).setOrigin(0,0);
+        ).setText(`STAGE: 0`).setOrigin(0,0);
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
@@ -3533,24 +3533,23 @@ class UIScene extends Phaser.Scene {
 
          // Countdown Text
         this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: COLOR_SCORE,
+            'color': '#FCFFB2',
+            'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
-            'font-family': ["Sono", 'sans-serif'],
-            padding: '1px 5px',
-            //'border-radius': '4px',
-            //outline: 'solid',
-            //"outline-color": 'white',
-            })).setText(
+            'font-weight': '400',
+            'font-family': 'Oxanium',
+            'padding': '3px 7px 0px 0px',
+            })).setHTML(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
         
         this.deltaScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `LastΔ: +0 `
+            `LASTΔ: +0 `
         ).setOrigin(0,1);
         
         this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `Score: ${commaInt(this.score.toString())}`
+            `SCORE: ${commaInt(this.score.toString())}`
         ).setOrigin(0,0);
         
 
@@ -3571,10 +3570,16 @@ class UIScene extends Phaser.Scene {
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
+                'color': '#FCFFB2',
+                'font-weight': '400',
+                'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
                 'font-size': '22px',
+                'font-family': 'Oxanium',
+                'padding': '3px 8px 0px 0px',
+                /*'font-size': '22px',
                 'font-weight': '400',
                 'font-weight': 'bold',
-                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
+                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,*/
             })).setOrigin(0,0);
             
             // Remove score text after a time period.
@@ -3623,18 +3628,18 @@ class UIScene extends Phaser.Scene {
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
 
             this.deltaScoreUI.setText(
-                `LastΔ: +${deltaScore}`
+                `LASTΔ: + ${deltaScore}`
             )
             
             this.runningScoreUI.setText(
-                `Score: ${commaInt(runningScore.toString())}`
+                `SCORE: ${commaInt(runningScore.toString())}`
             );
             
 
 
             // Update UI
 
-            this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.scoreUI.setText(`STAGE: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
@@ -3722,6 +3727,7 @@ class UIScene extends Phaser.Scene {
 
             this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             this.bestScoreUI.setText(`Best :  ${this.score}`);
+            herehere
 
             this.scene.pause();
 
@@ -3733,7 +3739,8 @@ class UIScene extends Phaser.Scene {
         
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             if (timeTick < SCORE_FLOOR ) {
-                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0"));
+                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0")
+            );
             }
             else {
                 this.countDown.setText(countDown.toString().padStart(3,"0"));
