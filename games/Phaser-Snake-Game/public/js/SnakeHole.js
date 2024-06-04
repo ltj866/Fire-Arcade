@@ -166,10 +166,11 @@ const STYLE_DEFAULT = {
     'font-family': 'Oxanium',
     'font-weight': '200',
     'text-align': 'center',
+    //'text-shadow': ' #FF8FEE 1px 0 2px'
 }
 
 const UISTYLE = { 
-    color: 'lightyellow',
+    color: 'white',
    'font-size': '16px',
    'font-weight': '400',
    'padding': '0px 0px 0px 12px'
@@ -503,7 +504,7 @@ class PlayerDataScene extends Phaser.Scene {
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
     ).setOrigin(0,0.5);*/
 
-    const gameVersionUI = this.add.dom(SCREEN_WIDTH -4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+    const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
         'font-size': '12px',
         })).setText(
             `snakehole.${GAME_VERSION}`
@@ -1327,8 +1328,10 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        ourUI.bestScoreUI = ourUI.add.dom(10, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
         ourUI.bestScoreUI.setOrigin(0,1);
+        ourUI.bestScoreLabelUI = ourUI.add.dom(GRID * 3, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        ourUI.bestScoreLabelUI.setOrigin(0,1);
 
         // Calculate this locally
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
@@ -1343,7 +1346,8 @@ class GameScene extends Phaser.Scene {
             var bestBase = 0;
         }
 
-        ourUI.bestScoreUI.setText(`BEST : ${bestBase}`);
+        ourUI.bestScoreUI.setText(`BEST :`);
+        ourUI.bestScoreLabelUI.setText(bestBase);
         
         /////////////////////////////////////////////////
         // Throw An event to start UI screen?
@@ -3486,7 +3490,11 @@ class UIScene extends Phaser.Scene {
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`STAGE: 0`).setOrigin(0,0);
+        ).setText(`STAGE :`).setOrigin(0,0);
+        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`0`).setOrigin(0,0);
+        //HEREHEREHERE
+        
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
@@ -3538,18 +3546,24 @@ class UIScene extends Phaser.Scene {
             'font-size': '22px',
             'font-weight': '400',
             'font-family': 'Oxanium',
-            'padding': '3px 7px 0px 0px',
+            'padding': '2px 7px 0px 0px',
             })).setHTML(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
         
-        this.deltaScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `LASTΔ: +0 `
+        this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `LASTΔ :`
+        ).setOrigin(0,1);
+        this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `0 `
         ).setOrigin(0,1);
         
         this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `SCORE: ${commaInt(this.score.toString())}`
+            `SCORE :`
+        ).setOrigin(0,0);
+        this.runningScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `${commaInt(this.score.toString())}`
         ).setOrigin(0,0);
         
 
@@ -3576,7 +3590,7 @@ class UIScene extends Phaser.Scene {
                 'font-size': '22px',
                 'font-family': 'Oxanium',
                 'padding': '3px 8px 0px 0px',
-                /*'font-size': '22px',
+                /*'font-size': '22px', //old settings
                 'font-weight': '400',
                 'font-weight': 'bold',
                 'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,*/
@@ -3628,18 +3642,25 @@ class UIScene extends Phaser.Scene {
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
 
             this.deltaScoreUI.setText(
-                `LASTΔ: + ${deltaScore}`
+                `LASTΔ : +`
+            )
+            this.deltaScoreLabelUI.setText(
+                `${deltaScore}`
             )
             
             this.runningScoreUI.setText(
-                `SCORE: ${commaInt(runningScore.toString())}`
+                `SCORE :`
+            );
+            this.runningScoreLabelUI.setText(
+                `${commaInt(runningScore.toString())}`
             );
             
 
 
             // Update UI
 
-            this.scoreUI.setText(`STAGE: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.scoreUI.setText(`STAGE :`);
+            this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
@@ -3727,7 +3748,6 @@ class UIScene extends Phaser.Scene {
 
             this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             this.bestScoreUI.setText(`Best :  ${this.score}`);
-            herehere
 
             this.scene.pause();
 
