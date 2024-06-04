@@ -103,50 +103,7 @@ var Snake = new Phaser.Class({
     this.snakeLightW.y = y
 
     var onPortal = false;
-    
-    scene.portals.forEach(portal => { 
-        if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
-            onPortal = true; // Used to ignore certain collisions when you are on top of a portal.
-            this.portal_buffer_on = false; // Used to keep you from reportaling immediately
-            
-            this.hold_move = true; // Keep the head from moving while recombinating.
 
-            if (DEBUG) { console.log("PORTAL"); }
-
-            var _x = portal.target.x*GRID;
-            var _y = portal.target.y*GRID;
-
-            var portalSound = scene.portalSounds[0]
-            portalSound.play();
-
-            scene.lastMoveTime += SPEEDWALK * 2;
-            this.traveling = true;
-            var _tween = scene.tweens.add({
-                targets: this.head, 
-                x: _x,
-                y: _y,
-                yoyo: false,
-                duration: SPEEDWALK * 2,
-                ease: 'Linear',
-                repeat: 0,
-                //delay: 500
-            });
-            _tween.on('complete',()=>{
-                this.traveling = false;
-            });
-            
-            
-            scene.time.delayedCall(SPEEDWALK * 4, event => {
-                
-                //console.log("YOU CAN PORTAL AGAIN.");
-                this.portal_buffer_on = true;
-                this.hold_move = false;
-                
-            }, [], scene);
-                                
-            return ;  //Don't know why this is here but I left it -James
-        }
-    });
 
     // Look ahead for bonks
 

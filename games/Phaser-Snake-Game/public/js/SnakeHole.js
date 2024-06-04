@@ -151,13 +151,21 @@ var tileset;
 var tileset2;
 
 //  Direction consts
-export const LEFT = 0;
-export const RIGHT = 1;
-export const UP = 2;
-export const DOWN = 3;
-const START_SPRINT = 4;
-const STOP_SPRINT = 5;
-export const STOP = 10;
+export const LEFT = 3;
+export const RIGHT = 4;
+export const UP = 1;
+export const DOWN = 2;
+const START_SPRINT = 5;
+const STOP_SPRINT = 6;
+export const STOP = 0;
+
+const DIRS = Object.freeze({ 
+    UP: 1, 
+    DOWN: 2, 
+    LEFT: 3, 
+    RIGHT: 4,
+    STOP: 0, 
+}); 
 
 
 // #region GLOBAL STYLES 
@@ -583,6 +591,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasks = [];
 
         this.DARK_MODE = DARK_MODE;
+        this.stepMode = true; // Stops auto moving, only pressing moves.
     }
     
     
@@ -1388,6 +1397,51 @@ class GameScene extends Phaser.Scene {
         }
         
     }
+    checkPortalAndMove() {
+        let snake = this.snake;
+
+        this.portals.forEach(portal => { 
+            if(snake.head.x === portal.x && snake.head.y === portal.y){
+                this.gState = GState.PORTAL;
+
+                if (DEBUG) { console.log("PORTAL"); }
+    
+                var _x = portal.target.x*GRID;
+                var _y = portal.target.y*GRID;
+    
+                var portalSound = this.portalSounds[0]
+                portalSound.play();
+    
+                this.lastMoveTime += SPEEDWALK * 2;
+
+                var _tween = this.tweens.add({
+                    targets: snake.head, 
+                    x: _x,
+                    y: _y,
+                    yoyo: false,
+                    duration: SPEEDWALK * 2,
+                    ease: 'Linear',
+                    repeat: 0,
+                    //delay: 500
+                });
+                
+                _tween.on('complete',()=>{
+                    snake.traveling = false;
+                });
+                
+                
+                this.time.delayedCall(SPEEDWALK * 4, event => {
+                    
+                    //console.log("YOU CAN PORTAL AGAIN.");
+                    this.portal_buffer_on = true;
+                    this.hold_move = false;
+                    }, [], this);
+                                    
+                return ;  //Don't know why this is here but I left it -James
+            }
+        });
+
+    }
     
     applyMask(){
         if (DARK_MODE) {
@@ -1492,17 +1546,6 @@ class GameScene extends Phaser.Scene {
         this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
         //console.log(this.dist)
 
-        if (this.snake.alive) {
-            this.tweens.add({
-                targets: this.curveRegroup,
-                xRadius: this.dist,
-                yRadius: this.dist,
-                ease: 'Linear',
-                duration: 20,
-                yoyo: false,
-                repeat: 0
-            });
-        }
 
 
         if (this.staggerMagnitude < 10){
@@ -3832,7 +3875,7 @@ class InputScene extends Phaser.Scene {
     }
     update() {
     }
-    
+   
     
     updateDirection(gameScene, event) {
         // Does not change the direction of the snake in code
@@ -3843,14 +3886,7 @@ class InputScene extends Phaser.Scene {
         switch (event.keyCode) {
             case 87: // w
 
-            if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
-                // At anytime you can update the direction of the snake.
-                gameScene.snake.head.setTexture('snakeDefault', 6);
- 
-                    
-            }
+
             break;
 
             case 65: // a
@@ -3931,176 +3967,137 @@ class InputScene extends Phaser.Scene {
         } 
     }
 
+
+    moveUp(gameScene) {
+        if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
+            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+            
+            this.snakeStart(gameScene);
+            
+                // At anytime you can update the direction of the snake.
+            gameScene.snake.head.setTexture('snakeDefault', 6);
+            gameScene.snake.direction = UP;
+            
+            this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+            this.turns += 1; 
+                
+            this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
+            gameScene.snake.move(gameScene);
+
+            this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
+            gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means technically you can go as fast as you turn.
+            
+            gameScene.checkPortalAndMove();
+        }
+    }
+
+    moveDown(gameScene) {
+        if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
+            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+           
+
+               this.snakeStart(gameScene);
+               gameScene.snake.head.setTexture('snakeDefault', 7);
+           gameScene.snake.direction = DOWN;
+
+           this.turns += 1;
+           this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
+           this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
+           gameScene.snake.move(gameScene);
+
+           this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
+           gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+
+           gameScene.checkPortalAndMove();
+       }
+
+    }
+
+    moveLeft(gameScene) {
+        if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
+            
+                this.snakeStart(gameScene);
+
+            gameScene.snake.head.setTexture('snakeDefault', 4);
+            gameScene.snake.direction = LEFT;
+
+            this.turns += 1;
+            this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
+            this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));   
+            gameScene.snake.move(gameScene);
+
+            this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
+            gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+
+            gameScene.checkPortalAndMove();
+            
+        }
+
+    }
+
+    moveRight(gameScene) {
+        if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+            
+                this.snakeStart(gameScene);
+                gameScene.snake.head.setTexture('snakeDefault', 5);
+            gameScene.snake.direction = RIGHT;
+
+            this.turns += 1;
+            this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
+            this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
+            gameScene.snake.move(gameScene);
+
+            this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+            gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            gameScene.checkPortalAndMove();
+        }
+
+    }
+
     moveDirection(gameScene, event) {
-        // console.log(event.keyCode, this.time.now); // all keys
-        //console.profile("UpdateDirection");
-        //console.time("UpdateDirection");
-        //console.log(this.turns);
+
+        /***
+         * All move up calls only move if it is safe to move
+        ***/
         
         // #region MoveDirection
         switch (event.keyCode) {
             case 87: // w
-
-            if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
-                this.snakeStart(gameScene);
-                
-                    // At anytime you can update the direction of the snake.
-                gameScene.snake.head.setTexture('snakeDefault', 6);
-                gameScene.snake.direction = UP;
-                
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-                this.turns += 1; 
-                    
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                
-            }
-            break;
+                this.moveUp(gameScene);
+                break;
 
             case 65: // a
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
-                
-                    this.snakeStart(gameScene);
-
-                gameScene.snake.head.setTexture('snakeDefault', 4);
-                gameScene.snake.direction = LEFT;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));   
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                
-            }
-            break;
+                this.moveLeft(gameScene);
+                break;
 
             case 83: // s
-
-            if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
-                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
-
-                    this.snakeStart(gameScene);
-                    gameScene.snake.head.setTexture('snakeDefault', 7);
-                gameScene.snake.direction = DOWN;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
- 
-                this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
+                this.moveDown(gameScene);
+                break;
 
             case 68: // d
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
-                    this.snakeStart(gameScene);
-                    gameScene.snake.head.setTexture('snakeDefault', 5);
-                gameScene.snake.direction = RIGHT;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
- 
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
+                this.moveRight(gameScene);
+                break;
 
             case 38: // UP
-
-            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
-
-                    this.snakeStart(gameScene);
-                    gameScene.snake.head.setTexture('snakeDefault', 6);
-                gameScene.snake.direction = UP;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
-                gameScene.snake.move(gameScene);
-                //console.log(this.cornerTime) //this highlights a bug when pressing direction from stationary
-                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
-                this.moveCount += 1;
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
+                this.moveUp(gameScene);
+                break;
 
             case 37: // LEFT
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
-                    this.snakeStart(gameScene);
-                    gameScene.snake.head.setTexture('snakeDefault', 4);
-                gameScene.snake.direction = LEFT;
-
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
-                this.moveCount += 1;
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
+                this.moveLeft(gameScene);
+                break;
 
             case 40: // DOWN
-
-            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-
-                    this.snakeStart(gameScene);
-                    gameScene.snake.head.setTexture('snakeDefault', 7);
-                gameScene.snake.direction = DOWN;
-                
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-                
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
-                this.moveCount += 1;
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
+                this.moveDown(gameScene);
+                break;
 
             case 39: // RIGHT
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-
-                    this.snakeStart(gameScene);
-                    gameScene.snake.head.setTexture('snakeDefault', 5);
-                gameScene.snake.direction = RIGHT;
-                
-                this.turns += 1;
-                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-                
-                this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
-                gameScene.snake.move(gameScene);
-                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
-                this.moveCount += 1;
-                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
+                this.moveRight(gameScene);
+                break;
 
             case 32: // SPACE
               if (DEBUG) { console.log(event.code, gameScene.time.now); }
