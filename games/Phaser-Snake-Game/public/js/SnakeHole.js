@@ -1407,6 +1407,8 @@ class GameScene extends Phaser.Scene {
         this.portals.forEach(portal => { 
             if(snake.head.x === portal.x && snake.head.y === portal.y){
                 this.gState = GState.PORTAL;
+                this.scene.get('UIScene').scoreTimer.paused = true;
+
                 console.log("PORTALING", this.gState);
 
                 if (DEBUG) { console.log("PORTAL"); }
@@ -1432,16 +1434,9 @@ class GameScene extends Phaser.Scene {
                 
                 _tween.on('complete',()=>{
                     this.gState = GState.START_WAIT;
+                    this.scene.get('UIScene').scoreTimer.paused = false;
                     console.log(this.gState);
                 });
-                
-                
-                this.time.delayedCall(SPEEDWALK * 4, event => {
-                    
-                    //console.log("YOU CAN PORTAL AGAIN.");
-                    this.portal_buffer_on = true;
-                    this.hold_move = false;
-                    }, [], this);
                                     
                 return ;  //Don't know why this is here but I left it -James
             }
