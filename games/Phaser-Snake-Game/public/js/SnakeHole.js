@@ -260,7 +260,7 @@ const STAGES_NEXT = {
     'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 

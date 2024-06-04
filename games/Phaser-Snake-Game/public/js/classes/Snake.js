@@ -102,7 +102,6 @@ var Snake = new Phaser.Class({
     this.snakeLightW.x = x - SCREEN_WIDTH
     this.snakeLightW.y = y
 
-    var onPortal = false;
 
 
     // Look ahead for bonks
@@ -134,7 +133,7 @@ var Snake = new Phaser.Class({
         
         // Bonk Wall
         scene.map.setLayer("Wall");
-        if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal && !this.traveling) {
+        if (scene.map.getTileAtWorldXY( xN, yN )  && !this.traveling) {
             
             // Only count a wall hit ahead if not on a portal.
             //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
@@ -152,7 +151,7 @@ var Snake = new Phaser.Class({
         
     
         // #region intesect self
-        if (scene.startMoving && !onPortal && !scene.ghosting && !this.traveling) {
+        if (scene.startMoving && !scene.ghosting && !this.traveling) {
         // Game Has started. Snake head has left Starting Square
             
 
