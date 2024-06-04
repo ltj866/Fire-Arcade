@@ -222,7 +222,7 @@ var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
 
-const GState = Object.freeze({ 
+export const GState = Object.freeze({ 
     START_WAIT: 1, 
     PLAY: 2, 
     PORTAL: 3, 
@@ -570,27 +570,29 @@ class GameScene extends Phaser.Scene {
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
 
-        this.startMoving = false;
-        this.stageOver = false;
+        this.startMoving = false; // deprecated to be removed
+        this.stageOver = false; // deprecated to be removed
+
+        this.winned = false; // marked as true any time this.winCondition is met.
 
         const { stage = START_STAGE } = props 
         this.stage = stage;
         
-
-        this.recombinate = true;
         this.startingArrowState = true;
 
         this.moveInterval = SPEEDWALK;
 
-        this.spaceWhileReGrouping = false;
+        // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
+        this.pressedSpaceDuringWait = false; 
 
-        // special flags
+        // Special flags
         this.ghosting = false;
-        this.bonkable = true;
-        this.lightMasks = [];
-
-        this.DARK_MODE = DARK_MODE;
+        this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = true; // Stops auto moving, only pressing moves.
+        
+        this.DARK_MODE = DARK_MODE;
+        this.lightMasks = [];
+         
     }
     
     
@@ -767,7 +769,6 @@ class GameScene extends Phaser.Scene {
             // run with as small of a delay as possible
             // for input responsiveness
 
-            this.snake.bonked = false;
 
             let gState = this.gState
 
@@ -799,8 +800,8 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.updateDirection(this, e);  
             }
 
-            if (this.snake.regrouping) {
-                this.spaceWhileReGrouping = true;
+            if (gState === GState.WAIT_FOR_INPUT) {
+                this.pressedSpaceDuringWait = true;
             }
 
 
@@ -862,7 +863,7 @@ class GameScene extends Phaser.Scene {
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
-            this.spaceWhileReGrouping = false;
+            this.pressedSpaceDuringWait = false;
         });
 
         this.input.keyboard.on('keydown-M', e => {
@@ -1278,7 +1279,7 @@ class GameScene extends Phaser.Scene {
                 _tween.on('complete',()=>{
                     this.gState = GState.START_WAIT;
                     this.scene.get('UIScene').scoreTimer.paused = false;
-                    console.log(this.gState);
+                    console.log(this.gState, "START_WAIT"); // Will be set to PLAY
                 });
                                     
                 return ;  //Don't know why this is here but I left it -James
@@ -1303,7 +1304,7 @@ class GameScene extends Phaser.Scene {
             yoyo: false,
             repeat: 0
         });
-        this.tweenRespawn = this.tweens.add({
+        var tweenRespawn = this.tweens.add({
             targets: this.snake.body, 
             x: GRID * 15, //this.pathRegroup.vec.x,
             y: GRID * 15, //this.pathRegroup.vec.y,
@@ -1313,6 +1314,8 @@ class GameScene extends Phaser.Scene {
             repeat: 0,
             delay: this.tweens.stagger(this.staggerMagnitude)
         });
+
+        return tweenRespawn
     }
 
     // #region Game Update
@@ -1375,7 +1378,7 @@ class GameScene extends Phaser.Scene {
         
         
         // #region Hold Reset
-        if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
+        if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.pressedSpaceDuringWait && this.gState === GState.WAIT_FOR_INPUT) {
                 console.log("SPACE LONG ENOUGH BRO");
  
                 this.events.off('addScore');
@@ -1391,58 +1394,36 @@ class GameScene extends Phaser.Scene {
         
 
         // #region Bonk and Regroup
-        if (!this.snake.alive && !this.snake.regrouping) {
+        if (this.gState === GState.BONK) {
+            console.log("REACHING BONK TWEEN CODE");
             //console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             
-            // DO THIS ON REAL RESET DEATH
-            
             ourUI.bonks += 1;
-            //ourUI.livesUI.setText(`x ${ourUI.bonks}`);
             
-
-
             // Do this on hardcore mode and take a life down.
             //game.destroy();
             //this.scene.restart();
             
-
-            if (DEBUG) {
-                const graphics = this.add.graphics();
-
-                graphics.lineStyle(2, 0x00ff00, 1);
-        
-                this.snake.body.forEach( part => {
-                graphics.beginPath();
-                graphics.moveTo(part.x, part.y);
-                graphics.lineTo(GRID * 15, GRID * 15);
-                graphics.closePath();
-                graphics.strokePath();
-                });
-            }
-    
-            this.snake.regrouping = true;
-            
-            this.vortexIn();
+            var tweenRespawn = this.vortexIn();
            
-            this.tweenRespawn.on('complete', () => {
+            tweenRespawn.on('complete', () => {
                 //this.vortexOut();
                 this.curveRegroup.x = GRID * 15 // We need this @holden?
                 this.curveRegroup.y = GRID * 15
-                //console.log("COMPLETE AND SET ALIVE")
-                this.snake.regrouping = false;
-                this.snake.alive = true;
-                
-                this.startMoving = false;
 
                 // Turn back on arrows
                 this.startingArrowState = true;
                 this.startingArrowsAnimN.setVisible(true);
                 this.startingArrowsAnimS.setVisible(true);
                 this.startingArrowsAnimE.setVisible(true);
-                this.startingArrowsAnimW.setVisible(true);   
+                this.startingArrowsAnimW.setVisible(true);
+                
+                this.gState = GState.WAIT_FOR_INPUT;
+                this.scene.get('UIScene').scoreTimer.paused = true;
+                console.log(this.gState, "WAIT FOR INPUT");
             });
         }
         

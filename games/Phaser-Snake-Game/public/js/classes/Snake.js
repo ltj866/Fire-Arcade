@@ -1,4 +1,4 @@
-import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
+import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
     LENGTH_GOAL, SPEEDWALK, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
@@ -9,20 +9,15 @@ var Snake = new Phaser.Class({
 
     function Snake (scene, x, y)
     {
-        this.alive = true;
         this.body = [];
-        this.hold_move = false;
-        this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
         this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
         this.head.setOrigin(0,0).setDepth(10);
         
         this.body.unshift(this.head);
 
-        this.bonked = false;
         this.lastPlayedCombo = 0;
 
-        this.traveling = false;
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
@@ -134,18 +129,15 @@ var Snake = new Phaser.Class({
         
         // Bonk Wall
         scene.map.setLayer("Wall");
-        if (scene.map.getTileAtWorldXY( xN, yN )  && !this.traveling) {
+        if (scene.map.getTileAtWorldXY( xN, yN )) {
             
             // Only count a wall hit ahead if not on a portal.
             //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
             
             this.direction = STOP;
             if (scene.bonkable) {
-                this.bonked = true;
-            
-                if(scene.recombinate) {
-                    this.death(scene);
-                }   
+                scene.gState = GState.BONK
+                console.log(scene.gState, "BONK");
             }
         }
 
@@ -156,15 +148,16 @@ var Snake = new Phaser.Class({
         // Game Has started. Snake head has left Starting Square
             
 
-            var body = this.body.slice(1);
-
-
             // Remove the Tail because the Tail will always move out of the way
             // when the head moves forward.
-            body.pop();
+            var checkBody = this.body.slice(1);
+
 
             
-            body.some(part => {
+            checkBody.pop();
+
+            
+            checkBody.some(part => {
                 if (part.x === xN && part.y === yN) {
                     var portalSafe = false; // Assume not on portal
                     scene.portals.forEach(portal => { 
@@ -190,10 +183,8 @@ var Snake = new Phaser.Class({
         const ourUI = scene.scene.get('UIScene'); // needs to move to somewhere more efficent
     
     // Actually Move the Snake Head
-    if (this.alive && this.direction != STOP) {
-        if (!this.bonked) {
+    if (scene.gState != GState.BONK && this.direction != STOP) {
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
-        }
     }
 
     // Check collision for all atoms
@@ -274,14 +265,10 @@ var Snake = new Phaser.Class({
         }
     });
     },
-    death: function (gameScene) {
-        this.alive = false;
-        this.hold_move = true;
-        gameScene.move_pause = true;
 
-        this.direction = STOP;
-        gameScene.started = false;
-    },
+    bonk: function (scene) {
+
+    }
 });
 
 export { Snake };
