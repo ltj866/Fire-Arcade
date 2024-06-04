@@ -795,7 +795,7 @@ class GameScene extends Phaser.Scene {
             }
 
             if (gState === GState.PORTAL) {
-               // Update snake facing direction but do not move the snake
+                // Update snake facing direction but do not move the snake
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -3710,93 +3710,32 @@ class InputScene extends Phaser.Scene {
    
     
     updateDirection(gameScene, event) {
-        // Does not change the direction of the snake in code
-        // Changes where the snake is looking with the sprite.
-        
-        
+        // preloads snake direction when portalling.
+
         // #region UpdateDirection
-        switch (event.keyCode) {
-            case 87: // w
+        var up = event.keyCode === 87 || event.keyCode === 38;
+        var down = event.keyCode === 83 || event.keyCode === 40;
+        var left = event.keyCode === 65 || event.keyCode === 37;
+        var right = event.keyCode === 68 || event.keyCode === 39;
 
-
-            break;
-
-            case 65: // a
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
-                
-                gameScene.snake.head.setTexture('snakeDefault', 4);
-
-
-            }
-            break;
-
-            case 83: // s
-
-            if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
-                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
+        switch (true) {
+            case up:
+                gameScene.snake.head.setTexture('snakeDefault', 6); 
+                gameScene.snake.direction = DIRS.UP
+                break;
+            case down:
                 gameScene.snake.head.setTexture('snakeDefault', 7);
-
-            }
-            break;
-
-            case 68: // d
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
-                gameScene.snake.head.setTexture('snakeDefault', 5);
-
-            }
-            break;
-
-            case 38: // UP
-
-            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
-
-                gameScene.snake.head.setTexture('snakeDefault', 6);
-
-            }
-            break;
-
-            case 37: // LEFT
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-                
+                gameScene.snake.direction = DIRS.DOWN
+                break;
+            case left:
                 gameScene.snake.head.setTexture('snakeDefault', 4);
-
-            }
-            break;
-
-            case 40: // DOWN
-
-            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-
-                gameScene.snake.head.setTexture('snakeDefault', 7);
-                
-            }
-            break;
-
-            case 39: // RIGHT
-
-            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
-
+                gameScene.snake.direction = DIRS.LEFT
+                break;
+            case right:
                 gameScene.snake.head.setTexture('snakeDefault', 5);
-                
-            }
-            break;
-
-            case 32: // SPACE
-              if (DEBUG) { console.log(event.code, gameScene.time.now); }
-              this.inputSet.push([START_SPRINT, gameScene.time.now]);
-              break;
-        } 
+                gameScene.snake.direction = DIRS.RIGHT
+                break;
+        }
     }
 
 
