@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 4; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 
@@ -890,51 +890,7 @@ class GameScene extends Phaser.Scene {
         //for (let index = 0; index < FRUIT; index++) {
         //    var food = new Food(this);
         //}
-        /*
-        var SpawnGroup = new Phaser.Class({
-            Extends: Phaser.GameObjects.Rectangle,
         
-            initialize:
-        
-            function SpawnGroup(scene, areas, name)
-            {
-                this.name = name;
-                this.areas = [];
-
-                for (let index = 0; index < areas.length; index++) {
-                    var spawnArea = new SpawnArea(scene, 
-                        areas[index][0],  // x
-                        areas[index][1],  // y
-                        areas[index][2],  // width
-                        areas[index][3],  // height
-                        `${name}${index+1}`,
-                        0x6666ff
-                    );
-                    
-                    this.areas.push(spawnArea);
-                    
-                }
-            }
-        });
-        
-        // Define Spawn Areas
-        
-        
-        var _group1 = [
-            [1,5,6,4],
-            [9,5,6,4],
-            [17,5,6,4],
-            [25,5,6,4]
-        ]
-
-        var groupA = new SpawnGroup(this, _group1, "A");
-
-        
-        groupA.areas.forEach( a => {
-            console.log(a.name);
-        });
-
-        */
         
         
         // #region Stage Logic
@@ -956,17 +912,9 @@ class GameScene extends Phaser.Scene {
             //p2.setFrame(randomStart)
         }
 
-        //makePair(this, [5,5],[3,3]);
-        //makePair(this, [6,5],[4,3]);
-        //makePair(this, [7,5],[5,3]);
-        // Add try loop to get all Portal Layers
 
         // do while loop Portal-X
-        
-        
 
-        let _from;
-        let _to;
 
         const PORTAL_X_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
         const PORTAL_N_DIFF = 32;
@@ -978,16 +926,13 @@ class GameScene extends Phaser.Scene {
         const B_FROM = 162;
         const B_TO = 166;
 
-
-        
-
         //do {
             
         //} while (i < PORTAL_N_START || i );
 
         
 
-        
+
         // #region Portal-X
         if (this.map.getLayer('Portal-X')) {
             var portalLayerX = this.map.createLayer('Portal-X', [this.tileset]);
@@ -1014,8 +959,8 @@ class GameScene extends Phaser.Scene {
                     // consider throwing an error if a portal doesn't have a correctly defined _to or _from
                     
                     toIndex = index + PORTAL_N_DIFF
-                    _from = Phaser.Math.RND.pick(portalArrayX[index]);
-                    _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
+                    let _from = Phaser.Math.RND.pick(portalArrayX[index]);
+                    let _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
                     console.log("Portal X Logic: FROM TO",_from, _to);
                     makePair(this, _to, _from);
                 }
@@ -1202,13 +1147,14 @@ class GameScene extends Phaser.Scene {
 
         // #region Stage Logic
 
+        // Check Tiled Properties and loop instead.
         var atom = new Food(this);
         var atom = new Food(this);
         var atom = new Food(this);
         var atom = new Food(this);
         var atom = new Food(this);
 
-        this.dist = 260
+        this.dist = 260 // Still need this @holden
 
         // #endregion
 
@@ -1224,7 +1170,6 @@ class GameScene extends Phaser.Scene {
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
 
         if (bestLogJSON) {
-            
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
             var bestBase = bestLog.calcBase();
@@ -1254,6 +1199,9 @@ class GameScene extends Phaser.Scene {
         //const cloud2 = this.add.image(400, 300 + 100, "snakeMask");
 
         // Snake Masks, one is added for each cardinal direction so screen wraps look cleaner
+        // Used for dark levels and to reveal Ghost Walls
+
+        // TODO move to snake object?
         this.snakeMask = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
@@ -1339,7 +1287,7 @@ class GameScene extends Phaser.Scene {
 
     }
     
-    applyMask(){
+    applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
         if (DARK_MODE) {
             this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
@@ -1377,35 +1325,31 @@ class GameScene extends Phaser.Scene {
 
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
+        // Do we need this @holden
         this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
         //console.log(this.dist)
 
 
 
+        // TODO: Add to bonk code
         if (this.staggerMagnitude < 10){
             this.staggerMagnitude = 10;
         }
         
 
+        // TODO: Add to bonk code
         if (this.snake.alive) {
             this.staggerMagnitude = 30
             //this.curveRegroup.x = this.snake.head.x
             //this.curveRegroup.y = this.snake.head.y
         }
 
-        /*this.time.delayedCall(900, function() {
-            console.log("working")
-            /*if (this.bg3.key = 'bg02_3'){
-                this.bg3.setTexture('bg02_3_2')
-            }
-        });*/
 
+        //Do we still need this? @holden
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
-        //this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
-        //this.graphics.fillStyle(0xff0000, 1);
-        //this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
 
+        // TODO: Add to bonk code
         if (!this.snake.alive) {
             this.staggerMagnitude -= 0.5
             //this.curveRegroup.x = GRID * 15
@@ -1419,6 +1363,7 @@ class GameScene extends Phaser.Scene {
         //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
         //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
 
+        // James note: this needs to stay here because it doesn't happen on manual move. But needs to happen each time the snake auto moves.
         this.bg.tilePositionX = Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05);
         this.bg.tilePositionY = Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05);
 
@@ -1427,6 +1372,8 @@ class GameScene extends Phaser.Scene {
 
         this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.67;
         this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.67;
+        
+        
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
@@ -1482,7 +1429,7 @@ class GameScene extends Phaser.Scene {
            
             this.tweenRespawn.on('complete', () => {
                 //this.vortexOut();
-                this.curveRegroup.x = GRID * 15
+                this.curveRegroup.x = GRID * 15 // We need this @holden?
                 this.curveRegroup.y = GRID * 15
                 //console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
@@ -1528,6 +1475,7 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
+            // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
             this.snakeMask.y = this.snake.head.y
 

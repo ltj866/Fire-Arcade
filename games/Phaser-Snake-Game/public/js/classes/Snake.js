@@ -87,6 +87,7 @@ var Snake = new Phaser.Class({
     let x = this.head.x;
     let y = this.head.y;
 
+    // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
     this.snakeLight.x = x + GRID/2;
     this.snakeLight.y = y + GRID/2;
 
@@ -151,7 +152,7 @@ var Snake = new Phaser.Class({
         
     
         // #region intesect self
-        if (scene.startMoving && !scene.ghosting && !this.traveling) {
+        if (scene.startMoving && !scene.ghosting && !this.traveling) { //GState.PLAY
         // Game Has started. Snake head has left Starting Square
             
 
