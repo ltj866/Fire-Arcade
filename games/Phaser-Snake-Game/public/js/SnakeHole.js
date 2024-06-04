@@ -570,7 +570,6 @@ class GameScene extends Phaser.Scene {
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
 
-        this.move_pause = true;
         this.startMoving = false;
         this.stageOver = false;
 
@@ -758,6 +757,10 @@ class GameScene extends Phaser.Scene {
 
         
         
+        // Starting Game State
+
+        this.gState = GState.START_WAIT;
+        
         // #region Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             // Separate if statements so the first will 
@@ -765,9 +768,10 @@ class GameScene extends Phaser.Scene {
             // for input responsiveness
 
             this.snake.bonked = false;
-            if (!this.move_pause || !this.startMoving) {
-                this.startMoving = true;
-                this.move_pause = false;
+
+            let gState = this.gState
+
+            if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
                 ourInputScene.moveDirection(this, e);
                 
                 
@@ -790,8 +794,8 @@ class GameScene extends Phaser.Scene {
                 }
             }
 
-            if (this.move_pause) {
-               // debugger
+            if (gState === GState.PORTAL) {
+               // Update snake facing direction but do not move the snake
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -1403,6 +1407,7 @@ class GameScene extends Phaser.Scene {
         this.portals.forEach(portal => { 
             if(snake.head.x === portal.x && snake.head.y === portal.y){
                 this.gState = GState.PORTAL;
+                console.log("PORTALING", this.gState);
 
                 if (DEBUG) { console.log("PORTAL"); }
     
@@ -1412,21 +1417,22 @@ class GameScene extends Phaser.Scene {
                 var portalSound = this.portalSounds[0]
                 portalSound.play();
     
-                this.lastMoveTime += SPEEDWALK * 2;
+                this.lastMoveTime += SPEEDWALK * 4;
 
                 var _tween = this.tweens.add({
                     targets: snake.head, 
                     x: _x,
                     y: _y,
                     yoyo: false,
-                    duration: SPEEDWALK * 2,
+                    duration: SPEEDWALK * 4,
                     ease: 'Linear',
                     repeat: 0,
                     //delay: 500
                 });
                 
                 _tween.on('complete',()=>{
-                    snake.traveling = false;
+                    this.gState = GState.START_WAIT;
+                    console.log(this.gState);
                 });
                 
                 
@@ -1643,7 +1649,6 @@ class GameScene extends Phaser.Scene {
             }
     
             this.snake.regrouping = true;
-            this.move_pause = true;
             
             this.vortexIn();
            
@@ -1670,7 +1675,6 @@ class GameScene extends Phaser.Scene {
         if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.stageOver) {
             console.log("YOU WIN" , this.stage);
             this.stageOver = true; // stops update loop from moving snake Score Scene.
-            this.move_pause = true; // Keeps snake from turning
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
             //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
@@ -4106,8 +4110,6 @@ class InputScene extends Phaser.Scene {
         } 
     }
     snakeStart(gameScene) {
-        gameScene.startMoving = true;
-        gameScene.move_pause = false;
 
         if (gameScene.startingArrowState == true){
                 
@@ -4117,9 +4119,8 @@ class InputScene extends Phaser.Scene {
             gameScene.startingArrowsAnimS.setVisible(false);
             gameScene.startingArrowsAnimE.setVisible(false);
             gameScene.startingArrowsAnimW.setVisible(false);
-            gameScene.move_pause = false;
             
-            //this.move_pause = false;
+
             //ourInputScene.moveDirection(this, e);
         }
 
