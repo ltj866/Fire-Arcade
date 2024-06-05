@@ -265,6 +265,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('howToCard', 'assets/howToCardNew.png');
         this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
 
+        this.load.image('UIbg', 'assets/sprites/UI_background.png');
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
         this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
@@ -636,6 +637,10 @@ class GameScene extends Phaser.Scene {
 
         // for changing bg sprites
         this.bgTimer = 0;
+
+        // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
+        this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
+        this.UIbackground.setScale(4) 
 
         // Furthest BG Object
         this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
@@ -2208,9 +2213,9 @@ class ScoreScene extends Phaser.Scene {
             
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
-            calcSumOfBest(ourStartScene); // Note: This really should be an event.
-            this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
-            this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
+            //calcSumOfBest(ourStartScene); // Note: This really should be an event.
+            //this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
+            //this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
 
         // #endregion
@@ -3439,6 +3444,8 @@ class UIScene extends Phaser.Scene {
     
     create() {
        const ourGame = this.scene.get('GameScene');
+
+
 
        // UI Icons
        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
