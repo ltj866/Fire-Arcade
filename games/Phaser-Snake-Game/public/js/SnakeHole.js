@@ -308,6 +308,7 @@ class StartScene extends Phaser.Scene {
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
@@ -1211,6 +1212,10 @@ class GameScene extends Phaser.Scene {
             this.lightMasks.push(this.portalMask)
         });
 
+        // #region Coins
+
+        this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
+            ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
         //Phaser.Math.RND.pick(nextGroup)
        
 
@@ -4300,6 +4305,12 @@ function loadAnimations(scene) {
       frameRate: 4,
       repeat: -1
     })
+    scene.anims.create({
+        key: 'coin01idle',
+        frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
+        frameRate: 8,
+        repeat: -1
+      })
   
     scene.anims.create({
       key: 'electronIdle',
