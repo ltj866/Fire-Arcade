@@ -382,13 +382,7 @@ class StartScene extends Phaser.Scene {
         ///
         
 
-        // Load all animations once.
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
-            frameRate: 16,
-            repeat: -1
-        }); 
+        // Load all animations once for the whole game.
         loadAnimations(this);
 
 
@@ -579,7 +573,7 @@ class GameScene extends Phaser.Scene {
         const { stage = START_STAGE } = props 
         this.stage = stage;
         
-        this.startingArrowState = true;
+        this.startingArrowState = true; // Deprecate
 
         this.moveInterval = SPEEDWALK;
 
@@ -641,7 +635,8 @@ class GameScene extends Phaser.Scene {
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.map.properties[1].value;
+        this.stageDiffBonus = this.map.properties[1].value; // TODO: Get them by name and throw errors.
+        // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -710,7 +705,7 @@ class GameScene extends Phaser.Scene {
         this.scrollFactorY = 0
         this.bgCoords = new Phaser.Math.Vector2(0,0)
 
-        this.staggerMagnitude = 30
+        this.staggerMagnitude = 30 // TODO: Deprecate
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
@@ -3786,17 +3781,23 @@ class InputScene extends Phaser.Scene {
  // #region Animations
 function loadAnimations(scene) {
     scene.anims.create({
+        key: 'idle',
+        frames: scene.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+        frameRate: 16,
+        repeat: -1
+    }); 
+    scene.anims.create({
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
         frameRate: 8,
         repeat: -1
-    })
+    });
     scene.anims.create({
         key: 'downArrowIdle',
         frames: scene.anims.generateFrameNumbers('downArrowAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7]}),
         frameRate: 8,
         repeat: -1
-    })
+    });
     scene.anims.create({
         key: 'twinkle01',
         frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
