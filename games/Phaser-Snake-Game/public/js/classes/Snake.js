@@ -138,6 +138,22 @@ var Snake = new Phaser.Class({
             if (scene.bonkable) {
                 scene.gState = GState.BONK
                 console.log(scene.gState, "BONK");
+                /////////////////////////////////////
+                console.log("REACHING BONK TWEEN CODE");
+                //console.log("DEAD, Now Rregroup", this.snake.alive);
+                scene.snakeCrash.play();    
+                // game.scene.scene.restart(); // This doesn't work correctly
+                if (DEBUG) { console.log("DEAD"); }
+                
+                scene.scene.get("UIScene").bonks += 1;
+                
+                // Do this on hardcore mode and take a life down.
+                //game.destroy();
+                //this.scene.restart();
+                
+                scene.tweenRespawn = scene.vortexIn();
+               
+                ////////////////////////////////
             }
         }
 

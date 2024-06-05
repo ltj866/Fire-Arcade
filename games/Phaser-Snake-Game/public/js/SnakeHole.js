@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 
@@ -258,9 +258,10 @@ const STAGES_NEXT = {
     'Stage-11': [['Stage-12', 0]],
     'Bonus-Stage-x1': [],
     'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
+    'testing-05': [['Stage-03a', 0]]
 }
 // #region START STAGE
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'testing02';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -1295,15 +1296,7 @@ class GameScene extends Phaser.Scene {
     }
 
     vortexIn(){
-        this.tweens.add({
-            targets: this.curveRegroup,
-            xRadius: 0,
-            yRadius: 0,
-            ease: 'Sine.easeOutIn',
-            duration: 500,
-            yoyo: false,
-            repeat: 0
-        });
+
         var tweenRespawn = this.tweens.add({
             targets: this.snake.body, 
             x: GRID * 15, //this.pathRegroup.vec.x,
@@ -1312,7 +1305,7 @@ class GameScene extends Phaser.Scene {
             duration: 500,
             ease: 'Sine.easeOutIn',
             repeat: 0,
-            delay: this.tweens.stagger(this.staggerMagnitude)
+            delay: this.tweens.stagger(30)
         });
 
         return tweenRespawn
@@ -1328,37 +1321,15 @@ class GameScene extends Phaser.Scene {
 
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
-        // Do we need this @holden
+        // Do we need this @holden - okay to delete
         this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
         //console.log(this.dist)
 
 
 
-        // TODO: Add to bonk code
-        if (this.staggerMagnitude < 10){
-            this.staggerMagnitude = 10;
-        }
-        
-
-        // TODO: Add to bonk code
-        if (this.snake.alive) {
-            this.staggerMagnitude = 30
-            //this.curveRegroup.x = this.snake.head.x
-            //this.curveRegroup.y = this.snake.head.y
-        }
-
-
-        //Do we still need this? @holden
+        //Do we still need this? @holden - okay to delete
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
-
-        // TODO: Add to bonk code
-        if (!this.snake.alive) {
-            this.staggerMagnitude -= 0.5
-            //this.curveRegroup.x = GRID * 15
-            //this.curveRegroup.y = GRID * 15
-            
-        }
         
         this.scrollFactorX += .025;
         this.scrollFactorY += .025;
@@ -1395,25 +1366,8 @@ class GameScene extends Phaser.Scene {
 
         // #region Bonk and Regroup
         if (this.gState === GState.BONK) {
-            console.log("REACHING BONK TWEEN CODE");
-            //console.log("DEAD, Now Rregroup", this.snake.alive);
-            this.snakeCrash.play();    
-            // game.scene.scene.restart(); // This doesn't work correctly
-            if (DEBUG) { console.log("DEAD"); }
-            
-            ourUI.bonks += 1;
-            
-            // Do this on hardcore mode and take a life down.
-            //game.destroy();
-            //this.scene.restart();
-            
-            var tweenRespawn = this.vortexIn();
-           
-            tweenRespawn.on('complete', () => {
-                //this.vortexOut();
-                this.curveRegroup.x = GRID * 15 // We need this @holden?
-                this.curveRegroup.y = GRID * 15
-
+            this.tweenRespawn.on('complete', () => {
+    
                 // Turn back on arrows
                 this.startingArrowState = true;
                 this.startingArrowsAnimN.setVisible(true);
@@ -1446,6 +1400,7 @@ class GameScene extends Phaser.Scene {
         // Only Calculate every move window
 
         // #region Check Update
+        
 
         //if (this.frameIndex < 9){
         //    this.frameIndex += 1;
