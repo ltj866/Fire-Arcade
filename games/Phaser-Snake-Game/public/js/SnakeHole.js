@@ -242,7 +242,7 @@ const STAGES_NEXT = {
     'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-04';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -675,6 +675,28 @@ class GameScene extends Phaser.Scene {
         this.bg3.tileScaleX = 3;
         this.bg3.tileScaleY = 3;
 
+        // Hue Shift
+        this.fx = this.bg.preFX.addColorMatrix();
+        this.fx2 = this.bg0.preFX.addColorMatrix();
+
+
+        if (this.stage === "Stage-04") {
+            this.fx.hue(330);
+        }
+        //this.fx.hue(0);
+        //this.fx2.hue(0);
+
+        /*const tween = this.tweens.addCounter({
+            from: 0,
+            to: 360,
+            duration: 15000,
+            loop: -1,
+            onUpdate: () => {
+                fx.hue(tween.getValue()),
+                fx2.hue(tween.getValue());
+            }
+        });*/
+
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
@@ -714,10 +736,11 @@ class GameScene extends Phaser.Scene {
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
         this.lightMasksContainer = this.make.container(0, 0);
-        this.lights.enable();
-        if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
-            this.lights.setAmbientColor(0xE4E4E4);
-        }
+         
+            this.lights.enable();
+            if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+                this.lights.setAmbientColor(0xE4E4E4);
+            }
         
 
         this.scrollFactorX = 0
@@ -1214,8 +1237,8 @@ class GameScene extends Phaser.Scene {
 
         // #region Coins
 
-        //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
-        //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
+        this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
+            ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
 
         //Phaser.Math.RND.pick(nextGroup)
        
@@ -1740,6 +1763,8 @@ class GameScene extends Phaser.Scene {
                 this.bgTimer = 0
             }   
         }
+
+        
         
         
 
