@@ -705,7 +705,6 @@ class GameScene extends Phaser.Scene {
         this.scrollFactorY = 0
         this.bgCoords = new Phaser.Math.Vector2(0,0)
 
-        this.staggerMagnitude = 30 // TODO: Deprecate
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
@@ -766,7 +765,7 @@ class GameScene extends Phaser.Scene {
             // for input responsiveness
 
 
-            let gState = this.gState
+            let gState = this.gState;
 
             if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
                 ourInputScene.moveDirection(this, e);
@@ -774,8 +773,8 @@ class GameScene extends Phaser.Scene {
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
                     
-                    var toDelete = this.boostOutlinesBody.shift();
-                    toDelete.destroy();
+                    var lastElement = this.boostOutlinesBody.shift();
+                    lastElement.destroy();
     
                     // Make the new one
                     var boostOutline = this.add.sprite(
@@ -800,47 +799,51 @@ class GameScene extends Phaser.Scene {
                 this.pressedSpaceDuringWait = true;
             }
 
+            // For GState Bonk and  SceneTransition hold move inputs
+
 
         })
-        this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
+        this.input.keyboard.on('keydown-SPACE', e => {
             
+            if (this.gState != GState.BONK && this.gState != GState.TRANSITION) {
             // #region Boost Outlines
-            this.boostOutlinesBody = [];
-            for (let index = 0; index < this.snake.body.length; index++) {
+                this.boostOutlinesBody = [];
+                for (let index = 0; index < this.snake.body.length; index++) {
                 
-                var boostOutline = this.add.sprite(
-                    this.snake.body[index].x, 
-                    this.snake.body[index].y
-                ).setOrigin(.083333,.083333).setDepth(8);
-                boostOutline.alpha = 0;
-                var fadeinTween = this.tweens.add({
-                    targets: boostOutline,
-                    alpha: 100,
-                    duration: 200,
-                    ease: 'linear'
-                    }, this);
+                    var boostOutline = this.add.sprite(
+                        this.snake.body[index].x, 
+                        this.snake.body[index].y
+                    ).setOrigin(.083333,.083333).setDepth(8);
+                    boostOutline.alpha = 0;
+                    var fadeinTween = this.tweens.add({
+                        targets: boostOutline,
+                        alpha: 100,
+                        duration: 200,
+                        ease: 'linear'
+                        }, this);
 
-                if (index < this.snake.body.length -1) {
-                    // For all the body segments
-                    boostOutline.play("snakeOutlineAnim");
-                    this.boostOutlinesBody.unshift(boostOutline);
-                }
-                else{
-                    // on taill
-                    boostOutline.play("snakeOutlineSmallAnim");
-                    this.boostOutlineTail = boostOutline;
+                    if (index < this.snake.body.length -1) {
+                        // For all the body segments
+                        boostOutline.play("snakeOutlineAnim");
+                        this.boostOutlinesBody.unshift(boostOutline);
+                    }
+                    else{
+                        // on taill
+                        boostOutline.play("snakeOutlineSmallAnim");
+                        this.boostOutlineTail = boostOutline;
+                    }
                 }
             }
         });
 
-        this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+        this.input.keyboard.on('keyup-SPACE', e => { 
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
 
                 // add the tail in.
                 this.boostOutlinesBody.push(this.boostOutlineTail);
 
-                this.boostOutlinesBody.forEach(boostOutline =>{
+                this.boostOutlinesBody.forEach(boostOutline =>{ //TODO - Do this in a wave with delay?
                     var fadeoutTween = this.tweens.add({
                         targets: boostOutline,
                         alpha: 0,
@@ -855,7 +858,7 @@ class GameScene extends Phaser.Scene {
                 this.boostOutlinesBody = [];
 
             }
-            //console.log("space released")
+
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
@@ -865,7 +868,6 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-M', e => {
             this.bg3.setTexture('bg02_3_2')
         });
-        this.frameIndex = 0
 
         // #endregion
 
@@ -883,7 +885,7 @@ class GameScene extends Phaser.Scene {
         });
         
 
-        // Make Fruit
+        // Make Fruit TODO: USE THE MAP.JSON CUSTOM ATTRIBUTES
         //for (let index = 0; index < FRUIT; index++) {
         //    var food = new Food(this);
         //}
@@ -909,26 +911,9 @@ class GameScene extends Phaser.Scene {
             //p2.setFrame(randomStart)
         }
 
-
-        // do while loop Portal-X
-
-
-        const PORTAL_X_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
+        // TODO Move out of here
+        const PORTAL_X_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
         const PORTAL_N_DIFF = 32;
-
-
-        const A_FROM = 34
-        const A_TO = 38
-
-        const B_FROM = 162;
-        const B_TO = 166;
-
-        //do {
-            
-        //} while (i < PORTAL_N_START || i );
-
-        
-
 
         // #region Portal-X
         if (this.map.getLayer('Portal-X')) {
@@ -969,7 +954,7 @@ class GameScene extends Phaser.Scene {
 
         // #region Portal-N
 
-        const portalTileRules = {
+        const portalTileRules = { // TODO Move out of here
             321:99,
             353:1,
             354:1,
@@ -995,11 +980,10 @@ class GameScene extends Phaser.Scene {
             424:3
         };
         
-        var layerIndex = 1
-
-
+        // FYI: Layers refer to layers in Tiled.
+        // Must start at 1 and go up continuously to work correctly. 
+        var layerIndex = 1   
         
-
         while (this.map.getLayer(`Portal-${layerIndex}`)) {
 
             console.log(`Portal-${layerIndex} Logic`);
@@ -1022,17 +1006,13 @@ class GameScene extends Phaser.Scene {
                 } 
             });
 
-            
-            console.log("portalLayerX", portalArrayN);
-
-
             for (var [key, value] of Object.entries(portalArrayN)) {
                 //console.log("Checking TileIndex", key, "has no more than", portalTileRules[key], "portals")
 
                 var count = 0;
                 
                 // Special Case Block. Put a from portal. 
-                // TODO Probably needs to recursively try when double up portals.
+                // Probably needs to recursively try when portal areas double up.
                 if (portalTileRules[key] == undefined) {
                     fromN = Phaser.Math.RND.pick(portalArrayN[key]);
 
@@ -1047,7 +1027,6 @@ class GameScene extends Phaser.Scene {
                             if(portal.x === tile[0]*GRID && portal.y === tile[1]*GRID){
                                 count += 1;
                                 //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
-                                //cords = this.genChords(scene);
                             }
                         });
                     });
@@ -1071,14 +1050,13 @@ class GameScene extends Phaser.Scene {
                 delete portalArrayN[fromAreaKey];     
             }
 
-            // Define To Portal Randomly from avaible tiles.
+            // Define To Portal Randomly from avalible tiles.
             var toAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
             var toArea = portalArrayN[toAreaKey];
+
             toN = Phaser.Math.RND.pick(toArea);
             delete portalArrayN[toAreaKey];
 
-
-            console.log("MAKE PORTAL", fromN, toN);
             makePair(this, fromN, toN);
     
             portalLayerN.visible = false;
@@ -1087,6 +1065,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
+
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
             switch (portal.tintTopLeft) { // checks each portal color and changes its light color
@@ -1151,8 +1130,6 @@ class GameScene extends Phaser.Scene {
         var atom = new Food(this);
         var atom = new Food(this);
 
-        this.dist = 260 // Still need this @holden
-
         // #endregion
 
         
@@ -1160,10 +1137,10 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreUI.setOrigin(0,1);
+        ourUI.bestScoreUI = ourUI.add.dom(0, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setOrigin(0,1);
 
-        // Calculate this locally
+        // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
 
         if (bestLogJSON) {
@@ -1176,27 +1153,14 @@ class GameScene extends Phaser.Scene {
         }
 
         ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
+
         
-        /////////////////////////////////////////////////
-        // Throw An event to start UI screen?
-
-        ////////////////////////////////////////////
-        
-        //this.graphics = this.add.graphics(); //temporarily used to debug graphics
-
-        this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
-        this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, this.dist);
-        this.tweens.add({
-            targets: this.pathRegroup,
-            t: 1,
-            ease: 'Linear',
-            duration: 4000,
-            repeat: -1
-        });
-        //const cloud2 = this.add.image(400, 300 + 100, "snakeMask");
-
-        // Snake Masks, one is added for each cardinal direction so screen wraps look cleaner
-        // Used for dark levels and to reveal Ghost Walls
+        // #region Snake Masks
+        /***  
+         * An additional mask is added for each cardinal direction
+         * a screen distance away so screen wraps look cleaner.
+         * Used for dark levels and to reveal Ghost Walls
+        **/
 
         // TODO move to snake object?
         this.snakeMask = this.make.image({
@@ -1239,6 +1203,8 @@ class GameScene extends Phaser.Scene {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
+
+        // #endregion
         
     }
     checkPortalAndMove() {
@@ -1316,9 +1282,6 @@ class GameScene extends Phaser.Scene {
 
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
-        // Do we need this @holden - okay to delete
-        this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
-        //console.log(this.dist)
 
 
 
