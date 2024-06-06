@@ -1214,8 +1214,9 @@ class GameScene extends Phaser.Scene {
 
         // #region Coins
 
-        this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
-            ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
+        //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
+        //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
+
         //Phaser.Math.RND.pick(nextGroup)
        
 
@@ -1323,11 +1324,23 @@ class GameScene extends Phaser.Scene {
 
         // #region New Stage Logic
 
-        var atom = new Food(this);
-        var atom = new Food(this);
-        var atom = new Food(this);
-        var atom = new Food(this);
-        var atom = new Food(this);
+        var atom1 = new Food(this);
+        var atom2 = new Food(this);
+        var atom3 = new Food(this);
+        var atom4 = new Food(this);
+        var atom5 = new Food(this);
+
+
+        this.tweens.add({
+            targets: this.atoms,
+            originY: .125,
+            yoyo: true,
+            ease: 'Sine.easeOutIn',
+            duration: 1000,
+            repeat: -1
+        });
+
+
 
         this.dist = 260
 
@@ -1553,13 +1566,14 @@ class GameScene extends Phaser.Scene {
 
         if (this.snake.alive) {
         }
+        
 
-        /*this.time.delayedCall(900, function() {
-            console.log("working")
-            /*if (this.bg3.key = 'bg02_3'){
-                this.bg3.setTexture('bg02_3_2')
-            }
-        });*/
+
+        this.atoms.forEach(atom=> {
+            atom.electrons.originY = atom.originY + .175
+            
+        });
+        
 
         this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
 
@@ -3505,7 +3519,7 @@ class UIScene extends Phaser.Scene {
         ).setText(`STAGE :`).setOrigin(0,0);
         this.scoreLabelUI = this.add.dom(GRID * 3 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
         ).setText(`0`).setOrigin(0,0);
-        //HEREHEREHERE
+
         
         
 
