@@ -579,7 +579,7 @@ class GameScene extends Phaser.Scene {
         // Special flags
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
-        this.stepMode = true; // Stops auto moving, only pressing moves.
+        this.stepMode = false; // Stops auto moving, only pressing moves.
         
         this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
