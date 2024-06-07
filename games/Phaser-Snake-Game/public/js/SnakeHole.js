@@ -861,6 +861,13 @@ class GameScene extends Phaser.Scene {
             this.bg3.setTexture('bg02_3_2')
         });
 
+        this.input.keyboard.on('keydown-N', e => {
+            if (this.winned) {
+                this.nextStage();
+            }
+
+        });
+
         // #endregion
 
         // Map only contains Walls at this point
@@ -1276,7 +1283,7 @@ class GameScene extends Phaser.Scene {
         var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
 
         ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
-        this.scene.restart( { stage: nextStage[0] } );
+        this.scene.restart( { stage: nextStage } );
         ourInputScene.scene.restart();
 
         // Add if time attack code here
@@ -1352,8 +1359,7 @@ class GameScene extends Phaser.Scene {
         
         // #region Win State
         if (this.checkWinCon() && !this.winned) {
-            
-            debugger
+
             console.log("YOU WIN" , this.stage);
             this.winned = true;
 
