@@ -42,12 +42,8 @@ const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
 
 
-
-// Game Objects
-
-//var atomSounds = [];
-//var portalSounds = [];
-//var pointSounds = [];
+//debug stuff
+const PORTAL_PAUSE = 2;
 
 
 // Speed Multiplier Stats
@@ -187,7 +183,7 @@ const UISTYLE = {
 const COLOR_SCORE = "yellow";
 const COLOR_FOCUS = "fuchsia";
 const COLOR_BONUS = "limegreen";
-const COLOR_TERTIARY = "goldenrod"
+const COLOR_TERTIARY = "goldenrod";
 
 
 var SOUND_ATOM = [
@@ -1220,14 +1216,14 @@ class GameScene extends Phaser.Scene {
                 var portalSound = this.portalSounds[0]
                 portalSound.play();
     
-                this.lastMoveTime += SPEED_WALK * 4;
+                this.lastMoveTime += SPEED_WALK * PORTAL_PAUSE;
 
                 var _tween = this.tweens.add({
                     targets: snake.head, 
                     x: _x,
                     y: _y,
                     yoyo: false,
-                    duration: SPEED_WALK * 4,
+                    duration: SPEED_WALK * PORTAL_PAUSE,
                     ease: 'Linear',
                     repeat: 0,
                     //delay: 500
@@ -1242,7 +1238,6 @@ class GameScene extends Phaser.Scene {
                 return ;  //Don't know why this is here but I left it -James
             }
         });
-
     }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
@@ -1265,6 +1260,11 @@ class GameScene extends Phaser.Scene {
         });
 
         return tweenRespawn
+    }
+
+    checkWinCon() { // Returns Bool
+        const ourUI = this.scene.get('UIScene');
+        return ourUI.length >= LENGTH_GOAL
     }
 
     // #region Game Update
@@ -1334,16 +1334,16 @@ class GameScene extends Phaser.Scene {
         }
         
         // #region Win State
-        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.stageOver) {
+        if (this.checkWinCon() && !this.winned) {
+            
             console.log("YOU WIN" , this.stage);
-            this.stageOver = true; // stops update loop from moving snake Score Scene.
+            this.winned = true;
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-            
+
+            this.gState = GState.TRANSITION;
             ourUI.scene.pause();
             ourUI.scene.start('ScoreScene');
-            
         }
 
         // #endregion
@@ -1826,7 +1826,6 @@ class ScoreScene extends Phaser.Scene {
         //console.log(atomList)
         var count = 0;
 
-        
         
         for (let i = 0; i < atomList.length; i++) {
             
@@ -3613,8 +3612,6 @@ class InputScene extends Phaser.Scene {
             gameScene.startingArrowsAnimE.setVisible(false);
             gameScene.startingArrowsAnimW.setVisible(false);
 
-            
-            
 
             //ourInputScene.moveDirection(this, e);
         }
