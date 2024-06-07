@@ -17,7 +17,6 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 export const LENGTH_GOAL = 3; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
-
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -168,13 +167,14 @@ const DIRS = Object.freeze({
 const STYLE_DEFAULT = {
     color: 'white',
     'font-size': '14px',
-    'font-family': ["Sono", 'sans-serif'],
+    'font-family': 'Oxanium',
     'font-weight': '200',
     'text-align': 'center',
+    //'text-shadow': ' #FF8FEE 1px 0 2px'
 }
 
 const UISTYLE = { 
-    color: 'lightyellow',
+    color: 'white',
    'font-size': '16px',
    'font-weight': '400',
    'padding': '0px 0px 0px 12px'
@@ -280,8 +280,11 @@ class StartScene extends Phaser.Scene {
         this.load.image('howToCard', 'assets/howToCardNew.png');
         this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
 
+        this.load.image('UIbg', 'assets/sprites/UI_background.png');
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
+        this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
+        this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
         this.load.image('bg02_2', 'assets/sprites/background02_2.png');
         this.load.image('bg02_3', 'assets/sprites/background02_3.png');
         this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
@@ -301,8 +304,8 @@ class StartScene extends Phaser.Scene {
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
-        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
-        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
+        this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
@@ -320,7 +323,8 @@ class StartScene extends Phaser.Scene {
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
-        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
@@ -499,20 +503,20 @@ class PlayerDataScene extends Phaser.Scene {
     ).setOrigin(0,0.5);
 
 
-    this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+    /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
         styleBottomText    
         )).setHTML(
             `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
-    ).setOrigin(0,0.5);
+    ).setOrigin(0,0.5);*/
 
-    this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+    /*this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
         styleBottomText    
         )).setText(
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
-    ).setOrigin(0,0.5);
+    ).setOrigin(0,0.5);*/
 
-    const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '10px',
+    const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+        'font-size': '12px',
         })).setText(
             `snakehole.${GAME_VERSION}`
     ).setOrigin(1,1);
@@ -644,15 +648,34 @@ class GameScene extends Phaser.Scene {
     
         // add background
 
+        // for changing bg sprites
+        this.bgTimer = 0;
+
+        // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
+        this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
+        this.UIbackground.setScale(4) 
+
         // Furthest BG Object
-        this.bg0 = this.add.sprite(0, GRID*2,'bg02_4').setDepth(-4).setOrigin(0,0); 
-        this.bg0.scale = 3
+        this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
+        this.bg0.tileScaleX = 3
+        this.bg0.tileScaleY = 3
 
         // Scrolling BG1
         this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
-        this.bg.tileScaleX = 2;
-        this.bg.tileScaleY = 2;
-
+        this.bg.tileScaleX = 3;
+        this.bg.tileScaleY = 3;
+        
+        // BG Mask
+        this.mask = this.make.tileSprite({
+            x: SCREEN_WIDTH/2,
+            y: SCREEN_HEIGHT/2,
+            key: 'bg02mask',
+            add: false
+        }).setOrigin(.5,.5);
+        
+        const mask = this.mask
+        mask.scale = 3
+        this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
         
         // Scrolling BG2 Planets
         this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
@@ -664,24 +687,53 @@ class GameScene extends Phaser.Scene {
         this.bg3.tileScaleX = 3;
         this.bg3.tileScaleY = 3;
 
+        // Hue Shift
+        this.fx = this.bg.preFX.addColorMatrix();
+        this.fx2 = this.bg0.preFX.addColorMatrix();
+
+
+        if (this.stage === "Stage-04") {
+            this.fx.hue(330);
+        }
+        //this.fx.hue(0);
+        //this.fx2.hue(0);
+
+        /*const tween = this.tweens.addCounter({
+            from: 0,
+            to: 360,
+            duration: 15000,
+            loop: -1,
+            onUpdate: () => {
+                fx.hue(tween.getValue()),
+                fx2.hue(tween.getValue());
+            }
+        });*/
+
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
-        this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
-        this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
-        this.startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
-        this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(15).setOrigin(0.5,0.5);
-        
-        
-        this.startingArrowsAnimS.flipY = true;
-        this.startingArrowsAnimE.angle = 90;
-        this.startingArrowsAnimW.angle = 270;
-        this.startingArrowsAnimN.play('idle');
-        this.startingArrowsAnimS.play('idle');
-        this.startingArrowsAnimE.play('idle');
-        this.startingArrowsAnimW.play('idle');
 
+        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
+            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN.play('idle');
+        }
+        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
+            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS.flipY = true;
+            this.startingArrowsAnimS.play('idle');
+        }
+        if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
+            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE.angle = 90;
+            this.startingArrowsAnimE.play('idle');
+        }
+        if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
+            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW.angle = 270;
+            this.startingArrowsAnimW.play('idle');
+        }
+        
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -691,10 +743,11 @@ class GameScene extends Phaser.Scene {
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
         this.lightMasksContainer = this.make.container(0, 0);
-        this.lights.enable();
-        if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
-            this.lights.setAmbientColor(0xE4E4E4);
-        }
+         
+            this.lights.enable();
+            if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+                this.lights.setAmbientColor(0xE4E4E4);
+            }
         
 
         this.scrollFactorX = 0
@@ -1120,14 +1173,135 @@ class GameScene extends Phaser.Scene {
             this.lightMasks.push(this.portalMask)
         });
 
-        // #region Stage Logic
+        // #region Coins
 
-        // Check Tiled Properties and loop instead.
-        var atom = new Food(this);
-        var atom = new Food(this);
-        var atom = new Food(this);
-        var atom = new Food(this);
-        var atom = new Food(this);
+        this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
+            ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
+
+        //Phaser.Math.RND.pick(nextGroup)
+       
+
+        
+        //makePair(this, _to, _from);
+
+
+        //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
+
+
+
+
+        // #region Old Logic 
+        /*
+        
+        // AREA NAME is [GROUP][ID]
+        var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
+        var areaAB = new SpawnArea(this, 9,5,6,4, "AB", 0x6666ff);
+        var areaAC = new SpawnArea(this, 16,5,6,4, "AC", 0x6666ff);
+        var areaAD = new SpawnArea(this, 23,5,6,4, "AD", 0x6666ff);
+
+        var areaBA = new SpawnArea(this, 2,14,6,4, "BA", 0x6666ff);
+        var areaBB = new SpawnArea(this, 9,14,6,4, "BB", 0x6666ff);
+        var areaBC = new SpawnArea(this, 16,14,6,4, "BC", 0x6666ff);
+        var areaBD = new SpawnArea(this, 23,14,6,4, "BD", 0x6666ff);
+
+        var areaCA = new SpawnArea(this, 2,23,6,4, "CA", 0x6666ff);
+        var areaCB = new SpawnArea(this, 9,23,6,4, "CB", 0x6666ff);
+        var areaCC = new SpawnArea(this, 16,23,6,4, "CC", 0x6666ff);
+        var areaCD = new SpawnArea(this, 23,23,6,4, "CD", 0x6666ff);
+
+        const groups = [
+
+            [areaAA, areaAB, areaAC, areaAD],
+            [areaBA, areaBB, areaBC, areaBD],
+            [areaCA, areaCB, areaCC, areaCD]
+        ]
+
+
+        // Outside Lanes
+        var nextArea = [
+            [areaAA, areaAB, areaAC, areaAD],
+            [areaCA, areaCB, areaCC, areaCD],
+        ];
+
+        // The first two pairs have some consistency to make sure we never have a disjointed map.
+        
+        // First Portal Cords
+        var cordsPA_1 = areaBA.genChords(this);
+        areaBA.portalCords = cordsPA_1;
+
+        // Choose a Random Lane (Either top or bottom)
+        var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+
+        // Choose random area from that lane and get chords
+        var areaPA_2 = Phaser.Math.RND.pick(nextGroup);
+        var cordsPA_2 = areaPA_2.genChords(this);
+        areaPA_2.portalCords = cordsPA_2;
+
+        makePair(this, cordsPA_1, cordsPA_2);
+
+        // Second Portal Pair
+        var cordsPB_1 = areaBD.genChords(this);
+        areaBD.portalCords = cordsPB_1;
+
+        // Other Lane gets the second portal
+        var otherGroup = Phaser.Math.RND.pick(nextArea);
+        var areaPB_2 = Phaser.Math.RND.pick(otherGroup);
+        var cordsPB_2 = areaPB_2.genChords(this);
+        areaPB_2.portalCords = cordsPB_2
+
+        makePair(this, cordsPB_1, cordsPB_2);
+
+        
+        // Generate next to portals
+        var pair3 = this.chooseAreaPair(this, groups);
+        makePair(this, pair3[0].genChords(this), pair3[1].genChords(this));
+
+        var pair4 = this.chooseAreaPair(this, groups);
+        makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
+        
+
+        
+         
+        
+
+        // Fair Fruit Spawn (5x)
+        
+        // Top Row
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+
+        
+        // Middle Row        
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+
+
+        // Bottom Row
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+        // #endregion
+        */
+
+        // #region New Stage Logic
+
+        var atom1 = new Food(this);
+        var atom2 = new Food(this);
+        var atom3 = new Food(this);
+        var atom4 = new Food(this);
+        var atom5 = new Food(this);
+
+
+        this.tweens.add({
+            targets: this.atoms,
+            originY: .125,
+            yoyo: true,
+            ease: 'Sine.easeOutIn',
+            duration: 1000,
+            repeat: -1
+        });
+
+
 
         // #endregion
 
@@ -1136,8 +1310,10 @@ class GameScene extends Phaser.Scene {
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
         const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(0, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setOrigin(0,1);
+        ourUI.bestScoreUI = ourUI.add.dom(10, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        ourUI.bestScoreUI.setOrigin(0,1);
+        ourUI.bestScoreLabelUI = ourUI.add.dom(GRID * 3, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        ourUI.bestScoreLabelUI.setOrigin(0,1);
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
@@ -1151,8 +1327,8 @@ class GameScene extends Phaser.Scene {
             var bestBase = 0;
         }
 
-        ourUI.bestScoreUI.setText(`Best : ${bestBase}`);
-
+        ourUI.bestScoreUI.setText(`BEST :`);
+        ourUI.bestScoreLabelUI.setText(bestBase);
         
         // #region Snake Masks
         /***  
@@ -1206,6 +1382,15 @@ class GameScene extends Phaser.Scene {
         // #endregion
         
     }
+    screenShake(){
+        if (this.moveInterval === SPEEDSPRINT) {
+            this.cameras.main.shake(400, .01);
+        }
+        else if (this.moveInterval === SPEEDWALK){
+            this.cameras.main.shake(300, .00625);
+        }    
+    }
+
     checkPortalAndMove() {
         let snake = this.snake;
 
@@ -1301,25 +1486,61 @@ class GameScene extends Phaser.Scene {
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
-
         
-        this.scrollFactorX += .025;
-        this.scrollFactorY += .025;
+        // Floating Electrons
+        this.atoms.forEach(atom=> {
+            atom.electrons.originY = atom.originY + .175
+            
+        });
+        
+
+        if (this.gState === GState.PORTAL || this.gState === GState.BONK) { 
+            
+            this.snake.snakeLight.x = this.snake.head.x
+            this.snake.snakeLight.y = this.snake.head.y
+
+            this.snakeMask.x = this.snake.head.x
+            this.snakeMask.y = this.snake.head.y
+
+            this.staggerMagnitude -= 0.5
+            //this.curveRegroup.x = GRID * 15
+            //this.curveRegroup.y = GRID * 15
+            
+        }
+        
+        //this.scrollFactorX += .025;
+        //this.scrollFactorY += .025;
 
         //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
         //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
 
-        // James note: this needs to stay here because it doesn't happen on manual move. But needs to happen each time the snake auto moves.
-        this.bg.tilePositionX = Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05);
-        this.bg.tilePositionY = Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05);
+        // not all of these need to be interpolated; wastes processing
 
-        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * .75;
-        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * .75;
+        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
+        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
 
-        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, (this.bgCoords.x + this.scrollFactorX), 0.05)) * 0.67;
-        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, (this.bgCoords.y + this.scrollFactorY), 0.05)) * 0.67;
-        
-        
+        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
+        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
+
+        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
+        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
+            
+        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
+        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
+
+        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
+        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
+
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.pressedSpaceDuringWait && this.gState === GState.WAIT_FOR_INPUT) {
                 console.log("SPACE LONG ENOUGH BRO");
@@ -1371,10 +1592,22 @@ class GameScene extends Phaser.Scene {
         }
 
         // #endregion
+        this.bgTimer += delta;
+
+        if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
+            this.bg3.setTexture('bg02_3_2') 
+            this.bg.setTexture('bg02frame2') 
+            if (this.bgTimer >= 2000) {
+                this.bg3.setTexture('bg02_3')
+                this.bg.setTexture('bg02') 
+                this.bgTimer = 0
+            }   
+        }
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
-            
+        // #region Check Update
+
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
             this.snakeMask.y = this.snake.head.y
@@ -1510,7 +1743,7 @@ class GameScene extends Phaser.Scene {
             }
 
             //var boosting
-            
+                   
             //this.spaceKey.isDown
 
 
@@ -1524,7 +1757,7 @@ class GameScene extends Phaser.Scene {
                     var boostOutline = this.add.sprite(
                         this.snake.head.x, 
                         this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(15);
+                    ).setOrigin(.083333,.083333).setDepth(8);
                     
                     boostOutline.play("snakeOutlineAnim");
                     this.boostOutlinesBody.push(boostOutline);
@@ -1774,9 +2007,9 @@ class ScoreScene extends Phaser.Scene {
             
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
-            calcSumOfBest(ourStartScene); // Note: This really should be an event.
-            this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
-            this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
+            //calcSumOfBest(ourStartScene); // Note: This really should be an event.
+            //this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
+            //this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
 
         // #endregion
@@ -2118,7 +2351,7 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line',
             'overflow-y': 'scroll',
             //'scroll-behavior': 'smooth', smooth scroll stutters when arrow key down/up is held
-            //'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
+            'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
@@ -2917,6 +3150,8 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
+
+
        // UI Icons
        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
 
@@ -2967,7 +3202,11 @@ class UIScene extends Phaser.Scene {
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`Stage: 0`).setOrigin(0,0);
+        ).setText(`STAGE :`).setOrigin(0,0);
+        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText(`0`).setOrigin(0,0);
+
+        
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
@@ -3014,24 +3253,29 @@ class UIScene extends Phaser.Scene {
 
          // Countdown Text
         this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: COLOR_SCORE,
+            'color': '#FCFFB2',
+            'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
-            'font-family': ["Sono", 'sans-serif'],
-            padding: '1px 5px',
-            //'border-radius': '4px',
-            //outline: 'solid',
-            //"outline-color": 'white',
-            })).setText(
+            'font-weight': '400',
+            'font-family': 'Oxanium',
+            'padding': '2px 7px 0px 0px',
+            })).setHTML(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
         
-        this.deltaScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `LastΔ: +0 `
+        this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `LASTΔ :`
+        ).setOrigin(0,1);
+        this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `0 `
         ).setOrigin(0,1);
         
         this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `Score: ${commaInt(this.score.toString())}`
+            `SCORE :`
+        ).setOrigin(0,0);
+        this.runningScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `${commaInt(this.score.toString())}`
         ).setOrigin(0,0);
         
 
@@ -3052,10 +3296,16 @@ class UIScene extends Phaser.Scene {
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
+                'color': '#FCFFB2',
+                'font-weight': '400',
+                'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
                 'font-size': '22px',
+                'font-family': 'Oxanium',
+                'padding': '3px 8px 0px 0px',
+                /*'font-size': '22px', //old settings
                 'font-weight': '400',
                 'font-weight': 'bold',
-                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
+                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,*/
             })).setOrigin(0,0);
             
             // Remove score text after a time period.
@@ -3104,18 +3354,25 @@ class UIScene extends Phaser.Scene {
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
 
             this.deltaScoreUI.setText(
-                `LastΔ: +${deltaScore}`
+                `LASTΔ : +`
+            )
+            this.deltaScoreLabelUI.setText(
+                `${deltaScore}`
             )
             
             this.runningScoreUI.setText(
-                `Score: ${commaInt(runningScore.toString())}`
+                `SCORE :`
+            );
+            this.runningScoreLabelUI.setText(
+                `${commaInt(runningScore.toString())}`
             );
             
 
 
             // Update UI
 
-            this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.scoreUI.setText(`STAGE :`);
+            this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
@@ -3209,7 +3466,8 @@ class UIScene extends Phaser.Scene {
         
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             if (timeTick < SCORE_FLOOR ) {
-                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0"));
+                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0")
+            );
             }
             else {
                 this.countDown.setText(countDown.toString().padStart(3,"0"));
@@ -3635,6 +3893,12 @@ function loadAnimations(scene) {
       frameRate: 4,
       repeat: -1
     })
+    scene.anims.create({
+        key: 'coin01idle',
+        frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
+        frameRate: 8,
+        repeat: -1
+      })
   
     scene.anims.create({
       key: 'electronIdle',
@@ -3780,8 +4044,10 @@ var config = {
     width: 744,
     height: 744,
     //seed: 1,
+    autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
+        //mode: Phaser.Scale.FIT,
     },
     parent: 'phaser-example',
     physics: {

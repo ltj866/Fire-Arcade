@@ -22,13 +22,15 @@ var Food = new Phaser.Class({
             this.fruitTimerText.setOrigin(0,0);  
         }
 
-        this.setOrigin(0);
+        this.setOrigin(0,-.0625);
         //this.startDecay(scene);
         this.setDepth(100);
         this.play("atom01idle");
-        this.electrons = scene.add.sprite().setOrigin(.2,.175).setDepth(10);
+        this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(101);
         this.electrons.play("electronIdle");
         this.electrons.anims.msPerFrame = 66;
+        
+
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
         this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000

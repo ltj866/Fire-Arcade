@@ -17,6 +17,8 @@
             "viewCenter": {
                 "x": 371.532698177782,
                 "y": 372.95347331421704
+                "x": 371.532698177782,
+                "y": 372.95347331421704
             }
         },
         "Bonus-Stage-x1.json#tileSheet": {
@@ -90,6 +92,7 @@
             "scaleInDock": 1
         },
         "Stage-02a.json": {
+            "scale": 1.5,
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
@@ -576,6 +579,8 @@
             "viewCenter": {
                 "x": 371.43721633888043,
                 "y": 371.4372163388805
+                "x": 371.43721633888043,
+                "y": 371.4372163388805
             }
         },
         "testing.json#tileSheetx24": {
@@ -680,6 +685,61 @@
         "testing07.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "testing05-2.json": {
+            "scale": 1.734005376344086,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.2595147662973,
+                "y": 372.25951476629723
+            }
+        },
+        "testing05-2.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing05-3.json": {
+            "scale": 1.734005376344086,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.2595147662973,
+                "y": 372.25951476629723
+            }
+        },
+        "testing05-3.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing05.json": {
+            "scale": 0.844018817204301,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 370.2524086312605,
+                "y": 370.25240863126044
+            }
+        },
+        "testing05.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing06-2.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 386.33333333333326,
+                "y": 351.66666666666663
+            }
+        },
+        "testing06-2.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing06.json": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 385,
+                "y": 350.3333333333333
+            }
+        },
+        "testing06.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "testing2.json": {
             "scale": 0.75,
             "selectedLayer": 0,
@@ -732,6 +792,10 @@
     "property.type": "int",
     "recentFiles": [
         "Stage-02d.json",
+        "Stage-10.json",
+        "Stage-02b.json",
+        "Stage-09.json",
+        "Stage-03b.json",
         "Stage-10.json",
         "Stage-02b.json",
         "Stage-09.json",
