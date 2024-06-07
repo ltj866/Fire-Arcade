@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
-    LENGTH_GOAL, SPEEDWALK, COMBO_ADD_FLOOR
+    LENGTH_GOAL, SPEED_WALK, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 

@@ -28,7 +28,7 @@ const SCORE_SCENE_DEBUG = false;
 
 // 1 frame is 16.666 milliseconds
 // 83.33 - 99.996
-export const SPEEDWALK = 99; // 99 In milliseconds  
+export const SPEED_WALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
 var SPEEDSPRINT = 24; // 24
@@ -261,7 +261,7 @@ const STAGES_NEXT = {
     'testing-05': [['Stage-03a', 0]]
 }
 // #region START STAGE
-const START_STAGE = 'testing02';
+const START_STAGE = 'Stage-02a';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -565,7 +565,6 @@ class GameScene extends Phaser.Scene {
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
 
-        this.startMoving = false; // deprecated to be removed
         this.stageOver = false; // deprecated to be removed
 
         this.winned = false; // marked as true any time this.winCondition is met.
@@ -575,7 +574,7 @@ class GameScene extends Phaser.Scene {
         
         this.startingArrowState = true; // Deprecate
 
-        this.moveInterval = SPEEDWALK;
+        this.moveInterval = SPEED_WALK;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -757,6 +756,7 @@ class GameScene extends Phaser.Scene {
         // Starting Game State
 
         this.gState = GState.START_WAIT;
+        console.log("GSTATE === START_WAIT", this.gState === GState.START_WAIT);
         
         // #region Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
@@ -769,6 +769,7 @@ class GameScene extends Phaser.Scene {
 
             if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
                 ourInputScene.moveDirection(this, e);
+                this.gState = GState.PLAY
                 
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -943,7 +944,7 @@ class GameScene extends Phaser.Scene {
                     toIndex = index + PORTAL_N_DIFF
                     let _from = Phaser.Math.RND.pick(portalArrayX[index]);
                     let _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
-                    console.log("Portal X Logic: FROM TO",_from, _to);
+                    //console.log("Portal X Logic: FROM TO",_from, _to);
                     makePair(this, _to, _from);
                 }
             }
@@ -986,7 +987,7 @@ class GameScene extends Phaser.Scene {
         
         while (this.map.getLayer(`Portal-${layerIndex}`)) {
 
-            console.log(`Portal-${layerIndex} Logic`);
+            //console.log(`Portal-${layerIndex} Logic`);
             var portalLayerN = this.map.createLayer(`Portal-${layerIndex}`, [this.tileset]);
             var portalArrayN = {};
             
@@ -1034,7 +1035,7 @@ class GameScene extends Phaser.Scene {
 
                     if (count >= portalTileRules[key]) {
                         delete portalArrayN[key];
-                        console.log("DELETING CAUSE PORTAL HERE", key);   
+                        //console.log("DELETING CAUSE PORTAL HERE", key);   
                     }
 
                 }
@@ -1225,23 +1226,23 @@ class GameScene extends Phaser.Scene {
                 var portalSound = this.portalSounds[0]
                 portalSound.play();
     
-                this.lastMoveTime += SPEEDWALK * 4;
+                this.lastMoveTime += SPEED_WALK * 4;
 
                 var _tween = this.tweens.add({
                     targets: snake.head, 
                     x: _x,
                     y: _y,
                     yoyo: false,
-                    duration: SPEEDWALK * 4,
+                    duration: SPEED_WALK * 4,
                     ease: 'Linear',
                     repeat: 0,
                     //delay: 500
                 });
                 
                 _tween.on('complete',()=>{
-                    this.gState = GState.START_WAIT;
+                    this.gState = GState.PLAY;
                     this.scene.get('UIScene').scoreTimer.paused = false;
-                    console.log(this.gState, "START_WAIT"); // Will be set to PLAY
+                    console.log("Game State === PLAY", this.gState === GState.PLAY); // Will be set to PLAY
                 });
                                     
                 return ;  //Don't know why this is here but I left it -James
@@ -1283,11 +1284,6 @@ class GameScene extends Phaser.Scene {
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
 
-
-
-        //Do we still need this? @holden - okay to delete
-        this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
-
         
         this.scrollFactorX += .025;
         this.scrollFactorY += .025;
@@ -1324,6 +1320,10 @@ class GameScene extends Phaser.Scene {
 
         // #region Bonk and Regroup
         if (this.gState === GState.BONK) {
+            /***  
+             * Checks for Tween complete on each frame.
+             * on. ("complete") is not run unless it is checked directly. It is not on an event listener
+            ***/ 
             this.tweenRespawn.on('complete', () => {
     
                 // Turn back on arrows
@@ -1347,7 +1347,6 @@ class GameScene extends Phaser.Scene {
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
             //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
             
-
             ourUI.scene.pause();
             ourUI.scene.start('ScoreScene');
             
@@ -1355,19 +1354,8 @@ class GameScene extends Phaser.Scene {
 
         // #endregion
 
-        // Only Calculate every move window
 
-        // #region Check Update
-        
-
-        //if (this.frameIndex < 9){
-        //    this.frameIndex += 1;
-        //}
-        //else{
-        //    this.frameIndex = 0;
-        //}
-
-        if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
+        if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -1472,12 +1460,35 @@ class GameScene extends Phaser.Scene {
                 
             }
             
-            // Move at last second
-            if (this.gState === GState.PLAY &&!this.stageOver) {
+            
+            if (this.gState === GState.PLAY) {
+                // Move at last second
                 this.snake.move(this);
                 ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
-                //move ghost segments here
+
+                this.checkPortalAndMove()
+
+
+                if (energyAmountX < 1) {
+                    // add the tail in.
+                    this.boostOutlinesBody.push(this.boostOutlineTail);
+    
+                    this.boostOutlinesBody.forEach(boostOutline =>{
+                        var fadeoutTween = this.tweens.add({
+                            targets: boostOutline,
+                            alpha: 0,
+                            duration: 340,
+                            ease: 'linear'
+                            }, this);
+    
+                        fadeoutTween.on('complete', e => {
+                            boostOutline.destroy()
+                        });
+                    });
+                    this.boostOutlinesBody = [];
+                    
+                } 
             }
 
             //var boosting
@@ -1503,127 +1514,14 @@ class GameScene extends Phaser.Scene {
                 }
                     this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
                     this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
-        
-                
 
-                //move the tail
-                //this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
-                //this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
-                
-                //this.boostOutlines = this.boostOutlines.slice(1,this.boostOutlines.length);
-                //console.log("boost length = ",this.boostOutlines.length)
-                //console.log("snake length = ",this.snake.body.length)
-                //this.boostOutlines[0].destroy();
-                //debugger;
-                /*var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
-                if(this.boostOutlines.length > (this.snake.body.length)){
-                    this.boostOutlines[latestOutline].destroy();
-                }*/
-                //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
-                
-                //this.boostGhosts.push(boostGhostSmall)
-                //console.log(this.frameIndex)
-                /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
-                boostTrailX.once('animationcomplete',()=>{
-                    boostTrailX.play("boostTrailXdissipate");
-                    boostTrailX.once('animationcomplete',()=>{
-                        boostTrailX.destroy() 
-                    })
-                    //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
-                })*/
             }
             
 
-            if (energyAmountX < 1 && this.startMoving) {
-                // add the tail in.
-                this.boostOutlinesBody.push(this.boostOutlineTail);
 
-                this.boostOutlinesBody.forEach(boostOutline =>{
-                    var fadeoutTween = this.tweens.add({
-                        targets: boostOutline,
-                        alpha: 0,
-                        duration: 340,
-                        ease: 'linear'
-                        }, this);
-
-                    fadeoutTween.on('complete', e => {
-                        boostOutline.destroy()
-                    });
-                });
-                this.boostOutlinesBody = [];
-                
-            } 
 
             // #region boost update
-            //if (boosting){
-                /*for (let index = 0; index < this.snake.body.length; index++) {
-                    if (index < this.snake.body.length -1) {
-                    var boostOutline = this.add.sprite(
-                        this.snake.body[index].x, 
-                        this.snake.body[index].y
-                    ).setOrigin(.083333,.083333).setDepth(15);
-                    this.boostOutlines.push(boostOutline)
-                    //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
-                    boostOutline.play("snakeOutlineAnim");
-                    }
-                    else{
-                    var boostOutlineSmall = this.add.sprite(
-                        this.snake.body[this.snake.body.length -1].x,
-                         this.snake.body[this.snake.body.length -1].y
-                    ).setOrigin(.083333,.083333).setDepth(0);
-                    this.boostOutlinesSmall.push(boostOutlineSmall)
-                    boostOutlineSmall.play("snakeOutlineSmallAnim");
-                    }
-                    
-                }*/
-                /*this.snake.body.forEach( part => {
-                    var latestOutline = (this.boostOutlines.length - (this.snake.body.length));
-                    if(this.boostOutlines.length > (this.snake.body.length)){
-                        this.boostOutlines[latestOutline].destroy();
-                    }
-      
-                    //console.log("boost length = ",this.boostOutlines.length)
-                    //console.log("snake length = ",this.snake.body.length)
-                    console.log(latestOutline)
-                    //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-                    this.boostOutlines.push(boostOutline)
-                    //var boostOutlineSmall = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
-                    boostOutline.play("snakeOutlineAnim");
-                    //boostOutlineSmall.play("snakeOutlineSmallAnim");
-                if (this.boostGhosts.length > 1){
-                    this.boostGhosts[this.boostGhosts.length-2].destroy();
-                }
-                })*/
-                /*this.snake.body.forEach( part => {
-                    var latestOutlineSmall = (this.boostOutlinesSmall.length - this.snake.body.length);
-                    if(this.boostOutlinesSmall.length > (this.snake.body.length)){
-                        //console.log(this.boostOutlinesSmall.length)
-                        this.boostOutlinesSmall[latestOutlineSmall].destroy();
-                    }
-                    var boostOutlineSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y).setOrigin(.083333,.083333).setDepth(0);
-                    this.boostOutlinesSmall.push(boostOutlineSmall)
-                    boostOutlineSmall.play("snakeOutlineSmallAnim");
-                })*/
-            //}
-            //else{
-                /*this.boostOutlines.forEach(boostOutline =>{
-                    boostOutline.destroy();
-                })/*
-                this.boostOutlinesSmall.forEach(boostOutlineSmall =>{
-                    boostOutlineSmall.destroy();
-                })
-                this.boostGhosts.forEach(boostGhost =>{
-                    boostGhost.destroy();
-                })
-                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
-                    this.boostOutlines.length = 1;
-                }
-                if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
-                    this.boostGhosts.length = 1;
-                }*/
-
-            //}
+ 
         }
         
         // Boost and Boost Multi Code
@@ -3114,7 +3012,7 @@ class UIScene extends Phaser.Scene {
 
        // Combo Sprites
 
-       this.visible = false;
+       this.visible = false; // Not clear by name what this references here @holden Also should not double up on a common phaser name.
 
        this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
        this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
@@ -3355,11 +3253,6 @@ class UIScene extends Phaser.Scene {
         
             // #endregion
 
-            
-
-
-            
-            
 
         }, this);
         
@@ -3368,7 +3261,7 @@ class UIScene extends Phaser.Scene {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         var ourInputScene = this.scene.get('InputScene');
 
-        // #region Bonus Level Code
+        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
@@ -3394,19 +3287,12 @@ class UIScene extends Phaser.Scene {
         }
         else {
             //this.countDown.setText(this.score);
-        } 
-        
-        if (DEBUG) {
-            if (timeTick < SCORE_FLOOR ) {
-            
-            } else {
-                this.timerText.setText(timeTick);
-            }  
         }
+        
 
         // #region Boost Logic
         if (!ourInputScene.spaceBar.isDown) { // Base Speed
-            this.scene.get('GameScene').moveInterval = SPEEDWALK; // Less is Faster
+            this.scene.get('GameScene').moveInterval = SPEED_WALK; // Less is Faster
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount += .25; // Recharge Boost Slowly
         }
@@ -3424,7 +3310,7 @@ class UIScene extends Phaser.Scene {
             }
             else{
                 //DISSIPATE LIVE ELECTRICITY
-                this.scene.get('GameScene').moveInterval = SPEEDWALK;
+                this.scene.get('GameScene').moveInterval = SPEED_WALK;
             }
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount -= 1;
