@@ -31,7 +31,7 @@ const SCORE_SCENE_DEBUG = false;
 export const SPEED_WALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
-var SPEEDSPRINT = 24; // 24
+const SPEED_SPRINT = 24; // 24
 
 
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
@@ -747,29 +747,23 @@ class GameScene extends Phaser.Scene {
             this.pointSounds.push(this.sound.add(soundID[0], {volume: 0.5}));
             });
 
+        // Starting Game State
+        this.gState = GState.START_WAIT;
+        console.log("GSTATE === START_WAIT", this.gState === GState.START_WAIT);
+
         // Define keys       
 
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
-
-        
-        
-        // Starting Game State
-
-        this.gState = GState.START_WAIT;
-        console.log("GSTATE === START_WAIT", this.gState === GState.START_WAIT);
         
         // #region Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
-            // Separate if statements so the first will 
-            // run with as small of a delay as possible
-            // for input responsiveness
-
-
+            // run with as small of a delay as possible for input responsiveness
+            // 
+            
             let gState = this.gState;
 
             if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
                 ourInputScene.moveDirection(this, e);
-                this.gState = GState.PLAY
                 
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -3288,33 +3282,30 @@ class UIScene extends Phaser.Scene {
         else {
             //this.countDown.setText(this.score);
         }
-        
 
-        // #region Boost Logic
-        if (!ourInputScene.spaceBar.isDown) { // Base Speed
-            this.scene.get('GameScene').moveInterval = SPEED_WALK; // Less is Faster
-            this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount += .25; // Recharge Boost Slowly
-        }
+        if (GState.PLAY === this.scene.get('GameScene').gState) {
+            if (ourInputScene.spaceBar.isDown) {
+                // Has Boost Logic, Then Boost
+                if(this.energyAmount > 1){
+                    this.scene.get('GameScene').moveInterval = SPEED_SPRINT;
+                    
+                    // Boost Stats
+                    ourInputScene.boostTime += 6;
+                    this.mask.setScale(this.energyAmount/100,1);
+                    this.energyAmount -= 1;
+                } else{
+                    //DISSIPATE LIVE ELECTRICITY
+                    this.scene.get('GameScene').moveInterval = SPEED_WALK;
+                }
         
-        // Is Trying to Boost
-        else {
-        
-            // Has Boost Logic
-            if(this.energyAmount > 1){
-                //CREATE BOOST ELECTRICITY HERE
-                this.scene.get('GameScene').moveInterval = SPEEDSPRINT;
-                
-                // Boost Stats
-                ourInputScene.boostTime += 1;
+            } else {
+                this.scene.get('GameScene').moveInterval = SPEED_WALK; // Less is Faster
+                this.mask.setScale(this.energyAmount/100,1);
+                this.energyAmount += .25; // Recharge Boost Slowly
             }
-            else{
-                //DISSIPATE LIVE ELECTRICITY
-                this.scene.get('GameScene').moveInterval = SPEED_WALK;
-            }
+        } else if (GState.START_WAIT === this.scene.get('GameScene').gState) {
             this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount -= 1;
-            
+            this.energyAmount += 1; // Recharge Boost Slowly
 
         }
 
@@ -3471,7 +3462,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
-            this.snakeStart(gameScene);
+            this.setPLAY(gameScene);
             
                 // At anytime you can update the direction of the snake.
             gameScene.snake.head.setTexture('snakeDefault', 6);
@@ -3482,11 +3473,12 @@ class InputScene extends Phaser.Scene {
                 
             this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
             gameScene.snake.move(gameScene);
+            gameScene.checkPortalAndMove();
 
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means technically you can go as fast as you turn.
             
-            gameScene.checkPortalAndMove();
+            
         }
     }
 
@@ -3495,7 +3487,7 @@ class InputScene extends Phaser.Scene {
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
            
 
-               this.snakeStart(gameScene);
+               this.setPLAY(gameScene);
                gameScene.snake.head.setTexture('snakeDefault', 7);
            gameScene.snake.direction = DOWN;
 
@@ -3504,11 +3496,12 @@ class InputScene extends Phaser.Scene {
 
            this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
            gameScene.snake.move(gameScene);
+           gameScene.checkPortalAndMove();
 
            this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
            gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
 
-           gameScene.checkPortalAndMove();
+           
        }
 
     }
@@ -3517,7 +3510,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
             
-                this.snakeStart(gameScene);
+                this.setPLAY(gameScene);
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
             gameScene.snake.direction = LEFT;
@@ -3541,7 +3534,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
-                this.snakeStart(gameScene);
+                this.setPLAY(gameScene);
                 gameScene.snake.head.setTexture('snakeDefault', 5);
             gameScene.snake.direction = RIGHT;
 
@@ -3604,9 +3597,14 @@ class InputScene extends Phaser.Scene {
               break;
         } 
     }
-    snakeStart(gameScene) {
+    setPLAY(gameScene) {
 
         if (gameScene.startingArrowState == true){
+
+            // Starting Game State
+            gameScene.gState = GState.PLAY;
+            console.log("GSTATE === PLAY", gameScene.gState === GState.PLAY);
+            this.scene.get('UIScene').scoreTimer.paused = false;
                 
             // turn off arrows and move snake.
             gameScene.startingArrowState = false;
@@ -3614,6 +3612,8 @@ class InputScene extends Phaser.Scene {
             gameScene.startingArrowsAnimS.setVisible(false);
             gameScene.startingArrowsAnimE.setVisible(false);
             gameScene.startingArrowsAnimW.setVisible(false);
+
+            
             
 
             //ourInputScene.moveDirection(this, e);
