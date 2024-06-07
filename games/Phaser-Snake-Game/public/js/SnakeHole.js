@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 3; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 
@@ -232,29 +232,29 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
+    'Stage-01': ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
     
-    'Stage-02a': [['Stage-03a', 0]],
-    'Stage-02b': [['Stage-03a', 50]],
-    'Stage-02c': [['Stage-03b', 50]],
-    'Stage-02d': [['Stage-03b', 50]],
-    'Stage-02e': [['Stage-03c', 105]],
+    'Stage-02a': ['Stage-03a'],
+    'Stage-02b': ['Stage-03a'],
+    'Stage-02c': ['Stage-03b'],
+    'Stage-02d': ['Stage-03b'],
+    'Stage-02e': ['Stage-03c'],
     
-    'Stage-03a': [['Stage-04', 0]],
-    'Stage-03b': [['Stage-04', 85]],
-    'Stage-03c': [['Stage-04', 85]],
+    'Stage-03a': ['Stage-04'],
+    'Stage-03b': ['Stage-04'],
+    'Stage-03c': ['Stage-04'],
     
-    'Stage-04': [['Stage-05', 0]],
-    'Stage-05': [['Stage-06', 0]],
-    'Stage-06': [['Stage-07', 0]],
-    'Stage-07': [['Stage-08', 0]],
-    'Stage-08': [['Stage-09', 0]],
-    'Stage-09': [['Stage-10', 0]],
-    'Stage-10': [['Stage-11', 0]],
-    'Stage-11': [['Stage-12', 0]],
+    'Stage-04': ['Stage-05'],
+    'Stage-05': ['Stage-06'],
+    'Stage-06': ['Stage-07'],
+    'Stage-07': ['Stage-08'],
+    'Stage-08': ['Stage-09'],
+    'Stage-09': ['Stage-10'],
+    'Stage-10': ['Stage-11'],
+    'Stage-11': ['Stage-12'],
     'Bonus-Stage-x1': [],
-    'testing04': [['Stage-02a', 0],['Stage-02b', 120],['Stage-02c', 120],['Stage-02d', 120],['Stage-02e', 105]],
-    'testing-05': [['Stage-03a', 0]]
+    'testing04': ['Stage-02a','Stage-02b','Stage-02c','Stage-02d','Stage-02e'],
+    'testing-05': ['Stage-03a']
 }
 // #region START STAGE
 const START_STAGE = 'Stage-02a';
@@ -544,6 +544,7 @@ class GameScene extends Phaser.Scene {
         this.dreamWalls = [];
 
         this.lastMoveTime = 0; // The last time we called move()
+        this.nextScore = 0; // Calculated and stored after score screen finishes.
 
 
         // Boost Array
@@ -1267,6 +1268,23 @@ class GameScene extends Phaser.Scene {
         return ourUI.length >= LENGTH_GOAL
     }
 
+    nextStage() {
+        const ourUI = this.scene.get('UIScene');
+        const ourInputScene = this.scene.get("InputScene");
+
+        var nextStages = STAGES_NEXT[this.stage]
+        var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
+
+        ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
+        this.scene.restart( { stage: nextStage[0] } );
+        ourInputScene.scene.restart();
+
+        // Add if time attack code here
+        //ourGame.scene.stop();
+        //ourScoreScene.scene.switch('TimeAttackScene');
+
+    }
+
     // #region Game Update
     update (time, delta) {
 
@@ -1276,7 +1294,6 @@ class GameScene extends Phaser.Scene {
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
-
 
         
         this.scrollFactorX += .025;
@@ -1336,6 +1353,7 @@ class GameScene extends Phaser.Scene {
         // #region Win State
         if (this.checkWinCon() && !this.winned) {
             
+            debugger
             console.log("YOU WIN" , this.stage);
             this.winned = true;
 
@@ -1679,6 +1697,7 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourStartScene = this.scene.get('StartScene');
+        const ourPlayerData = this.scene.get('PlayerDataScene');
 
         var stageDataJSON = {
             bonks: ourUI.bonks,
@@ -2297,119 +2316,31 @@ class ScoreScene extends Phaser.Scene {
             // #region Space to Continue
             this.input.keyboard.on('keydown-SPACE', function() {     
 
-                localStorage.setItem("zeds", ourTimeAttack.zeds);
+                localStorage.setItem("zeds", ourPlayerData.zeds);
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
-                // As the event is defined there, but this works and is why I did it. - James
+                // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
-
-                ourInputScene.scene.restart();
-
-                if (ourTimeAttack.inTimeAttack) {
-                    
-                    // Go back to time attack scene
-                    debugger
-                    ourGame.scene.stop();
-                    ourScoreScene.scene.switch('TimeAttackScene');
-                    
-                }
-                else {
-                    if (ourGame.stage != END_STAGE) {
                 
-                        
-                        var nextScore = 0;
-                        var sumOfBase = 0;
-                        var _histLog = [];
-                        
-                        ourStartScene.stageHistory.forEach( _stage => {
-                            _histLog = [ ..._histLog, ..._stage.foodLog];
-                            sumOfBase += _stage.calcBase();
-                            nextScore += _stage.calcTotal();
+                var sumOfBase = 0;
+                var _histLog = [];
+                
+                ourStartScene.stageHistory.forEach( _stage => {
+                    _histLog = [ ..._histLog, ..._stage.foodLog];
+                    sumOfBase += _stage.calcBase();
+                    ourGame.nextScore += _stage.calcTotal();
 
-                        });
-                        ourStartScene.globalFoodLog = _histLog;
-                        
-                        var histBaseScore = ourStartScene.globalFoodLog.reduce((a,b) => a + b, 0);
-                        var currentAve = histBaseScore / ourStartScene.globalFoodLog.length;
+                });
 
-    
-                        var nextStages = STAGES_NEXT[ourGame.stage];
-                        var unlockedStages = [];
-    
-                        // #region Next Stage
-                        console.log("CHECK NEXT STAGES");
-                        nextStages.forEach( _stage => {
-    
-                            var goalSum = _stage[1] * ourStartScene.stageHistory.length * 28
-                            console.log(
-                                _stage[0], 
-                                "histSum:", histBaseScore, 
-                                "targetSum", goalSum, 
-                                "unlocked=", histBaseScore  > goalSum,
-                                "currentBase=", sumOfBase,
-                                "newUnlocked=", (sumOfBase > goalSum && histBaseScore < goalSum)
-                            )
-                            if (histBaseScore >= goalSum) {
-                                unlockedStages.push(_stage);
-                            }
+                ourStartScene.globalFoodLog = _histLog;
 
-                            if (sumOfBase > goalSum && histBaseScore < goalSum) {
-                                if (ourTimeAttack.newUnlocked) {
-                                    ourTimeAttack.newUnlocked.push(_stage);
-                                }
-                                else {
-                                    ourTimeAttack.newUnlocked = [
-                                        _stage[0], // Stage Name
-                                        _stage[1], // Requirement Average
-                                        currentAve]; // Average now
-                                }
-                            }
+                // Go Back Playing To Select New Stage
+                ourScoreScene.scene.stop();
+                ourGame.gState = GState.PLAY;
                             
-    
-                        });
-    
-                        if (unlockedStages.length != 0) {
-    
-    
-                            var nextStage = Phaser.Math.RND.pick(unlockedStages);
-    
-                            ourUI.scene.restart( { score: nextScore, lives: ourUI.lives } );
-                            ourGame.scene.restart( { stage: nextStage[0] } );
-    
-                            ourScoreScene.scene.switch('GameScene'); // This doubles the game scene I think.
-                            
-                        }
-                        else {
-    
-                            // go to Time Attack
-    
-                            
-                            ourGame.scene.stop();
-                            ourScoreScene.scene.switch('TimeAttackScene');
-                        }
-                        
-                        
-                    }
-                    else {
-                        // Start From The beginning. Must force reset values or it won't reset.
-
-                        ourGame.scene.stop();
-                        ourScoreScene.scene.switch('TimeAttackScene');
-                        
-                        // do in Win Screen After the very end.
-                        //console.log("END STAGE", ourGame.stage, END_STAGE);
-                        //ourUI.scene.restart( { score: 0 });
-                        //ourGame.scene.restart({ stage: START_STAGE });
-                    }
-
-                }
-
-                // Maybe should only have this in the TimeAttackScene
                 if (bestrun < ourUI.score + ourScoreScene.stageData.calcTotal()) {
                     localStorage.setItem('BestFinalScore', ourUI.score + ourScoreScene.stageData.calcTotal());
                 }
-                
-                
 
             });
         }, [], this);
