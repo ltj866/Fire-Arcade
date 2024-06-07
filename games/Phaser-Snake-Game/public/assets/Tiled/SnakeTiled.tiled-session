@@ -607,8 +607,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 387.33333333333337,
-                "y": 352.66666666666663
+                "x": 386,
+                "y": 351.33333333333337
             }
         },
         "testing04.json#tileSheetx24": {
@@ -651,8 +651,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 385.6666666666667,
-                "y": 351
+                "x": 386.33333333333326,
+                "y": 351.66666666666663
             }
         },
         "testing06-2.json#tileSheetx24": {
