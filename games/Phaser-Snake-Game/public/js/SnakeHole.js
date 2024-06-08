@@ -1349,13 +1349,27 @@ class GameScene extends Phaser.Scene {
     
         
         // Make all the unsafe places unsafe
-        this.walls.forEach(wall => {
-            if (wall.x < SCREEN_WIDTH) {
-                // Hack to sanitize index undefined value
-                // Current Tiled input script adds additional X values.
+
+        
+        console.log("CHECKING ALL TILES IN THE WALL LAYER")
+        this.wallLayer.forEachTile(wall => {
+    
+            if (wall.index > 0) {
+                
                 testGrid[wall.x][wall.y] = false;
             }
         });
+
+
+
+
+        //this.walls.forEach(wall => {
+        //    if (wall.x < SCREEN_WIDTH) {
+        //        // Hack to sanitize index undefined value
+        //        // Current Tiled input script adds additional X values.
+        //        testGrid[wall.x][wall.y] = false;
+        //    }
+        //});
 
         this.atoms.forEach(_fruit => {
             testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
