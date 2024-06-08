@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 3; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 // #region DEBUG OPTIONS
@@ -296,6 +296,9 @@ class StartScene extends Phaser.Scene {
         this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
         this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
+
+        // Load Tilemap as Sprite sheet to allow conversion to Sprites later.
+        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
 
@@ -931,7 +934,37 @@ class GameScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
-                this.nextStage();
+
+                this.gState = GState.TRANSITION;
+
+                var wallSprites = []
+
+                this.wallLayer.culledTiles.forEach( tile => {
+
+                    if (tile.y > 1 && tile.y < 30) {
+                        var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
+                    ).setOrigin(0,0).setDepth(99);
+
+                    wallSprites.push(_sprite);
+                    }
+                    
+                });
+                this.wallLayer.visible = false;
+                
+                var allTheThings = [
+                    ...this.snake.body, 
+                    ...this.coins,
+                    ...this.portals,
+                    ...wallSprites
+                ];
+
+
+                var blackholeTween = this.vortexIn(allTheThings, this.snake.head.x/GRID, this.snake.head.y/GRID);
+                blackholeTween.on('complete', () => {
+                    this.nextStage();
+                });
+                    
+                
             }
 
         });
@@ -1354,8 +1387,8 @@ class GameScene extends Phaser.Scene {
         // Make all the unsafe places unsafe
 
         
-        console.log("CHECKING ALL TILES IN THE WALL LAYER")
-        this.wallLayer.forEachTile(wall => {
+        console.log("CHECKING CULLED TILES")
+        this.wallLayer.culledTiles.forEach(wall => {
     
             if (wall.index > 0) {
                 
@@ -1473,12 +1506,12 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    vortexIn(){
+    vortexIn(target, x, y){
 
         var tweenRespawn = this.tweens.add({
-            targets: this.snake.body, 
-            x: GRID * 15, //this.pathRegroup.vec.x,
-            y: GRID * 15, //this.pathRegroup.vec.y,
+            targets: target, 
+            x: x * GRID, //this.pathRegroup.vec.x,
+            y: y * GRID, //this.pathRegroup.vec.y,
             yoyo: false,
             duration: 500,
             ease: 'Sine.easeOutIn',

@@ -321,7 +321,7 @@ var Snake = new Phaser.Class({
         //game.destroy();
         //this.scene.restart();
         
-        scene.tweenRespawn = scene.vortexIn();
+        scene.tweenRespawn = scene.vortexIn(this.body, 15, 15);
 
     }
 });
