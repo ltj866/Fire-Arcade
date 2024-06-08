@@ -1363,6 +1363,7 @@ class GameScene extends Phaser.Scene {
 
 
 
+        // This version for if we decide to build the wall index once and check against only wall values.
         //this.walls.forEach(wall => {
         //    if (wall.x < SCREEN_WIDTH) {
         //        // Hack to sanitize index undefined value
