@@ -38,10 +38,10 @@
         },
         "Stage-02a.json": {
             "scale": 1.6612231182795698,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 372.0150491524738,
-                "y": 372.3160322019499
+                "x": 403.9192523969416,
+                "y": 371.71406610299766
             }
         },
         "Stage-02a.json#tileSheetx24": {
@@ -93,9 +93,9 @@
         },
         "Stage-03a.json": {
             "scale": 1.6612231182795698,
-            "selectedLayer": 0,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 372.0150491524738,
+                "x": 376.2288118451394,
                 "y": 372.3160322019499
             }
         },

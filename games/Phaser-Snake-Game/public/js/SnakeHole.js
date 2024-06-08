@@ -2,6 +2,7 @@ import { Food } from './classes/Food.js';
 import { Portal } from './classes/Portal.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
+import { Coin } from './classes/Coin.js';
 
 import {PORTAL_COLORS} from './const.js';
 
@@ -257,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'testing06';
+const START_STAGE = 'Stage-02a';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -943,6 +944,16 @@ class GameScene extends Phaser.Scene {
         //for (let index = 0; index < FRUIT; index++) {
         //    var food = new Food(this);
         //}
+        // #region Coin Logic
+
+        this.coins = []
+
+        if (this.map.getLayer('Coin')) {
+
+            var coinLayer = this.map.createLayer('Coin', [this.tileset]);
+        
+        }
+
         
         
         
@@ -1178,7 +1189,9 @@ class GameScene extends Phaser.Scene {
         // #region Coins
 
         this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
-            ).play('coin01idle').setDepth(21).setOrigin(.125,.125)
+            ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+            this.add.sprite(GRID * 5, GRID * 5,'coinPickup01Anim'
+            ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
 
         //Phaser.Math.RND.pick(nextGroup)
        
