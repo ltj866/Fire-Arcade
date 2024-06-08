@@ -525,7 +525,7 @@ class PlayerDataScene extends Phaser.Scene {
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
     ).setOrigin(0,0.5);*/
 
-    const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+    this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
         'font-size': '12px',
         })).setText(
             `snakehole.${GAME_VERSION}`
@@ -614,6 +614,7 @@ class GameScene extends Phaser.Scene {
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
+        const ourPlayerData = this.scene.get('PlayerDataScene');
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
@@ -646,6 +647,8 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.map.properties[1].value; // TODO: Get them by name and throw errors.
+
+        ourPlayerData.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
 
