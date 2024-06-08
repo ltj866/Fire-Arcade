@@ -1491,6 +1491,11 @@ class GameScene extends Phaser.Scene {
         return ourUI.length >= LENGTH_GOAL
     }
 
+    checkLoseCon() {
+        const ourPlayerData = this.scene.get("PlayerDataScene");
+        return ourPlayerData.coins < 0;
+    }
+
     nextStage() {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
@@ -1621,6 +1626,27 @@ class GameScene extends Phaser.Scene {
             ourUI.scene.pause();
             ourUI.scene.start('ScoreScene');
         }
+
+        // #region Lose State
+        if (this.checkLoseCon()) {
+            this.coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
+                {
+                    "font-size": '32px',
+                    "text-align": 'center',
+                    "text-shadow": '2px 2px 4px #000000',
+                    "white-space": 'pre-line'
+
+                }
+            )).setHTML(
+                `GAMEOVER
+                ON
+                ${this.stage}
+                Better Luck Next Time.`
+                
+        ).setOrigin(0.5,0.5);
+            
+        }
+
 
         // #endregion
         this.bgTimer += delta;
