@@ -937,6 +937,8 @@ class GameScene extends Phaser.Scene {
 
                 this.gState = GState.TRANSITION;
 
+                this.snake.head.setTexture('snakeDefault', 0);
+
                 var wallSprites = []
 
                 this.wallLayer.culledTiles.forEach( tile => {
