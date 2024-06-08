@@ -2,7 +2,6 @@ import { Food } from './classes/Food.js';
 import { Portal } from './classes/Portal.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
-import { Coin } from './classes/Coin.js';
 
 import {PORTAL_COLORS} from './const.js';
 
@@ -951,7 +950,18 @@ class GameScene extends Phaser.Scene {
         if (this.map.getLayer('Coin')) {
 
             var coinLayer = this.map.createLayer('Coin', [this.tileset]);
-        
+
+            coinLayer.forEachTile(tile => {
+                if(tile.index > 0) { // -1 = empty tile
+                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID,'coinPickup01Anim'
+                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+
+                    this.coins.push(_coin);
+                }
+            });
+
+            coinLayer.visible = false;
+            console.log(this.coins);        
         }
 
         
@@ -1188,10 +1198,10 @@ class GameScene extends Phaser.Scene {
 
         // #region Coins
 
-        this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
-            ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-            this.add.sprite(GRID * 5, GRID * 5,'coinPickup01Anim'
-            ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+        //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
+        //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+        //    this.add.sprite(GRID * 5, GRID * 5,'coinPickup01Anim'
+        //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
 
         //Phaser.Math.RND.pick(nextGroup)
        
