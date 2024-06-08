@@ -130,38 +130,10 @@ var Snake = new Phaser.Class({
         scene.map.setLayer("Wall");
         if (scene.map.getTileAtWorldXY( xN, yN )) {
             
-            // Only count a wall hit ahead if not on a portal.
-            //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
-            
             this.direction = STOP;
             if (scene.bonkable) {
-                scene.gState = GState.BONK
-                console.log(scene.gState, "BONK");
-
-                scene.screenShake();
-                
-                ourPlayerData.coins += -1;
-                ourUI.coinUIText.setHTML(
-                    `${commaInt(ourPlayerData.coins)}`
-                )
-
-
-                /////////////////////////////////////
-                console.log("REACHING BONK TWEEN CODE");
-                //console.log("DEAD, Now Rregroup", this.snake.alive);
-                scene.snakeCrash.play();    
-                // game.scene.scene.restart(); // This doesn't work correctly
-                if (DEBUG) { console.log("DEAD"); }
-                
-                scene.scene.get("UIScene").bonks += 1;
-                
-                // Do this on hardcore mode and take a life down.
-                //game.destroy();
-                //this.scene.restart();
-                
-                scene.tweenRespawn = scene.vortexIn();
+                this.bonk(scene);
                
-                ////////////////////////////////
             }
         }
 
@@ -322,6 +294,34 @@ var Snake = new Phaser.Class({
     },
 
     bonk: function (scene) {
+        const ourPlayerData = scene.scene.get('PlayerDataScene');
+        const ourUI = scene.scene.get('UIScene');
+        
+        scene.gState = GState.BONK
+        console.log(scene.gState, "BONK");
+
+        scene.screenShake();
+        
+        ourPlayerData.coins += -1;
+        ourUI.coinUIText.setHTML(
+            `${commaInt(ourPlayerData.coins)}`
+        )
+
+
+        /////////////////////////////////////
+        console.log("REACHING BONK TWEEN CODE");
+        //console.log("DEAD, Now Rregroup", this.snake.alive);
+        scene.snakeCrash.play();    
+        // game.scene.scene.restart(); // This doesn't work correctly
+        if (DEBUG) { console.log("DEAD"); }
+        
+        scene.scene.get("UIScene").bonks += 1;
+        
+        // Do this on hardcore mode and take a life down.
+        //game.destroy();
+        //this.scene.restart();
+        
+        scene.tweenRespawn = scene.vortexIn();
 
     }
 });
