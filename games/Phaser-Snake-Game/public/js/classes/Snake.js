@@ -137,6 +137,8 @@ var Snake = new Phaser.Class({
             if (scene.bonkable) {
                 scene.gState = GState.BONK
                 console.log(scene.gState, "BONK");
+
+                scene.screenShake();
                 
                 ourPlayerData.coins += -1;
                 ourUI.coinUIText.setHTML(

@@ -1328,10 +1328,10 @@ class GameScene extends Phaser.Scene {
         
     }
     screenShake(){
-        if (this.moveInterval === SPEEDSPRINT) {
+        if (this.moveInterval === SPEED_SPRINT) {
             this.cameras.main.shake(400, .01);
         }
-        else if (this.moveInterval === SPEEDWALK){
+        else if (this.moveInterval === SPEED_WALK){
             this.cameras.main.shake(300, .00625);
         }    
     }
