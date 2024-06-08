@@ -68,76 +68,7 @@ var Food = new Phaser.Class({
         //var safePoints = [];
         
         
-        var testGrid = {};
-
-        // Start with all safe points as true. This is important because Javascript treats 
-        // non initallized values as undefined and so any comparison or look up throws an error.
-        for (var x1 = 0; x1 <= END_X; x1++) {
-            testGrid[x1] = {};
-    
-            for (var y1 = 2; y1 < END_Y; y1++)
-            {
-                testGrid[x1][y1] = true;
-            }
-        }
-    
-        
-        // Make all the unsafe places unsafe
-        scene.walls.forEach(wall => {
-            if (wall.x < SCREEN_WIDTH) {
-                // Hack to sanitize index undefined value
-                // Current Tiled input script adds additional X values.
-                testGrid[wall.x][wall.y] = false;
-            }
-        });
-
-        scene.atoms.forEach(_fruit => {
-            testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
-        });
-
-        scene.portals.forEach(_portal => {
-            testGrid[_portal.x/GRID][_portal.y/GRID] = false;
-        });
-
-        scene.dreamWalls.forEach( _dreamWall => {
-            testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-        });
-
-        // Don't let fruit spawn on dreamwall blocks
-        //scene.dreamWalls.forEach(_dreamWall => {
-        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-        //});
-
-
-
-        
-        
-        scene.snake.body.forEach(_part => {
-            //testGrid[_part.x/GRID][_part.y/GRID] = false;
-            //debugger
-            if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
-                // This goes nan sometimes. Ignore if that happens.
-                // Round maths for the case when adding a fruit while the head interpolates across the screen
-                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
-            }
-            
-        });
-        
-
-        
-        var validLocations = [];
-    
-        for (var x2 = 0; x2 <= END_X; x2++)
-        {
-            for (var y2 = 0; y2 <= END_Y; y2++)
-            {
-                if (testGrid[x2][y2] === true)
-                {
-                    // Push only valid positions to an array.
-                    validLocations.push({x: x2, y: y2});
-                }
-            }
-        }
+        var validLocations = scene.validSpawnLocations();
         
         var pos = Phaser.Math.RND.pick(validLocations);
         

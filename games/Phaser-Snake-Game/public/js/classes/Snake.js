@@ -204,9 +204,31 @@ var Snake = new Phaser.Class({
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
     }
 
+    for (let index = 0; index < scene.coins.length; index++) {
+        var _coin = scene.coins[index];
+        if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
+            console.log("Hit Coin");
+            _coin.destroy();
+            scene.coins.splice(index,1);
+            console.log(scene.coins)
+        }
+    }
+
+    /*
+    scene.coins.forEach(_coin => {
+        if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
+
+            console.log("Hit Coin");
+            _coin.destroy();
+            console.log(scene.coins)
+
+        }
+
+    }); */
+
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
-        if(this.head.x === _atom.x && this.head.y === _atom.y && !this.traveling){
+        if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 

@@ -1213,102 +1213,9 @@ class GameScene extends Phaser.Scene {
         //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
 
 
+  
 
-
-        // #region Old Logic 
-        /*
-        
-        // AREA NAME is [GROUP][ID]
-        var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
-        var areaAB = new SpawnArea(this, 9,5,6,4, "AB", 0x6666ff);
-        var areaAC = new SpawnArea(this, 16,5,6,4, "AC", 0x6666ff);
-        var areaAD = new SpawnArea(this, 23,5,6,4, "AD", 0x6666ff);
-
-        var areaBA = new SpawnArea(this, 2,14,6,4, "BA", 0x6666ff);
-        var areaBB = new SpawnArea(this, 9,14,6,4, "BB", 0x6666ff);
-        var areaBC = new SpawnArea(this, 16,14,6,4, "BC", 0x6666ff);
-        var areaBD = new SpawnArea(this, 23,14,6,4, "BD", 0x6666ff);
-
-        var areaCA = new SpawnArea(this, 2,23,6,4, "CA", 0x6666ff);
-        var areaCB = new SpawnArea(this, 9,23,6,4, "CB", 0x6666ff);
-        var areaCC = new SpawnArea(this, 16,23,6,4, "CC", 0x6666ff);
-        var areaCD = new SpawnArea(this, 23,23,6,4, "CD", 0x6666ff);
-
-        const groups = [
-
-            [areaAA, areaAB, areaAC, areaAD],
-            [areaBA, areaBB, areaBC, areaBD],
-            [areaCA, areaCB, areaCC, areaCD]
-        ]
-
-
-        // Outside Lanes
-        var nextArea = [
-            [areaAA, areaAB, areaAC, areaAD],
-            [areaCA, areaCB, areaCC, areaCD],
-        ];
-
-        // The first two pairs have some consistency to make sure we never have a disjointed map.
-        
-        // First Portal Cords
-        var cordsPA_1 = areaBA.genChords(this);
-        areaBA.portalCords = cordsPA_1;
-
-        // Choose a Random Lane (Either top or bottom)
-        var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
-
-        // Choose random area from that lane and get chords
-        var areaPA_2 = Phaser.Math.RND.pick(nextGroup);
-        var cordsPA_2 = areaPA_2.genChords(this);
-        areaPA_2.portalCords = cordsPA_2;
-
-        makePair(this, cordsPA_1, cordsPA_2);
-
-        // Second Portal Pair
-        var cordsPB_1 = areaBD.genChords(this);
-        areaBD.portalCords = cordsPB_1;
-
-        // Other Lane gets the second portal
-        var otherGroup = Phaser.Math.RND.pick(nextArea);
-        var areaPB_2 = Phaser.Math.RND.pick(otherGroup);
-        var cordsPB_2 = areaPB_2.genChords(this);
-        areaPB_2.portalCords = cordsPB_2
-
-        makePair(this, cordsPB_1, cordsPB_2);
-
-        
-        // Generate next to portals
-        var pair3 = this.chooseAreaPair(this, groups);
-        makePair(this, pair3[0].genChords(this), pair3[1].genChords(this));
-
-        var pair4 = this.chooseAreaPair(this, groups);
-        makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
-        
-
-        
-         
-        
-
-        // Fair Fruit Spawn (5x)
-        
-        // Top Row
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
-
-        
-        // Middle Row        
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-
-
-        // Bottom Row
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-
-        // #endregion
-        */
-
-        // #region New Stage Logic
+        // #region Stage Logic
 
         var atom1 = new Food(this);
         var atom2 = new Food(this);
@@ -1414,6 +1321,78 @@ class GameScene extends Phaser.Scene {
         else if (this.moveInterval === SPEEDWALK){
             this.cameras.main.shake(300, .00625);
         }    
+    }
+
+    validSpawnLocations() {
+        var testGrid = {};
+
+        // Start with all safe points as true. This is important because Javascript treats 
+        // non initallized values as undefined and so any comparison or look up throws an error.
+        for (var x1 = 0; x1 <= END_X; x1++) {
+            testGrid[x1] = {};
+    
+            for (var y1 = 2; y1 < END_Y; y1++)
+            {
+                testGrid[x1][y1] = true;
+            }
+        }
+    
+        
+        // Make all the unsafe places unsafe
+        this.walls.forEach(wall => {
+            if (wall.x < SCREEN_WIDTH) {
+                // Hack to sanitize index undefined value
+                // Current Tiled input script adds additional X values.
+                testGrid[wall.x][wall.y] = false;
+            }
+        });
+
+        this.atoms.forEach(_fruit => {
+            testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
+        });
+
+        this.portals.forEach(_portal => {
+            testGrid[_portal.x/GRID][_portal.y/GRID] = false;
+        });
+
+        this.dreamWalls.forEach( _dreamWall => {
+            testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        });
+
+        // Don't let fruit spawn on dreamwall blocks
+        //scene.dreamWalls.forEach(_dreamWall => {
+        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        //});
+        
+        this.snake.body.forEach(_part => {
+            //testGrid[_part.x/GRID][_part.y/GRID] = false;
+            //debugger
+            if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
+                // This goes nan sometimes. Ignore if that happens.
+                // Round maths for the case when adding a fruit while the head interpolates across the screen
+                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+            }
+            
+        });
+        
+
+        
+        var validLocations = [];
+    
+        for (var x2 = 0; x2 <= END_X; x2++)
+        {
+            for (var y2 = 0; y2 <= END_Y; y2++)
+            {
+                if (testGrid[x2][y2] === true)
+                {
+                    // Push only valid positions to an array.
+                    validLocations.push({x: x2, y: y2});
+                }
+            }
+        }
+
+        return validLocations;
+
     }
 
     checkPortalAndMove() {
@@ -3165,6 +3144,8 @@ class UIScene extends Phaser.Scene {
         // BOOST METER
         this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
         this.comboCounter = 0;
+
+        this.coinSpawnCounter = 100;
     }
 
     preload () {
@@ -3469,10 +3450,13 @@ class UIScene extends Phaser.Scene {
 
 
         }, this);
+
+        this.lastTimeTick = 0;
+
         
     }
-    update() {
-        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+    update(time) {
+        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         var ourInputScene = this.scene.get('InputScene');
 
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
@@ -3488,21 +3472,38 @@ class UIScene extends Phaser.Scene {
             this.scene.start('ScoreScene');
         }
         // #endregion
-        
-        if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
-        
+
+        if (!this.scene.get("GameScene").checkWinCon() && !this.scoreTimer.paused) {
+            /***
+             * This is out of the Time Tick Loop because otherwise it won't pause 
+             * correctly and when the snake portals after the timer pauses at the Score Floor
+             *  the countdown timer will go to 0.
+             */
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            if (timeTick < SCORE_FLOOR ) {
-                this.countDown.setText(SCORE_FLOOR.toString().padStart(3,"0")
-            );
+    
+            if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
+                this.scoreTimer.paused = true;
             }
-            else {
-                this.countDown.setText(countDown.toString().padStart(3,"0"));
+
+            this.countDown.setText(countDown.toString().padStart(3,"0"));
+
+        }
+
+        if (timeTick != this.lastTimeTick) {
+            this.lastTimeTick = timeTick;
+
+            if(!this.scoreTimer.paused) {
+                this.coinSpawnCounter -= 1;
+                console.log(this.coinSpawnCounter);
+
+                if (this.coinSpawnCounter < 1) {
+                    console.log("COIN TIME YAY");
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(20,120);
+                }
             }
         }
-        else {
-            //this.countDown.setText(this.score);
-        }
+        
+
 
         if (GState.PLAY === this.scene.get('GameScene').gState) {
             if (ourInputScene.spaceBar.isDown) {
