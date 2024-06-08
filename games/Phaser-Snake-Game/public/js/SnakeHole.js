@@ -30,7 +30,7 @@ const SCORE_SCENE_DEBUG = false;
 export const SPEED_WALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
-const SPEED_SPRINT = 24; // 24
+const SPEED_SPRINT = 16; // 24
 
 
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
