@@ -24,7 +24,7 @@ var Food = new Phaser.Class({
 
         this.setOrigin(0,-.0625);
         //this.startDecay(scene);
-        this.setDepth(100);
+        this.setDepth(75);
         this.play("atom01idle");
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(101);
         this.electrons.play("electronIdle");

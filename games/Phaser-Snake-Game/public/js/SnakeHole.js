@@ -943,7 +943,7 @@ class GameScene extends Phaser.Scene {
 
                     if (tile.y > 1 && tile.y < 30) {
                         var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
-                    ).setOrigin(0,0).setDepth(99);
+                    ).setOrigin(0,0).setDepth(50);
 
                     wallSprites.push(_sprite);
                     }
@@ -1392,8 +1392,8 @@ class GameScene extends Phaser.Scene {
         // Make all the unsafe places unsafe
 
         
-        console.log("CHECKING CULLED TILES")
-        this.wallLayer.culledTiles.forEach(wall => {
+        console.log("CHECKING ALL TILES IN THE WALL LAYER")
+        this.wallLayer.forEachTile(wall => {
     
             if (wall.index > 0) {
                 
