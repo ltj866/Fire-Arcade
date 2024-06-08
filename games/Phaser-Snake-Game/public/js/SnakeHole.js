@@ -3457,7 +3457,8 @@ class UIScene extends Phaser.Scene {
     }
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        var ourInputScene = this.scene.get('InputScene');
+        const ourInputScene = this.scene.get('InputScene');
+        const ourGame = this.scene.get('GameScene');
 
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
@@ -3473,7 +3474,7 @@ class UIScene extends Phaser.Scene {
         }
         // #endregion
 
-        if (!this.scene.get("GameScene").checkWinCon() && !this.scoreTimer.paused) {
+        if (!ourGame.checkWinCon() && !this.scoreTimer.paused) {
             /***
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly and when the snake portals after the timer pauses at the Score Floor
@@ -3498,6 +3499,15 @@ class UIScene extends Phaser.Scene {
 
                 if (this.coinSpawnCounter < 1) {
                     console.log("COIN TIME YAY");
+
+                    var validLocations = ourGame.validSpawnLocations();
+                    var pos = Phaser.Math.RND.pick(validLocations)
+
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim'
+                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+                    
+                    ourGame.coins.push(_coin);
+
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(20,120);
                 }
             }
