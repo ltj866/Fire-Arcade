@@ -154,6 +154,10 @@ var Snake = new Phaser.Class({
             }
         }
 
+        scene.map.setLayer("Ghost-1"); {
+            // Check Ghost Wall Collision
+        }
+
         
     
         // #region intesect self

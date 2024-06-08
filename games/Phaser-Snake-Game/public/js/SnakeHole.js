@@ -643,6 +643,8 @@ class GameScene extends Phaser.Scene {
 
         this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
+
+        // Add ghost wall layer here. @holden
         
         
     
@@ -782,7 +784,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // Audio
-        this.snakeCrash = this.sound.add('snakeCrash');
+        this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
 
         //this.pointCollect = this.sound.add('pointCollect01');
         //this.pointCollect.play();
@@ -924,17 +926,17 @@ class GameScene extends Phaser.Scene {
         // #endregion
 
         // Map only contains Walls at this point
-        this.map.forEachTile( tile => {
+        //this.map.forEachTile( tile => {
 
             // Empty tiles are indexed at -1. 
             // Any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index.
-            if (tile.index > 0) {  
-                var wall = new Phaser.Geom.Point(tile.x,tile.y);
-                this.walls.push(wall);
-            }
+            //if (tile.index > 0) {  
+            //    var wall = new Phaser.Geom.Point(tile.x,tile.y);
+            //    this.walls.push(wall);
+            //}
 
-        });
+        //});
         
 
         // Make Fruit TODO: USE THE MAP.JSON CUSTOM ATTRIBUTES
