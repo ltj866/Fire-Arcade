@@ -950,16 +950,21 @@ class GameScene extends Phaser.Scene {
                     
                 });
                 this.wallLayer.visible = false;
+
+                Phaser.Utils.Array.Shuffle(wallSprites);
                 
                 var allTheThings = [
                     ...this.snake.body, 
                     ...this.coins,
                     ...this.portals,
+                    ...this.atoms,
                     ...wallSprites
                 ];
 
+                
 
-                var blackholeTween = this.vortexIn(allTheThings, this.snake.head.x/GRID, this.snake.head.y/GRID);
+
+                var blackholeTween = this.vortexIn(allTheThings, 15, 15);
                 blackholeTween.on('complete', () => {
                     this.nextStage();
                 });
