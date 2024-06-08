@@ -1,5 +1,5 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
-    LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
+    LEFT, RIGHT, UP, DOWN, STOP, DEBUG, commaInt,
     LENGTH_GOAL, SPEED_WALK, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
@@ -75,32 +75,34 @@ var Snake = new Phaser.Class({
     
     
     move: function (scene) {
+        const ourUI = scene.scene.get('UIScene');
+        const ourPlayerData = scene.scene.get('PlayerDataScene')
     
-    // Alias x and y to the current head position
-    let x = this.head.x;
-    let y = this.head.y;
+        // Alias x and y to the current head position
+        let x = this.head.x;
+        let y = this.head.y;
 
-    // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
-    this.snakeLight.x = x + GRID/2;
-    this.snakeLight.y = y + GRID/2;
+        // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
+        this.snakeLight.x = x + GRID/2;
+        this.snakeLight.y = y + GRID/2;
 
-    this.snakeLightN.x = x
-    this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3)
+        this.snakeLightN.x = x
+        this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3)
 
-    this.snakeLightE.x = x + SCREEN_WIDTH
-    this.snakeLightE.y = y
+        this.snakeLightE.x = x + SCREEN_WIDTH
+        this.snakeLightE.y = y
 
-    this.snakeLightS.x = x
-    this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)
+        this.snakeLightS.x = x
+        this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)
 
-    this.snakeLightW.x = x - SCREEN_WIDTH
-    this.snakeLightW.y = y
+        this.snakeLightW.x = x - SCREEN_WIDTH
+        this.snakeLightW.y = y
 
 
-    // Look ahead for bonks
+        // Look ahead for bonks
 
-    var xN = this.head.x;
-    var yN = this.head.y;
+        var xN = this.head.x;
+        var yN = this.head.y;
 
         
         if (this.direction === LEFT)
@@ -135,6 +137,13 @@ var Snake = new Phaser.Class({
             if (scene.bonkable) {
                 scene.gState = GState.BONK
                 console.log(scene.gState, "BONK");
+                
+                ourPlayerData.coins += -1;
+                ourUI.coinUIText.setHTML(
+                    `${commaInt(ourPlayerData.coins)}`
+                )
+
+
                 /////////////////////////////////////
                 console.log("REACHING BONK TWEEN CODE");
                 //console.log("DEAD, Now Rregroup", this.snake.alive);
@@ -197,7 +206,6 @@ var Snake = new Phaser.Class({
             }) 
         }
         // #endregion
-        const ourUI = scene.scene.get('UIScene'); // needs to move to somewhere more efficent
     
     // Actually Move the Snake Head
     if (scene.gState != GState.BONK && this.direction != STOP) {
@@ -208,6 +216,12 @@ var Snake = new Phaser.Class({
         var _coin = scene.coins[index];
         if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
             console.log("Hit Coin");
+
+            ourPlayerData.coins += 1;
+            ourUI.coinUIText.setHTML(
+                `${commaInt(ourPlayerData.coins)}`
+            )
+
             _coin.destroy();
             scene.coins.splice(index,1);
             console.log(scene.coins)

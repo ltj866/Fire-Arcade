@@ -78,7 +78,7 @@ var calcSumOfBest = function(scene) {
     })
 }
 
-var commaInt = function(int) {
+export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -257,7 +257,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -463,15 +463,25 @@ class PlayerDataScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
+        this.coins = 4;
     }
     
     preload(){
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
+
 
     }
     
     create() {
 
     // #region Bottom Bar
+
+    this.anims.create({
+        key: 'coin01idle',
+        frames: this.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
+        frameRate: 8,
+        repeat: -1
+      })
 
     // Is Zero if there is none.
 
@@ -3145,6 +3155,7 @@ class UIScene extends Phaser.Scene {
         this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
         this.comboCounter = 0;
 
+
         this.coinSpawnCounter = 100;
     }
 
@@ -3271,20 +3282,34 @@ class UIScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
+        this.coinsUIIcon = this.add.sprite(GRID*21.5 - 7, GRID,'coinPickup01Anim'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0);
+
+        this.coinsUIIcon.setScale(0.5);
         
-        this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `LASTΔ :`
-        ).setOrigin(0,1);
-        this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `0 `
-        ).setOrigin(0,1);
+        this.coinUIText = this.add.dom(GRID*22 - 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE
+            )).setHTML(
+                `${commaInt(this.scene.get("PlayerDataScene").coins)}`
+        ).setOrigin(0,0);
+        
+        //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `LASTΔ :`
+        //).setOrigin(0,1);
+        //this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `0 `
+        //).setOrigin(0,1);
         
         this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `SCORE :`
-        ).setOrigin(0,0);
+        ).setOrigin(0,1);
         this.runningScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
-        ).setOrigin(0,0);
+        ).setOrigin(0,1);
+
+       
+        
+
+        
         
 
         
@@ -3361,12 +3386,12 @@ class UIScene extends Phaser.Scene {
             var runningScore = this.score + calcBonus(baseScore);
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
 
-            this.deltaScoreUI.setText(
-                `LASTΔ : +`
-            )
-            this.deltaScoreLabelUI.setText(
-                `${deltaScore}`
-            )
+            //this.deltaScoreUI.setText(
+            //    `LASTΔ : +`
+            //)
+            //this.deltaScoreLabelUI.setText(
+            //    `${deltaScore}`
+            //)
             
             this.runningScoreUI.setText(
                 `SCORE :`
