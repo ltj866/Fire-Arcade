@@ -1515,7 +1515,7 @@ class GameScene extends Phaser.Scene {
 
     vortexIn(target, x, y){
 
-        var tweenRespawn = this.tweens.add({
+        var vortexTween = this.tweens.add({
             targets: target, 
             x: x * GRID, //this.pathRegroup.vec.x,
             y: y * GRID, //this.pathRegroup.vec.y,
@@ -1526,7 +1526,7 @@ class GameScene extends Phaser.Scene {
             delay: this.tweens.stagger(30)
         });
 
-        return tweenRespawn
+        return vortexTween
     }
 
     checkWinCon() { // Returns Bool

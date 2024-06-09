@@ -301,11 +301,14 @@ var Snake = new Phaser.Class({
         console.log(scene.gState, "BONK");
 
         scene.screenShake();
-        
-        ourPlayerData.coins += -1;
-        ourUI.coinUIText.setHTML(
-            `${commaInt(ourPlayerData.coins)}`
-        )
+
+        if (!scene.winned) {
+            ourPlayerData.coins += -1;
+            ourUI.coinUIText.setHTML(
+                `${commaInt(ourPlayerData.coins)}`
+            )
+            
+        }
 
 
         /////////////////////////////////////
