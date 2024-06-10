@@ -1538,7 +1538,7 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(25)
+            delay: this.tweens.stagger(SPEED_SPRINT)
         });
 
         return snakeEating
