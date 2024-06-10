@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -1247,13 +1247,17 @@ class GameScene extends Phaser.Scene {
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
             
-            this.portalMask = this.make.image({
-                x: portal.x,
-                y: portal.y,
-                key: 'portalMask',
-                add: false,
-            });
-            this.lightMasks.push(this.portalMask)
+            if (GHOST_WALLS === false) {
+                this.portalMask = this.make.image({
+                    x: portal.x,
+                    y: portal.y,
+                    key: 'portalMask',
+                    add: false,
+                });
+                
+                this.lightMasks.push(this.portalMask)
+            }
+
         });
 
         // #region Coins
