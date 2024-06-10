@@ -258,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-07';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -948,15 +948,21 @@ class GameScene extends Phaser.Scene {
 
                 this.snake.head.setTexture('snakeDefault', 0);
 
-                var wallSprites = []
+                var wallSprites = [];
+                var fadeOutSprites = []; 
 
                 this.wallLayer.culledTiles.forEach( tile => {
 
                     if (tile.y > 1 && tile.y < 30) {
+                        
                         var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
-                    ).setOrigin(0,0).setDepth(50);
-
-                    wallSprites.push(_sprite);
+                        ).setOrigin(0,0).setDepth(50);
+                        
+                        if (104 === tile.index) {
+                            fadeOutSprites.push(_sprite);
+                        } else {
+                            wallSprites.push(_sprite);
+                        }               
                     }
                     
                 });
@@ -974,8 +980,18 @@ class GameScene extends Phaser.Scene {
 
                 
 
+                var blackholeTween = this.tweens.add({
+                    targets: allTheThings, 
+                    x: 15 * GRID, //this.pathRegroup.vec.x,
+                    y: 15 * GRID, //this.pathRegroup.vec.y,
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Sine.easeOutIn',
+                    repeat: 0,
+                    delay: this.tweens.stagger(30)
+                });
 
-                var blackholeTween = this.vortexIn(allTheThings, 15, 15);
+
                 blackholeTween.on('complete', () => {
                     this.nextStage();
                 });
