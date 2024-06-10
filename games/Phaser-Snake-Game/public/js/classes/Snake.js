@@ -137,7 +137,7 @@ var Snake = new Phaser.Class({
             }
         }
 
-        if (scene.GHOST_WALLS = true) {
+        if (scene.hasGhostTiles = true) {
             scene.map.setLayer("Ghost-1");
         }
         if (scene.map.getTileAtWorldXY( xN, yN )) {

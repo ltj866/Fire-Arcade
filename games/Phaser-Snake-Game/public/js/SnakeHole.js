@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -258,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'Stage-03a';
+const START_STAGE = 'Stage-01';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -601,6 +601,7 @@ class GameScene extends Phaser.Scene {
         
         this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
+        this.hasGhostTiles = false;
          
     }
     
@@ -661,7 +662,8 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
 
-        if (GHOST_WALLS === true) {
+        if (this.map.getLayer('Ghost-1')) {
+            this.hasGhostTiles = true;
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
@@ -1247,7 +1249,7 @@ class GameScene extends Phaser.Scene {
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
             
-            if (GHOST_WALLS === false) {
+            if (!this.hasGhostTiles) {
                 this.portalMask = this.make.image({
                     x: portal.x,
                     y: portal.y,
@@ -1374,7 +1376,7 @@ class GameScene extends Phaser.Scene {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
-        if (GHOST_WALLS) {
+        if (this.hasGhostTiles) {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
         }
@@ -1409,7 +1411,8 @@ class GameScene extends Phaser.Scene {
         // Make all the unsafe places unsafe
 
         
-        console.log("CHECKING ALL TILES IN THE WALL LAYER")
+        console.log("CHECKING ALL TILES IN THE WALL LAYER");
+        this.map.getLayer('Wall'); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
             if (wall.index > 0) {
@@ -1417,6 +1420,16 @@ class GameScene extends Phaser.Scene {
                 testGrid[wall.x][wall.y] = false;
             }
         });
+        
+        if (this.map.getLayer('Ghost-1')) {
+            this.ghostWallLayer.forEachTile(wall => {
+    
+                if (wall.index > 0) {
+                    
+                    testGrid[wall.x][wall.y] = false;
+                }
+            });
+        }
 
 
 
