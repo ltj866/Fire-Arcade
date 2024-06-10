@@ -218,6 +218,7 @@ var Snake = new Phaser.Class({
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
             const ourUI = scene.scene.get('UIScene');
+            scene.snakeEating();
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
             if(timeSinceFruit > COMBO_ADD_FLOOR){

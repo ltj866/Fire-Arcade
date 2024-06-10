@@ -1529,6 +1529,21 @@ class GameScene extends Phaser.Scene {
         return vortexTween
     }
 
+    snakeEating(){
+        
+        var snakeEating = this.tweens.add({
+            targets: this.snake.body, 
+            scale: [1.25,1],
+            yoyo: false,
+            duration: 64,
+            ease: 'Linear',
+            repeat: 0,
+            delay: this.tweens.stagger(25)
+        });
+
+        return snakeEating
+    }
+
     checkWinCon() { // Returns Bool
         const ourUI = this.scene.get('UIScene');
         return ourUI.length >= LENGTH_GOAL
