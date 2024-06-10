@@ -14,9 +14,10 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
+const GHOST_WALLS = true;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -257,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-03a';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -659,6 +660,12 @@ class GameScene extends Phaser.Scene {
 
         this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
+
+        if (GHOST_WALLS === true) {
+            this.ghostWallLayer = this.map.createLayer('Ghost-Wall', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer.setDepth(26);
+        }
+        
 
         // Add ghost wall layer here. @holden
         
@@ -1363,7 +1370,11 @@ class GameScene extends Phaser.Scene {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
+        if (GHOST_WALLS) {
+            this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
+        }
+        
         // #endregion
         
     }
