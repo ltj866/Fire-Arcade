@@ -941,6 +941,8 @@ class GameScene extends Phaser.Scene {
             this.bg3.setTexture('bg02_3_2')
         });
 
+        const FADE_OUT_TILES = [104];
+
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
 
@@ -958,7 +960,7 @@ class GameScene extends Phaser.Scene {
                         var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
                         ).setOrigin(0,0).setDepth(50);
                         
-                        if (104 === tile.index) {
+                        if (FADE_OUT_TILES.includes(tile.index)) {
                             fadeOutSprites.push(_sprite);
                         } else {
                             wallSprites.push(_sprite);
