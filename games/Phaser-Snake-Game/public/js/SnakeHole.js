@@ -662,7 +662,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer.setDepth(25);
 
         if (GHOST_WALLS === true) {
-            this.ghostWallLayer = this.map.createLayer('Ghost-Wall', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
         

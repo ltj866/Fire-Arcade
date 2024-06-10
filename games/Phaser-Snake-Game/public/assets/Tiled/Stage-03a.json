@@ -79,7 +79,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":31,
          "id":5,
-         "name":"Ghost-Wall",
+         "name":"Ghost-1",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
