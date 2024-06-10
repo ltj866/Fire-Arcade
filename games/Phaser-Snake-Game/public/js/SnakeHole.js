@@ -258,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'Stage-07';
+const START_STAGE = 'Stage-03g';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -693,7 +693,7 @@ class GameScene extends Phaser.Scene {
         this.bg.tileScaleY = 3;
         
         // BG Mask
-        this.mask = this.make.tileSprite({
+        this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
             x: SCREEN_WIDTH/2,
             y: SCREEN_HEIGHT/2,
             key: 'bg02mask',
@@ -1385,10 +1385,12 @@ class GameScene extends Phaser.Scene {
             add: false
         }).setOrigin(0.5,0.5);
 
+        this.snakeMask.setScale(0.666);
+
 
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
 
-        this.lightMasksContainer.add ( this.lightMasks);
+        this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
         if (DARK_MODE) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
@@ -3663,7 +3665,7 @@ class UIScene extends Phaser.Scene {
                     
                     ourGame.coins.push(_coin);
 
-                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(20,120);
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
                 }
             }
         }
