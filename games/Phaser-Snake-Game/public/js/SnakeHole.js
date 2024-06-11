@@ -258,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'testing04';
+const START_STAGE = 'testing';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -671,6 +671,17 @@ class GameScene extends Phaser.Scene {
         if (this.map.getLayer('Food')) {
             this.foodLayer = this.map.createLayer('Food', [this.tileset]);
             this.foodLayer.visible = false;
+
+            this.foodLayer.forEachTile(_tile => {
+                if(11 === _tile.index) {
+                    var food = new Food(this);
+                    food.x = _tile.x*GRID;
+                    food.y = _tile.y*GRID;
+
+                    food.electrons.x = _tile.x*GRID;
+                    food.electrons.y = _tile.y*GRID;
+                }
+            })
         }
         
 

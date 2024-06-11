@@ -172,7 +172,7 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 160.42396537076743,
+                "x": 426.19199805817385,
                 "y": 420.47332011812773
             }
         },
@@ -183,18 +183,29 @@
             "scale": 0.7661290322580644,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.6526315789474,
+                "x": 948.926315789474,
                 "y": 372.6526315789474
             }
         },
         "Stage-09.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "Stage-10.json": {
+            "scale": 1.8961693548387095,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.32961190855923,
+                "y": 372.06592238171186
+            }
+        },
+        "Stage-10.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "Stage-11.json": {
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.1121000040455,
+                "x": 636.2781665924997,
                 "y": 371.71406610299766
             }
         },
@@ -205,7 +216,7 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.41308305352163,
+                "x": 370.81111695456934,
                 "y": 371.71406610299766
             }
         },
@@ -216,7 +227,7 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.41308305352163,
+                "x": 370.81111695456934,
                 "y": 371.71406610299766
             }
         },
@@ -249,7 +260,7 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.41308305352163,
+                "x": 370.81111695456934,
                 "y": 371.71406610299766
             }
         },
@@ -404,6 +415,7 @@
     "openFiles": [
     ],
     "project": "SnakeTiled.tiled-project",
+    "property.type": "int",
     "recentFiles": [
         "testing03-1.json",
         "testing03-2.json",
