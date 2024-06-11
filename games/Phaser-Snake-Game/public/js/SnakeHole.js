@@ -255,10 +255,19 @@ const STAGES_NEXT = {
     'Stage-11': ['Stage-12'],
     'Bonus-Stage-x1': [],
     'testing04': ['Stage-02a','Stage-02b','Stage-02c','Stage-02d','Stage-02e'],
-    'testing-05': ['Stage-03a']
+    'testing-05': ['Stage-03a'],
+
+    'testing02': ['testing03-1'],
+    'testing03-1': ['testing05-1'],
+    'testing05-1': ['testing05-2'],
+    'testing05-2': ['testing06'],
+    'testing06': ['testing06-2'],
+    'testing06-2': ['testing03-2'],
+    'testing03-2': ['testing08'],
+    'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'testing';
+const START_STAGE = 'testing02';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
