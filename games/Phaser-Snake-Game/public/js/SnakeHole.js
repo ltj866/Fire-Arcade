@@ -258,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'testing08';
+const START_STAGE = 'testing04';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -666,6 +666,11 @@ class GameScene extends Phaser.Scene {
             this.hasGhostTiles = true;
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
+        }
+
+        if (this.map.getLayer('Food')) {
+            this.foodLayer = this.map.createLayer('Food', [this.tileset]);
+            this.foodLayer.visible = false;
         }
         
 
@@ -1449,6 +1454,17 @@ class GameScene extends Phaser.Scene {
                     testGrid[wall.x][wall.y] = false;
                 }
             });
+        }
+
+        if (this.map.getLayer('Food')) {
+            this.foodLayer.forEachTile(foodTile => {
+    
+                if (foodTile.index > 0) {
+                    
+                    testGrid[foodTile.x][foodTile.y] = false;
+                }
+            });
+
         }
 
 
