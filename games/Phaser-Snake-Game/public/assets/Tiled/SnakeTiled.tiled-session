@@ -150,7 +150,7 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 370.5101339050933,
+                "x": 362.38359156923826,
                 "y": 371.71406610299766
             }
         },
@@ -353,6 +353,17 @@
             }
         },
         "testing07.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing08.json": {
+            "scale": 1.6612231182795698,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 427.99789635503055,
+                "y": 419.2693879202233
+            }
+        },
+        "testing08.json#tileSheetx24": {
             "scaleInDock": 1
         }
     },

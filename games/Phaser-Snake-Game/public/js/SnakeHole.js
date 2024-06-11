@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -258,7 +258,7 @@ const STAGES_NEXT = {
     'testing-05': ['Stage-03a']
 }
 // #region START STAGE
-const START_STAGE = 'Stage-03g';
+const START_STAGE = 'testing08';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -1385,7 +1385,7 @@ class GameScene extends Phaser.Scene {
             add: false
         }).setOrigin(0.5,0.5);
 
-        this.snakeMask.setScale(0.666);
+        this.snakeMask.setScale(1); //Note I'd like to be able to set the scale per level so I can fine tune this during level design.
 
 
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
