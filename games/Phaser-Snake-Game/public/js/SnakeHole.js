@@ -791,6 +791,8 @@ class GameScene extends Phaser.Scene {
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
 
+        this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
+
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
         this.lightMasksContainer = this.make.container(0, 0);
@@ -1485,6 +1487,15 @@ class GameScene extends Phaser.Scene {
             });
 
         }
+
+
+        // Don't spawn on Dream Walls
+
+
+        this.dreamWalls.forEach( dreamwall => {
+            testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
+        });
+        
 
 
 
