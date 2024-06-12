@@ -1,6 +1,6 @@
-import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
-    LENGTH_GOAL, SPEEDWALK, COMBO_ADD_FLOOR
+import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
+    LEFT, RIGHT, UP, DOWN, STOP, DEBUG, commaInt,
+    LENGTH_GOAL, SPEED_WALK, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 
@@ -9,144 +9,155 @@ var Snake = new Phaser.Class({
 
     function Snake (scene, x, y)
     {
-        this.alive = true;
         this.body = [];
-        this.hold_move = false;
-        this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
-        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
-        this.head.setOrigin(0,0).setDepth(10);
+        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
+        this.head.setOrigin(0,0).setDepth(99);
         
-        this.body.push(this.head);
+        this.body.unshift(this.head);
 
-        this.bonked = false;
         this.lastPlayedCombo = 0;
 
 
+
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
-        
+
+
+        if (scene.DARK_MODE) {
+            this.lightIntensity = 1.5
+            this.lightDiameter = 192
+        }
+        else{
+            this.lightIntensity = .5
+            this.lightDiameter = 92
+        }
+
+        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightE = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightW = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
     },
     
     grow: function (scene)
     {
-        // Current Tail of the snake
-        this.tail = this.body.slice(-1);
+        if (scene.boostOutlinesBody.length > 0) {
+            //newPart.setTint(0xFF00FF);
+            // Make the new one
+            var boostOutline = scene.add.sprite(
+                this.body[this.body.length - 2].x, 
+                this.body[this.body.length - 2].y
+            ).setOrigin(.083333,.083333).setDepth(15);
+             
+            boostOutline.play("snakeOutlineAnim");
+            scene.boostOutlinesBody.unshift(boostOutline);
+        }
         
-        // Add a new part at the current tail position
+        this.tail = this.body.slice(-1);
+
+        
+        // Add a new part at  the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
-        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 1);
-        newPart.setOrigin(0,0).setDepth(9);
+        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
+        newPart.setOrigin(0,0).setDepth(9).setPipeline('Light2D');
+        
 
+        if (this.body.length > 1){
+            this.body[this.body.length -1].setTexture('snakeDefault',[1])
+            
+        }
         this.body.push(newPart);
+        scene.applyMask();
 
-        
-        
+
     },
     
     
     move: function (scene) {
+        const ourUI = scene.scene.get('UIScene');
+        const ourPlayerData = scene.scene.get('PlayerDataScene')
     
-    // Alias x and y to the current head position
-    let x = this.head.x;
-    let y = this.head.y;
+        // Alias x and y to the current head position
+        let x = this.head.x;
+        let y = this.head.y;
 
-    var onPortal = false;
+        // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
+        this.snakeLight.x = x + GRID/2;
+        this.snakeLight.y = y + GRID/2;
 
-    
-    scene.portals.forEach(portal => { 
-        if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
-            onPortal = true; // Used to ignore certain collisions when you are on top of a portal.
-            this.portal_buffer_on = false; // Used to keep you from reportaling immediately
-            
-            this.hold_move = true; // Keep the head from moving while recombinating.
+        this.snakeLightN.x = x
+        this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3)
 
-            if (DEBUG) { console.log("PORTAL"); }
+        this.snakeLightE.x = x + SCREEN_WIDTH
+        this.snakeLightE.y = y
 
-            var _x = portal.target.x*GRID;
-            var _y = portal.target.y*GRID;
+        this.snakeLightS.x = x
+        this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)
 
-            var portalSound = scene.portalSounds[0]
-            portalSound.play();
+        this.snakeLightW.x = x - SCREEN_WIDTH
+        this.snakeLightW.y = y
 
-            scene.lastMoveTime += SPEEDWALK * 2;
-            var _tween = scene.tweens.add({
-                targets: this.head, 
-                x: _x,
-                y: _y,
-                yoyo: false,
-                duration: SPEEDWALK * 2,
-                ease: 'Linear',
-                repeat: 0,
-                //delay: 500
-            });
-            
-            scene.time.delayedCall(SPEEDWALK * 4, event => {
-                
-                //console.log("YOU CAN PORTAL AGAIN.");
-                this.portal_buffer_on = true;
-                this.hold_move = false;
-                
-            }, [], scene);
-                                
-            return ;  //Don't know why this is here but I left it -James
-        }
-    });
 
-    // Look ahead for bonks
+        // Look ahead for bonks
 
-    var xN = this.head.x;
-    var yN = this.head.y;
+        var xN = this.head.x;
+        var yN = this.head.y;
 
         
         if (this.direction === LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
+            scene.bgCoords.x -= .25;
         }
         else if (this.direction === RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+            scene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+            scene.bgCoords.y -= .25;
         }
         else if (this.direction === DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
+            scene.bgCoords.y += .25;
         }
         
         // Bonk Wall
         scene.map.setLayer("Wall");
-        if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal) {
-            
-            // Only count a wall hit ahead if not on a portal.
-            //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
+        if (scene.map.getTileAtWorldXY( xN, yN )) {
             
             this.direction = STOP;
-            this.bonked = true;
-            
-            if(scene.recombinate) {
-                this.death(scene);
+            if (scene.bonkable) {
+                this.bonk(scene);
+               
             }
+        }
+
+        scene.map.setLayer("Ghost-1"); {
+            // Check Ghost Wall Collision
         }
 
         
     
-        // #region Bonk Self
-        if (scene.startMoving && !onPortal) {
+        // #region intesect self
+        if (scene.startMoving && !scene.ghosting && !this.traveling) { //GState.PLAY
         // Game Has started. Snake head has left Starting Square
             
 
-            var tail = this.body.slice(1);
-
-
             // Remove the Tail because the Tail will always move out of the way
             // when the head moves forward.
-            tail.pop();
+            var checkBody = this.body.slice(1);
+
 
             
-            tail.some(part => {
+            checkBody.pop();
+
+            
+            checkBody.some(part => {
                 if (part.x === xN && part.y === yN) {
                     var portalSafe = false; // Assume not on portal
                     scene.portals.forEach(portal => { 
@@ -155,61 +166,74 @@ var Snake = new Phaser.Class({
                         }
                     });
                     
-                    
                     if (!portalSafe) {
                         this.direction = STOP;
-                        this.bonked = true;
-                        if(scene.recombinate) {
-                            this.death(scene);
+                        if (scene.bonkable) {
+                            this.bonked = true;
+                            if(scene.recombinate) {
+                                this.death(scene);
+                            }
                         }
                         // Only colide if the snake has left the center square    
                     }  
                 }
-            })
-            
+            }) 
         }
         // #endregion
-        
-
     
     // Actually Move the Snake Head
-    if (this.alive) {
-        if (!this.bonked) {
+    if (scene.gState != GState.BONK && this.direction != STOP) {
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+    }
+
+    for (let index = 0; index < scene.coins.length; index++) {
+        var _coin = scene.coins[index];
+        if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
+            console.log("Hit Coin");
+
+            ourPlayerData.coins += 1;
+            ourUI.coinUIText.setHTML(
+                `${commaInt(ourPlayerData.coins)}`
+            )
+
+            _coin.destroy();
+            scene.coins.splice(index,1);
+            console.log(scene.coins)
         }
     }
-    
-    
-    
 
-    // Check if dead by map
+    /*
+    scene.coins.forEach(_coin => {
+        if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
 
-    
-    
-    
+            console.log("Hit Coin");
+            _coin.destroy();
+            console.log(scene.coins)
+
+        }
+
+    }); */
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
-        if(this.head.x === _atom.x && this.head.y === _atom.y){
+        if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            //console.log("time since last fruit:", timeSinceFruit);
-            
+
             if(timeSinceFruit > COMBO_ADD_FLOOR){
-                 
-                //console.log("combo",this.lastPlayedCombo)
-                
-                scene.pointSounds[this.lastPlayedCombo].play();
-                
+                if (this.lastPlayedCombo > 0) {
+                    ourUI.comboCounter += 1;
+                    ourUI.comboBounce();
+                    };
+                scene.pointSounds[this.lastPlayedCombo].play();       
                 if (this.lastPlayedCombo < 7) {
                     this.lastPlayedCombo += 1;
                 }
             }
             else {
                 this.lastPlayedCombo = 0;
+                ourUI.comboCounter = 0;
             }
-            
-
 
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
@@ -268,13 +292,40 @@ var Snake = new Phaser.Class({
         }
     });
     },
-    death: function (gameScene) {
-        this.alive = false;
-        this.hold_move = true;
-        gameScene.move_pause = true;
 
-        this.direction = STOP;
-        gameScene.started = false;
+    bonk: function (scene) {
+        const ourPlayerData = scene.scene.get('PlayerDataScene');
+        const ourUI = scene.scene.get('UIScene');
+        
+        scene.gState = GState.BONK
+        console.log(scene.gState, "BONK");
+
+        scene.screenShake();
+
+        if (!scene.winned) {
+            ourPlayerData.coins += -1;
+            ourUI.coinUIText.setHTML(
+                `${commaInt(ourPlayerData.coins)}`
+            )
+            
+        }
+
+
+        /////////////////////////////////////
+        console.log("REACHING BONK TWEEN CODE");
+        //console.log("DEAD, Now Rregroup", this.snake.alive);
+        scene.snakeCrash.play();    
+        // game.scene.scene.restart(); // This doesn't work correctly
+        if (DEBUG) { console.log("DEAD"); }
+        
+        scene.scene.get("UIScene").bonks += 1;
+        
+        // Do this on hardcore mode and take a life down.
+        //game.destroy();
+        //this.scene.restart();
+        
+        scene.tweenRespawn = scene.vortexIn(this.body, 15, 15);
+
     }
 });
 
