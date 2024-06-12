@@ -137,8 +137,16 @@ var Snake = new Phaser.Class({
             }
         }
 
-        scene.map.setLayer("Ghost-1"); {
-            // Check Ghost Wall Collision
+        if (scene.hasGhostTiles = true) {
+            scene.map.setLayer("Ghost-1");
+        }
+        if (scene.map.getTileAtWorldXY( xN, yN )) {
+        
+            this.direction = STOP;
+            if (scene.bonkable) {
+                this.bonk(scene);
+                
+            }
         }
 
         

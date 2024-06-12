@@ -16,13 +16,13 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
-const DARK_MODE = false;
+const DARK_MODE = true;
+const GHOST_WALLS = true;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
-
 
 
 // 1 frame is 16.666 milliseconds
@@ -254,10 +254,19 @@ const STAGES_NEXT = {
     'Stage-11': ['Stage-12'],
     'Bonus-Stage-x1': [],
     'testing04': ['Stage-02a','Stage-02b','Stage-02c','Stage-02d','Stage-02e'],
-    'testing-05': ['Stage-03a']
+    'testing-05': ['Stage-03a'],
+
+    'testing02': ['testing03-1'],
+    'testing03-1': ['testing05-1'],
+    'testing05-1': ['testing05-2'],
+    'testing05-2': ['testing06'],
+    'testing06': ['testing06-2'],
+    'testing06-2': ['testing03-2'],
+    'testing03-2': ['testing08'],
+    'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'testing02';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -600,6 +609,7 @@ class GameScene extends Phaser.Scene {
         
         this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
+        this.hasGhostTiles = false;
          
     }
     
@@ -660,6 +670,29 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
 
+        if (this.map.getLayer('Ghost-1')) {
+            this.hasGhostTiles = true;
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer.setDepth(26);
+        }
+
+        if (this.map.getLayer('Food')) {
+            this.foodLayer = this.map.createLayer('Food', [this.tileset]);
+            this.foodLayer.visible = false;
+
+            this.foodLayer.forEachTile(_tile => {
+                if(11 === _tile.index) {
+                    var food = new Food(this);
+                    food.x = _tile.x*GRID;
+                    food.y = _tile.y*GRID;
+
+                    food.electrons.x = _tile.x*GRID;
+                    food.electrons.y = _tile.y*GRID;
+                }
+            })
+        }
+        
+
         // Add ghost wall layer here. @holden
         
         
@@ -684,7 +717,7 @@ class GameScene extends Phaser.Scene {
         this.bg.tileScaleY = 3;
         
         // BG Mask
-        this.mask = this.make.tileSprite({
+        this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
             x: SCREEN_WIDTH/2,
             y: SCREEN_HEIGHT/2,
             key: 'bg02mask',
@@ -932,6 +965,8 @@ class GameScene extends Phaser.Scene {
             this.bg3.setTexture('bg02_3_2')
         });
 
+        const FADE_OUT_TILES = [104];
+
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
 
@@ -939,15 +974,21 @@ class GameScene extends Phaser.Scene {
 
                 this.snake.head.setTexture('snakeDefault', 0);
 
-                var wallSprites = []
+                var wallSprites = [];
+                var fadeOutSprites = []; 
 
                 this.wallLayer.culledTiles.forEach( tile => {
 
                     if (tile.y > 1 && tile.y < 30) {
+                        
                         var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
-                    ).setOrigin(0,0).setDepth(50);
-
-                    wallSprites.push(_sprite);
+                        ).setOrigin(0,0).setDepth(50);
+                        
+                        if (FADE_OUT_TILES.includes(tile.index)) {
+                            fadeOutSprites.push(_sprite);
+                        } else {
+                            wallSprites.push(_sprite);
+                        }               
                     }
                     
                 });
@@ -965,8 +1006,18 @@ class GameScene extends Phaser.Scene {
 
                 
 
+                var blackholeTween = this.tweens.add({
+                    targets: allTheThings, 
+                    x: 15 * GRID, //this.pathRegroup.vec.x,
+                    y: 15 * GRID, //this.pathRegroup.vec.y,
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Sine.easeOutIn',
+                    repeat: 0,
+                    delay: this.tweens.stagger(30)
+                });
 
-                var blackholeTween = this.vortexIn(allTheThings, 15, 15);
+
                 blackholeTween.on('complete', () => {
                     this.nextStage();
                 });
@@ -1240,13 +1291,17 @@ class GameScene extends Phaser.Scene {
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
             
-            this.portalMask = this.make.image({
-                x: portal.x,
-                y: portal.y,
-                key: 'portalMask',
-                add: false,
-            });
-            this.lightMasks.push(this.portalMask)
+            if (!this.hasGhostTiles) {
+                this.portalMask = this.make.image({
+                    x: portal.x,
+                    y: portal.y,
+                    key: 'portalMask',
+                    add: false,
+                });
+                
+                this.lightMasks.push(this.portalMask)
+            }
+
         });
 
         // #region Coins
@@ -1354,16 +1409,22 @@ class GameScene extends Phaser.Scene {
             add: false
         }).setOrigin(0.5,0.5);
 
+        this.snakeMask.setScale(1); //Note I'd like to be able to set the scale per level so I can fine tune this during level design.
+
 
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
 
-        this.lightMasksContainer.add ( this.lightMasks);
+        this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
         if (DARK_MODE) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
+        if (this.hasGhostTiles) {
+            this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
+        }
+        
         // #endregion
         
     }
@@ -1394,7 +1455,8 @@ class GameScene extends Phaser.Scene {
         // Make all the unsafe places unsafe
 
         
-        console.log("CHECKING ALL TILES IN THE WALL LAYER")
+        console.log("CHECKING ALL TILES IN THE WALL LAYER");
+        this.map.getLayer('Wall'); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
             if (wall.index > 0) {
@@ -1402,6 +1464,27 @@ class GameScene extends Phaser.Scene {
                 testGrid[wall.x][wall.y] = false;
             }
         });
+        
+        if (this.map.getLayer('Ghost-1')) {
+            this.ghostWallLayer.forEachTile(wall => {
+    
+                if (wall.index > 0) {
+                    
+                    testGrid[wall.x][wall.y] = false;
+                }
+            });
+        }
+
+        if (this.map.getLayer('Food')) {
+            this.foodLayer.forEachTile(foodTile => {
+    
+                if (foodTile.index > 0) {
+                    
+                    testGrid[foodTile.x][foodTile.y] = false;
+                }
+            });
+
+        }
 
 
 
@@ -3632,7 +3715,7 @@ class UIScene extends Phaser.Scene {
                     
                     ourGame.coins.push(_coin);
 
-                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(20,120);
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
                 }
             }
         }
