@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'stage-03g';
+const START_STAGE = 'Stage-07'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -521,7 +521,7 @@ class PlayerDataScene extends Phaser.Scene {
             font-size: 16px;
             border: limegreen solid 1px;
             border-radius: 5px;
-            padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
+            padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
     ).setOrigin(0,0.5);
 
 
@@ -1018,6 +1018,13 @@ class GameScene extends Phaser.Scene {
                     repeat: 0,
                     delay: this.tweens.stagger(30)
                 });
+
+                var fadeoutTween = this.tweens.add({
+                    targets: fadeOutSprites,
+                    alpha: 0,
+                    duration: 1000,
+                    ease: 'linear'
+                  }, this);
 
 
                 blackholeTween.on('complete', () => {
@@ -1651,6 +1658,7 @@ class GameScene extends Phaser.Scene {
     nextStage() {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
+        debugger
 
         var nextStages = STAGES_NEXT[this.stage]
         var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
@@ -2872,7 +2880,7 @@ class ScoreScene extends Phaser.Scene {
                     font-size: 16px;
                     border: limegreen solid 1px;
                     border-radius: 5px;
-                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
+                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} To Next Level.</span>`
                 );
             }
 
@@ -3696,7 +3704,7 @@ class UIScene extends Phaser.Scene {
         if (!ourGame.checkWinCon() && !this.scoreTimer.paused) {
             /***
              * This is out of the Time Tick Loop because otherwise it won't pause 
-             * correctly and when the snake portals after the timer pauses at the Score Floor
+             * correctly during portaling. After the timer pauses at the Score Floor
              *  the countdown timer will go to 0.
              */
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
@@ -3706,7 +3714,6 @@ class UIScene extends Phaser.Scene {
             }
 
             this.countDown.setText(countDown.toString().padStart(3,"0"));
-
         }
 
         if (timeTick != this.lastTimeTick) {
