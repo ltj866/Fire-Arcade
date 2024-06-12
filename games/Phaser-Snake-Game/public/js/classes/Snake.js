@@ -129,6 +129,7 @@ var Snake = new Phaser.Class({
         // Bonk Wall
         scene.map.setLayer("Wall");
         if (scene.map.getTileAtWorldXY( xN, yN )) {
+            debugger
             
             this.direction = STOP;
             if (scene.bonkable) {
@@ -139,15 +140,17 @@ var Snake = new Phaser.Class({
 
         if (scene.hasGhostTiles = true) {
             scene.map.setLayer("Ghost-1");
-        }
-        if (scene.map.getTileAtWorldXY( xN, yN )) {
+            if (scene.map.getTileAtWorldXY( xN, yN )) {
+            
         
-            this.direction = STOP;
-            if (scene.bonkable) {
-                this.bonk(scene);
-                
+                this.direction = STOP;
+                if (scene.bonkable) {
+                    this.bonk(scene);
+                    
+                }
             }
         }
+        
 
         
     

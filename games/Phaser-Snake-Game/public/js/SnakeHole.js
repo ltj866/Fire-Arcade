@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'testing02';
+const START_STAGE = 'stage-03g';
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
