@@ -1812,15 +1812,15 @@ class GameScene extends Phaser.Scene {
                     "text-align": 'center',
                     "text-shadow": '2px 2px 4px #000000',
                     "white-space": 'pre-line'
-
                 }
-            )).setHTML(
+                )).setHTML(
                 `GAMEOVER
                 ON
                 ${this.stage}
-                Better Luck Next Time.`
-                
-        ).setOrigin(0.5,0.5);
+                Better Luck Next Time...` 
+            ).setOrigin(0.5,0.5);
+
+            this.scene.pause("GameScene");
             
         }
 
@@ -2737,13 +2737,21 @@ class ScoreScene extends Phaser.Scene {
         card.setOrigin(0.5,0); 
         card.displayHeight = 108;*/
 
+        var totalScore = 0;
+
+        ourStartScene.stageHistory.forEach( stageData => {
+            totalScore += stageData.calcTotal();
+        });
+
+
+
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             color: COLOR_SCORE,
             "font-size":'28px',
             'font-weight': 500,
         })).setText(
-            `TOTAL SCORE: ${commaInt(ourUI.score + this.stageData.calcTotal() - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+            `TOTAL SCORE: ${commaInt(totalScore)}`
         ).setOrigin(0.5,0).setDepth(60);
 
         // #endregion
