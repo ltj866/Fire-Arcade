@@ -267,7 +267,7 @@ const STAGES_NEXT = {
 }
 // #region START STAGE
 const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
-var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
+var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
 
@@ -1581,6 +1581,7 @@ class GameScene extends Phaser.Scene {
                     portal.snakePortalingSprite.visible = true;   
                 }
 
+
                 var _x = portal.target.x*GRID;
                 var _y = portal.target.y*GRID;
     
@@ -2180,10 +2181,6 @@ class ScoreScene extends Phaser.Scene {
         }
 
         this.stageData = new StageData(stageDataJSON);
-
-
-
-
         
         console.log(JSON.stringify(this.stageData));
 
@@ -2802,6 +2799,12 @@ class ScoreScene extends Phaser.Scene {
                 // Go Back Playing To Select New Stage
                 ourScoreScene.scene.stop();
                 ourGame.gState = GState.PLAY;
+
+                ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
+
+                    })).setHTML(
+                        `Press "n" to continue to the next stage.`
+                ).setOrigin(0.5,0.5);
                             
                 if (bestrun < ourUI.score + ourScoreScene.stageData.calcTotal()) {
                     localStorage.setItem('BestFinalScore', ourUI.score + ourScoreScene.stageData.calcTotal());
@@ -3634,9 +3637,6 @@ class UIScene extends Phaser.Scene {
                 this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
             }
             
-            
-            
-
              // Restart Score Timer
             if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
