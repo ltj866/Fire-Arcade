@@ -664,10 +664,19 @@ class GameScene extends Phaser.Scene {
         ourPlayerData.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
-
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
+        this.wallVarient = '';
+        if (this.map.getLayer('Wall_1')) {
+            /***
+             * Check if there are Fungible wall varients.
+             */
+
+        } else {
+            this.wallVarient = "Wall";
+        }
+
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
 
         if (this.map.getLayer('Ghost-1')) {
@@ -3517,12 +3526,6 @@ class UIScene extends Phaser.Scene {
         this.runningScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
         ).setOrigin(0,1);
-
-       
-        
-
-        
-        
 
         
         if (DEBUG) {

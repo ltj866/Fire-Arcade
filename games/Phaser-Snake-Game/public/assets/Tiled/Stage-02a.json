@@ -79,7 +79,7 @@
          "height":31,
          "id":1,
          "locked":true,
-         "name":"Wall",
+         "name":"Wall-1",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
