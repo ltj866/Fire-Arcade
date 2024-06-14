@@ -1755,7 +1755,11 @@ class GameScene extends Phaser.Scene {
             (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
 
         // #region Hold Reset
-        if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.pressedSpaceDuringWait && this.gState === GState.WAIT_FOR_INPUT) {
+        if (this.spaceKey.getDuration() > RESET_WAIT_TIME 
+            && this.pressedSpaceDuringWait 
+            && this.gState === GState.WAIT_FOR_INPUT
+            && !this.winned
+        ) {
                 console.log("SPACE LONG ENOUGH BRO");
  
                 this.events.off('addScore');
