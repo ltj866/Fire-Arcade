@@ -1667,7 +1667,6 @@ class GameScene extends Phaser.Scene {
     nextStage() {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
-        debugger
 
         var nextStages = STAGES_NEXT[this.stage]
         var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
