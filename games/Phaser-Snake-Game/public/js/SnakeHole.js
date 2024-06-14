@@ -1581,11 +1581,6 @@ class GameScene extends Phaser.Scene {
                     portal.snakePortalingSprite.visible = true;   
                 }
 
-
-
-
-                //Phaser.Actions.ShiftPosition(this.snake.body, snake.head.x, snake.head.y, this.tail);
-
                 var _x = portal.target.x*GRID;
                 var _y = portal.target.y*GRID;
     

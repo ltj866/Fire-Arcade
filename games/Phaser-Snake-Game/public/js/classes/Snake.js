@@ -313,8 +313,9 @@ var Snake = new Phaser.Class({
         const ourPlayerData = scene.scene.get('PlayerDataScene');
         const ourUI = scene.scene.get('UIScene');
         
-        scene.gState = GState.BONK
-        console.log(scene.gState, "BONK");
+        scene.gState = GState.BONK;
+        this.direction = STOP;
+        console.log(scene.gState, "BONK" , this.direction);
 
         scene.screenShake();
 
