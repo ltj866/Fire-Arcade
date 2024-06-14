@@ -232,12 +232,12 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
+    'Stage-01': ['Stage-02a', 'Stage-02b', 'Stage-02e'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
     
     'Stage-02a': ['Stage-03a'],
     'Stage-02b': ['Stage-03a'],
-    'Stage-02c': ['Stage-03b'],
-    'Stage-02d': ['Stage-03b'],
+    //'Stage-02c': ['Stage-03b'],
+    //'Stage-02d': ['Stage-03b'],
     'Stage-02e': ['Stage-03c'],
     
     'Stage-03a': ['Stage-04'],
