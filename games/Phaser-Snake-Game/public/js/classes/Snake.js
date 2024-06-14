@@ -130,7 +130,7 @@ var Snake = new Phaser.Class({
         }
         
         // #region Bonk Walls
-        scene.map.setLayer("Wall");
+        scene.map.setLayer(scene.wallVarient);
         if (scene.map.getTileAtWorldXY( xN, yN )) {
             
             this.direction = STOP;

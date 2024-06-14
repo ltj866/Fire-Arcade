@@ -232,7 +232,7 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a', 'Stage-02b', 'Stage-02e'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
+    'Stage-01': ['Stage-02a'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
     
     'Stage-02a': ['Stage-03a'],
     'Stage-02b': ['Stage-03a'],
@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
@@ -610,6 +610,7 @@ class GameScene extends Phaser.Scene {
         this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
         this.hasGhostTiles = false;
+        this.wallVarient = ''; // Used for Fungible wall setups.
          
     }
     
@@ -666,8 +667,8 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.wallVarient = '';
         if (this.map.getLayer('Wall_1')) {
+            this.wallVarient = 'Wall_1';
             /***
              * Check if there are Fungible wall varients.
              */
@@ -1474,7 +1475,7 @@ class GameScene extends Phaser.Scene {
 
         
         console.log("CHECKING ALL TILES IN THE WALL LAYER");
-        this.map.getLayer('Wall'); //if not set, Ghost Walls overwrite and break Black Hole code
+        this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
             if (wall.index > 0) {
