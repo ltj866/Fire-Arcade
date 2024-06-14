@@ -876,6 +876,9 @@ class GameScene extends Phaser.Scene {
             let gState = this.gState;
 
             if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
+                if(gState === GState.START_WAIT || gState === GState.WAIT_FOR_INPUT){
+                    this.lastMoveTime = this.time.now;
+                }
                 ourInputScene.moveDirection(this, e);
                 
                 
@@ -979,6 +982,7 @@ class GameScene extends Phaser.Scene {
 
         const FADE_OUT_TILES = [104];
 
+        // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
 
@@ -1009,12 +1013,22 @@ class GameScene extends Phaser.Scene {
                 Phaser.Utils.Array.Shuffle(wallSprites);
                 
                 var allTheThings = [
-                    ...this.snake.body, 
                     ...this.coins,
                     ...this.portals,
                     ...this.atoms,
                     ...wallSprites
                 ];
+
+                var snakeholeTween = this.tweens.add({
+                    targets: this.snake.body, 
+                    x: 15 * GRID, //this.pathRegroup.vec.x,
+                    y: 15 * GRID, //this.pathRegroup.vec.y,
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Sine.easeOutIn',
+                    repeat: 0,
+                    delay: this.tweens.stagger(30)
+                });
 
                 
 
@@ -1455,6 +1469,9 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.shake(300, .00625);
         }    
     }
+    transitionVisual () {
+        
+    }
 
     validSpawnLocations() {
         var testGrid = {};
@@ -1597,8 +1614,6 @@ class GameScene extends Phaser.Scene {
     
                 var portalSound = this.portalSounds[0]
                 portalSound.play();
-    
-                this.lastMoveTime += SPEED_WALK * PORTAL_PAUSE;
 
                 var _tween = this.tweens.add({
                     targets: snake.head, 
@@ -1620,6 +1635,9 @@ class GameScene extends Phaser.Scene {
                     if (this.snake.body.length > 2) {
                         portal.targetObject.snakePortalingSprite.visible = true;   
                     }
+
+                    // Set last move to now. Fixes Corner Time.
+                    this.lastMoveTime = this.time.now;
                 });
                                     
                 return ;  //Don't know why this is here but I left it -James
@@ -1756,7 +1774,11 @@ class GameScene extends Phaser.Scene {
             (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
 
         // #region Hold Reset
-        if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.pressedSpaceDuringWait && this.gState === GState.WAIT_FOR_INPUT) {
+        if (this.spaceKey.getDuration() > RESET_WAIT_TIME 
+            && this.pressedSpaceDuringWait 
+            && this.gState === GState.WAIT_FOR_INPUT
+            && !this.winned
+        ) {
                 console.log("SPACE LONG ENOUGH BRO");
  
                 this.events.off('addScore');
@@ -1813,15 +1835,15 @@ class GameScene extends Phaser.Scene {
                     "text-align": 'center',
                     "text-shadow": '2px 2px 4px #000000',
                     "white-space": 'pre-line'
-
                 }
-            )).setHTML(
+                )).setHTML(
                 `GAMEOVER
                 ON
                 ${this.stage}
-                Better Luck Next Time.`
-                
-        ).setOrigin(0.5,0.5);
+                Better Luck Next Time...` 
+            ).setOrigin(0.5,0.5);
+
+            this.scene.pause("GameScene");
             
         }
 
@@ -1841,7 +1863,8 @@ class GameScene extends Phaser.Scene {
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
-        // #region Check Update
+            this.lastMoveTime = time;
+            // #region Check Update
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -1860,7 +1883,7 @@ class GameScene extends Phaser.Scene {
             this.snakeMaskW.y = this.snake.head.y
             //Phaser.Math.Between(0, 9);
 
-            this.lastMoveTime = time;
+            
             //let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
             
             
@@ -2131,8 +2154,7 @@ var StageData = new Phaser.Class({
     },
     
     cornerBonus() {
-        return 0; // Below code is broken.
-        //return Math.ceil(this.cornerTime / 100) * 10;
+        return Math.ceil(this.cornerTime / 100) * 10;
     },
 
     boostBonus() {
@@ -2738,13 +2760,21 @@ class ScoreScene extends Phaser.Scene {
         card.setOrigin(0.5,0); 
         card.displayHeight = 108;*/
 
+        var totalScore = 0;
+
+        ourStartScene.stageHistory.forEach( stageData => {
+            totalScore += stageData.calcTotal();
+        });
+
+
+
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             color: COLOR_SCORE,
             "font-size":'28px',
             'font-weight': 500,
         })).setText(
-            `TOTAL SCORE: ${commaInt(ourUI.score + this.stageData.calcTotal() - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+            `TOTAL SCORE: ${commaInt(totalScore)}`
         ).setOrigin(0.5,0).setDepth(60);
 
         // #endregion
@@ -3937,9 +3967,17 @@ class InputScene extends Phaser.Scene {
             gameScene.snake.direction = UP;
             
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
-            this.turns += 1; 
+            this.turns += 1;
+            
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+
+            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+                this.cornerTime += _cornerTime;
+
+            }
+            gameScene.lastMoveTime = gameScene.time.now;
+
                 
-            this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
             gameScene.snake.move(gameScene);
             gameScene.checkPortalAndMove();
 
@@ -3962,7 +4000,13 @@ class InputScene extends Phaser.Scene {
            this.turns += 1;
            this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-           this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
+           var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+
+           if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+               this.cornerTime += _cornerTime;
+           }
+           gameScene.lastMoveTime = gameScene.time.now;
+
            gameScene.snake.move(gameScene);
            gameScene.checkPortalAndMove();
 
@@ -3986,7 +4030,13 @@ class InputScene extends Phaser.Scene {
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-            this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));   
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+
+            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+                this.cornerTime += _cornerTime;
+            }
+            gameScene.lastMoveTime = gameScene.time.now;
+
             gameScene.snake.move(gameScene);
 
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
@@ -4009,7 +4059,13 @@ class InputScene extends Phaser.Scene {
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-            this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+
+            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+                this.cornerTime += _cornerTime;
+            }
+            gameScene.lastMoveTime = gameScene.time.now;
+             
             gameScene.snake.move(gameScene);
 
             this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
