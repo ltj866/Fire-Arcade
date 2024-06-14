@@ -978,6 +978,7 @@ class GameScene extends Phaser.Scene {
 
         const FADE_OUT_TILES = [104];
 
+        // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
 
@@ -1008,12 +1009,22 @@ class GameScene extends Phaser.Scene {
                 Phaser.Utils.Array.Shuffle(wallSprites);
                 
                 var allTheThings = [
-                    ...this.snake.body, 
                     ...this.coins,
                     ...this.portals,
                     ...this.atoms,
                     ...wallSprites
                 ];
+
+                var snakeholeTween = this.tweens.add({
+                    targets: this.snake.body, 
+                    x: 15 * GRID, //this.pathRegroup.vec.x,
+                    y: 15 * GRID, //this.pathRegroup.vec.y,
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Sine.easeOutIn',
+                    repeat: 0,
+                    delay: this.tweens.stagger(30)
+                });
 
                 
 
@@ -1453,6 +1464,9 @@ class GameScene extends Phaser.Scene {
         else if (this.moveInterval === SPEED_WALK){
             this.cameras.main.shake(300, .00625);
         }    
+    }
+    transitionVisual () {
+        
     }
 
     validSpawnLocations() {
