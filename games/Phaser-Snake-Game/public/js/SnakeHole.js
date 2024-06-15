@@ -611,6 +611,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasks = [];
         this.hasGhostTiles = false;
         this.wallVarient = ''; // Used for Fungible wall setups.
+        this.varientIndex = 0;
          
     }
     
@@ -667,12 +668,22 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
+        // #region Wall Varients
         if (this.map.getLayer('Wall_1')) {
-            this.wallVarient = 'Wall_1';
             /***
              * Check if there are Fungible wall varients.
              */
 
+            var wallIndex = 1;
+            var wallVarients = [];
+
+            while (this.map.getLayer(`Wall_${wallIndex}`)) {
+                wallVarients.push(wallIndex);
+                wallIndex++;
+            }
+
+            this.varientIndex = Phaser.Math.RND.pick(wallVarients)
+            this.wallVarient = "Wall_" + this.varientIndex;
         } else {
             this.wallVarient = "Wall";
         }
@@ -1096,9 +1107,7 @@ class GameScene extends Phaser.Scene {
                     this.coins.push(_coin);
                 }
             });
-
-            coinLayer.visible = false;
-            console.log(this.coins);        
+            coinLayer.visible = false;       
         }
 
         
@@ -1127,9 +1136,18 @@ class GameScene extends Phaser.Scene {
         const PORTAL_X_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
         const PORTAL_N_DIFF = 32;
 
+
+        var portalVarient = ""
+        if (this.varientIndex) { // False if 0
+            portalVarient = `Portal_${this.varientIndex}`
+        } else {
+            portalVarient = `Portal`
+        }
+
         // #region Portal-X
-        if (this.map.getLayer('Portal-X')) {
-            var portalLayerX = this.map.createLayer('Portal-X', [this.tileset]);
+        if (this.map.getLayer(`${portalVarient}-X`)) {
+            debugger
+            var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
             var portalArrayX = [];
 
             portalLayerX.forEachTile(tile => {
@@ -1196,10 +1214,11 @@ class GameScene extends Phaser.Scene {
         // Must start at 1 and go up continuously to work correctly. 
         var layerIndex = 1   
         
-        while (this.map.getLayer(`Portal-${layerIndex}`)) {
+        while (this.map.getLayer(`${portalVarient}-${layerIndex}`)) {
+            debugger
 
             //console.log(`Portal-${layerIndex} Logic`);
-            var portalLayerN = this.map.createLayer(`Portal-${layerIndex}`, [this.tileset]);
+            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset]);
             var portalArrayN = {};
             
             var toN = [];

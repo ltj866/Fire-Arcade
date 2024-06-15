@@ -39,10 +39,10 @@
         },
         "Stage-02a.json": {
             "scale": 1.6612231182795698,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 267.8749140337392,
-                "y": 345.8295238480521
+                "x": 265.4670496379303,
+                "y": 358.7717949755249
             }
         },
         "Stage-02a.json#tileSheetx24": {
@@ -63,8 +63,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 399.70548970427603,
-                "y": 379.2386423399004
+                "x": 399.1035236053238,
+                "y": 378.63667624094825
             }
         },
         "Stage-02c.json#tileSheetx24": {
@@ -482,6 +482,7 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "Stage-02a.json",
         "testing05-2.json",
         "Stage-09.json",
         "Stage-08.json",
@@ -492,7 +493,6 @@
         "Stage-04.json",
         "Stage-12.json",
         "Stage-02b.json",
-        "Stage-06.json",
-        "Stage-11.json"
+        "Stage-06.json"
     ]
 }
