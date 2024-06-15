@@ -232,7 +232,7 @@ const DREAMWALLSKIP = [0,1,2];
 
 // #region STAGES_NEXT
 const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a', 'Stage-02b', 'Stage-02e'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
+    'Stage-01': ['Stage-02a'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
     
     'Stage-02a': ['Stage-03a'],
     'Stage-02b': ['Stage-03a'],
@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
@@ -610,6 +610,8 @@ class GameScene extends Phaser.Scene {
         this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
         this.hasGhostTiles = false;
+        this.wallVarient = ''; // Used for Fungible wall setups.
+        this.varientIndex = 0;
          
     }
     
@@ -666,12 +668,22 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.wallVarient = '';
+        // #region Wall Varients
         if (this.map.getLayer('Wall_1')) {
             /***
              * Check if there are Fungible wall varients.
              */
 
+            var wallIndex = 1;
+            var wallVarients = [];
+
+            while (this.map.getLayer(`Wall_${wallIndex}`)) {
+                wallVarients.push(wallIndex);
+                wallIndex++;
+            }
+
+            this.varientIndex = Phaser.Math.RND.pick(wallVarients)
+            this.wallVarient = "Wall_" + this.varientIndex;
         } else {
             this.wallVarient = "Wall";
         }
@@ -1079,13 +1091,21 @@ class GameScene extends Phaser.Scene {
         //for (let index = 0; index < FRUIT; index++) {
         //    var food = new Food(this);
         //}
+
         // #region Coin Logic
 
         this.coins = []
 
-        if (this.map.getLayer('Coin')) {
+        var coinVarient = ''
+        if (this.varientIndex) {
+            coinVarient = `Coin_${this.varientIndex}`;
+        } else {
+            coinVarient = 'Coin';
+        }
 
-            var coinLayer = this.map.createLayer('Coin', [this.tileset]);
+        if (this.map.getLayer(coinVarient)) {
+
+            var coinLayer = this.map.createLayer(coinVarient, [this.tileset]);
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
@@ -1095,9 +1115,7 @@ class GameScene extends Phaser.Scene {
                     this.coins.push(_coin);
                 }
             });
-
-            coinLayer.visible = false;
-            console.log(this.coins);        
+            coinLayer.visible = false;       
         }
 
         
@@ -1126,9 +1144,17 @@ class GameScene extends Phaser.Scene {
         const PORTAL_X_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
         const PORTAL_N_DIFF = 32;
 
+
+        var portalVarient = ""
+        if (this.varientIndex) { // False if 0
+            portalVarient = `Portal_${this.varientIndex}`
+        } else {
+            portalVarient = `Portal`
+        }
+
         // #region Portal-X
-        if (this.map.getLayer('Portal-X')) {
-            var portalLayerX = this.map.createLayer('Portal-X', [this.tileset]);
+        if (this.map.getLayer(`${portalVarient}-X`)) {
+            var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
             var portalArrayX = [];
 
             portalLayerX.forEachTile(tile => {
@@ -1195,10 +1221,10 @@ class GameScene extends Phaser.Scene {
         // Must start at 1 and go up continuously to work correctly. 
         var layerIndex = 1   
         
-        while (this.map.getLayer(`Portal-${layerIndex}`)) {
+        while (this.map.getLayer(`${portalVarient}-${layerIndex}`)) {
 
             //console.log(`Portal-${layerIndex} Logic`);
-            var portalLayerN = this.map.createLayer(`Portal-${layerIndex}`, [this.tileset]);
+            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset]);
             var portalArrayN = {};
             
             var toN = [];
@@ -1336,7 +1362,7 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        // #region Coins
+        
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
         //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
@@ -1355,7 +1381,6 @@ class GameScene extends Phaser.Scene {
 
   
 
-        // #region Stage Logic
 
         var atom1 = new Food(this);
         var atom2 = new Food(this);
@@ -1491,7 +1516,7 @@ class GameScene extends Phaser.Scene {
 
         
         console.log("CHECKING ALL TILES IN THE WALL LAYER");
-        this.map.getLayer('Wall'); //if not set, Ghost Walls overwrite and break Black Hole code
+        this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
             if (wall.index > 0) {
