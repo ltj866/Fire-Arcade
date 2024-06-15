@@ -26,6 +26,17 @@
         "Bonus-Stage-x2.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "C:/Users/jlhan/OneDrive/Documents/Minifantasy_ForgottenPlainsTiles.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/jlhan/OneDrive/Documents/untitled.tmx": {
+            "scale": 6.365,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 120.10997643362137,
+                "y": 80.12568735271013
+            }
+        },
         "Stage-01.json": {
             "scale": 1.6612231182795698,
             "selectedLayer": 1,
@@ -38,11 +49,11 @@
             "scaleInDock": 1
         },
         "Stage-02a.json": {
-            "scale": 1.6612231182795698,
-            "selectedLayer": 1,
+            "scale": 1.90383064516129,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 265.4670496379303,
-                "y": 358.7717949755249
+                "x": 372.14444562109503,
+                "y": 372.4070740230859
             }
         },
         "Stage-02a.json#tileSheetx24": {
@@ -52,8 +63,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.617015251426,
-                "y": 362.9855576681905
+                "x": 331.984303572151,
+                "y": 362.38359156923826
             }
         },
         "Stage-02b.json#tileSheetx24": {
@@ -63,8 +74,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 399.1035236053238,
-                "y": 378.63667624094825
+                "x": 358.4708119260487,
+                "y": 378.034710141996
             }
         },
         "Stage-02c.json#tileSheetx24": {
@@ -93,11 +104,11 @@
             "scaleInDock": 1
         },
         "Stage-03a.json": {
-            "scale": 1.6612231182795698,
+            "scale": 1.90383064516129,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 468.93159108378165,
-                "y": 363.58752376714267
+                "x": 372.14444562109503,
+                "y": 372.4070740230859
             }
         },
         "Stage-03a.json#tileSheetx24": {
@@ -482,6 +493,7 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "C:/Users/jlhan/OneDrive/Documents/untitled.tmx",
         "Stage-02a.json",
         "testing05-2.json",
         "Stage-09.json",
@@ -492,7 +504,6 @@
         "Stage-10.json",
         "Stage-04.json",
         "Stage-12.json",
-        "Stage-02b.json",
-        "Stage-06.json"
+        "Stage-02b.json"
     ]
 }

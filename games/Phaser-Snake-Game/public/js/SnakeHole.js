@@ -1091,13 +1091,21 @@ class GameScene extends Phaser.Scene {
         //for (let index = 0; index < FRUIT; index++) {
         //    var food = new Food(this);
         //}
+
         // #region Coin Logic
 
         this.coins = []
 
-        if (this.map.getLayer('Coin')) {
+        var coinVarient = ''
+        if (this.varientIndex) {
+            coinVarient = `Coin_${this.varientIndex}`;
+        } else {
+            coinVarient = 'Coin';
+        }
 
-            var coinLayer = this.map.createLayer('Coin', [this.tileset]);
+        if (this.map.getLayer(coinVarient)) {
+
+            var coinLayer = this.map.createLayer(coinVarient, [this.tileset]);
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
@@ -1146,7 +1154,6 @@ class GameScene extends Phaser.Scene {
 
         // #region Portal-X
         if (this.map.getLayer(`${portalVarient}-X`)) {
-            debugger
             var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
             var portalArrayX = [];
 
@@ -1215,7 +1222,6 @@ class GameScene extends Phaser.Scene {
         var layerIndex = 1   
         
         while (this.map.getLayer(`${portalVarient}-${layerIndex}`)) {
-            debugger
 
             //console.log(`Portal-${layerIndex} Logic`);
             var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset]);
@@ -1356,7 +1362,7 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        // #region Coins
+        
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
         //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
@@ -1375,7 +1381,6 @@ class GameScene extends Phaser.Scene {
 
   
 
-        // #region Stage Logic
 
         var atom1 = new Food(this);
         var atom2 = new Food(this);
