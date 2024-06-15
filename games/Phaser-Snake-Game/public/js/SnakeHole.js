@@ -1828,7 +1828,7 @@ class GameScene extends Phaser.Scene {
 
         // #region Lose State
         if (this.checkLoseCon()) {
-            this.coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
+            var coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
                 {
                     "font-size": '32px',
                     "text-align": 'center',
@@ -1836,11 +1836,18 @@ class GameScene extends Phaser.Scene {
                     "white-space": 'pre-line'
                 }
                 )).setHTML(
-                `GAMEOVER
+                `\u{1F480} 
+                GAMEOVER
                 ON
                 ${this.stage}
                 Better Luck Next Time...` 
             ).setOrigin(0.5,0.5);
+
+            this.scene.get("UIScene").coinUIText.setHTML(
+                ` \u{1F480}`
+            )
+
+
 
             this.scene.pause("GameScene");
             
