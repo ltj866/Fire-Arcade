@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
@@ -2189,7 +2189,7 @@ var StageData = new Phaser.Class({
     },
 
     boostBonus() {
-        return Math.ceil(this.boostFrames / 10) * 10;
+        return Math.ceil(this.boostFrames / 10) * 5;
     },
     
     calcTotal() {
