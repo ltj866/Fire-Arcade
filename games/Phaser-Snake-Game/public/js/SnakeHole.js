@@ -16,7 +16,7 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
-const DARK_MODE = true;
+const DARK_MODE = false;
 const GHOST_WALLS = true;
 // #region DEBUG OPTIONS
 
@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'testing05-3'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
@@ -475,7 +475,7 @@ class PlayerDataScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 4;
+        this.coins = 24;
     }
     
     preload(){
@@ -2866,16 +2866,20 @@ class ScoreScene extends Phaser.Scene {
 
                 ourStartScene.globalFoodLog = _histLog;
 
-                // Go Back Playing To Select New Stage
-                ourScoreScene.scene.stop();
-                ourGame.gState = GState.PLAY;
+                if (ourGame.stage != END_STAGE) {
+                                    // Go Back Playing To Select New Stage
+                    ourScoreScene.scene.stop();
+                    ourGame.gState = GState.PLAY;
 
-                ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
+                    ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
 
-                    })).setHTML(
-                        `Press "n" to continue to the next stage.`
-                ).setOrigin(0.5,0.5);
-                            
+                        })).setHTML(
+                            `Press "n" to continue to the next stage.`
+                    ).setOrigin(0.5,0.5);
+                  
+                    
+                }
+          
                 if (bestrun < ourUI.score + ourScoreScene.stageData.calcTotal()) {
                     localStorage.setItem('BestFinalScore', ourUI.score + ourScoreScene.stageData.calcTotal());
                 }
