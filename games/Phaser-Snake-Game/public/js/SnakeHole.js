@@ -3523,7 +3523,7 @@ class UIScene extends Phaser.Scene {
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
 
-        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)      // Snake Body
+        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50).setPipeline('Light2D');      // Snake Body
         var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
  
         snakeBody.scale = .667;
