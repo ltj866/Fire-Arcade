@@ -1,5 +1,5 @@
 {
-    "activeFile": "testing04.json",
+    "activeFile": "Stage-02a.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -38,22 +38,22 @@
             }
         },
         "Stage-01.json": {
-            "scale": 1.6612231182795698,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 400.6084388527044,
-                "y": 364.7914559650471
+                "x": 372,
+                "y": 373
             }
         },
         "Stage-01.json#tileSheetx24": {
             "scaleInDock": 1
         },
         "Stage-02a.json": {
-            "scale": 1.90383064516129,
+            "scale": 0.5,
             "selectedLayer": 7,
             "viewCenter": {
-                "x": 371.88181721910416,
-                "y": 371.6191888171133
+                "x": 372,
+                "y": 373
             }
         },
         "Stage-02a.json#tileSheetx24": {
@@ -349,8 +349,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 298.66666666666663,
-                "y": 456.66666666666674
+                "x": 372,
+                "y": 372.66666666666674
             }
         },
         "testing04.json#tileSheetx24": {
@@ -628,22 +628,23 @@
         "Stage-03a.json",
         "Stage-02a.json",
         "Stage-05.json",
-        "testing05.json"
+        "testing05.json",
+        "Stage-01.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "testing05-2.json",
-        "testing05-3.json",
         "testing05-1.json",
+        "testing05-2.json",
         "testing06.json",
         "testing06-2.json",
         "testing03-2.json",
         "testing03-1.json",
         "testing08.json",
         "testing07.json",
-        "testing05.json",
-        "Stage-05.json",
-        "Stage-02a.json"
+        "testing04.json",
+        "Stage-13.json",
+        "Stage-02b.json",
+        "Stage-02c.json"
     ]
 }

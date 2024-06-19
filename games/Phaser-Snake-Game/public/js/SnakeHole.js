@@ -192,6 +192,7 @@ var SOUND_ATOM = [
     ['bubbleBopLow01', [ 'bubbleBopLow01.ogg', 'bubbleBopLow01.mp3' ]]
 ]
 
+
 /*var SOUND_ATOM = [
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]],
     ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]],
@@ -356,6 +357,10 @@ class StartScene extends Phaser.Scene {
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
+        this.load.audio({
+            key: 'chargeUp',
+            url: ['chargeUp.ogg', 'chargeUp.mp3']
+        })
         
         SOUND_PORTAL.forEach(soundID =>
             {
@@ -630,6 +635,12 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPlayerData = this.scene.get('PlayerDataScene');
+
+        // SOUND
+
+        var _chargeUp = this.sound.add('chargeUp');
+
+        _chargeUp.play();
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
