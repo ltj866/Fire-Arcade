@@ -115,7 +115,7 @@ var Snake = new Phaser.Class({
         }
         else if (this.direction === RIGHT)
         {
-            xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x + GRID, 0, SCREEN_WIDTH);
             scene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
