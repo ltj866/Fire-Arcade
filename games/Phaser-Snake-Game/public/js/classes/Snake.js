@@ -115,7 +115,7 @@ var Snake = new Phaser.Class({
         }
         else if (this.direction === RIGHT)
         {
-            xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+            xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH);
             scene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
@@ -125,7 +125,7 @@ var Snake = new Phaser.Class({
         }
         else if (this.direction === DOWN)
         {
-            yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
+            yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 1 );
             scene.bgCoords.y += .25;
         }
         
