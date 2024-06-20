@@ -466,9 +466,9 @@ class StartScene extends Phaser.Scene {
     }
 }
 
-class PlayerDataScene extends Phaser.Scene {
+class PersistScene extends Phaser.Scene {
     constructor () {
-        super({key: 'PlayerDataScene', active: true});
+        super({key: 'PersistScene', active: true});
     }
 
     init() {
@@ -486,7 +486,7 @@ class PlayerDataScene extends Phaser.Scene {
     
     create() {
 
-    // #region Bottom Bar
+    // #region Persistent Scene
 
     this.anims.create({
         key: 'coin01idle',
@@ -495,8 +495,64 @@ class PlayerDataScene extends Phaser.Scene {
         repeat: -1
       })
 
-    // Is Zero if there is none.
+    // # Backgrounds
 
+    // for changing bg sprites
+    this.bgTimer = 0;
+
+            // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
+            this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
+            this.UIbackground.setScale(4); 
+    
+            // Furthest BG Object
+            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
+            this.bg0.tileScaleX = 3;
+            this.bg0.tileScaleY = 3;
+    
+            // Scrolling BG1
+            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
+            this.bg.tileScaleX = 3;
+            this.bg.tileScaleY = 3;
+            
+            // BG Mask
+            this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT/2,
+                key: 'bg02mask',
+                add: false
+            }).setOrigin(.5,.5);
+            
+            const mask = this.mask;
+            mask.scale = 3;
+            this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
+            
+            // Scrolling BG2 Planets
+            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
+            this.bg2.tileScaleX = 3;
+            this.bg2.tileScaleY = 3;
+            
+            // Scrolling BG3 Stars (depth is behind planets)
+            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
+            this.bg3.tileScaleX = 3;
+            this.bg3.tileScaleY = 3;
+    
+            // Hue Shift
+            this.fx = this.bg.preFX.addColorMatrix();
+            this.fx2 = this.bg0.preFX.addColorMatrix();
+    
+    
+            //if (this.stage === "Stage-04") {
+            //    this.fx.hue(330);
+            //}
+            this.scrollFactorX = 0;
+            this.scrollFactorY = 0;
+            this.bgCoords = new Phaser.Math.Vector2(0,0);
+
+    
+    
+    
+    
+      // Is Zero if there is none.
     var rawZeds = localStorage.getItem(`zeds`);
     // Catch if any reason undefined gets saved to localstorage
     if (rawZeds === 'undefined') {
@@ -543,9 +599,56 @@ class PlayerDataScene extends Phaser.Scene {
             `snakehole.${GAME_VERSION}`
     ).setOrigin(1,1);
 
+    this.scene.moveBelow("StartScene", "PersistScene");
+
 
     }
-    update() {
+    update(time, delta) {
+
+                //this.scrollFactorX += .025;
+        //this.scrollFactorY += .025;
+
+        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
+        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
+
+        // not all of these need to be interpolated; wastes processing
+
+        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
+        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
+
+        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
+        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
+
+        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
+        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
+            
+        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
+        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
+
+        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
+        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
+
+        this.bgTimer += delta;
+
+        if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
+            this.bg3.setTexture('bg02_3_2') 
+            this.bg.setTexture('bg02frame2') 
+            if (this.bgTimer >= 2000) {
+                this.bg3.setTexture('bg02_3')
+                this.bg.setTexture('bg02') 
+                this.bgTimer = 0
+            }   
+        }
 
     }
 
@@ -629,7 +732,7 @@ class GameScene extends Phaser.Scene {
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
-        const ourPlayerData = this.scene.get('PlayerDataScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
@@ -663,7 +766,7 @@ class GameScene extends Phaser.Scene {
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.map.properties[1].value; // TODO: Get them by name and throw errors.
 
-        ourPlayerData.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
+        ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -716,59 +819,6 @@ class GameScene extends Phaser.Scene {
 
         // Add ghost wall layer here. @holden
         
-        
-    
-        // add background
-
-        // for changing bg sprites
-        this.bgTimer = 0;
-
-        // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-        this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
-        this.UIbackground.setScale(4) 
-
-        // Furthest BG Object
-        this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
-        this.bg0.tileScaleX = 3
-        this.bg0.tileScaleY = 3
-
-        // Scrolling BG1
-        this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
-        this.bg.tileScaleX = 3;
-        this.bg.tileScaleY = 3;
-        
-        // BG Mask
-        this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
-            x: SCREEN_WIDTH/2,
-            y: SCREEN_HEIGHT/2,
-            key: 'bg02mask',
-            add: false
-        }).setOrigin(.5,.5);
-        
-        const mask = this.mask
-        mask.scale = 3
-        this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
-        
-        // Scrolling BG2 Planets
-        this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
-        this.bg2.tileScaleX = 3;
-        this.bg2.tileScaleY = 3;
-        
-        // Scrolling BG3 Stars (depth is behind planets)
-        this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
-        this.bg3.tileScaleX = 3;
-        this.bg3.tileScaleY = 3;
-
-        // Hue Shift
-        this.fx = this.bg.preFX.addColorMatrix();
-        this.fx2 = this.bg0.preFX.addColorMatrix();
-
-
-        if (this.stage === "Stage-04") {
-            this.fx.hue(330);
-        }
-        //this.fx.hue(0);
-        //this.fx2.hue(0);
 
         /*const tween = this.tweens.addCounter({
             from: 0,
@@ -824,9 +874,7 @@ class GameScene extends Phaser.Scene {
             }
         
 
-        this.scrollFactorX = 0
-        this.scrollFactorY = 0
-        this.bgCoords = new Phaser.Math.Vector2(0,0)
+
 
         // Dream wall corners 
         
@@ -991,7 +1039,7 @@ class GameScene extends Phaser.Scene {
             this.bg3.setTexture('bg02_3_2')
         });
 
-        const FADE_OUT_TILES = [104];
+        const FADE_OUT_TILES = [104]; // todo move to consts
 
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
@@ -1466,7 +1514,7 @@ class GameScene extends Phaser.Scene {
             add: false
         }).setOrigin(0.5,0.5);
 
-        this.snakeMask.setScale(1); //Note I'd like to be able to set the scale per level so I can fine tune this during level design.
+        this.snakeMask.setScale(1); //Note I'd like to be able to set the scale per level so I can fine tune this during level design. -- James
 
 
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
@@ -1712,8 +1760,8 @@ class GameScene extends Phaser.Scene {
     }
 
     checkLoseCon() {
-        const ourPlayerData = this.scene.get("PlayerDataScene");
-        return ourPlayerData.coins < 0;
+        const ourPersist = this.scene.get("PersistScene");
+        return ourPersist.coins < 0;
     }
 
     nextStage() {
@@ -1764,38 +1812,7 @@ class GameScene extends Phaser.Scene {
             
         }
         
-        //this.scrollFactorX += .025;
-        //this.scrollFactorY += .025;
 
-        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
-        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
-
-        // not all of these need to be interpolated; wastes processing
-
-        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
-
-        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
-        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
-
-        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
-        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
-            
-        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
-        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
-
-        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
-        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
 
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME 
@@ -1882,17 +1899,7 @@ class GameScene extends Phaser.Scene {
 
 
         // #endregion
-        this.bgTimer += delta;
 
-        if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
-            this.bg3.setTexture('bg02_3_2') 
-            this.bg.setTexture('bg02frame2') 
-            if (this.bgTimer >= 2000) {
-                this.bg3.setTexture('bg02_3')
-                this.bg.setTexture('bg02') 
-                this.bgTimer = 0
-            }   
-        }
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
@@ -2227,7 +2234,7 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourStartScene = this.scene.get('StartScene');
-        const ourPlayerData = this.scene.get('PlayerDataScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         var stageDataJSON = {
             bonks: ourUI.bonks,
@@ -2295,8 +2302,8 @@ class ScoreScene extends Phaser.Scene {
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             //calcSumOfBest(ourStartScene); // Note: This really should be an event.
-            //this.scene.get("PlayerDataScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
-            //this.scene.get("PlayerDataScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
+            //this.scene.get("PersistScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
+            //this.scene.get("PersistScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
 
         // #endregion
@@ -2818,7 +2825,7 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
-        this.prevZeds = this.scene.get("PlayerDataScene").zeds;
+        this.prevZeds = this.scene.get("PersistScene").zeds;
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -2850,7 +2857,7 @@ class ScoreScene extends Phaser.Scene {
             // #region Space to Continue
             this.input.keyboard.on('keydown-SPACE', function() {     
 
-                localStorage.setItem("zeds", ourPlayerData.zeds);
+                localStorage.setItem("zeds", ourPersist.zeds);
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
@@ -2895,7 +2902,7 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        const ourPlayerData = this.scene.get('PlayerDataScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         var scoreCountDown = this.foodLogSeed.slice(-1);
 
@@ -2960,11 +2967,11 @@ class ScoreScene extends Phaser.Scene {
                 You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
-            if (this.prevZeds + this.difficulty > ourPlayerData.zeds) {
-                ourPlayerData.zeds = this.prevZeds + this.difficulty;
-                var zedsObj = calcZedLevel(ourPlayerData.zeds);
+            if (this.prevZeds + this.difficulty > ourPersist.zeds) {
+                ourPersist.zeds = this.prevZeds + this.difficulty;
+                var zedsObj = calcZedLevel(ourPersist.zeds);
 
-                ourPlayerData.zedsUI.setHTML(
+                ourPersist.zedsUI.setHTML(
                     `<span style ="color: limegreen;
                     font-size: 16px;
                     border: limegreen solid 1px;
@@ -3580,7 +3587,7 @@ class UIScene extends Phaser.Scene {
         
         this.coinUIText = this.add.dom(GRID*22 - 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE
             )).setHTML(
-                `${commaInt(this.scene.get("PlayerDataScene").coins)}`
+                `${commaInt(this.scene.get("PersistScene").coins)}`
         ).setOrigin(0,0);
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
@@ -4436,7 +4443,7 @@ var config = {
     },
     
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, PlayerDataScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, PersistScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 
 };
 
