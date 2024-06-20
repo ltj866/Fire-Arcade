@@ -1410,7 +1410,6 @@ class GameScene extends Phaser.Scene {
         });
 
 
-
         // #endregion
 
         
@@ -1437,6 +1436,9 @@ class GameScene extends Phaser.Scene {
 
         ourUI.bestScoreUI.setText(`BEST :`);
         ourUI.bestScoreLabelUI.setText(bestBase);
+
+
+        
         
         // #region Snake Masks
         /***  
@@ -1494,7 +1496,6 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        
     }
     screenShake(){
         if (this.moveInterval === SPEED_SPRINT) {
@@ -1903,6 +1904,12 @@ class GameScene extends Phaser.Scene {
             }   
         }
 
+        if (this.gState === GState.START_WAIT) {
+            if (energyAmountX > 99 && !ourUI.chargeUpTween.isDestroyed()) {
+                ourUI.chargeUpTween.resume();
+            }
+        }
+
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
@@ -2019,7 +2026,6 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveCount += 1;
 
                 this.checkPortalAndMove()
-
 
                 if (energyAmountX < 1) {
                     // add the tail in.
@@ -3491,6 +3497,18 @@ class UIScene extends Phaser.Scene {
        boostBar.play('increasing');
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+       const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
+
+       this.chargeUpTween = this.tweens.add({
+            targets: fx1,
+            outerStrength: 16,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: true,
+            loop: 0 
+        });
+        this.chargeUpTween.pause();
 
        // Combo Sprites
 
