@@ -404,7 +404,7 @@ class StartScene extends Phaser.Scene {
             scale: 1,
             width: 450,
             height: 500,
-            duration: 500,
+            duration: 300,
             ease: 'sine.inout',
             yoyo: false,
             repeat: 0,
@@ -648,6 +648,44 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPlayerData = this.scene.get('PlayerDataScene');
+
+        //UI
+
+        const panel = this.add.nineslice(GRID * 15.5, GRID * 8, 'uiGlass', 'Glass', 450, 72, 72, 72, 36, 36);
+        panel.setDepth(100)
+        panel.setScale(0)
+
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)
+
+        this.panelTween = this.tweens.add({
+            targets: [panel,text],
+            scale: 1,
+            width: 420,
+            height: 36,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+
+        this.panelTweenCollapse = this.tweens.add({
+            targets: [panel,text],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+        this.panelTweenCollapse.pause();
+
 
         // SOUND
 
@@ -931,6 +969,7 @@ class GameScene extends Phaser.Scene {
                     this.lastMoveTime = this.time.now;
                 }
                 ourInputScene.moveDirection(this, e);
+                this.panelTweenCollapse.resume();
                 
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -966,7 +1005,6 @@ class GameScene extends Phaser.Scene {
 
         })
         this.input.keyboard.on('keydown-SPACE', e => {
-            
             if (this.gState != GState.BONK && this.gState != GState.TRANSITION) {
             // #region Boost Outlines
                 this.boostOutlinesBody = [];
@@ -1025,10 +1063,6 @@ class GameScene extends Phaser.Scene {
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.pressedSpaceDuringWait = false;
-        });
-
-        this.input.keyboard.on('keydown-M', e => {
-            this.bg3.setTexture('bg02_3_2')
         });
 
         const FADE_OUT_TILES = [104];
