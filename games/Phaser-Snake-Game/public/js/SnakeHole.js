@@ -825,10 +825,12 @@ class GameScene extends Phaser.Scene {
         const _arrowE = this.startingArrowsAnimE
         const _arrowW = this.startingArrowsAnimW
         this.time.delayedCall(2000, function() {
+            if (ourUI.energyAmount > 99) {
                 _arrowN.setVisible(true);
                 _arrowS.setVisible(true);
                 _arrowE.setVisible(true);
                 _arrowW.setVisible(true);
+            }
             });
         
 
