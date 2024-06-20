@@ -800,22 +800,36 @@ class GameScene extends Phaser.Scene {
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
+            this.startingArrowsAnimN.setVisible(false);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
+            this.startingArrowsAnimS.setVisible(false);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('idle');
+            this.startingArrowsAnimE.setVisible(false);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('idle');
+            this.startingArrowsAnimW.setVisible(false);
         }
+        const _arrowN = this.startingArrowsAnimN
+        const _arrowS = this.startingArrowsAnimS
+        const _arrowE = this.startingArrowsAnimE
+        const _arrowW = this.startingArrowsAnimW
+        this.time.delayedCall(2000, function() {
+                _arrowN.setVisible(true);
+                _arrowS.setVisible(true);
+                _arrowE.setVisible(true);
+                _arrowW.setVisible(true);
+            });
         
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
