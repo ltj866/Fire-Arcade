@@ -1847,8 +1847,10 @@ class GameScene extends Phaser.Scene {
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
 
             this.gState = GState.TRANSITION;
-            ourUI.scene.pause();
-            ourUI.scene.start('ScoreScene');
+            
+            this.events.off('addScore');
+            
+            ourUI.scene.launch('ScoreScene');
         }
 
         // #region Lose State
@@ -2874,7 +2876,9 @@ class ScoreScene extends Phaser.Scene {
                     ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
 
                         })).setHTML(
-                            `Press "n" to continue to the next stage.`
+                            
+                            `Free Play </br>
+                            Press "n" to warp to the next stage.`
                     ).setOrigin(0.5,0.5);
                   
                     
