@@ -631,7 +631,7 @@
         "testing05.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "testing05-2.json",
         "testing05-3.json",

@@ -763,8 +763,16 @@ class GameScene extends Phaser.Scene {
 
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
-        this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.map.properties[1].value; // TODO: Get them by name and throw errors.
+
+        this.mapProperties = {};
+
+        this.map.properties.forEach(prop => {
+            this.mapProperties[prop.name] = prop.value;
+        });
+
+        // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
+        this.stageUUID = this.mapProperties.UUID; // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.mapProperties.diffBonus; // TODO: Get them by name and throw errors.
 
         ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
