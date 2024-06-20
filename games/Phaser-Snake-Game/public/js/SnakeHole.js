@@ -317,6 +317,7 @@ class StartScene extends Phaser.Scene {
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
@@ -395,7 +396,19 @@ class StartScene extends Phaser.Scene {
 
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
-
+        const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
+        panel.setDepth(100)
+        panel.setScale(0)
+        this.tweens.add({
+            targets: panel,
+            scale: 1,
+            width: 450,
+            height: 500,
+            duration: 500,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
         ///
         
 
