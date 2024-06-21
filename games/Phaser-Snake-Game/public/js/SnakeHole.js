@@ -64,13 +64,12 @@ var calcSumOfBest = function(scene) {
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
 
-    entries.forEach(entry => {
-        
-        var key = entry[0].split("-");
+    entries.forEach(log => {
+        var key = log[0].split("-");
         if (key[key.length - 1] === "bestStageData") {
             scene.stagesComplete += 1
 
-            var levelLog = new StageData(JSON.parse(entry[1]));
+            var levelLog = new StageData(JSON.parse(log[1]));
             var _scoreTotal = levelLog.calcTotal();
             scene.sumOfBest += _scoreTotal;
         }
@@ -231,41 +230,6 @@ export const GState = Object.freeze({
 
 const DREAMWALLSKIP = [0,1,2];
 
-// #region STAGES_NEXT
-const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
-    
-    'Stage-02a': ['Stage-03a'],
-    'Stage-02b': ['Stage-03a'],
-    //'Stage-02c': ['Stage-03b'],
-    //'Stage-02d': ['Stage-03b'],
-    'Stage-02e': ['Stage-03c'],
-    
-    'Stage-03a': ['Stage-04'],
-    'Stage-03b': ['Stage-04'],
-    'Stage-03c': ['Stage-04'],
-    
-    'Stage-04': ['Stage-05'],
-    'Stage-05': ['Stage-06'],
-    'Stage-06': ['Stage-07'],
-    'Stage-07': ['Stage-08'],
-    'Stage-08': ['Stage-09'],
-    'Stage-09': ['Stage-10'],
-    'Stage-10': ['Stage-11'],
-    'Stage-11': ['Stage-12'],
-    'Bonus-Stage-x1': [],
-    'testing04': ['Stage-02a','Stage-02b','Stage-02c','Stage-02d','Stage-02e'],
-    'testing-05': ['Stage-03a'],
-
-    'testing02': ['testing03-1'],
-    'testing03-1': ['testing05-1'],
-    'testing05-1': ['testing05-2'],
-    'testing05-2': ['testing06'],
-    'testing06': ['testing06-2'],
-    'testing06-2': ['testing03-2'],
-    'testing03-2': ['testing08'],
-    'testing08': ['testing'],
-}
 // #region START STAGE
 const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
@@ -742,6 +706,11 @@ class GameScene extends Phaser.Scene {
 
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
+        //const ourGame = this.scene.get("GameScene");
+        console.log(this.stage);
+        
+
+
     }
 
     create () {
@@ -826,15 +795,38 @@ class GameScene extends Phaser.Scene {
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
-        this.mapProperties = {};
+        this.tiledProperties = {};
 
         this.map.properties.forEach(prop => {
-            this.mapProperties[prop.name] = prop.value;
+            this.tiledProperties[prop.name] = prop.value;
         });
 
+
+        // Loading all Next Stage name to slug to grab from the cache later.
+
+        // The first split and join santizes any spaces.
+        this.nextStages = this.tiledProperties.next.split(" ").join("").split(",");
+        
+
+        this.nextStages.forEach( stageName => {
+            /***
+             * ${stageName}data is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}data
+             * exclusivley loads the Tiled properties into the global cache.
+             */
+            this.load.json(`${stageName}data`, `assets/Tiled/${stageName}.json`, 'properties');
+
+        });
+
+        this.load.start(); // Loader doesn't start on its own outside of the preload function.
+        this.load.on('complete', function () {
+            console.log('Loaded all the json properties for NextStages');
+        });
+
+
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
-        this.stageUUID = this.mapProperties.UUID; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.mapProperties.diffBonus; // TODO: Get them by name and throw errors.
+        this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
         ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
@@ -1851,8 +1843,50 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
 
-        var nextStages = STAGES_NEXT[this.stage]
-        var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
+        const STAGE_UNLOCKS = {
+            'start': function ( ) { 
+                return true
+            },
+            'babies-first-wall': function () {
+                return false
+            },
+            'horz-row': function () {
+                return false
+            },
+            'now-vertical': function () {
+                return true
+            }
+        }
+        
+        //console.log(STAGE_UNLOCKS['start'].call());
+        //console.log(STAGE_UNLOCKS['babies-first-wall'].call());
+
+        // #region Check Unlocked
+        var unlockedLevels = [];
+        
+        this.nextStages.forEach( stageName => {
+            var dataName = `${stageName}data`;
+            var data = this.cache.json.get(dataName);
+            
+            data.forEach( propObj => {
+                if (propObj.name === 'slug') {
+                    if (STAGE_UNLOCKS[propObj.value].call()) {
+                        unlockedLevels.push(stageName);
+                    }
+                }
+            });
+        });
+
+        var nextStage = "";
+        if (unlockedLevels.length > 0 ) {
+            nextStage = Phaser.Math.RND.pick(unlockedLevels);
+        } else {
+            /**
+             * If a slug is not set up properly it will try to load the next 
+             * directly from the Tiled map properties.
+             */
+            nextStage = Phaser.Math.RND.pick(this.nextStages);
+        }
 
         ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
         this.scene.restart( { stage: nextStage } );
@@ -2201,6 +2235,8 @@ var StageData = new Phaser.Class({
         this.zedLevel = props.zedLevel;
 
         this.uuid = props.uuid;
+        if (this.slug) { this.slug = props.slug }
+        
         this.foodHistory = props.foodHistory;
         this.moveHistory = props.moveHistory;
 
@@ -2336,10 +2372,16 @@ class ScoreScene extends Phaser.Scene {
             moveHistory: ourInputScene.moveHistory,
             stage:ourGame.stage,
             uuid:ourGame.stageUUID,
-            zedLevel: calcZedLevel(ourTimeAttack.zeds).level,
+            zedLevel: calcZedLevel(ourTimeAttack.zeds).level
         }
 
+
         this.stageData = new StageData(stageDataJSON);
+
+               // For properties that may not exist.
+        if (ourGame.tiledProperties.slug != undefined) {
+            this.stageData.slug = ourGame.tiledProperties.slug;
+        }
         
         console.log(JSON.stringify(this.stageData));
 
