@@ -807,6 +807,7 @@ class GameScene extends Phaser.Scene {
         // The first split and join santizes any spaces.
         this.nextStages = this.tiledProperties.next.split(" ").join("").split(",");
         
+    
 
         this.nextStages.forEach( stageName => {
             /***
