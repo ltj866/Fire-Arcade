@@ -481,6 +481,7 @@ class PersistScene extends Phaser.Scene {
 
     // for changing bg sprites
     this.bgTimer = 0;
+    this.bgTick = 0;
 
             // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
             this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
@@ -497,7 +498,7 @@ class PersistScene extends Phaser.Scene {
             this.bg.tileScaleY = 3;
             
             // BG Mask
-            this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
+            /*this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
                 x: SCREEN_WIDTH/2,
                 y: SCREEN_HEIGHT/2,
                 key: 'bg02mask',
@@ -506,7 +507,7 @@ class PersistScene extends Phaser.Scene {
             
             const mask = this.mask;
             mask.scale = 3;
-            this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
+            this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); */
             
             // Scrolling BG2 Planets
             this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
@@ -595,40 +596,42 @@ class PersistScene extends Phaser.Scene {
 
         // not all of these need to be interpolated; wastes processing
 
-        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
+        //this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            //(this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
+        //this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            //(this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
 
         this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
         this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
 
-        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
-        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
+        this.bg.tilePositionX = (this.bg0.tilePositionX ) * 4;
+        this.bg.tilePositionY = (this.bg0.tilePositionY ) * 4;
             
-        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
-        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
+        this.bg2.tilePositionX = (this.bg0.tilePositionX ) * 8;
+        this.bg2.tilePositionY = (this.bg0.tilePositionY ) * 8;
 
-        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
-        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
+        this.bg3.tilePositionX = (this.bg0.tilePositionX ) * 2;
+        this.bg3.tilePositionY = (this.bg0.tilePositionY ) * 2;
 
         this.bgTimer += delta;
 
         if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
-            this.bg3.setTexture('bg02_3_2') 
-            this.bg.setTexture('bg02frame2') 
+            if (this.bgTick === 0) {
+                this.bg3.setTexture('bg02_3_2') 
+                this.bg.setTexture('bg02frame2') 
+                this.bgTick += 1;
+            }
+
             if (this.bgTimer >= 2000) {
-                this.bg3.setTexture('bg02_3')
-                this.bg.setTexture('bg02') 
-                this.bgTimer = 0
+                if (this.bgTick === 1) {
+                    this.bg3.setTexture('bg02_3')
+                    this.bg.setTexture('bg02') 
+                    this.bgTimer = 0
+                    this.bgTick -=1;
+                }
+
             }   
         }
 
@@ -4562,6 +4565,7 @@ var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
     height: 744,
+    renderer: Phaser.AUTO,
     //seed: 1,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
