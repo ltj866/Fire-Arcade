@@ -4564,6 +4564,7 @@ var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
     height: 744,
+    renderer: Phaser.AUTO,
     //seed: 1,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
