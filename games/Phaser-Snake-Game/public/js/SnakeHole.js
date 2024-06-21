@@ -192,6 +192,7 @@ var SOUND_ATOM = [
     ['bubbleBopLow01', [ 'bubbleBopLow01.ogg', 'bubbleBopLow01.mp3' ]]
 ]
 
+
 /*var SOUND_ATOM = [
     ['atomAbsorb01', [ 'atomAbsorb01.ogg', 'atomAbsorb01.mp3' ]],
     ['atomAbsorb02', [ 'atomAbsorb02.ogg', 'atomAbsorb02.mp3' ]],
@@ -316,6 +317,7 @@ class StartScene extends Phaser.Scene {
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
@@ -356,6 +358,10 @@ class StartScene extends Phaser.Scene {
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
+        this.load.audio({
+            key: 'chargeUp',
+            url: ['chargeUp.ogg', 'chargeUp.mp3']
+        })
         
         SOUND_PORTAL.forEach(soundID =>
             {
@@ -390,7 +396,19 @@ class StartScene extends Phaser.Scene {
 
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
-
+        const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
+        panel.setDepth(100)
+        panel.setScale(0)
+        this.tweens.add({
+            targets: panel,
+            scale: 1,
+            width: 450,
+            height: 500,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
         ///
         
 
@@ -734,6 +752,50 @@ class GameScene extends Phaser.Scene {
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
 
+        //UI
+
+        const panel = this.add.nineslice(GRID * 15.5, GRID * 8, 'uiGlass', 'Glass', 450, 72, 72, 72, 36, 36);
+        panel.setDepth(100)
+        panel.setScale(0)
+
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)
+
+        this.panelTween = this.tweens.add({
+            targets: [panel,text],
+            scale: 1,
+            width: 420,
+            height: 36,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+
+        this.panelTweenCollapse = this.tweens.add({
+            targets: [panel,text],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+        this.panelTweenCollapse.pause();
+
+
+        // SOUND
+
+        var _chargeUp = this.sound.add('chargeUp');
+
+        _chargeUp.play();
+
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
 
@@ -847,22 +909,38 @@ class GameScene extends Phaser.Scene {
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
+            this.startingArrowsAnimN.setVisible(false);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
+            this.startingArrowsAnimS.setVisible(false);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('idle');
+            this.startingArrowsAnimE.setVisible(false);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('idle');
+            this.startingArrowsAnimW.setVisible(false);
         }
+        const _arrowN = this.startingArrowsAnimN
+        const _arrowS = this.startingArrowsAnimS
+        const _arrowE = this.startingArrowsAnimE
+        const _arrowW = this.startingArrowsAnimW
+        this.time.delayedCall(2000, function() {
+            if (ourUI.energyAmount > 99) {
+                _arrowN.setVisible(true);
+                _arrowS.setVisible(true);
+                _arrowE.setVisible(true);
+                _arrowW.setVisible(true);
+            }
+            });
         
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
@@ -947,6 +1025,7 @@ class GameScene extends Phaser.Scene {
                     this.lastMoveTime = this.time.now;
                 }
                 ourInputScene.moveDirection(this, e);
+                this.panelTweenCollapse.resume();
                 
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -982,7 +1061,6 @@ class GameScene extends Phaser.Scene {
 
         })
         this.input.keyboard.on('keydown-SPACE', e => {
-            
             if (this.gState != GState.BONK && this.gState != GState.TRANSITION) {
             // #region Boost Outlines
                 this.boostOutlinesBody = [];
@@ -1043,11 +1121,7 @@ class GameScene extends Phaser.Scene {
             this.pressedSpaceDuringWait = false;
         });
 
-        this.input.keyboard.on('keydown-M', e => {
-            this.bg3.setTexture('bg02_3_2')
-        });
-
-        const FADE_OUT_TILES = [104]; // todo move to consts
+        const FADE_OUT_TILES = [104];
 
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
@@ -1455,7 +1529,6 @@ class GameScene extends Phaser.Scene {
         });
 
 
-
         // #endregion
 
         
@@ -1482,6 +1555,9 @@ class GameScene extends Phaser.Scene {
 
         ourUI.bestScoreUI.setText(`BEST :`);
         ourUI.bestScoreLabelUI.setText(bestBase);
+
+
+        
         
         // #region Snake Masks
         /***  
@@ -1539,7 +1615,6 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        
     }
     screenShake(){
         if (this.moveInterval === SPEED_SPRINT) {
@@ -1909,6 +1984,12 @@ class GameScene extends Phaser.Scene {
         // #endregion
 
 
+        if (this.gState === GState.START_WAIT) {
+            if (energyAmountX > 99 && !ourUI.chargeUpTween.isDestroyed()) {
+                ourUI.chargeUpTween.resume();
+            }
+        }
+
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
@@ -2025,7 +2106,6 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveCount += 1;
 
                 this.checkPortalAndMove()
-
 
                 if (energyAmountX < 1) {
                     // add the tail in.
@@ -3499,6 +3579,18 @@ class UIScene extends Phaser.Scene {
        boostBar.play('increasing');
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+       const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
+
+       this.chargeUpTween = this.tweens.add({
+            targets: fx1,
+            outerStrength: 16,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: true,
+            loop: 0 
+        });
+        this.chargeUpTween.pause();
 
        // Combo Sprites
 
