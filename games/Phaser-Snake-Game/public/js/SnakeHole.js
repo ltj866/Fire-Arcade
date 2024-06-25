@@ -232,7 +232,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'warp-draft-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -460,7 +460,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 24;
+        this.coins = 4;
     }
     
     preload(){
@@ -3936,11 +3936,14 @@ class UIScene extends Phaser.Scene {
 
         
     }
+    // #region UI Update
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         this.scoreDigitLength = this.runningScore.toString().length;
         this.panel.width = ((96) + (this.scoreDigitLength * 10));
 
+        
+        
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
@@ -3987,7 +3990,7 @@ class UIScene extends Phaser.Scene {
                     
                     this.ourGame.coins.push(_coin);
 
-                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(100,160);
                 }
             }
         }
