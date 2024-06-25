@@ -232,7 +232,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Dark_Stage-02'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -681,7 +681,6 @@ class GameScene extends Phaser.Scene {
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         
-        this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
         this.hasGhostTiles = false;
         this.wallVarient = ''; // Used for Fungible wall setups.
@@ -740,14 +739,22 @@ class GameScene extends Phaser.Scene {
 
 
         // Create the snake so it is addressable immediately 
-        this.snake = new Snake(this, 15, 15);
+        //this.snake = new Snake(this, 15, 15);
     
-        this.snake.direction = STOP;
+        
 
         // #region TileMap
 
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
+
+        var spawnTile = this.map.findByIndex(9); // Snake Head Index
+        this.startCoords = { x: spawnTile.x, y: spawnTile.y};
+        spawnTile.index = -1; // Set to empty tile
+
+        this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
+        this.snake.direction = STOP;
+        
 
         this.tiledProperties = {};
 
@@ -902,7 +909,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
-            if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            if (!this.tiledProperties.dark) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
         
@@ -1506,7 +1513,7 @@ class GameScene extends Phaser.Scene {
 
         this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
-        if (DARK_MODE) {
+        if (this.tiledProperties.dark) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
@@ -1779,7 +1786,7 @@ class GameScene extends Phaser.Scene {
     }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
-        if (DARK_MODE) {
+        if (this.tiledProperties.dark) {
             this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
     }
@@ -1897,7 +1904,6 @@ class GameScene extends Phaser.Scene {
         // console.log("update -- time=" + time + " delta=" + delta);
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
-        var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
         
         // Floating Electrons
         this.atoms.forEach(atom=> {
