@@ -301,7 +301,7 @@ class StartScene extends Phaser.Scene {
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
-        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
+        //this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
@@ -434,6 +434,10 @@ class StartScene extends Phaser.Scene {
                 this.scene.start('ScoreScene');
             }
             else {
+                                                
+                this.scene.setVisible(false);
+                //this.scene.get("UIScene").setVisible(false);
+                
                 this.scene.launch('UIScene');
                 this.scene.launch('GameScene');
                 //var ourGameScene = this.scene.get("GameScene");
@@ -463,19 +467,13 @@ class PersistScene extends Phaser.Scene {
     preload(){
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
 
-
     }
     
     create() {
 
     // #region Persistent Scene
 
-    this.anims.create({
-        key: 'coin01idle',
-        frames: this.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
-        frameRate: 8,
-        repeat: -1
-      })
+    
 
     // # Backgrounds
 
@@ -496,18 +494,6 @@ class PersistScene extends Phaser.Scene {
             this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
             this.bg.tileScaleX = 3;
             this.bg.tileScaleY = 3;
-            
-            // BG Mask
-            /*this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
-                x: SCREEN_WIDTH/2,
-                y: SCREEN_HEIGHT/2,
-                key: 'bg02mask',
-                add: false
-            }).setOrigin(.5,.5);
-            
-            const mask = this.mask;
-            mask.scale = 3;
-            this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); */
             
             // Scrolling BG2 Planets
             this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
@@ -724,42 +710,7 @@ class GameScene extends Phaser.Scene {
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
 
-        //UI
-
-        const panel = this.add.nineslice(GRID * 15.5, GRID * 8, 'uiGlass', 'Glass', 450, 72, 72, 72, 36, 36);
-        panel.setDepth(100)
-        panel.setScale(0)
-
-        const goalText = [
-            'GOAL : COLLECT 28 ATOMS',
-        ];
-        const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)
-
-        this.panelTween = this.tweens.add({
-            targets: [panel,text],
-            scale: 1,
-            width: 420,
-            height: 36,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });
-
-        this.panelTweenCollapse = this.tweens.add({
-            targets: [panel,text],
-            scale: 0,
-            width: 0,
-            height: 0,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });
-        this.panelTweenCollapse.pause();
+       
 
 
         // SOUND
@@ -1021,7 +972,7 @@ class GameScene extends Phaser.Scene {
                     this.lastMoveTime = this.time.now;
                 }
                 ourInputScene.moveDirection(this, e);
-                this.panelTweenCollapse.resume();
+                //this.panelTweenCollapse.resume();
                 
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -3567,8 +3518,8 @@ class UIScene extends Phaser.Scene {
     init(props) {
         //this.score = 0;
         var { score = 0 } = props
-        this.score = score;
-        this.stageStartScore = score;
+        this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
+        this.stageStartScore = Math.trunc(score);
         
         this.length = 0;
 
@@ -3599,7 +3550,44 @@ class UIScene extends Phaser.Scene {
     }
     
     create() {
-       const ourGame = this.scene.get('GameScene');
+       this.ourGame = this.scene.get('GameScene');
+       this.ourInputScene = this.scene.get('InputScene');
+
+        //9-Slice Panels
+
+        const panel = this.add.nineslice(GRID * .125, GRID * 3.125, 'uiGlass', 'GlassThin', 100, 36, 80, 18);
+        panel.setDepth(100).setOrigin(0,.5)
+
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)*/
+
+        /*this.panelTween = this.tweens.add({
+            targets: [panel],
+            scale: 1,
+            width: 420,
+            height: 36,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+
+        this.panelTweenCollapse = this.tweens.add({
+            targets: [panel],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });*/
+        //this.panelTweenCollapse.pause();
 
 
 
@@ -3640,7 +3628,7 @@ class UIScene extends Phaser.Scene {
 
        // Combo Sprites
 
-       this.visible = false; // Not clear by name what this references here @holden Also should not double up on a common phaser name.
+       this.comboActive = false; //used to communicate when to activate combo tweens
 
        this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
        this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
@@ -3649,8 +3637,7 @@ class UIScene extends Phaser.Scene {
        this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
        this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
        this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
-      
-       //this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 6).setDepth(20);
+       
        // #endregion
 
         
@@ -3680,7 +3667,7 @@ class UIScene extends Phaser.Scene {
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
 
-        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50).setPipeline('Light2D');      // Snake Body
+        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)//Snake Body
         var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
  
         snakeBody.scale = .667;
@@ -3743,10 +3730,10 @@ class UIScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreUI = this.add.dom(0, GRID * 3.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `SCORE :`
         ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
         ).setOrigin(0,1);
 
@@ -3763,7 +3750,7 @@ class UIScene extends Phaser.Scene {
         }
         
         //  Event: addScore
-        ourGame.events.on('addScore', function (fruit) {
+        this.ourGame.events.on('addScore', function (fruit) {
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
@@ -3773,10 +3760,6 @@ class UIScene extends Phaser.Scene {
                 'font-size': '22px',
                 'font-family': 'Oxanium',
                 'padding': '3px 8px 0px 0px',
-                /*'font-size': '22px', //old settings
-                'font-weight': '400',
-                'font-weight': 'bold',
-                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,*/
             })).setOrigin(0,0);
             
             // Remove score text after a time period.
@@ -3786,7 +3769,8 @@ class UIScene extends Phaser.Scene {
 
             this.tweens.add({
                 targets: scoreText,
-                alpha: { from: 1, to: 0.1 },
+                alpha: { from: 1, to: 0.0 },
+                y: scoreText.y - 10,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -3831,9 +3815,9 @@ class UIScene extends Phaser.Scene {
             //    `${deltaScore}`
             //)
             
-            this.runningScoreUI.setText(
+            /*this.runningScoreUI.setText(
                 `SCORE :`
-            );
+            );*/
             this.runningScoreLabelUI.setText(
                 `${commaInt(runningScore.toString())}`
             );
@@ -3873,10 +3857,10 @@ class UIScene extends Phaser.Scene {
         }, this);
 
         //  Event: saveScore
-        ourGame.events.on('saveScore', function () {
-            const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
-            const ourScoreScene = ourGame.scene.get('ScoreScene');
-            const ourUIScene = ourGame.scene.get('UIScene');
+        this.ourGame.events.on('saveScore', function () {
+            const ourTimeAttack = this.ourGame.scene.get('TimeAttackScene');
+            const ourScoreScene = this.ourGame.scene.get('ScoreScene');
+            const ourUIScene = this.ourGame.scene.get('UIScene');
             const ourStartScene = this.scene.get('StartScene');
 
 
@@ -3917,8 +3901,6 @@ class UIScene extends Phaser.Scene {
     }
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        const ourInputScene = this.scene.get('InputScene');
-        const ourGame = this.scene.get('GameScene');
 
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
@@ -3934,7 +3916,7 @@ class UIScene extends Phaser.Scene {
         }
         // #endregion
 
-        if (!ourGame.checkWinCon() && !this.scoreTimer.paused) {
+        if (!this.ourGame.checkWinCon() && !this.scoreTimer.paused) {
             /***
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly during portaling. After the timer pauses at the Score Floor
@@ -3958,13 +3940,13 @@ class UIScene extends Phaser.Scene {
                 if (this.coinSpawnCounter < 1) {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
-                    var validLocations = ourGame.validSpawnLocations();
+                    var validLocations = this.ourGame.validSpawnLocations();
                     var pos = Phaser.Math.RND.pick(validLocations)
 
                     var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim'
                     ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
                     
-                    ourGame.coins.push(_coin);
+                    this.ourGame.coins.push(_coin);
 
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
                 }
@@ -3973,27 +3955,27 @@ class UIScene extends Phaser.Scene {
         
 
 
-        if (GState.PLAY === this.scene.get('GameScene').gState) {
-            if (ourInputScene.spaceBar.isDown) {
+        if (GState.PLAY === this.ourGame.gState) {
+            if (this.ourInputScene.spaceBar.isDown) {
                 // Has Boost Logic, Then Boost
                 if(this.energyAmount > 1){
-                    this.scene.get('GameScene').moveInterval = SPEED_SPRINT;
+                    this.ourGame.moveInterval = SPEED_SPRINT;
                     
                     // Boost Stats
-                    ourInputScene.boostTime += 6;
+                    this.ourInputScene.boostTime += 6;
                     this.mask.setScale(this.energyAmount/100,1);
                     this.energyAmount -= 1;
                 } else{
                     //DISSIPATE LIVE ELECTRICITY
-                    this.scene.get('GameScene').moveInterval = SPEED_WALK;
+                    this.ourGame.moveInterval = SPEED_WALK;
                 }
         
             } else {
-                this.scene.get('GameScene').moveInterval = SPEED_WALK; // Less is Faster
+                this.ourGame.moveInterval = SPEED_WALK; // Less is Faster
                 this.mask.setScale(this.energyAmount/100,1);
                 this.energyAmount += .25; // Recharge Boost Slowly
             }
-        } else if (GState.START_WAIT === this.scene.get('GameScene').gState) {
+        } else if (GState.START_WAIT === this.ourGame.gState) {
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount += 1; // Recharge Boost Slowly
 
@@ -4010,13 +3992,13 @@ class UIScene extends Phaser.Scene {
         
         // #region Combo Logic
 
-        if (this.comboCounter > 0 && !this.visible) {
+        if (this.comboCounter > 0 && !this.comboActive) {
             this.comboAppear();
         }
-        else if (this.comboCounter == 0 && this.visible){
+        else if (this.comboCounter == 0 && this.comboActive){
             this.comboFade();
         }
-        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.visible) {
+        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
             this.comboFade();
         }
     }
@@ -4043,7 +4025,7 @@ class UIScene extends Phaser.Scene {
             duration: 300,
             repeat: 0,
         });
-        this.visible = true;
+        this.comboActive = true;
         }
     comboFade(){
         console.log("fading")
@@ -4055,7 +4037,7 @@ class UIScene extends Phaser.Scene {
             duration: 500,
             repeat: 0,
         });
-        this.visible = false;
+        this.comboActive = false;
         this.comboCounter = 0;
     }
 
@@ -4565,7 +4547,7 @@ var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
     height: 744,
-    renderer: Phaser.AUTO,
+    renderer: Phaser.WEBGL_MULTI,
     //seed: 1,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
@@ -4609,6 +4591,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 
 // region const Game
 export const game = new Phaser.Game(config);
+
 
 
 
