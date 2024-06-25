@@ -158,6 +158,28 @@
         "Racing_Stage-04_Dark.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "Racing_Stage-04_Ghost.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.3520419305525,
+                "y": 372.08124044551204
+            }
+        },
+        "Racing_Stage-04_Ghost.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Racing_Stage-05.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.3520419305525,
+                "y": 372.08124044551204
+            }
+        },
+        "Racing_Stage-05.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "Stage-01.json": {
             "scale": 1.5,
             "selectedLayer": 0,
@@ -726,8 +748,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 123.4030502852057,
-                "y": 368.40325255876047
+                "x": 123.10206723572963,
+                "y": 367.8012864598082
             }
         },
         "testing07.json#tileSheetx24": {
@@ -770,8 +792,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 66.21627088474452,
-                "y": 399.10352360532386
+                "x": 65.91528783526843,
+                "y": 398.5015575063716
             }
         },
         "testing09.json#tileSheetx24": {
@@ -825,7 +847,7 @@
             "scale": 1.90383064516129,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 153.90024356666316,
+                "x": 153.63761516467227,
                 "y": 368.2050195912317
             }
         },
