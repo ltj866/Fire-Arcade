@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -359,7 +359,7 @@ class StartScene extends Phaser.Scene {
 
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
-        const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
+        /*const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
         panel.setDepth(100)
         panel.setScale(0)
         this.tweens.add({
@@ -371,7 +371,7 @@ class StartScene extends Phaser.Scene {
             ease: 'sine.inout',
             yoyo: false,
             repeat: 0,
-        });
+        });*/
         ///
         
 
@@ -856,44 +856,47 @@ class GameScene extends Phaser.Scene {
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
-            this.startingArrowsAnimN.setVisible(false);
+            this.startingArrowsAnimN.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
-            this.startingArrowsAnimS.setVisible(false);
+            this.startingArrowsAnimS.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('idle');
-            this.startingArrowsAnimE.setVisible(false);
+            this.startingArrowsAnimE.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('idle');
-            this.startingArrowsAnimW.setVisible(false);
+            this.startingArrowsAnimW.setAlpha(0);
         }
         const _arrowN = this.startingArrowsAnimN
         const _arrowS = this.startingArrowsAnimS
         const _arrowE = this.startingArrowsAnimE
         const _arrowW = this.startingArrowsAnimW
-        this.time.delayedCall(2000, function() {
-            if (this.energyAmount > 99) {
-                _arrowN.setVisible(true);
-                _arrowS.setVisible(true);
-                _arrowE.setVisible(true);
-                _arrowW.setVisible(true);
+        
+        this.time.delayedCall(3000, event => {
+            if (this.gState != GState.PLAY) {
+                this.tweens.add({
+                    targets: [_arrowN,_arrowS,_arrowE,_arrowW],
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'linear',
+                    });
             }
-            });
+        });
         
 
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
-        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
+        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(50);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(50);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(50);
 
         this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
 
@@ -914,11 +917,11 @@ class GameScene extends Phaser.Scene {
         // Dream walls for Horizontal Wrap
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(50).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
                 this.dreamWalls.push(wallShimmerRight);
                 
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(50).setOrigin(0,0);
                 wallShimmerLeft.play('wrapBlock04');
                 this.dreamWalls.push(wallShimmerLeft);
             }
@@ -926,11 +929,11 @@ class GameScene extends Phaser.Scene {
 
         // Dream walls for Vertical Wrap
         for (let index = 1; index < END_X; index++) {
-            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(50).setOrigin(0,0);
             wallShimmerTop.play('wrapBlock02');
             this.dreamWalls.push(wallShimmerTop);
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(10).setOrigin(0,0);
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(50).setOrigin(0,0);
             wallShimmerBottom.play('wrapBlock07');
             this.dreamWalls.push(wallShimmerBottom);
         
@@ -1083,12 +1086,12 @@ class GameScene extends Phaser.Scene {
 
                         var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
                             stageName
-                        ).setDepth(35).setOrigin(0,0);
+                        ).setDepth(50).setOrigin(0,0);
 
                         var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                             'nextStagePortal' 
 
-                        ).setDepth(35).setOrigin(0.21,0.21).setScale(2);
+                        ).setDepth(50).setOrigin(0.21,0.21).setScale(2);
 
                         this.nextStagePortals.push(portalImage);
 
@@ -1947,10 +1950,10 @@ class GameScene extends Phaser.Scene {
     
                 // Turn back on arrows
                 this.startingArrowState = true;
-                this.startingArrowsAnimN.setVisible(true);
-                this.startingArrowsAnimS.setVisible(true);
-                this.startingArrowsAnimE.setVisible(true);
-                this.startingArrowsAnimW.setVisible(true);
+                this.startingArrowsAnimN.setAlpha(1);
+                this.startingArrowsAnimS.setAlpha(1);
+                this.startingArrowsAnimE.setAlpha(1);
+                this.startingArrowsAnimW.setAlpha(1);
                 
                 this.gState = GState.WAIT_FOR_INPUT;
                 this.scene.get('UIScene').scoreTimer.paused = true;
@@ -2434,13 +2437,10 @@ class ScoreScene extends Phaser.Scene {
         // #endregion
 
         
-
-
-        
         // #region
         // Dream walls for Horizontal Wrap
                 
-        for (let index = 2; index < END_Y - 1; index++) {
+        /*for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
@@ -2468,7 +2468,7 @@ class ScoreScene extends Phaser.Scene {
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
-        // #endregion
+        // #endregion*/
 
         this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
@@ -2491,8 +2491,18 @@ class ScoreScene extends Phaser.Scene {
         //var stageAverage = stageScore();
         
         // Scene Background Color
-        this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
-        this.stageBackGround.setOrigin(0,0).setDepth(8);
+        ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x412D43, .88);
+        ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
+        ourGame.stageBackGround.alpha = 0;
+
+        ourGame.bgTween = ourGame.tweens.add({
+            targets: ourGame.stageBackGround,
+            alpha: 1,
+            yoyo: false,
+            loop: 0,
+            duration: 200,
+            ease: 'sine.inout'
+        });
 
 
         // #region Atomic Food List
@@ -3004,6 +3014,14 @@ class ScoreScene extends Phaser.Scene {
                                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
                     ourGame.gState = GState.PLAY;
+                    ourGame.bgTween = ourGame.tweens.add({
+                        targets: ourGame.stageBackGround,
+                        alpha: 0,
+                        yoyo: false,
+                        loop: 0,
+                        duration: 200,
+                        ease: 'sine.inout'
+                    });
 
                     ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
 
@@ -3595,7 +3613,6 @@ class UIScene extends Phaser.Scene {
        const ourUI = this.ourGame.scene.get('UIScene');
 
        this.UIScoreContainer = this.make.container(0,0);
-       this.UIScoreShown = true;
 
         
 
@@ -4412,10 +4429,10 @@ class InputScene extends Phaser.Scene {
                 
             // turn off arrows and move snake.
             gameScene.startingArrowState = false;
-            gameScene.startingArrowsAnimN.setVisible(false);
-            gameScene.startingArrowsAnimS.setVisible(false);
-            gameScene.startingArrowsAnimE.setVisible(false);
-            gameScene.startingArrowsAnimW.setVisible(false);
+            gameScene.startingArrowsAnimN.setAlpha(0);
+            gameScene.startingArrowsAnimS.setAlpha(0);
+            gameScene.startingArrowsAnimE.setAlpha(0);
+            gameScene.startingArrowsAnimW.setAlpha(0);
 
 
             //ourInputScene.moveDirection(this, e);
