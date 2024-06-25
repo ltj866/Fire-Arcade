@@ -3590,9 +3590,10 @@ class UIScene extends Phaser.Scene {
        this.ourInputScene = this.scene.get('InputScene');
 
         //9-Slice Panels
+        this.runningScore = 0; //needs to be set initially so panel can access length of string
 
-        const panel = this.add.nineslice(GRID * .125, GRID * 3.125, 'uiGlass', 'GlassThin', 100, 36, 80, 18);
-        panel.setDepth(100).setOrigin(0,.5)
+        this.panel = this.add.nineslice(GRID * .125, GRID * 3.125, 'uiGlass', 'GlassThin', 100, 36, 80, 18);
+        this.panel.setDepth(100).setOrigin(0,.5)
 
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
@@ -3841,7 +3842,7 @@ class UIScene extends Phaser.Scene {
             var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
             console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
 
-            var runningScore = this.score + calcBonus(baseScore);
+            this.runningScore = this.score + calcBonus(baseScore);
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
 
             //this.deltaScoreUI.setText(
@@ -3855,7 +3856,7 @@ class UIScene extends Phaser.Scene {
                 `SCORE :`
             );*/
             this.runningScoreLabelUI.setText(
-                `${commaInt(runningScore.toString())}`
+                `${commaInt(this.runningScore.toString())}`
             );
             
 
@@ -3937,6 +3938,8 @@ class UIScene extends Phaser.Scene {
     }
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        this.scoreDigitLength = this.runningScore.toString().length;
+        this.panel.width = ((96) + (this.scoreDigitLength * 10));
 
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
