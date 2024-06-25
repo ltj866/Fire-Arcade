@@ -517,11 +517,33 @@
             "scale": 1.8463709677419355,
             "selectedLayer": 0,
             "viewCenter": {
+                "x": 371.8104389604717,
+                "y": 370.99803450535046
+            }
+        },
+        "Wrap_Stage-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-03b.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 371.8104389604717,
+                "y": 370.99803450535046
+            }
+        },
+        "Wrap_Stage-03b.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-03c.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 1,
+            "viewCenter": {
                 "x": 372.3520419305525,
                 "y": 372.08124044551204
             }
         },
-        "Wrap_Stage-03.json#tileSheetx24": {
+        "Wrap_Stage-03c.json#tileSheetx24": {
             "scaleInDock": 1
         },
         "Wrap_Stage-04.json": {
