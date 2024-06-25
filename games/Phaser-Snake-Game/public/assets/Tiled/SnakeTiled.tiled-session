@@ -590,6 +590,28 @@
         "Wrap_Stage-xx.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "rough-02.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.3520419305525,
+                "y": 372.08124044551204
+            }
+        },
+        "rough-02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-03.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.3520419305525,
+                "y": 372.08124044551204
+            }
+        },
+        "rough-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
         "snakeMap.tmx": {
             "scale": 0.7137768817204301,
             "selectedLayer": 0,
