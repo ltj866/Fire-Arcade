@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -232,7 +232,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'warp-draft-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -881,7 +881,7 @@ class GameScene extends Phaser.Scene {
         const _arrowE = this.startingArrowsAnimE
         const _arrowW = this.startingArrowsAnimW
         this.time.delayedCall(2000, function() {
-            if (ourUI.energyAmount > 99) {
+            if (this.energyAmount > 99) {
                 _arrowN.setVisible(true);
                 _arrowS.setVisible(true);
                 _arrowE.setVisible(true);
@@ -1436,11 +1436,7 @@ class GameScene extends Phaser.Scene {
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
-        const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(10, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreUI.setOrigin(0,1);
-        ourUI.bestScoreLabelUI = ourUI.add.dom(GRID * 3, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreLabelUI.setOrigin(0,1);
+
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
@@ -1448,14 +1444,13 @@ class GameScene extends Phaser.Scene {
         if (bestLogJSON) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
-            var bestBase = bestLog.calcBase();
+            this.bestBase = bestLog.calcBase();
         }
         else {
-            var bestBase = 0;
+            this.bestBase = 0;
         }
 
-        ourUI.bestScoreUI.setText(`BEST :`);
-        ourUI.bestScoreLabelUI.setText(bestBase);
+
 
 
         
@@ -1970,7 +1965,6 @@ class GameScene extends Phaser.Scene {
             this.winned = true;
 
             //ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
-            ourUI.scoreTweenShow();
             this.gState = GState.TRANSITION;
             
             this.events.off('addScore');
@@ -2012,7 +2006,8 @@ class GameScene extends Phaser.Scene {
         if (this.gState === GState.START_WAIT) {
             if (energyAmountX > 99 && !ourUI.chargeUpTween.isDestroyed()) {
                 ourUI.chargeUpTween.resume();
-                ourUI.scoreTweenHide();
+                //ourUI.scoreTweenHide();
+
             }
         }
 
@@ -2126,7 +2121,12 @@ class GameScene extends Phaser.Scene {
             
             
             if (this.gState === GState.PLAY) {
-                ourUI.scoreTweenHide();
+
+                if (!this.winned) {
+                    ourUI.scoreTweenHide(); 
+                }
+                
+
                 // Move at last second
                 this.snake.move(this);
                 ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
@@ -2353,6 +2353,8 @@ class ScoreScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
+        ourUI.scoreTweenShow();
+
         var stageDataJSON = {
             bonks: ourUI.bonks,
             boostFrames: ourInputScene.boostTime,
@@ -2418,7 +2420,7 @@ class ScoreScene extends Phaser.Scene {
         if (currentLocal > bestLocal) {
             console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
             bestLocal = currentLocal;
-            ourUI.bestScoreUI.setText(`Best : ${this.stageData.calcBase()}`);
+            //this.bestScoreUI.setText(`Best : ${this.stageData.calcBase()}`);
 
             this.stageData.newBest = true;
             
@@ -3590,43 +3592,12 @@ class UIScene extends Phaser.Scene {
     create() {
        this.ourGame = this.scene.get('GameScene');
        this.ourInputScene = this.scene.get('InputScene');
+       const ourUI = this.ourGame.scene.get('UIScene');
 
-        //9-Slice Panels
-        this.runningScore = 0; //needs to be set initially so panel can access length of string
+       this.UIScoreContainer = this.make.container(0,0);
+       this.UIScoreShown = true;
 
-        this.panel = this.add.nineslice(GRID * .125, GRID * 2.75, 'uiGlass', 'GlassThin', 100, 36, 80, 18);
-        this.panel.setDepth(100).setOrigin(0,.5)
-
-        const goalText = [
-            'GOAL : COLLECT 28 ATOMS',
-        ];
-        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)*/
-
-        /*this.panelTween = this.tweens.add({
-            targets: [panel],
-            scale: 1,
-            width: 420,
-            height: 36,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });
-
-        this.panelTweenCollapse = this.tweens.add({
-            targets: [panel],
-            scale: 0,
-            width: 0,
-            height: 0,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });*/
-        //this.panelTweenCollapse.pause();
+        
 
 
 
@@ -3688,13 +3659,18 @@ class UIScene extends Phaser.Scene {
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
         
-        this.UIScoreContainer = this.make.container(0,0);
+        
 
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`STAGE :`).setOrigin(0,0);
+            ).setText(`STAGE :`).setOrigin(0,0);
         this.scoreLabelUI = this.add.dom(GRID * 3 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`0`).setOrigin(0,0);
+            ).setText(`0`).setOrigin(0,0);
+
+        this.bestScoreUI = this.add.dom(10, 0 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`BEST :`).setOrigin(0,0);;
+        this.bestScoreLabelUI = this.add.dom(GRID * 3, 0, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(this.ourGame.bestBase).setOrigin(0,0);
 
 
 
@@ -3871,6 +3847,7 @@ class UIScene extends Phaser.Scene {
                 `${commaInt(this.runningScore.toString())}`
             );
             
+            
 
 
             // Update UI
@@ -3882,6 +3859,9 @@ class UIScene extends Phaser.Scene {
             this.globalFruitCount += 1; // Run Wide Counter
 
             var length = `${this.length}`;
+
+            this.bestScoreUI.setText(`BEST :`);
+            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
@@ -3945,10 +3925,52 @@ class UIScene extends Phaser.Scene {
         }, this);
 
         this.lastTimeTick = 0;
+        //9-Slice Panels
+        // We recalculate running score so it can be referenced for the 9-slice panel
+        var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+        this.runningScore = this.score + calcBonus(baseScore);
+        this.scoreDigitLength = this.runningScore.toString().length;
+        
+        this.panel = this.add.nineslice(GRID * .125, GRID * 2.75, 'uiGlass', 'GlassThin', ((96) + (this.scoreDigitLength * 10)), 36, 80, 18);
+        this.panel.setDepth(100).setOrigin(0,.5)
 
-        this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
-            this.bestScoreUI,this.bestScoreLabelUI, this.panel,
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)*/
+
+        /*this.panelTween = this.tweens.add({
+            targets: [panel],
+            scale: 1,
+            width: 420,
+            height: 36,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+
+        this.panelTweenCollapse = this.tweens.add({
+            targets: [panel],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });*/
+        //this.panelTweenCollapse.pause();
+
+        if (this.UIScoreContainer.length === 0) {
+                    this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
+                        this.bestScoreUI,this.bestScoreLabelUI, this.panel,
              this.runningScoreUI, this.runningScoreLabelUI])
+        }
+
 
 
 
@@ -4061,14 +4083,13 @@ class UIScene extends Phaser.Scene {
     }
 
     scoreTweenShow(){
-        
-        if (this.UIScoreContainer.y === GRID * -1) {
+        if (this.UIScoreContainer.y === -GRID) {
             console.log('showing')
             this.tweens.add({
                 targets: this.UIScoreContainer,
-                y: this.UIScoreContainer.y + (GRID * 1),
+                y: (0),
                 ease: 'Sine.InOut',
-                duration: 1000,
+                duration: 500,
                 repeat: 0,
                 yoyo: false
               });
@@ -4079,9 +4100,9 @@ class UIScene extends Phaser.Scene {
             console.log('hiding')
             this.tweens.add({
                 targets: this.UIScoreContainer,
-                y: this.UIScoreContainer.y - (GRID * 1),
+                y: (-GRID * 1),
                 ease: 'Sine.InOut',
-                duration: 1000,
+                duration: 500,
                 repeat: 0,
                 yoyo: false
               });
