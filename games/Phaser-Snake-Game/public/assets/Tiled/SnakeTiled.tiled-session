@@ -515,10 +515,10 @@
         },
         "Wrap_Stage-03.json": {
             "scale": 0.7137768817204301,
-            "selectedLayer": 4,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 369.1629790038603,
-                "y": 369.8634780152528
+                "x": 367.7619809810752,
+                "y": 367.06148196968263
             }
         },
         "Wrap_Stage-03.json#tileSheetx24": {
@@ -952,6 +952,17 @@
         },
         "testingx01.json#tileSheetx24": {
             "scaleInDock": 1
+        },
+        "warp-draft-01.json": {
+            "scale": 1.8463709677419355,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 371.8104389604717,
+                "y": 370.99803450535046
+            }
+        },
+        "warp-draft-01.json#tileSheetx24": {
+            "scaleInDock": 1
         }
     },
     "map.lastUsedFormat": "json",
@@ -977,6 +988,7 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "warp-draft-01.json",
         "Stage-03a.json",
         "Stage-06.json",
         "Stage-02a.json",
@@ -987,7 +999,6 @@
         "Portal_Stage-03.json",
         "Dark_Stage-02.json",
         "Dark_Stage-04.json",
-        "Dark_Stage-06.json",
-        "Ghost_Stage-03.json"
+        "Dark_Stage-06.json"
     ]
 }
