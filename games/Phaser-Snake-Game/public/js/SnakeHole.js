@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 1; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -2932,9 +2932,32 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 21.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
+            width:'335px',
             "fontSize":'18px',
-            })).setOrigin(0.5, 0);
+        })).setOrigin(1, 0);
+
+
+    
+        
+
+        calcSumOfBest(ourPersist);
+        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), 21);
+
+
+        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 21, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-style": 'bold',
+            })).setText(
+                `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
+        ).setOrigin(0,0);
+        
+        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 22.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-style": 'bold',
+            })).setHTML(
+                `SUM OF BEST : <span style="color:goldenrod">${commaInt(ourPersist.sumOfBest)}</span>`
+        ).setOrigin(0,0);
 
         // #region Help Card
         /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
