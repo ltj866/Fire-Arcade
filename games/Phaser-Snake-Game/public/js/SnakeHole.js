@@ -2429,7 +2429,7 @@ class ScoreScene extends Phaser.Scene {
         if (currentLocal > bestLocal) {
             console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
             bestLocal = currentLocal;
-            //this.bestScoreUI.setText(`Best : ${this.stageData.calcBase()}`);
+            var bestScoreValue = this.stageData.calcBase()
 
             this.stageData.newBest = true;
             
@@ -2438,6 +2438,9 @@ class ScoreScene extends Phaser.Scene {
             //calcSumOfBest(ourStartScene); // Note: This really should be an event.
             //this.scene.get("PersistScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
             //this.scene.get("PersistScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
+        }
+        else{
+            bestScoreValue = 0;
         }
 
         // #endregion
@@ -3800,6 +3803,8 @@ class UIScene extends Phaser.Scene {
         //  Event: addScore
         this.ourGame.events.on('addScore', function (fruit) {
 
+            const ourScoreScene = this.scene.get('ScoreScene');
+
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
                 'color': '#FCFFB2',
@@ -3884,7 +3889,7 @@ class UIScene extends Phaser.Scene {
             var length = `${this.length}`;
 
             this.bestScoreUI.setText(`BEST`);
-            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
+            this.bestScoreLabelUI.setText(ourScoreScene.bestScoreValue);
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
@@ -4142,7 +4147,7 @@ class UIScene extends Phaser.Scene {
               });
             this.tweens.add({
                 targets: this.panel,
-                height: 50,
+                height: 52,
                 ease: 'Sine.InOut',
                 duration: 500,
                 repeat: 0,
