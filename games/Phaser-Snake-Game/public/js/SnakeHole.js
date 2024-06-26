@@ -359,7 +359,7 @@ class StartScene extends Phaser.Scene {
 
         const ourTimeAttack = this.scene.get('TimeAttackScene');
 
-        const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
+        /*const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
         panel.setDepth(100)
         panel.setScale(0)
         this.tweens.add({
@@ -371,7 +371,7 @@ class StartScene extends Phaser.Scene {
             ease: 'sine.inout',
             yoyo: false,
             repeat: 0,
-        });
+        });*/
         ///
         
 
@@ -863,44 +863,47 @@ class GameScene extends Phaser.Scene {
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
-            this.startingArrowsAnimN.setVisible(false);
+            this.startingArrowsAnimN.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
-            this.startingArrowsAnimS.setVisible(false);
+            this.startingArrowsAnimS.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('idle');
-            this.startingArrowsAnimE.setVisible(false);
+            this.startingArrowsAnimE.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('idle');
-            this.startingArrowsAnimW.setVisible(false);
+            this.startingArrowsAnimW.setAlpha(0);
         }
         const _arrowN = this.startingArrowsAnimN
         const _arrowS = this.startingArrowsAnimS
         const _arrowE = this.startingArrowsAnimE
         const _arrowW = this.startingArrowsAnimW
-        this.time.delayedCall(2000, function() {
-            if (ourUI.energyAmount > 99) {
-                _arrowN.setVisible(true);
-                _arrowS.setVisible(true);
-                _arrowE.setVisible(true);
-                _arrowW.setVisible(true);
+        
+        this.time.delayedCall(3000, event => {
+            if (this.gState != GState.PLAY) {
+                this.tweens.add({
+                    targets: [_arrowN,_arrowS,_arrowE,_arrowW],
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'linear',
+                    });
             }
-            });
+        });
         
 
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
-        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
+        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(50);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(50);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(50);
 
         this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
 
@@ -921,11 +924,11 @@ class GameScene extends Phaser.Scene {
         // Dream walls for Horizontal Wrap
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(50).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
                 this.dreamWalls.push(wallShimmerRight);
                 
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(50).setOrigin(0,0);
                 wallShimmerLeft.play('wrapBlock04');
                 this.dreamWalls.push(wallShimmerLeft);
             }
@@ -933,11 +936,11 @@ class GameScene extends Phaser.Scene {
 
         // Dream walls for Vertical Wrap
         for (let index = 1; index < END_X; index++) {
-            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(50).setOrigin(0,0);
             wallShimmerTop.play('wrapBlock02');
             this.dreamWalls.push(wallShimmerTop);
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(10).setOrigin(0,0);
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(50).setOrigin(0,0);
             wallShimmerBottom.play('wrapBlock07');
             this.dreamWalls.push(wallShimmerBottom);
         
@@ -1090,12 +1093,12 @@ class GameScene extends Phaser.Scene {
 
                         var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
                             stageName
-                        ).setDepth(35).setOrigin(0,0);
+                        ).setDepth(50).setOrigin(0,0);
 
                         var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                             'nextStagePortal' 
 
-                        ).setDepth(35).setOrigin(0.21,0.21).setScale(2);
+                        ).setDepth(50).setOrigin(0.21,0.21).setScale(2);
 
                         this.nextStagePortals.push(portalImage);
 
@@ -1443,11 +1446,7 @@ class GameScene extends Phaser.Scene {
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
         // #region GameScene UI Plug
-        const ourUI = this.scene.get('UIScene'); 
-        ourUI.bestScoreUI = ourUI.add.dom(10, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreUI.setOrigin(0,1);
-        ourUI.bestScoreLabelUI = ourUI.add.dom(GRID * 3, GRID , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        ourUI.bestScoreLabelUI.setOrigin(0,1);
+
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
         var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
@@ -1455,14 +1454,13 @@ class GameScene extends Phaser.Scene {
         if (bestLogJSON) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
-            var bestBase = bestLog.calcBase();
+            this.bestBase = bestLog.calcBase();
         }
         else {
-            var bestBase = 0;
+            this.bestBase = 0;
         }
 
-        ourUI.bestScoreUI.setText(`BEST :`);
-        ourUI.bestScoreLabelUI.setText(bestBase);
+
 
 
         
@@ -1958,10 +1956,10 @@ class GameScene extends Phaser.Scene {
     
                 // Turn back on arrows
                 this.startingArrowState = true;
-                this.startingArrowsAnimN.setVisible(true);
-                this.startingArrowsAnimS.setVisible(true);
-                this.startingArrowsAnimE.setVisible(true);
-                this.startingArrowsAnimW.setVisible(true);
+                this.startingArrowsAnimN.setAlpha(1);
+                this.startingArrowsAnimS.setAlpha(1);
+                this.startingArrowsAnimE.setAlpha(1);
+                this.startingArrowsAnimW.setAlpha(1);
                 
                 this.gState = GState.WAIT_FOR_INPUT;
                 this.scene.get('UIScene').scoreTimer.paused = true;
@@ -1975,8 +1973,7 @@ class GameScene extends Phaser.Scene {
             console.log("YOU WIN" , this.stage);
             this.winned = true;
 
-            ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
-
+            //ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
             this.gState = GState.TRANSITION;
             
             this.events.off('addScore');
@@ -2018,6 +2015,8 @@ class GameScene extends Phaser.Scene {
         if (this.gState === GState.START_WAIT) {
             if (energyAmountX > 99 && !ourUI.chargeUpTween.isDestroyed()) {
                 ourUI.chargeUpTween.resume();
+                //ourUI.scoreTweenHide();
+
             }
         }
 
@@ -2131,6 +2130,12 @@ class GameScene extends Phaser.Scene {
             
             
             if (this.gState === GState.PLAY) {
+
+                if (!this.winned) {
+                    ourUI.scoreTweenHide(); 
+                }
+                
+
                 // Move at last second
                 this.snake.move(this);
                 ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
@@ -2357,6 +2362,8 @@ class ScoreScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
+        ourUI.scoreTweenShow();
+
         var stageDataJSON = {
             bonks: ourUI.bonks,
             boostFrames: ourInputScene.boostTime,
@@ -2422,7 +2429,7 @@ class ScoreScene extends Phaser.Scene {
         if (currentLocal > bestLocal) {
             console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
             bestLocal = currentLocal;
-            ourUI.bestScoreUI.setText(`Best : ${this.stageData.calcBase()}`);
+            //this.bestScoreUI.setText(`Best : ${this.stageData.calcBase()}`);
 
             this.stageData.newBest = true;
             
@@ -2436,13 +2443,10 @@ class ScoreScene extends Phaser.Scene {
         // #endregion
 
         
-
-
-        
         // #region
         // Dream walls for Horizontal Wrap
                 
-        for (let index = 2; index < END_Y - 1; index++) {
+        /*for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
@@ -2470,7 +2474,7 @@ class ScoreScene extends Phaser.Scene {
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
-        // #endregion
+        // #endregion*/
 
         this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
@@ -2493,8 +2497,18 @@ class ScoreScene extends Phaser.Scene {
         //var stageAverage = stageScore();
         
         // Scene Background Color
-        this.stageBackGround = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, .88);
-        this.stageBackGround.setOrigin(0,0).setDepth(8);
+        ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x412D43, .88);
+        ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
+        ourGame.stageBackGround.alpha = 0;
+
+        ourGame.bgTween = ourGame.tweens.add({
+            targets: ourGame.stageBackGround,
+            alpha: 1,
+            yoyo: false,
+            loop: 0,
+            duration: 200,
+            ease: 'sine.inout'
+        });
 
 
         // #region Atomic Food List
@@ -3006,6 +3020,14 @@ class ScoreScene extends Phaser.Scene {
                                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
                     ourGame.gState = GState.PLAY;
+                    ourGame.bgTween = ourGame.tweens.add({
+                        targets: ourGame.stageBackGround,
+                        alpha: 0,
+                        yoyo: false,
+                        loop: 0,
+                        duration: 200,
+                        ease: 'sine.inout'
+                    });
 
                     ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
 
@@ -3594,43 +3616,11 @@ class UIScene extends Phaser.Scene {
     create() {
        this.ourGame = this.scene.get('GameScene');
        this.ourInputScene = this.scene.get('InputScene');
+       const ourUI = this.ourGame.scene.get('UIScene');
 
-        //9-Slice Panels
-        this.runningScore = 0; //needs to be set initially so panel can access length of string
+       this.UIScoreContainer = this.make.container(0,0);
 
-        this.panel = this.add.nineslice(GRID * .125, GRID * 3.125, 'uiGlass', 'GlassThin', 100, 36, 80, 18);
-        this.panel.setDepth(100).setOrigin(0,.5)
-
-        const goalText = [
-            'GOAL : COLLECT 28 ATOMS',
-        ];
-        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)*/
-
-        /*this.panelTween = this.tweens.add({
-            targets: [panel],
-            scale: 1,
-            width: 420,
-            height: 36,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });
-
-        this.panelTweenCollapse = this.tweens.add({
-            targets: [panel],
-            scale: 0,
-            width: 0,
-            height: 0,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });*/
-        //this.panelTweenCollapse.pause();
+        
 
 
 
@@ -3693,13 +3683,21 @@ class UIScene extends Phaser.Scene {
 
         
         
+
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`STAGE :`).setOrigin(0,0);
+            ).setText(`STAGE :`).setOrigin(0,0);
         this.scoreLabelUI = this.add.dom(GRID * 3 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText(`0`).setOrigin(0,0);
+            ).setText(`0`).setOrigin(0,0);
 
-        
+        this.bestScoreUI = this.add.dom(10, 0 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`BEST :`).setOrigin(0,0);;
+        this.bestScoreLabelUI = this.add.dom(GRID * 3, 0, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(this.ourGame.bestBase).setOrigin(0,0);
+
+
+
+   
         
 
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
@@ -3756,14 +3754,21 @@ class UIScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5 - 7, GRID,'coinPickup01Anim'
+        this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'coinPickup01Anim'
         ).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon.setScale(0.5);
+        //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*22 - 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE
-            )).setHTML(
-                `${commaInt(this.scene.get("PersistScene").coins)}`
+        this.coinUIText = this.add.dom(GRID*23.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: COLOR_SCORE,
+            'color': 'white',
+            'font-weight': '400',
+            //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+            'font-size': '22px',
+            'font-family': 'Oxanium',
+            //'padding': '3px 8px 0px 0px',
+        })).setHTML(
+                `x ${commaInt(this.scene.get("PersistScene").coins)}`
         ).setOrigin(0,0);
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
@@ -3773,10 +3778,10 @@ class UIScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(0, GRID * 3.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreUI = this.add.dom(0, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `SCORE :`
         ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
         ).setOrigin(0,1);
 
@@ -3865,6 +3870,7 @@ class UIScene extends Phaser.Scene {
                 `${commaInt(this.runningScore.toString())}`
             );
             
+            
 
 
             // Update UI
@@ -3876,6 +3882,9 @@ class UIScene extends Phaser.Scene {
             this.globalFruitCount += 1; // Run Wide Counter
 
             var length = `${this.length}`;
+
+            this.bestScoreUI.setText(`BEST :`);
+            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
@@ -3939,6 +3948,54 @@ class UIScene extends Phaser.Scene {
         }, this);
 
         this.lastTimeTick = 0;
+        //9-Slice Panels
+        // We recalculate running score so it can be referenced for the 9-slice panel
+        var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+        this.runningScore = this.score + calcBonus(baseScore);
+        this.scoreDigitLength = this.runningScore.toString().length;
+        
+        this.panel = this.add.nineslice(GRID * .125, GRID * 2.75, 'uiGlass', 'GlassThin', ((96) + (this.scoreDigitLength * 10)), 36, 80, 18);
+        this.panel.setDepth(100).setOrigin(0,.5)
+
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)*/
+
+        /*this.panelTween = this.tweens.add({
+            targets: [panel],
+            scale: 1,
+            width: 420,
+            height: 36,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+
+        this.panelTweenCollapse = this.tweens.add({
+            targets: [panel],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });*/
+        //this.panelTweenCollapse.pause();
+
+        if (this.UIScoreContainer.length === 0) {
+                    this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
+                        this.bestScoreUI,this.bestScoreLabelUI, this.panel,
+             this.runningScoreUI, this.runningScoreLabelUI])
+        }
+
+
+
 
         
     }
@@ -4050,7 +4107,34 @@ class UIScene extends Phaser.Scene {
             this.comboFade();
         }
     }
-    
+
+    scoreTweenShow(){
+        if (this.UIScoreContainer.y === -GRID) {
+            console.log('showing')
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (0),
+                ease: 'Sine.InOut',
+                duration: 500,
+                repeat: 0,
+                yoyo: false
+              });
+        }
+    }
+    scoreTweenHide(){
+        if (this.UIScoreContainer.y === 0) {
+            console.log('hiding')
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (-GRID * 1),
+                ease: 'Sine.InOut',
+                duration: 500,
+                repeat: 0,
+                yoyo: false
+              });
+        }
+    }
+
     comboBounce(){
         this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
@@ -4354,10 +4438,10 @@ class InputScene extends Phaser.Scene {
                 
             // turn off arrows and move snake.
             gameScene.startingArrowState = false;
-            gameScene.startingArrowsAnimN.setVisible(false);
-            gameScene.startingArrowsAnimS.setVisible(false);
-            gameScene.startingArrowsAnimE.setVisible(false);
-            gameScene.startingArrowsAnimW.setVisible(false);
+            gameScene.startingArrowsAnimN.setAlpha(0);
+            gameScene.startingArrowsAnimS.setAlpha(0);
+            gameScene.startingArrowsAnimE.setAlpha(0);
+            gameScene.startingArrowsAnimW.setAlpha(0);
 
 
             //ourInputScene.moveDirection(this, e);
