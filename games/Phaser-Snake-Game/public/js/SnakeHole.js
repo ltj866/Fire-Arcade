@@ -460,7 +460,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 24;
+        this.coins = 4;
     }
     
     preload(){
@@ -677,7 +677,6 @@ class GameScene extends Phaser.Scene {
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         
-        this.DARK_MODE = DARK_MODE;
         this.lightMasks = [];
         this.hasGhostTiles = false;
         this.wallVarient = ''; // Used for Fungible wall setups.
@@ -736,9 +735,9 @@ class GameScene extends Phaser.Scene {
 
 
         // Create the snake so it is addressable immediately 
-        this.snake = new Snake(this, 15, 15);
+        //this.snake = new Snake(this, 15, 15);
     
-        this.snake.direction = STOP;
+        
 
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
         this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65,'UIbg').setDepth(40).setOrigin(0,0);
@@ -748,6 +747,14 @@ class GameScene extends Phaser.Scene {
 
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
+
+        var spawnTile = this.map.findByIndex(9); // Snake Head Index
+        this.startCoords = { x: spawnTile.x, y: spawnTile.y};
+        spawnTile.index = -1; // Set to empty tile
+
+        this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
+        this.snake.direction = STOP;
+        
 
         this.tiledProperties = {};
 
@@ -905,7 +912,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
-            if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            if (!this.tiledProperties.dark) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
         
@@ -1504,7 +1511,7 @@ class GameScene extends Phaser.Scene {
 
         this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
-        if (DARK_MODE) {
+        if (this.tiledProperties.dark) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
@@ -1777,7 +1784,7 @@ class GameScene extends Phaser.Scene {
     }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
-        if (DARK_MODE) {
+        if (this.tiledProperties.dark) {
             this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
     }
@@ -1895,7 +1902,6 @@ class GameScene extends Phaser.Scene {
         // console.log("update -- time=" + time + " delta=" + delta);
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
-        var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
         
         // Floating Electrons
         this.atoms.forEach(atom=> {
@@ -3993,11 +3999,14 @@ class UIScene extends Phaser.Scene {
 
         
     }
+    // #region UI Update
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         this.scoreDigitLength = this.runningScore.toString().length;
         this.panel.width = ((96) + (this.scoreDigitLength * 10));
 
+        
+        
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
         if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
@@ -4044,7 +4053,7 @@ class UIScene extends Phaser.Scene {
                     
                     this.ourGame.coins.push(_coin);
 
-                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(100,160);
                 }
             }
         }
