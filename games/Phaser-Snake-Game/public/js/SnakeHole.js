@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -3264,7 +3264,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-size': '14px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
-                scoreUI.setText(`Score: ${realScore} SpeedBonus: ${calcBonus(baseScore)}`).setOrigin(0,0);
+                scoreUI.setText(`Score ${realScore} SpeedBonus: ${calcBonus(baseScore)}`).setOrigin(0,0);
 
 
                 // food Log
@@ -3685,14 +3685,14 @@ class UIScene extends Phaser.Scene {
         
 
         // Score Text
-        this.scoreUI = this.add.dom(0 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`STAGE :`).setOrigin(0,0);
-        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        this.scoreUI = this.add.dom(1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`STAGE`).setOrigin(0,0);
+        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(`0`).setOrigin(0,0);
 
-        this.bestScoreUI = this.add.dom(10, 0 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`BEST :`).setOrigin(0,0);;
-        this.bestScoreLabelUI = this.add.dom(GRID * 3, 0, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        this.bestScoreUI = this.add.dom(11, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`BEST`).setOrigin(0,0);;
+        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(this.ourGame.bestBase).setOrigin(0,0);
 
 
@@ -3779,7 +3779,7 @@ class UIScene extends Phaser.Scene {
         //).setOrigin(0,1);
         
         this.runningScoreUI = this.add.dom(0, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `SCORE :`
+            `SCORE`
         ).setOrigin(0,1);
         this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
@@ -3875,7 +3875,7 @@ class UIScene extends Phaser.Scene {
 
             // Update UI
 
-            this.scoreUI.setText(`STAGE :`);
+            this.scoreUI.setText(`STAGE`);
             this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
             this.length += 1;
@@ -3883,7 +3883,7 @@ class UIScene extends Phaser.Scene {
 
             var length = `${this.length}`;
 
-            this.bestScoreUI.setText(`BEST :`);
+            this.bestScoreUI.setText(`BEST`);
             this.bestScoreLabelUI.setText(this.ourGame.bestBase);
             
             // Exception for Bonus Levels when the Length Goal = 0
@@ -3954,8 +3954,8 @@ class UIScene extends Phaser.Scene {
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.panel = this.add.nineslice(GRID * .125, GRID * 2.75, 'uiGlass', 'GlassThin', ((96) + (this.scoreDigitLength * 10)), 36, 80, 18);
-        this.panel.setDepth(100).setOrigin(0,.5)
+        this.panel = this.add.nineslice(GRID * .125, 0, 'uiGlass', 'Glass', ((96) + (this.scoreDigitLength * 10)), 78, 80, 18, 18, 18);
+        this.panel.setDepth(100).setOrigin(0,0)
 
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
@@ -3990,7 +3990,7 @@ class UIScene extends Phaser.Scene {
 
         if (this.UIScoreContainer.length === 0) {
                     this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
-                        this.bestScoreUI,this.bestScoreLabelUI, this.panel,
+                        this.bestScoreUI,this.bestScoreLabelUI,
              this.runningScoreUI, this.runningScoreLabelUI])
         }
 
@@ -4003,7 +4003,7 @@ class UIScene extends Phaser.Scene {
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         this.scoreDigitLength = this.runningScore.toString().length;
-        this.panel.width = ((96) + (this.scoreDigitLength * 10));
+        this.panel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
 
         
         
@@ -4012,8 +4012,8 @@ class UIScene extends Phaser.Scene {
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
 
-            this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            this.bestScoreUI.setText(`Best :  ${this.score}`);
+            this.scoreUI.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.bestScoreUI.setText(`Best  ${this.score}`);
 
             this.scene.pause();
 
@@ -4119,6 +4119,14 @@ class UIScene extends Phaser.Scene {
                 repeat: 0,
                 yoyo: false
               });
+              this.tweens.add({
+                targets: this.panel,
+                height: 78,
+                ease: 'Sine.InOut',
+                duration: 500,
+                repeat: 0,
+                yoyo: false
+              });
         }
     }
     scoreTweenHide(){
@@ -4127,6 +4135,14 @@ class UIScene extends Phaser.Scene {
             this.tweens.add({
                 targets: this.UIScoreContainer,
                 y: (-GRID * 1),
+                ease: 'Sine.InOut',
+                duration: 500,
+                repeat: 0,
+                yoyo: false
+              });
+            this.tweens.add({
+                targets: this.panel,
+                height: 50,
                 ease: 'Sine.InOut',
                 duration: 500,
                 repeat: 0,
