@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -479,10 +479,6 @@ class PersistScene extends Phaser.Scene {
     // for changing bg sprites
     this.bgTimer = 0;
     this.bgTick = 0;
-
-            // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-            this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
-            this.UIbackground.setScale(4); 
     
             // Furthest BG Object
             this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
@@ -744,6 +740,10 @@ class GameScene extends Phaser.Scene {
     
         this.snake.direction = STOP;
 
+        // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
+        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65,'UIbg').setDepth(40).setOrigin(0,0);
+        this.UIbackground.setScale(32); 
+
         // #region TileMap
 
         // Tilemap
@@ -854,24 +854,24 @@ class GameScene extends Phaser.Scene {
         
 
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
             this.startingArrowsAnimN.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
-            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
             this.startingArrowsAnimS.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
-            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('idle');
             this.startingArrowsAnimE.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
-            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(51).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('idle');
             this.startingArrowsAnimW.setAlpha(0);
@@ -3762,7 +3762,7 @@ class UIScene extends Phaser.Scene {
             'font-family': 'Oxanium',
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
-                `x ${commaInt(this.scene.get("PersistScene").coins)}`
+                `${commaInt(this.scene.get("PersistScene").coins)}`
         ).setOrigin(0,0);
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
@@ -4670,8 +4670,7 @@ var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
     height: 744,
-    renderer: Phaser.WEBGL_MULTI,
-    //seed: 1,
+    renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
@@ -4696,7 +4695,6 @@ var config = {
     
     //scene: [ StartScene, InputScene]
     scene: [ StartScene, PersistScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
-
 };
 
 // #region Screen Settings
