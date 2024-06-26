@@ -217,14 +217,9 @@
  "orientation":"orthogonal",
  "properties":[
         {
-         "name":"Test",
-         "type":"bool",
-         "value":false
-        }, 
-        {
          "name":"UUID",
          "type":"string",
-         "value":"a10ffefb-85a6-4821-8804-345b47d4cbc5"
+         "value":"1c0f573e-5a77-4399-9af9-dddedc5759b5"
         }, 
         {
          "name":"diffBonus",
