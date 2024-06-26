@@ -191,6 +191,11 @@
          "name":"next",
          "type":"string",
          "value":"Stage-05"
+        }, 
+        {
+         "name":"slug",
+         "type":"string",
+         "value":"first-medium"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Racing_Stage-test03'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1116,7 +1116,7 @@ class GameScene extends Phaser.Scene {
                     return true
                 },
                 'medium-wrap': function () {
-                    return ourPersist.checkCompletedRank("Stage-01", BRONZE);
+                    return ourPersist.checkCompletedRank("Stage-01", SILVER);
                 },
                 'dark-precision': function () {
                     return true
