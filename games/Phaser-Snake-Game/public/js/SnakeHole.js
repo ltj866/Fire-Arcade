@@ -1120,6 +1120,9 @@ class GameScene extends Phaser.Scene {
                 },
                 'dark-precision': function () {
                     return true
+                },
+                'vert-rows': function () {
+                    return ourPersist.checkCompletedRank("Stage-02b", SILVER);
                 }
             }
 
