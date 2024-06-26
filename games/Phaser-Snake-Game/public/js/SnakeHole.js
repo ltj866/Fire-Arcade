@@ -63,6 +63,7 @@ var calcSumOfBest = function(scene) {
     let entries = Object.entries(localStorage);
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
+    scene.bestOfStageData = {};
 
     entries.forEach(log => {
         var key = log[0].split("-");
@@ -70,6 +71,8 @@ var calcSumOfBest = function(scene) {
             scene.stagesComplete += 1
 
             var levelLog = new StageData(JSON.parse(log[1]));
+            scene.bestOfStageData[levelLog.stage] = levelLog;
+
             var _scoreTotal = levelLog.calcTotal();
             scene.sumOfBest += _scoreTotal;
         }
@@ -567,6 +570,19 @@ class PersistScene extends Phaser.Scene {
 
 
     }
+
+    checkCompletedRank = function (targetStageName, rank) {
+
+        if (this.bestOfStageData[targetStageName] != undefined ) {
+            var resultRank = this.bestOfStageData[targetStageName].stageRank()
+            var bool = resultRank > rank
+            return  bool;
+        } else {
+            debugger
+            return false;
+        }
+    }
+    
     update(time, delta) {
 
                 //this.scrollFactorX += .025;
@@ -1078,9 +1094,51 @@ class GameScene extends Phaser.Scene {
             this.pressedSpaceDuringWait = false;
         });
 
+
+
+
+        
+
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
+            
+            const STAGE_UNLOCKS = {
+                'start': function ( ) { 
+                    return true
+                },
+                'babies-first-wall': function () {
+                    return true
+                },
+                'horz-row': function () {
+                    return true
+                },
+                'now-vertical': function () {
+                    return true
+                },
+                'medium-wrap': function () {
+                    return ourPersist.checkCompletedRank("Stage-01", BRONZE);
+                },
+                'dark-precision': function () {
+                    return true
+                },
+                'vert-rows': function () {
+                    return ourPersist.checkCompletedRank("Stage-02b", SILVER);
+                }
+            }
+
             if (this.winned) {
+                calcSumOfBest(ourPersist);
+
+
+                var debugStage = "Stage-01";
+                console.log("checking rank >",SILVER, debugStage , ourPersist.checkCompletedRank(debugStage , SILVER), "Stage rank = ",ourPersist.bestOfStageData[debugStage].stageRank() );
+        
+                this.nextStages.forEach( stageName => {
+                    
+                });
+                
+                
+                
                 if (this.map.getLayer('Next')) {
 
                     this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
@@ -1088,22 +1146,67 @@ class GameScene extends Phaser.Scene {
                     //debugger;
                     this.nextStages.forEach( stageName => {
 
-                        var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
-                        console.log("MAKING PORTAL TILE AT", tile.index, tile.x, tile.y);
+                        var dataName = `${stageName}data`;
+                        var data = this.cache.json.get(dataName);
+                    
+                        data.forEach( propObj => {
+                            
+                            var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
+                            
+                            if (propObj.name === 'slug') {
 
-                        var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
-                            stageName
-                        ).setDepth(50).setOrigin(0,0);
+                                if (STAGE_UNLOCKS[propObj.value] != undefined) {
+                                    // Makes it so it only removes levels that have unlock slugs.
+                                    // Easier to debug which levels don't have slugs formatted correctly.
+                                    tile.index = -1;
+                                } 
 
-                        var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
-                            'nextStagePortal' 
+                                if (STAGE_UNLOCKS[propObj.value].call()) {
+                                    // Now we know the Stage is unlocked, so make the black hole tile.
+                                    
+                                    console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
 
-                        ).setDepth(50).setOrigin(0.21,0.21).setScale(2);
+                                    var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
+                                        stageName
+                                    ).setDepth(50).setOrigin(0,0);
 
-                        this.nextStagePortals.push(portalImage);
+                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
+                                        'nextStagePortal' 
+                                    ).setDepth(50).setOrigin(0.21,0.21).setScale(2);
+
+                                    if (ourPersist.bestOfStageData[stageName] != undefined) {
+                                        switch (ourPersist.bestOfStageData[stageName].stageRank()) {
+                                            case COPPER:
+                                                portalImage.setTint(0xB87333);
+                                                break;
+                                            case BRONZE:
+                                                portalImage.setTint(0xCD7F32);
+                                                break;
+                                            case SILVER:
+                                                portalImage.setTint(0xC0C0C0);
+                                                break;
+                                            case GOLD:
+                                                portalImage.setTint(0xDAA520);
+                                                break;
+                                            case PLATINUM:
+                                                portalImage.setTint(0xE5E4E2);
+                                                break;
+                                            default:
+                                                portalImage.setTint(0xFFFFFF);    
+                                                break;
+                                        }
+                                    } else {
+                                        portalImage.setTint(0xFFFFFF);
+                                    }
+                                    
+                                    this.nextStagePortals.push(portalImage);
+                                }
+                            }
+                        });
 
                         tiledIndex++;
                     });
+
 
                 }
 
@@ -1834,43 +1937,16 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
 
-        const STAGE_UNLOCKS = {
-            'start': function ( ) { 
-                return true
-            },
-            'babies-first-wall': function () {
-                return true
-            },
-            'horz-row': function () {
-                return true
-            },
-            'now-vertical': function () {
-                return true
-            },
-            'dark-precision': function () {
-                return true
-            }
-        }
         
         //console.log(STAGE_UNLOCKS['start'].call());
         //console.log(STAGE_UNLOCKS['babies-first-wall'].call());
 
         // #region Check Unlocked
         //*
+        
         var unlockedLevels = [];
-        this.nextStages.forEach( stageName => {
-            var dataName = `${stageName}data`;
-            var data = this.cache.json.get(dataName);
-            
-            data.forEach( propObj => {
-                if (propObj.name === 'slug') {
-                    
-                    //if (STAGE_UNLOCKS[propObj.value].call()) {
-                    //    unlockedLevels.push(stageName);
-                    //}
-                }
-            });
-        });
+        
+        
 
         var nextStage = "";
         if (unlockedLevels.length > 0 ) {
@@ -1882,6 +1958,7 @@ class GameScene extends Phaser.Scene {
              */
             nextStage = Phaser.Math.RND.pick(this.nextStages);
         }
+        
         
 
         ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
@@ -2935,9 +3012,32 @@ class ScoreScene extends Phaser.Scene {
         var foodHash = calcHashInt(this.foodLogSeed.toString());
         this.bestHashInt = parseInt(foodHash);
 
-        this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 21.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
+        this.hashUI = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 21.5, 'div',  Object.assign({}, STYLE_DEFAULT, {
+            width:'335px',
             "fontSize":'18px',
-            })).setOrigin(0.5, 0);
+        })).setOrigin(1, 0);
+
+
+    
+        
+
+        calcSumOfBest(ourPersist);
+        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), 21);
+
+
+        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 21, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-style": 'bold',
+            })).setText(
+                `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
+        ).setOrigin(0,0);
+        
+        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 22.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-style": 'bold',
+            })).setHTML(
+                `SUM OF BEST : <span style="color:goldenrod">${commaInt(ourPersist.sumOfBest)}</span>`
+        ).setOrigin(0,0);
 
         // #region Help Card
         /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
