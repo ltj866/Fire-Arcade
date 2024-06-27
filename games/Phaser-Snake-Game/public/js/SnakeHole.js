@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -4214,7 +4214,7 @@ class UIScene extends Phaser.Scene {
     }
 
     scoreTweenShow(){
-        if (this.UIScoreContainer.y === -GRID) {
+        if (this.UIScoreContainer.y === -20) {
             console.log('showing')
             this.tweens.add({
                 targets: this.UIScoreContainer,
@@ -4239,7 +4239,7 @@ class UIScene extends Phaser.Scene {
             console.log('hiding')
             this.tweens.add({
                 targets: this.UIScoreContainer,
-                y: (-GRID * 1),
+                y: (-20),
                 ease: 'Sine.InOut',
                 duration: 500,
                 repeat: 0,
@@ -4247,7 +4247,7 @@ class UIScene extends Phaser.Scene {
               });
             this.tweens.add({
                 targets: this.panel,
-                height: 52,
+                height: 58,
                 ease: 'Sine.InOut',
                 duration: 500,
                 repeat: 0,
