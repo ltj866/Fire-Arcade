@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Portal_Stage-ghost'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -2032,10 +2032,19 @@ class GameScene extends Phaser.Scene {
     
                 // Turn back on arrows
                 this.startingArrowState = true;
-                this.startingArrowsAnimN.setAlpha(1);
+                if (this.startingArrowsAnimN != undefined){
+                this.startingArrowsAnimN.setAlpha(1)
+                }
+                
+                if (this.startingArrowsAnimS != undefined){
                 this.startingArrowsAnimS.setAlpha(1);
+                }
+                if (this.startingArrowsAnimE != undefined){
                 this.startingArrowsAnimE.setAlpha(1);
+                }
+                if (this.startingArrowsAnimW != undefined){
                 this.startingArrowsAnimW.setAlpha(1);
+                }
                 
                 this.gState = GState.WAIT_FOR_INPUT;
                 this.scene.get('UIScene').scoreTimer.paused = true;
@@ -4563,10 +4572,19 @@ class InputScene extends Phaser.Scene {
                 
             // turn off arrows and move snake.
             gameScene.startingArrowState = false;
-            gameScene.startingArrowsAnimN.setAlpha(0);
+            if (gameScene.startingArrowsAnimN != undefined){
+                gameScene.startingArrowsAnimN.setAlpha(0)
+            }
+            
+            if (gameScene.startingArrowsAnimS != undefined){
             gameScene.startingArrowsAnimS.setAlpha(0);
+            }
+            if (gameScene.startingArrowsAnimE != undefined){
             gameScene.startingArrowsAnimE.setAlpha(0);
+            }
+            if (gameScene.startingArrowsAnimW != undefined){
             gameScene.startingArrowsAnimW.setAlpha(0);
+            }
 
 
             //ourInputScene.moveDirection(this, e);
