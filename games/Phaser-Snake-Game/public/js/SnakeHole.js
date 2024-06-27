@@ -3732,8 +3732,8 @@ class UIScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.25,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 + 2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image((GRID * 8) + 9,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({
@@ -3815,8 +3815,8 @@ class UIScene extends Phaser.Scene {
             "text-align": 'right',
         } 
 
-        this.lengthGoalUI = this.add.dom(GRID * 26, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        this.lengthGoalUILabel = this.add.dom(GRID * 27.85, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
+        this.lengthGoalUI = this.add.dom((GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUILabel = this.add.dom(GRID * 26.5, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -3868,12 +3868,12 @@ class UIScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'coinPickup01Anim'
+        this.coinsUIIcon = this.add.sprite(GRID*22.5, 8,'coinPickup01Anim'
         ).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*23.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(GRID*24.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -4073,7 +4073,7 @@ class UIScene extends Phaser.Scene {
         this.scorePanel = this.add.nineslice(GRID * .125, 0, 'uiGlass', 'Glass', ((96) + (this.scoreDigitLength * 10)), 78, 80, 18, 18, 18);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
-        this.progressPanel = this.add.nineslice((GRID * 26), 0, 'uiGlass', 'GlassRight',120, 58, 58, 18, 18, 18);
+        this.progressPanel = this.add.nineslice((GRID * 26), 0, 'uiGlass', 'GlassRight',120, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
