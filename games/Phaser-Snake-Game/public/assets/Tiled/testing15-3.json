@@ -39,7 +39,7 @@
          "name":"Wall_01",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":31,
          "x":0,
          "y":0
