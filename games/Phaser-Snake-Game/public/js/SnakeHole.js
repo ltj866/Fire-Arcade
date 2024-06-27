@@ -3989,7 +3989,7 @@ class UIScene extends Phaser.Scene {
             var length = `${this.length}`;
 
             this.bestScoreUI.setText(`BEST`);
-            this.bestScoreLabelUI.setText(ourScoreScene.bestScoreValue);
+            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
