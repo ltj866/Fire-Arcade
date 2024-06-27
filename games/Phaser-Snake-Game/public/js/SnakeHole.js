@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testing15-2'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -462,7 +462,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 4;
+        this.coins = 24; // 4
     }
     
     preload(){
@@ -1532,14 +1532,14 @@ class GameScene extends Phaser.Scene {
         var atom5 = new Food(this);
 
 
-        this.tweens.add({
-            targets: this.atoms,
-            originY: .125,
-            yoyo: true,
-            ease: 'Sine.easeOutIn',
-            duration: 1000,
-            repeat: -1
-        });
+        //this.tweens.add({
+        //    targets: this.atoms,
+        //    originY: .125,
+        //    yoyo: true,
+        //    ease: 'Sine.easeOutIn',
+        //    duration: 1000,
+        //    repeat: -1
+        //});
 
 
         // #endregion
@@ -4149,10 +4149,20 @@ class UIScene extends Phaser.Scene {
 
                     var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim'
                     ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+
+                    // tween code not working @holden I am not sure what I am missing -James
+                    //this.tweens.add({
+                    //    targets: this.atoms,
+                    //    originY: .125,
+                    //    yoyo: true,
+                    //    ease: 'Sine.easeOutIn',
+                    //    duration: 1000,
+                    //    repeat: -1
+                    //});
                     
                     this.ourGame.coins.push(_coin);
 
-                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(100,160);
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
             }
         }
