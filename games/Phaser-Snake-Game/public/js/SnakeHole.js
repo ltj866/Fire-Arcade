@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -2092,8 +2092,6 @@ class GameScene extends Phaser.Scene {
         if (this.gState === GState.START_WAIT) {
             if (energyAmountX > 99 && !ourUI.chargeUpTween.isDestroyed()) {
                 ourUI.chargeUpTween.resume();
-                //ourUI.scoreTweenHide();
-
             }
         }
 
@@ -2209,7 +2207,9 @@ class GameScene extends Phaser.Scene {
             if (this.gState === GState.PLAY) {
 
                 if (!this.winned) {
-                    ourUI.scoreTweenHide(); 
+                    this.time.delayedCall(1000, event => {
+                        ourUI.scoreTweenHide(); 
+                    }); 
                 }
                 
 
@@ -3809,13 +3809,19 @@ class UIScene extends Phaser.Scene {
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        const lengthGoalStyle = {
+            "font-size": '16px',
+            "font-weight": 400,
+            "text-align": 'right',
+        } 
 
-        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)//Snake Body
-        var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
+        this.lengthGoalUI = this.add.dom(GRID * 26, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUILabel = this.add.dom(GRID * 27.85, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
+        //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
+        //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
-        snakeBody.scale = .667;
-        flagGoal.scale = .667;
+        //snakeBody.scale = .667;
+        //flagGoal.scale = .667;
         
         
         var length = `${this.length}`;
@@ -3825,10 +3831,15 @@ class UIScene extends Phaser.Scene {
                 <hr style="font-size:3px"/>
                 ${LENGTH_GOAL.toString().padStart(2, "0")}`
             ).setOrigin(0,0.5);
+            this.lengthGoalUILabel.setHTML(
+                `LENGTH
+                <br/>
+                GOAL`
+            ).setOrigin(0,0.5);
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,1);
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
             this.lengthGoalUI.x = GRID * 27
         }
         
@@ -4059,9 +4070,11 @@ class UIScene extends Phaser.Scene {
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.panel = this.add.nineslice(GRID * .125, 0, 'uiGlass', 'Glass', ((96) + (this.scoreDigitLength * 10)), 78, 80, 18, 18, 18);
-        this.panel.setDepth(100).setOrigin(0,0)
+        this.scorePanel = this.add.nineslice(GRID * .125, 0, 'uiGlass', 'Glass', ((96) + (this.scoreDigitLength * 10)), 78, 80, 18, 18, 18);
+        this.scorePanel.setDepth(100).setOrigin(0,0)
 
+        this.progressPanel = this.add.nineslice((GRID * 26), 0, 'uiGlass', 'GlassRight',120, 58, 58, 18, 18, 18);
+        this.progressPanel.setDepth(100).setOrigin(0,0)
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
@@ -4108,7 +4121,7 @@ class UIScene extends Phaser.Scene {
     update(time) {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         this.scoreDigitLength = this.runningScore.toString().length;
-        this.panel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
+        this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
 
         
         
@@ -4220,15 +4233,23 @@ class UIScene extends Phaser.Scene {
                 targets: this.UIScoreContainer,
                 y: (0),
                 ease: 'Sine.InOut',
-                duration: 500,
+                duration: 1000,
                 repeat: 0,
                 yoyo: false
               });
               this.tweens.add({
-                targets: this.panel,
+                targets: this.scorePanel,
                 height: 78,
                 ease: 'Sine.InOut',
-                duration: 500,
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+              this.tweens.add({
+                targets: [this.bestScoreLabelUI, this.bestScoreUI],
+                alpha: 1,
+                ease: 'Sine.InOut',
+                duration: 1000,
                 repeat: 0,
                 yoyo: false
               });
@@ -4241,15 +4262,23 @@ class UIScene extends Phaser.Scene {
                 targets: this.UIScoreContainer,
                 y: (-20),
                 ease: 'Sine.InOut',
-                duration: 500,
+                duration: 800,
                 repeat: 0,
                 yoyo: false
               });
             this.tweens.add({
-                targets: this.panel,
+                targets: this.scorePanel,
                 height: 58,
                 ease: 'Sine.InOut',
-                duration: 500,
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+              });
+            this.tweens.add({
+                targets: [this.bestScoreLabelUI, this.bestScoreUI],
+                alpha: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
                 repeat: 0,
                 yoyo: false
               });
