@@ -3733,7 +3733,7 @@ class UIScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2 + 2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image((GRID * 8) + 9,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image((GRID * 8) + 14,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({
