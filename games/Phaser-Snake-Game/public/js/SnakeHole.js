@@ -906,7 +906,7 @@ class GameScene extends Phaser.Scene {
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY) {
-                this.tweens.add({
+                this.arrowTween =  this.tweens.add({
                     targets: [_arrowN,_arrowS,_arrowE,_arrowW],
                     alpha: 1,
                     duration: 300,
@@ -4588,6 +4588,9 @@ class InputScene extends Phaser.Scene {
                 
             // turn off arrows and move snake.
             gameScene.startingArrowState = false;
+            if (gameScene.arrowTween === 'undefined') {
+                gameScene.arrowTween.destroy();
+            }
             gameScene.startingArrowsAnimN.setAlpha(0);
             gameScene.startingArrowsAnimS.setAlpha(0);
             gameScene.startingArrowsAnimE.setAlpha(0);
