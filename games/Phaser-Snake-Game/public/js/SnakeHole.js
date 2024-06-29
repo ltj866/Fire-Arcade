@@ -305,7 +305,8 @@ class StartScene extends Phaser.Scene {
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
-        this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiGlassL', 'assets/sprites/UI_Glass_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiGlassR', 'assets/sprites/UI_Glass_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         //this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         //this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
@@ -4137,12 +4138,12 @@ class UIScene extends Phaser.Scene {
         this.scoreDigitLength = this.runningScore.toString().length;
         
         this.scorePanel = this.add.nineslice(GRID * .125, 0, 
-            'megaAtlas', 'UI_Glass_9Slice.png', 
+            'uiGlassL', 'Glass', 
             ((96) + (this.scoreDigitLength * 10)), 78, 
             80, 18, 18, 18);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
-        this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlass', 'GlassRight',114, 58, 18, 58, 18, 18);
+        this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
         
         /*if (ourGameScene.stage = "Stage-01") {
