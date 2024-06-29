@@ -4,7 +4,7 @@
 			"image": "UI_Glass_9Slice",
 			"format": "RGBA8888",
 			"size": {
-				"w": 144,
+				"w": 288,
 				"h": 192
 			},
 			"scale": 1,
@@ -49,6 +49,27 @@
 						"y": 144,
 						"w": 144,
 						"h": 48
+					}
+				},
+				{
+					"filename": "GlassRight",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 144,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 144,
+						"h": 144
+					},
+					"frame": {
+						"x": 144,
+						"y": 0,
+						"w": 144,
+						"h": 144
 					}
 				}
 			]

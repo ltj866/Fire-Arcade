@@ -1,5 +1,5 @@
 {
-    "activeFile": "testing04.json",
+    "activeFile": "Portal_Stage-04.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -126,11 +126,11 @@
             "scaleInDock": 1
         },
         "Portal_Stage-04.json": {
-            "scale": 1.225806451612903,
+            "scale": 1,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 372.40789473684214,
-                "y": 372
+                "x": 360,
+                "y": 357.5
             }
         },
         "Portal_Stage-04.json#tileSheetx24": {
@@ -1103,8 +1103,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 568,
-                "y": 239
+                "x": 358,
+                "y": 358
             }
         },
         "testing12-3.json#tileSheetx24": {
@@ -1114,8 +1114,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 224,
-                "y": 455
+                "x": 358,
+                "y": 358
             }
         },
         "testing12-4.json#tileSheetx24": {
@@ -1180,8 +1180,8 @@
             "scale": 1.1198252688172041,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 407.2063854047891,
-                "y": 371.04002880633743
+                "x": 365.2355518214008,
+                "y": 365.2355518214008
             }
         },
         "testing15-2.json#tileSheetx24": {
@@ -1191,8 +1191,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 380,
-                "y": 423.33333333333326
+                "x": 362.66666666666663,
+                "y": 362.66666666666663
             }
         },
         "testing15-3.json#tileSheetx24": {
@@ -1224,8 +1224,8 @@
             "scale": 1.1198252688172041,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 407.2063854047891,
-                "y": 369.2540358878954
+                "x": 365.2355518214008,
+                "y": 365.2355518214008
             }
         },
         "testing16.json#tileSheetx24": {
@@ -1256,38 +1256,48 @@
     },
     "map.lastUsedFormat": "json",
     "openFiles": [
-        "testing05-1.json",
-        "testing05-2.json",
-        "testing06.json",
-        "testing06-2.json",
-        "testing03-2.json",
-        "testing03-1.json",
-        "testing08.json",
         "testing07.json",
         "testing04.json",
         "Stage-13.json",
         "Stage-02b.json",
-        "Stage-02c.json",
         "Stage-02e.json",
         "Stage-03a.json",
         "Stage-02a.json",
         "Stage-05.json",
-        "testing05.json"
+        "testing05.json",
+        "testing15-3.json",
+        "testing15-2.json",
+        "testing15.json",
+        "testing16.json",
+        "testing16-02.json",
+        "testingx01.json",
+        "warp-draft-01.json",
+        "Wrap_Stage-03.json",
+        "Wrap_Stage-03b.json",
+        "Wrap_Stage-03c.json",
+        "Wrap_Stage-04.json",
+        "Wrap_Stage-xx.json",
+        "testing12-3.json",
+        "testing12-4.json",
+        "testing12-2.json",
+        "testing13.json",
+        "Stage-01.json",
+        "Portal_Stage-04.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "rough-02.json",
-        "rough-03.json",
-        "rough-04.json",
-        "Wrap_Stage-03.json",
-        "Racing_Stage-03.json",
-        "Stage-03a.json",
-        "Stage-06.json",
-        "Stage-02a.json",
+        "testing07.json",
+        "testing04.json",
+        "Stage-13.json",
         "Stage-02b.json",
-        "Stage-03b.json",
-        "Stage-01.json",
-        "warp-draft-01.json"
+        "Stage-02e.json",
+        "Stage-03a.json",
+        "Stage-02a.json",
+        "Stage-05.json",
+        "testing05.json",
+        "testing15-3.json",
+        "testing15-2.json",
+        "testing15.json"
     ]
 }
