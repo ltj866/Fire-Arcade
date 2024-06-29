@@ -20,6 +20,7 @@ var Portal = new Phaser.Class({
         this.targetObject = {};
         this.snakePortalingSprite = scene.add.sprite(from[0] * GRID, from[1] * GRID, 'snakeDefault', 1
         ).setDepth(52).setOrigin(0,0).setPipeline('Light2D');
+        this.snakePortalingSprite.setAlpha(0.66);
 
 
         scene.portals.push(this);
