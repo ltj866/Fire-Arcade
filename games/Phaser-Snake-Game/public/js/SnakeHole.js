@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -877,24 +877,24 @@ class GameScene extends Phaser.Scene {
         
 
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('idle');
             this.startingArrowsAnimN.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
-            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('idle');
             this.startingArrowsAnimS.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
-            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('idle');
             this.startingArrowsAnimE.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
-            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('idle');
             this.startingArrowsAnimW.setAlpha(0);
@@ -1077,7 +1077,7 @@ class GameScene extends Phaser.Scene {
                         targets: boostOutline,
                         alpha: 0,
                         duration: 340,
-                        ease: 'linear'
+                        ease: 'linear',
                       }, this);
     
                     fadeoutTween.on('complete', e => {
@@ -2229,7 +2229,7 @@ class GameScene extends Phaser.Scene {
                             targets: boostOutline,
                             alpha: 0,
                             duration: 340,
-                            ease: 'linear'
+                            ease: 'linear',
                             }, this);
     
                         fadeoutTween.on('complete', e => {
@@ -3721,7 +3721,7 @@ class UIScene extends Phaser.Scene {
        this.ourInputScene = this.scene.get('InputScene');
        const ourUI = this.ourGame.scene.get('UIScene');
 
-       this.UIScoreContainer = this.make.container(0,0);
+       this.UIScoreContainer = this.make.container(0,0).setAlpha(0);
 
         
 
@@ -3830,17 +3830,22 @@ class UIScene extends Phaser.Scene {
                 `${length.padStart(2, "0")}<br/>
                 <hr style="font-size:3px"/>
                 ${LENGTH_GOAL.toString().padStart(2, "0")}`
-            ).setOrigin(0,0.5);
+            ).setOrigin(0,0.5)//.setAlpha(0);
             this.lengthGoalUILabel.setHTML(
                 `Length
                 <br/>
                 Goal`
-            ).setOrigin(0,0.5);
+            ).setOrigin(0,0.5)//.setAlpha(0);
         }
         else {
             // Special Level
             this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
             this.lengthGoalUI.x = GRID * 27
+        }
+
+        if (this.ourGame.stage === "Stage-01") {
+            this.lengthGoalUI.setAlpha(0)
+            this.lengthGoalUILabel.setAlpha(0)
         }
         
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
@@ -4064,7 +4069,8 @@ class UIScene extends Phaser.Scene {
         }, this);
 
         this.lastTimeTick = 0;
-        //9-Slice Panels
+        const ourGameScene = this.scene.get('GameScene');
+        // 9-Slice Panels
         // We recalculate running score so it can be referenced for the 9-slice panel
         var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
         this.runningScore = this.score + calcBonus(baseScore);
@@ -4075,6 +4081,11 @@ class UIScene extends Phaser.Scene {
 
         this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlass', 'GlassRight',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
+        
+        if (ourGameScene.stage = "Stage-01") {
+            this.progressPanel.setAlpha(0)
+            this.scorePanel .setAlpha(0)
+        }
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
@@ -4082,19 +4093,104 @@ class UIScene extends Phaser.Scene {
         text.setOrigin(0.5, 0.5);
         text.setScale(0)
         text.setDepth(101)*/
+        
+        if (ourGameScene.stage === START_STAGE) {
+            
+            this.time.delayedCall(400, event => {
+                this.panelAppearTween = this.tweens.add({
+                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'sine.inout',
+                    yoyo: false,
+                    repeat: 0,
+                });
+            })
+        }
 
-        /*this.panelTween = this.tweens.add({
-            targets: [panel],
-            scale: 1,
-            width: 420,
-            height: 36,
-            duration: 300,
+        // dot matrix
+
+        const hsv = Phaser.Display.Color.HSVColorWheel();
+
+        const gw = 32;
+        const gh = 32;
+        const bs = 24;
+
+        const group = this.add.group({
+            key: 'portalParticle01',
+            quantity: gw * gh,
+            gridAlign: {
+                width: gw,
+                height: gh,
+                cellWidth: bs,
+                cellHeight: bs,
+                x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
+                y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
+            },
+            /*hitAreaCallback:{
+                hitArea: 24,
+                x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
+                y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2,
+                gameObject: this.scorePanel
+            }*/
+        }).setDepth(103);
+
+        const size = gw * gh;
+
+
+        //  set alpha
+        /*group.getChildren().forEach((child,) => {
+            child = this.make.image({
+                x: child.x,
+                y: child.y,
+                key: 'portalParticle01'},
+                 false);
+            const mask = child.createBitmapMask();
+            this.scorePanel.setMask(mask)*/
+
+            //child.setAlpha(1).setScale(1);
+            /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
+                ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
+            ) {
+                child.setAlpha(1).setScale(1);
+            }*/
+
+        //debugger
+        //});
+
+        this.variations = [
+            [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
+        ];
+
+    
+        this.getStaggerTween(0, group);
+    }
+
+    getStaggerTween (i, group)
+    {
+        const stagger = this.variations[i];
+        
+        this.tweens.add({
+            targets: group.getChildren(),
+            scale: [1.5,0],
+            alpha: [.5,0],
             ease: 'sine.inout',
-            yoyo: false,
+            duration: 1400,
+            delay: this.tweens.stagger(...stagger),
+            completeDelay: 1000,
             repeat: 0,
+            onComplete: () =>
+            {
+                group.getChildren().forEach(child => {
+
+                    child.destroy();
+
+                });
+            }
         });
 
-        this.panelTweenCollapse = this.tweens.add({
+
+        /*this.panelTweenCollapse = this.tweens.add({
             targets: [panel],
             scale: 0,
             width: 0,
@@ -4237,7 +4333,7 @@ class UIScene extends Phaser.Scene {
                 repeat: 0,
                 yoyo: false
               });
-              this.tweens.add({
+                this.tweens.add({
                 targets: this.scorePanel,
                 height: 78,
                 ease: 'Sine.InOut',
