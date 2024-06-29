@@ -2441,6 +2441,12 @@ class ScoreScene extends Phaser.Scene {
 
         ourUI.scoreTweenShow();
 
+        /*var style = {
+            'color': '0x828213'
+          };
+        ourUI.countDown.style = style*/
+        ourUI.countDown.setHTML('OFF');
+
         var stageDataJSON = {
             bonks: ourUI.bonks,
             boostFrames: ourInputScene.boostTime,
@@ -4139,16 +4145,16 @@ class UIScene extends Phaser.Scene {
 
 
         //  set alpha
-        /*group.getChildren().forEach((child,) => {
+        group.getChildren().forEach((child,) => {
             child = this.make.image({
                 x: child.x,
                 y: child.y,
                 key: 'portalParticle01'},
                  false);
             const mask = child.createBitmapMask();
-            this.scorePanel.setMask(mask)*/
+            this.scorePanel.setMask(mask)
 
-            //child.setAlpha(1).setScale(1);
+            child.setAlpha(0).setScale(0);
             /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
                 ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
             ) {
@@ -4156,7 +4162,7 @@ class UIScene extends Phaser.Scene {
             }*/
 
         //debugger
-        //});
+        });
 
         this.variations = [
             [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
