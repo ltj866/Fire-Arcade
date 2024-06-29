@@ -4151,10 +4151,10 @@ class UIScene extends Phaser.Scene {
                 y: child.y,
                 key: 'portalParticle01'},
                  false);
-            const mask = child.createBitmapMask();
-            this.scorePanel.setMask(mask)
+            //const mask = child.createBitmapMask();
+            //this.scorePanel.setMask(mask)
 
-            child.setAlpha(0).setScale(0);
+            child.setAlpha(1).setScale(1);
             /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
                 ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
             ) {
