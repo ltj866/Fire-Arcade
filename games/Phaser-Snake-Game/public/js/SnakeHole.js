@@ -305,7 +305,7 @@ class StartScene extends Phaser.Scene {
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
-        //this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         //this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         //this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
@@ -4136,19 +4136,19 @@ class UIScene extends Phaser.Scene {
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.panel = this.add.nineslice(GRID * .125, 0, 
+        this.scorePanel = this.add.nineslice(GRID * .125, 0, 
             'megaAtlas', 'UI_Glass_9Slice.png', 
             ((96) + (this.scoreDigitLength * 10)), 78, 
             80, 18, 18, 18);
-        this.panel.setDepth(100).setOrigin(0,0)
+        this.scorePanel.setDepth(100).setOrigin(0,0)
 
         this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlass', 'GlassRight',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
         
-        if (ourGameScene.stage = "Stage-01") {
+        /*if (ourGameScene.stage = "Stage-01") {
             this.progressPanel.setAlpha(0)
             this.scorePanel .setAlpha(0)
-        }
+        }*/
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
