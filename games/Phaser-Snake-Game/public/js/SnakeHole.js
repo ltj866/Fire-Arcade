@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.7.06.21.001';
+const GAME_VERSION = 'v0.7.06.21.012';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 2; //28..................... Win Condition
@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -254,65 +254,94 @@ class StartScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('howToCard', 'assets/howToCardNew.png');
-        this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
+        //this.load.image('howToCard', 'assets/howToCardNew.png');
+        //this.load.image('helpCard02', 'assets/HowToCards/howToCard02.png');
 
-        this.load.image('UIbg', 'assets/sprites/UI_background.png');
-        this.load.image('bg01', 'assets/sprites/background01.png');
-        this.load.image('bg02', 'assets/sprites/background02.png');
-        this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
-        this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
-        this.load.image('bg02_2', 'assets/sprites/background02_2.png');
-        this.load.image('bg02_3', 'assets/sprites/background02_3.png');
-        this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
-        this.load.image('bg02_4', 'assets/sprites/background02_4.png');
 
-        this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
+        //this.load.atlas({
+        //    key: '',
+        //    textureURL: '',
+        //    atlasURL: ''
+        //});
+        //this.load.atlas('megaAtlas', 'assets/atlas/textureAtlas24_06_27.png', 'assets/atlas/atlasMeta24_06_27.json');
+        this.load.atlas({
+            key: 'megaAtlas',
+            textureURL: 'assets/atlas/textureAtlas24_06_27.png',
+            normalMap: 'assets/atlas/textureAtlas24_06_27_n.png',
+            atlasURL: 'assets/atlas/atlasMeta24_06_27.json'
+        });
 
-        this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
+        
+
+        //this.load.image('UIbg', 'assets/sprites/UI_background.png');
+        //this.load.image('bg01', 'assets/sprites/background01.png');
+        //this.load.image('bg02', 'assets/sprites/background02.png');
+        //this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
+        //this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
+        //this.load.image('bg02_2', 'assets/sprites/background02_2.png');
+        //this.load.image('bg02_3', 'assets/sprites/background02_3.png');
+        //this.load.image('bg02_3_2', 'assets/sprites/background02_3_2.png');
+        //this.load.image('bg02_4', 'assets/sprites/background02_4.png');
+
+        
+        //this.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim', frameWidth: 64, frameHeight: 64 });
+        //scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim.png', frameWidth: 64, frameHeight: 64 }); 
+        //debugger
+        //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
+
+        //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
+
+        
+        //this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
         this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
 
         // Load Tilemap as Sprite sheet to allow conversion to Sprites later.
+        // Doesn't need to be GPU optimized unless we use it more regularly.
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-        this.load.image('nextStagePortal', '/assets/sprites/portalBlue.png');
+        //this.load.image('nextStagePortal', '/assets/sprites/portalBlue.png');
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
-        this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
-        this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
-        this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
-        this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
-        this.load.image("mask", "assets/sprites/boostMask.png");
-        this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
-        this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
-        this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
-        this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
+        //this.load.atlas('uiGlass', 'assets/sprites/UI_Glass_9Slice.png', 'assets/9slice/nine-slice.json');
+        //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
+        //this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
+        //this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
+        //this.load.image('boostMask', "assets/sprites/boostMask.png");
+        //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
+        //this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
+        //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
+        //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
+        //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
+        //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
+        //this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
+        //this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
 
-        this.load.image("snakeMask", "assets/sprites/snakeMask.png");
-        this.load.image("portalMask", "assets/sprites/portalMask.png");
+        //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
+        //this.load.image("portalMask", "assets/sprites/portalMask.png");
+            /**
+            * Template *
+    scene.textures.addSpriteSheetFromAtlas('', { atlas: 'megaAtlas', frameWidth:  ,frameHeight: ,
+        frame: ''
+    }); scene.anims.create({
+            */
 
         // Animations
-        this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
-        this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
+        //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         //this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
-        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
-        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
-        this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
-        this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
-        this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
+        //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
+        //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
+        //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
+        //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
+        //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
+        //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
 
 
         //WRAP BLOCKS:
-        this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
+        //this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
 
         // Audio
         this.load.setPath('assets/audio');
@@ -378,12 +407,13 @@ class StartScene extends Phaser.Scene {
         
 
         // Load all animations once for the whole game.
-        loadAnimations(this);
+        loadSpriteSheetsAndAnims(this);
+        this.scene.launch('PersistScene');
 
 
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
+        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
 
         //card.setScale(1)
@@ -455,7 +485,7 @@ class StartScene extends Phaser.Scene {
 
 class PersistScene extends Phaser.Scene {
     constructor () {
-        super({key: 'PersistScene', active: true});
+        super({key: 'PersistScene', active: false});
     }
 
     init() {
@@ -466,13 +496,13 @@ class PersistScene extends Phaser.Scene {
     }
     
     preload(){
-        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
+        //this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
 
     }
     
     create() {
 
-    // #region Persistent Scene
+    // #region Persist Scene
 
     
 
@@ -483,22 +513,22 @@ class PersistScene extends Phaser.Scene {
     this.bgTick = 0;
     
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
+            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             this.bg0.tileScaleX = 3;
             this.bg0.tileScaleY = 3;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
+            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             this.bg.tileScaleX = 3;
             this.bg.tileScaleY = 3;
             
             // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
+            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
             this.bg2.tileScaleX = 3;
             this.bg2.tileScaleY = 3;
             
             // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
+            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
             this.bg3.tileScaleX = 3;
             this.bg3.tileScaleY = 3;
     
@@ -615,16 +645,16 @@ class PersistScene extends Phaser.Scene {
 
         if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
             if (this.bgTick === 0) {
-                this.bg3.setTexture('bg02_3_2') 
-                this.bg.setTexture('bg02frame2') 
+                this.bg3.setTexture('megaAtlas', 'background02_3_2.png'); 
+                this.bg.setTexture('megaAtlas', 'background02_frame2.png'); 
                 this.bgTick += 1;
             }
 
             if (this.bgTimer >= 2000) {
                 if (this.bgTick === 1) {
-                    this.bg3.setTexture('bg02_3')
-                    this.bg.setTexture('bg02') 
-                    this.bgTimer = 0
+                    this.bg3.setTexture('megaAtlas', 'background02_3.png');
+                    this.bg.setTexture('megaAtlas','background02.png'); 
+                    this.bgTimer = 0;
                     this.bgTick -=1;
                 }
 
@@ -706,9 +736,8 @@ class GameScene extends Phaser.Scene {
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
         //const ourGame = this.scene.get("GameScene");
-        
-        
-
+        // would need to be custom for snake skins.
+        //this.load.image('snakeDefaultNormal', 'assets/sprites/snakeSheetDefault_n.png');
 
     }
 
@@ -722,7 +751,6 @@ class GameScene extends Phaser.Scene {
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-        console.log("STAGE IN GameScene", this.stage);
 
 
        
@@ -760,7 +788,7 @@ class GameScene extends Phaser.Scene {
         
 
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65,'UIbg').setDepth(40).setOrigin(0,0);
+        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
 
         // #region TileMap
@@ -881,26 +909,26 @@ class GameScene extends Phaser.Scene {
         
 
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN.play('idle');
+            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN.play('startArrowIdle');
             this.startingArrowsAnimN.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('idle');
+            this.startingArrowsAnimS.play('startArrowIdle');
             this.startingArrowsAnimS.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('idle');
+            this.startingArrowsAnimE.play('startArrowIdle');
             this.startingArrowsAnimE.setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('idle');
+            this.startingArrowsAnimW.play('startArrowIdle');
             this.startingArrowsAnimW.setAlpha(0);
         }
         const _arrowN = this.startingArrowsAnimN
@@ -1175,7 +1203,7 @@ class GameScene extends Phaser.Scene {
                                     ).setDepth(50).setOrigin(0,0);
 
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
-                                        'nextStagePortal' 
+                                        'megaAtlas', 'portalBlue.png' 
                                     ).setDepth(50).setOrigin(0.21,0.21).setScale(2);
 
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
@@ -1257,7 +1285,7 @@ class GameScene extends Phaser.Scene {
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
-                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID,'coinPickup01Anim'
+                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
                     ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
 
                     this.coins.push(_coin);
@@ -1484,8 +1512,9 @@ class GameScene extends Phaser.Scene {
             }
             
             this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
-            
-            this.add.particles(portal.x, portal.y, "portalParticle01", {
+
+            this.add.particles(portal.x, portal.y, 'megaAtlas', {
+                frame: ['portalParticle01.png'],
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
                 x:{steps: 2, min: -18, max: 48},
@@ -1501,7 +1530,8 @@ class GameScene extends Phaser.Scene {
                 this.portalMask = this.make.image({
                     x: portal.x,
                     y: portal.y,
-                    key: 'portalMask',
+                    key: 'megaAtlas',
+                    frame: 'portalMask.png',
                     add: false,
                 });
                 
@@ -1583,31 +1613,36 @@ class GameScene extends Phaser.Scene {
         this.snakeMask = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
-            key: 'snakeMask',
+            key: 'megaAtlas',
+            frame: 'snakeMask.png',
             add: false
         }).setOrigin(0.5,0.5);
         this.snakeMaskN = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
-            key: 'snakeMask',
+            key: 'megaAtlas',
+            frame: 'snakeMask.png',
             add: false
         }).setOrigin(0.5,0.5);
         this.snakeMaskE = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
-            key: 'snakeMask',
+            key: 'megaAtlas',
+            frame: 'snakeMask.png',
             add: false
         }).setOrigin(0.5,0.5);
         this.snakeMaskS = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
-            key: 'snakeMask',
+            key: 'megaAtlas',
+            frame: 'snakeMask.png',
             add: false
         }).setOrigin(0.5,0.5);
         this.snakeMaskW = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
-            key: 'snakeMask',
+            key: 'megaAtlas',
+            frame: 'snakeMask.png',
             add: false
         }).setOrigin(0.5,0.5);
 
@@ -2575,8 +2610,8 @@ class ScoreScene extends Phaser.Scene {
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
         // #endregion*/
 
-        this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
-        this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
+        this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
+        this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
         var scrollArrowDown = this.add.sprite(GRID * 22.5, GRID * 19,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
         
 
@@ -2779,10 +2814,10 @@ class ScoreScene extends Phaser.Scene {
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
         
-        let rank = this.stageData.stageRank()
+        let rank = this.stageData.stageRank() + 1; // FileNames start at 01.png
+        //rank = 4; // Temp override.
         
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",
-            rank
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
         ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
         
         this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
@@ -2824,7 +2859,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
+            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -2996,11 +3031,11 @@ class ScoreScene extends Phaser.Scene {
         //this.statCards.setMask(ourScoreScene.mask)
         /*var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsE.angle = 90;
-        arrowsE.play('idle');
+        arrowsE.play('startArrowIdle');
 
         var arrowsW = this.add.sprite(GRID * 15, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
         arrowsW.angle = 270;
-        arrowsW.play('idle');*/
+        arrowsW.play('startArrowIdle');*/
         
 
         /*this.input.keyboard.on('keydown-RIGHT', function() {
@@ -3423,9 +3458,9 @@ class TimeAttackScene extends Phaser.Scene{
             var upArrow = this.add.sprite(GRID, selected[0].y - 42).setDepth(15).setOrigin(0.5,0);
             var downArrow = this.add.sprite(GRID, selected[0].y + 32).setDepth(15).setOrigin(0.5,0);
 
-            upArrow.play('idle');
+            upArrow.play('startArrowIdle');
             downArrow.flipY = true;
-            downArrow.play('idle');
+            downArrow.play('startArrowIdle');
 
 
 
@@ -3756,14 +3791,15 @@ class UIScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image((GRID * 8) + 14,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2,GRID,'megaAtlas', 'UI_boostMeterFrame.png').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.25,GRID,'megaAtlas', 'UI_atomScoreFrame.png').setDepth(51).setOrigin(0.5,0.5);
 
 
-       this.mask = this.make.image({
+       this.mask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
            y: GRID,
-           key: 'mask',
+           key: 'megaAtlas',
+           frame: 'boostMask.png',
            add: false
        }).setOrigin(0.5,0.5);
 
@@ -3897,7 +3933,7 @@ class UIScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.add.sprite(GRID*22.5, 8,'coinPickup01Anim'
+        this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         //this.coinsUIIcon.setScale(0.5);
@@ -4100,8 +4136,11 @@ class UIScene extends Phaser.Scene {
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.scorePanel = this.add.nineslice(GRID * .125, 0, 'uiGlass', 'Glass', ((96) + (this.scoreDigitLength * 10)), 78, 80, 18, 18, 18);
-        this.scorePanel.setDepth(100).setOrigin(0,0)
+        this.panel = this.add.nineslice(GRID * .125, 0, 
+            'megaAtlas', 'UI_Glass_9Slice.png', 
+            ((96) + (this.scoreDigitLength * 10)), 78, 
+            80, 18, 18, 18);
+        this.panel.setDepth(100).setOrigin(0,0)
 
         this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlass', 'GlassRight',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
@@ -4286,7 +4325,7 @@ class UIScene extends Phaser.Scene {
                     var validLocations = this.ourGame.validSpawnLocations();
                     var pos = Phaser.Math.RND.pick(validLocations)
 
-                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim'
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'megaAtlas', 'coinPickup01Anim.png'
                     ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
 
                     // tween code not working @holden I am not sure what I am missing -James
@@ -4737,7 +4776,6 @@ class InputScene extends Phaser.Scene {
             //ourInputScene.moveDirection(this, e);
         }
 
-    }
 }
 
 
@@ -4745,101 +4783,174 @@ class InputScene extends Phaser.Scene {
 
 
 
+
  // #region Animations
-function loadAnimations(scene) {
-    scene.anims.create({
-        key: 'idle',
-        frames: scene.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+function loadSpriteSheetsAndAnims(scene) {
+    /**
+     * Template *
+    scene.textures.addSpriteSheetFromAtlas('', { atlas: 'megaAtlas', frameWidth:  ,frameHeight: ,
+        frame: ''
+    }); scene.anims.create({
+     */
+
+    
+    /**
+     * SpriteSheets don't support loading the normal map when loading from an Atlas. 
+     * This adds it directly and somehow all of the data lines up. :thumbs-up: 
+     * Work flow is to add the normal maps to the atlas with the same file name and the _n postfix.
+     * 
+     * Alternate Strategy:
+     *   this.load.image('snakeDefaultNormal', 'assets/sprites/snakeSheetDefault_n.png');
+     *   // Later … 
+     *   const snakeDefaultNormal = scene.textures.get('snakeDefaultNormal');
+     *   sakeSpriteSheet.setDataSource(snakeDefaultNormal.getSourceImage());
+     * 
+     *   Thank you samme from Phaser for both solutions!
+     */
+
+    const snakeSpriteSheet = scene.textures.addSpriteSheetFromAtlas('snakeDefault', { atlas: 'megaAtlas', frameWidth: 24 ,frameHeight: 24 ,
+        frame: 'snakeSheetDefault.png'
+    }); 
+    snakeSpriteSheet.setDataSource(
+        scene.textures.get('megaAtlas').getDataSourceImage()
+    );
+
+
+    
+
+
+    // Sprite Sheets that don't have animations.
+    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 36 ,frameHeight: 48 ,
+        frame: 'comboLetters.png'
+    });
+
+
+    // Sprite Sheets and add Animations
+    scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 48, frameHeight: 48,
+        frame: 'startingArrowsAnim.png'
+    }); scene.anims.create({
+        key: 'startArrowIdle',
+        frames: scene.anims.generateFrameNumbers('startArrow', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
         frameRate: 16,
         repeat: -1
-    }); 
-    scene.anims.create({
+    });
+    
+    scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
+        frame: 'portalAnim.png'
+    }); scene.anims.create({
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
         frameRate: 8,
         repeat: -1
     });
-    scene.anims.create({
+    
+    scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
+        frame: 'UI_ArrowDownAnim.png'
+    }); scene.anims.create({
         key: 'downArrowIdle',
         frames: scene.anims.generateFrameNumbers('downArrowAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7]}),
         frameRate: 8,
         repeat: -1
     });
-    scene.anims.create({
+    
+    scene.textures.addSpriteSheetFromAtlas('twinkle01Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16,
+        frame: 'twinkle01Anim.png'
+    }); scene.anims.create({
         key: 'twinkle01',
         frames: scene.anims.generateFrameNumbers('twinkle01Anim',{ frames: [0, 1, 2, 1, 3]}),
         frameRate: 6,
         repeat: 0
-    })
-    scene.anims.create({
+    });
+    
+    scene.textures.addSpriteSheetFromAtlas('twinkle02Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16 ,
+        frame: 'twinkle02Anim.png'
+    }); scene.anims.create({
         key: 'twinkle02',
         frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6]}),
         frameRate: 6,
         repeat: 0
-    })
-    scene.anims.create({
+    });
+
+    scene.textures.addSpriteSheetFromAtlas('twinkle03Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16 ,
+        frame: 'twinkle03Anim.png'
+    }); scene.anims.create({
         key: 'twinkle03',
         frames: scene.anims.generateFrameNumbers('twinkle03Anim',{ frames: [0, 1, 2, 3, 2, 1,]}),
         frameRate: 6,
         repeat: -1
-    })
-    scene.anims.create({
+    });
+    
+    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoosting', { atlas: 'megaAtlas', frameWidth: 28,frameHeight: 28,
+        frame: 'snakeOutlineAnim.png'
+    }); scene.anims.create({
         key: 'snakeOutlineAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2, 3]}),
         frameRate: 12,
         repeat: -1
-    })
-    scene.anims.create({
+    });
+
+    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoostingSmall', { atlas: 'megaAtlas', frameWidth: 28,frameHeight: 28,
+        frame: 'snakeOutlineSmallAnim.png'
+    }); scene.anims.create({
         key: 'snakeOutlineSmallAnim',
         frames: scene.anims.generateFrameNumbers('snakeOutlineBoostingSmall',{ frames: [ 0, 1, 2, 3]}),
         frameRate: 12,
         repeat: -1
     })
-    scene.anims.create({
+
+    scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
+        frame: 'atomicPickup01Anim.png'
+    }); scene.anims.create({
       key: 'atom01idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
       frameRate: 12,
       repeat: -1
-    })
-    scene.anims.create({
+    }); scene.anims.create({
       key: 'atom02idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
       frameRate: 8,
       repeat: -1
-    })
-    scene.anims.create({
+    }); scene.anims.create({
       key: 'atom03idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
       frameRate: 6,
       repeat: -1
-    })
-    scene.anims.create({
+    }); scene.anims.create({
       key: 'atom04idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
       frameRate: 4,
       repeat: -1
     })
-    scene.anims.create({
+
+
+
+
+    scene.textures.addSpriteSheetFromAtlas('coinPickup01Anim', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
+        frame: 'coinPickup01Anim.png'
+    }); scene.anims.create({
         key: 'coin01idle',
         frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
         frameRate: 8,
         repeat: -1
-      })
+    })
   
-    scene.anims.create({
+    scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 44 ,frameHeight: 36,
+        frame: 'electronCloudAnim.png'
+    }); scene.anims.create({
       key: 'electronIdle',
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
       frameRate: 16,
       repeat: -1
-    })
-    scene.anims.create({
+    }); scene.anims.create({
       key: 'electronDispersion01',
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
       frameRate: 16,
       repeat: 0
     })
   
-    scene.anims.create({
+    scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
+        frame: 'UI_boostMeterAnim.png'
+    }); scene.anims.create({
       key: 'increasing',
       frames: scene.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
       frameRate: 8,
@@ -4847,7 +4958,9 @@ function loadAnimations(scene) {
     });
   
     //WRAP_BLOCK_ANIMS
-    scene.anims.create({
+    scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 24,frameHeight: 24,
+        frame: 'wrapBlockAnim.png'
+    }); scene.anims.create({
       key: 'wrapBlock01',
       frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9, 10 ,11]}),
       frameRate: 8,
@@ -4895,12 +5008,17 @@ function loadAnimations(scene) {
       frameRate: 8,
       repeat: -1
     })
-    scene.anims.create({
+
+
+    /*
+    scene.textures.addSpriteSheetFromAtlas('boostTrailX', { atlas: 'megaAtlas', frameWidth: 24,frameHeight:72,
+        frame: 'boostTrailX01Anim.png'
+    }); scene.anims.create({
       key: 'boostTrailX1',
       frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
       frameRate: 16,
       repeat: 0
-    })
+    });
     scene.anims.create({
         key: 'boostTrailX2',
         frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
@@ -4961,6 +5079,7 @@ function loadAnimations(scene) {
         frameRate: 16,
         repeat: 0
       })
+    */
   }
 // #endregion
 
