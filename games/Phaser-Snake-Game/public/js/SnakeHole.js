@@ -719,6 +719,11 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
+        
+        //loadAnimations(this);
+        //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
+        console.log("STAGE IN GameScene", this.stage);
+
 
        
 
@@ -1960,7 +1965,7 @@ class GameScene extends Phaser.Scene {
         
         
 
-        ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
+        ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives, startupAnim: false } );
         this.scene.restart( { stage: stageName } );
         ourInputScene.scene.restart();
 
@@ -3704,6 +3709,9 @@ class UIScene extends Phaser.Scene {
         var {lives = STARTING_ATTEMPTS } = props;
         this.lives = lives;
 
+        var {startupAnim = true } = props;
+        this.startupAnim = startupAnim
+
         this.scoreHistory = [];
 
         // BOOST METER
@@ -3727,6 +3735,8 @@ class UIScene extends Phaser.Scene {
        const ourUI = this.ourGame.scene.get('UIScene');
 
        this.UIScoreContainer = this.make.container(0,0);
+
+       console.log("Startup animation on?", this.startupAnim);
 
         
 
