@@ -1208,13 +1208,13 @@ class GameScene extends Phaser.Scene {
                                     ).setDepth(10).setOrigin(0.4375,0.4375);
 
 
-                                    /*this.barrel = portalImage.preFX.addBarrel(.75);
-
-                                    this.portals.forEach(portal => {
-                                        portal.preFX.addBarrel();
-                                    });
+                                    this.barrel = portalImage.postFX.addBarrel(.75);
                                     
-
+                                    
+                                    this.portals.forEach(portal => {
+                                        this.portalBarrel = portal.postFX.addBarrel(.75);
+                                    });
+                                    this.cameras.main.setPostPipeline(this.barrel);
                                     this.add.tween({
                                         duration: 500,
                                         repeatDelay: 0,
@@ -1234,7 +1234,7 @@ class GameScene extends Phaser.Scene {
                                             })
                                         }
                                     });
-                                    */
+                                    
                                     
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
                                         switch (ourPersist.bestOfStageData[stageName].stageRank()) {
@@ -1323,7 +1323,6 @@ class GameScene extends Phaser.Scene {
             });
             coinLayer.visible = false;       
         }
-
         
         
         
@@ -1570,7 +1569,7 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        
+        this.cameras.main.setPostPipeline(this.portalBarrel);
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
         //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
