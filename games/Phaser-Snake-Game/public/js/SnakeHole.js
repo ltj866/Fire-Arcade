@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -887,7 +887,15 @@ class GameScene extends Phaser.Scene {
                     food.electrons.y = _tile.y*GRID;
                 }
             })
+            this.foodLayer.destroy();
         }
+
+        // end on the wall map
+        this.map.getLayer(this.wallVarient);
+
+
+
+        
         
 
         // Add ghost wall layer here. @holden
@@ -1292,8 +1300,9 @@ class GameScene extends Phaser.Scene {
                     this.coins.push(_coin);
                 }
             });
-            coinLayer.visible = false;       
+            coinLayer.destroy();
         }
+
 
         
         
@@ -1362,8 +1371,11 @@ class GameScene extends Phaser.Scene {
                 }
             }
 
-            portalLayerX.visible = false;
+            portalLayerX.destroy()
         }
+
+        var layers = this.map.layers;
+        debugger
         // #endregion
 
         // #region Portal-N
