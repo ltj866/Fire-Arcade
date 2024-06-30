@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -301,15 +301,15 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-        //this.load.image('nextStagePortal', '/assets/sprites/portalBlue.png');
+        this.load.image('blackHole', '/assets/sprites/blackHole.png');
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
         this.load.atlas('uiGlassL', 'assets/sprites/UI_Glass_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiGlassR', 'assets/sprites/UI_Glass_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
-        //this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
-        //this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
+        this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
+        this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         //this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
@@ -1127,9 +1127,7 @@ class GameScene extends Phaser.Scene {
             this.pressedSpaceDuringWait = false;
         });
 
-
-
-
+        
         
 
         // #region Transition Visual
@@ -1203,10 +1201,41 @@ class GameScene extends Phaser.Scene {
                                         stageName
                                     ).setDepth(50).setOrigin(0,0);
 
-                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
-                                        'megaAtlas', 'portalBlue.png' 
-                                    ).setDepth(50).setOrigin(0.21,0.21).setScale(2);
 
+
+                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
+                                        'blackHole' 
+                                    ).setDepth(10).setOrigin(0.4375,0.4375);
+
+
+                                    /*this.barrel = portalImage.preFX.addBarrel(.75);
+
+                                    this.portals.forEach(portal => {
+                                        portal.preFX.addBarrel();
+                                    });
+                                    
+
+                                    this.add.tween({
+                                        duration: 500,
+                                        repeatDelay: 0,
+                                        targets: this.barrel,
+                                        ease: 'Sine.easeOutIn',
+                                        amount: 1.25,
+                                        yoyo: true,
+                                        repeat: -1,
+                                        onStart: () => {
+                                            this.add.tween({
+                                                duration: 666,
+                                                repeatDelay: 0,
+                                                targets: this.portals,
+                                                ease: (value) => Math.round(value),
+                                                yoyo: true,
+                                                repeat: -1
+                                            })
+                                        }
+                                    });
+                                    */
+                                    
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
                                         switch (ourPersist.bestOfStageData[stageName].stageRank()) {
                                             case COPPER:
@@ -2494,7 +2523,7 @@ class ScoreScene extends Phaser.Scene {
             'color': '0x828213'
           };
         ourUI.countDown.style = style*/
-        ourUI.countDown.setHTML('OFF');
+        ourUI.countDown.setHTML('0FF');
 
         var stageDataJSON = {
             bonks: ourUI.bonks,
@@ -3779,7 +3808,10 @@ class UIScene extends Phaser.Scene {
        this.ourInputScene = this.scene.get('InputScene');
        const ourUI = this.ourGame.scene.get('UIScene');
 
-       this.UIScoreContainer = this.make.container(0,0).setAlpha(0);
+       this.UIScoreContainer = this.make.container(0,0)
+       if (this.ourGame.stage === START_STAGE) {
+        this.UIScoreContainer.setAlpha(0);
+        }
 
        console.log("Startup animation on?", this.startupAnim);
 
@@ -3792,8 +3824,8 @@ class UIScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2,GRID,'megaAtlas', 'UI_boostMeterFrame.png').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.25,GRID,'megaAtlas', 'UI_atomScoreFrame.png').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({ // name is unclear.
