@@ -2148,6 +2148,7 @@ class GameScene extends Phaser.Scene {
             this.gState = GState.TRANSITION;
             
             this.events.off('addScore');
+
             
             ourUI.scene.launch('ScoreScene');
         }
@@ -4229,7 +4230,8 @@ class UIScene extends Phaser.Scene {
         const bs = 24;
 
         const group = this.add.group({
-            key: 'portalParticle01',
+            key: "megaAtlas",
+            frame: 'portalParticle01.png',
             quantity: gw * gh,
             gridAlign: {
                 width: gw,
@@ -4239,12 +4241,6 @@ class UIScene extends Phaser.Scene {
                 x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
                 y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
             },
-            /*hitAreaCallback:{
-                hitArea: 24,
-                x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
-                y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2,
-                gameObject: this.scorePanel
-            }*/
         }).setDepth(103);
 
         const size = gw * gh;
