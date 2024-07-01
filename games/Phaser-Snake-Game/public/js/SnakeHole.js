@@ -2166,11 +2166,11 @@ class GameScene extends Phaser.Scene {
         // #endregion
 
 
-        if (this.gState === GState.START_WAIT) {
+        /*if (this.gState === GState.START_WAIT) {
             if (energyAmountX > 99 && !ourUI.chargeUpTween.isDestroyed()) {
                 ourUI.chargeUpTween.resume();
             }
-        }
+        }*/
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
@@ -3844,7 +3844,7 @@ class UIScene extends Phaser.Scene {
 
        const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
 
-       this.chargeUpTween = this.tweens.add({
+       /*this.chargeUpTween = this.tweens.add({
             targets: fx1,
             outerStrength: 16,
             duration: 300,
@@ -3852,7 +3852,7 @@ class UIScene extends Phaser.Scene {
             yoyo: true,
             loop: 0 
         });
-        this.chargeUpTween.pause();
+        this.chargeUpTween.pause();*/
 
        // Combo Sprites
 
