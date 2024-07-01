@@ -3853,7 +3853,7 @@ class UIScene extends Phaser.Scene {
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID).setOrigin(0.5,0.5);
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2 -3, GRID).setOrigin(0.5,0.5);
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
@@ -4967,6 +4967,11 @@ function loadSpriteSheetsAndAnims(scene) {
     }); scene.anims.create({
       key: 'atom04idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
+      frameRate: 4,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atom05spawn',
+      frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 48, 49, 50, 51, 52]}),
       frameRate: 4,
       repeat: -1
     })
