@@ -357,6 +357,10 @@ class StartScene extends Phaser.Scene {
             key: 'chargeUp',
             url: ['chargeUp.ogg', 'chargeUp.mp3']
         })
+        this.load.audio({
+            key: 'coinCollect',
+            url: ['coinCollect.ogg', 'coinCollect.mp3']
+        })
         
         SOUND_PORTAL.forEach(soundID =>
             {
@@ -758,6 +762,8 @@ class GameScene extends Phaser.Scene {
 
 
         // SOUND
+
+        this.coinSound = this.sound.add('coinCollect');
 
         var _chargeUp = this.sound.add('chargeUp');
 
@@ -3834,7 +3840,7 @@ class UIScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
        this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 

@@ -221,6 +221,7 @@ var Snake = new Phaser.Class({
             var _coin = scene.coins[index];
             if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
                 console.log("Hit Coin");
+                scene.coinSound.play();
 
                 ourPersistScene.coins += 1;
                 ourUI.coinUIText.setHTML(
