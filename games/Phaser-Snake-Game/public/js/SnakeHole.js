@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.012';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -612,7 +612,7 @@ class PersistScene extends Phaser.Scene {
             var bool = resultRank > rank
             return  bool;
         } else {
-            debugger
+            //debugger
             return false;
         }
     }
@@ -1408,7 +1408,7 @@ class GameScene extends Phaser.Scene {
         }
 
         var layers = this.map.layers;
-        debugger
+        //debugger
         // #endregion
 
         // #region Portal-N
@@ -3826,7 +3826,7 @@ class UIScene extends Phaser.Scene {
        const ourUI = this.ourGame.scene.get('UIScene');
 
        this.UIScoreContainer = this.make.container(0,0)
-       if (this.ourGame.stage === START_STAGE) {
+       if (this.startupAnim) {
         this.UIScoreContainer.setAlpha(0);
         }
 
@@ -3904,7 +3904,7 @@ class UIScene extends Phaser.Scene {
             ).setText(`0`).setOrigin(0,0);
 
         this.bestScoreUI = this.add.dom(12, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Best`).setOrigin(0,0);;
+            ).setText(`Best`).setOrigin(0,0);
         this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(this.ourGame.bestBase).setOrigin(0,0);
 
@@ -3953,7 +3953,7 @@ class UIScene extends Phaser.Scene {
             this.lengthGoalUI.x = GRID * 27
         }
 
-        if (this.ourGame.stage === "Stage-01") {
+        if (this.startupAnim) {
             this.lengthGoalUI.setAlpha(0)
             this.lengthGoalUILabel.setAlpha(0)
         }
@@ -4195,10 +4195,16 @@ class UIScene extends Phaser.Scene {
         this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
         
-        /*if (ourGameScene.stage = "Stage-01") {
+
+        this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
+            this.bestScoreUI,this.bestScoreLabelUI,
+            this.runningScoreUI, this.runningScoreLabelUI])
+
+        if (this.startupAnim) {
             this.progressPanel.setAlpha(0)
-            this.scorePanel .setAlpha(0)
-        }*/
+            this.scorePanel.setAlpha(0)
+        }
+
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
@@ -4207,7 +4213,7 @@ class UIScene extends Phaser.Scene {
         text.setScale(0)
         text.setDepth(101)*/
         
-        if (ourGameScene.stage === START_STAGE) {
+        if (this.startupAnim) {
             
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
@@ -4223,55 +4229,47 @@ class UIScene extends Phaser.Scene {
 
         // dot matrix
 
-        const hsv = Phaser.Display.Color.HSVColorWheel();
+        if (this.startupAnim){
 
-        const gw = 32;
-        const gh = 32;
-        const bs = 24;
+            const hsv = Phaser.Display.Color.HSVColorWheel();
 
-        const group = this.add.group({
-            key: "megaAtlas",
-            frame: 'portalParticle01.png',
-            quantity: gw * gh,
-            gridAlign: {
-                width: gw,
-                height: gh,
-                cellWidth: bs,
-                cellHeight: bs,
-                x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
-                y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
-            },
-        }).setDepth(103);
+            const gw = 32;
+            const gh = 32;
+            const bs = 24;
 
-        const size = gw * gh;
+            const group = this.add.group({
+                key: "megaAtlas",
+                frame: 'portalParticle01.png',
+                quantity: gw * gh,
+                gridAlign: {
+                    width: gw,
+                    height: gh,
+                    cellWidth: bs,
+                    cellHeight: bs,
+                    x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
+                    y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
+                },
+            }).setDepth(103).setAlpha(0);
+
+            const size = gw * gh;
 
 
-        //  set alpha
-        group.getChildren().forEach((child,) => {
-            child = this.make.image({
-                x: child.x,
-                y: child.y,
-                key: 'portalParticle01'},
-                 false);
-            //const mask = child.createBitmapMask();
-            //this.scorePanel.setMask(mask)
+            //  set alpha
+            group.getChildren().forEach((child,) => {
+                child = this.make.image({},
+                    false);
+                /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
+                    ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
+                ) {
+                    child.setAlpha(1).setScale(1);
+                }*/
+            });
 
-            child.setAlpha(1).setScale(1);
-            /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
-                ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
-            ) {
-                child.setAlpha(1).setScale(1);
-            }*/
-
-        //debugger
-        });
-
-        this.variations = [
-            [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
-        ];
-
-    
-        this.getStaggerTween(0, group);
+            this.variations = [
+                [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
+            ];
+            this.getStaggerTween(0, group);
+        }
     }
 
     getStaggerTween (i, group)
@@ -4280,10 +4278,10 @@ class UIScene extends Phaser.Scene {
         
         this.tweens.add({
             targets: group.getChildren(),
-            scale: [1.5,0],
+            scale: [2,0],
             alpha: [.5,0],
-            ease: 'sine.inout',
-            duration: 1400,
+            ease: 'power2',
+            duration: 800,
             delay: this.tweens.stagger(...stagger),
             completeDelay: 1000,
             repeat: 0,
@@ -4295,31 +4293,7 @@ class UIScene extends Phaser.Scene {
 
                 });
             }
-        });
-
-
-        /*this.panelTweenCollapse = this.tweens.add({
-            targets: [panel],
-            scale: 0,
-            width: 0,
-            height: 0,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });*/
-        //this.panelTweenCollapse.pause();
-
-        if (this.UIScoreContainer.length === 0) {
-                    this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
-                        this.bestScoreUI,this.bestScoreLabelUI,
-             this.runningScoreUI, this.runningScoreLabelUI])
-        }
-
-
-
-
-        
+        }); 
     }
     // #region UI Update
     update(time) {
