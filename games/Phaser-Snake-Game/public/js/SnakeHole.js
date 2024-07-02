@@ -337,6 +337,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
+        this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 24, frameHeight: 48 });
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
 
@@ -1002,8 +1003,13 @@ class GameScene extends Phaser.Scene {
 
         this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
 
-        //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
+        this.CapSpark = this.add.sprite(GRID * 10, GRID).play("CapSpark1").setOrigin(.5,.5).setDepth(100).setAlpha(0)
         
+        this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+
+            this.play(`CapSpark${Phaser.Math.Between(0,9)}`)
+        })
+
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
@@ -4460,6 +4466,748 @@ class TimeAttackScene extends Phaser.Scene{
     }
 }
 
+
+
+class UIScene extends Phaser.Scene {
+    // #region UIScene
+    constructor () {
+        super({ key: 'UIScene', active: false });
+    }
+    
+    init(props) {
+        //this.score = 0;
+        var { score = 0 } = props
+        this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
+        this.stageStartScore = Math.trunc(score);
+        
+        this.length = 0;
+
+        this.scoreMulti = 0;
+        this.globalFruitCount = 0;
+        this.bonks = 0;
+        this.medals = {};
+        this.zedLevel = 0;
+
+        var {lives = STARTING_ATTEMPTS } = props;
+        this.lives = lives;
+
+        var {startupAnim = true } = props;
+        this.startupAnim = startupAnim
+
+        this.scoreHistory = [];
+
+        // BOOST METER
+        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
+        this.comboCounter = 0;
+
+
+        this.coinSpawnCounter = 100;
+    }
+
+    preload () {
+        //const ourGame = this.scene.get('GameScene');
+        //this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
+
+        this.load.spritesheet('ui-blocks', 'assets/sprites/hudIconsSheet.png', { frameWidth: GRID, frameHeight: GRID });
+    }
+    
+    create() {
+       this.ourGame = this.scene.get('GameScene');
+       this.ourInputScene = this.scene.get('InputScene');
+       const ourUI = this.ourGame.scene.get('UIScene');
+
+       this.UIScoreContainer = this.make.container(0,0)
+       if (this.startupAnim) {
+        this.UIScoreContainer.setAlpha(0);
+        }
+
+       console.log("Startup animation on?", this.startupAnim);
+
+        
+
+
+
+       // UI Icons
+       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+
+
+       // #region Boost Meter UI
+       this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+
+
+       this.mask = this.make.image({ // name is unclear.
+           x: SCREEN_WIDTH/2,
+           y: GRID,
+           key: 'megaAtlas',
+           frame: 'boostMask.png',
+           add: false
+       }).setOrigin(0.5,0.5);
+
+       const keys = ['increasing'];
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2 -3, GRID).setOrigin(0.5,0.5);
+       boostBar.setDepth(50);
+       boostBar.play('increasing');
+
+       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+       const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
+
+       /*this.chargeUpTween = this.tweens.add({
+            targets: fx1,
+            outerStrength: 16,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: true,
+            loop: 0 
+        });
+        this.chargeUpTween.pause();*/
+
+       // Combo Sprites
+
+       this.comboActive = false; //used to communicate when to activate combo tweens
+
+       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
+       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
+       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
+       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
+       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
+       
+       // #endregion
+
+        
+        //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
+        //stageUUID = this.cache.json.get(`${this.stage}-json`);
+   
+
+        // Store the Current Version in Cookies
+        localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
+
+        
+        
+
+        // Score Text
+        this.scoreUI = this.add.dom(5 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`Stage`).setOrigin(0,0);
+        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`0`).setOrigin(0,0);
+
+        this.bestScoreUI = this.add.dom(12, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`Best`).setOrigin(0,0);
+        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(this.ourGame.bestBase).setOrigin(0,0);
+
+
+
+   
+        
+
+        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
+        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //).setText(`x ${this.lives}`).setOrigin(0,1);
+
+        // Goal UI
+        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
+        const lengthGoalStyle = {
+            "font-size": '16px',
+            "font-weight": 400,
+            "text-align": 'right',
+        } 
+
+        this.lengthGoalUI = this.add.dom((GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUILabel = this.add.dom(GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
+        //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
+        //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
+ 
+        //snakeBody.scale = .667;
+        //flagGoal.scale = .667;
+        
+        
+        var length = `${this.length}`;
+        if (LENGTH_GOAL != 0) {
+            this.lengthGoalUI.setHTML(
+                `${length.padStart(2, "0")}<br/>
+                <hr style="font-size:3px"/>
+                ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            ).setOrigin(0,0.5)//.setAlpha(0);
+            this.lengthGoalUILabel.setHTML(
+                `Length
+                <br/>
+                Goal`
+            ).setOrigin(0,0.5)//.setAlpha(0);
+        }
+        else {
+            // Special Level
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
+            this.lengthGoalUI.x = GRID * 27
+        }
+
+        if (this.startupAnim) {
+            this.lengthGoalUI.setAlpha(0)
+            this.lengthGoalUILabel.setAlpha(0)
+        }
+        
+        //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
+
+        // Start Fruit Score Timer
+        if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+
+        this.scoreTimer = this.time.addEvent({
+            delay: MAX_SCORE *100,
+            paused: true
+         });
+
+        var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+
+         // Countdown Text
+        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+            'color': '#FCFFB2',
+            'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
+            'font-size': '22px',
+            'font-weight': '400',
+            'font-family': 'Oxanium',
+            'padding': '2px 7px 0px 0px',
+            })).setHTML(
+                countDown.toString().padStart(3,"0")
+        ).setOrigin(1,0.5);
+
+        this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'megaAtlas', 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0);
+
+        //this.coinsUIIcon.setScale(0.5);
+        
+        this.coinUIText = this.add.dom(GRID*24.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: COLOR_SCORE,
+            'color': 'white',
+            'font-weight': '400',
+            //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+            'font-size': '22px',
+            'font-family': 'Oxanium',
+            //'padding': '3px 8px 0px 0px',
+        })).setHTML(
+                `${commaInt(this.scene.get("PersistScene").coins)}`
+        ).setOrigin(0,0);
+        
+        //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `LASTΔ :`
+        //).setOrigin(0,1);
+        //this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `0 `
+        //).setOrigin(0,1);
+        
+        this.runningScoreUI = this.add.dom(GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `Score`
+        ).setOrigin(0,1);
+        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+            `${commaInt(this.score.toString())}`
+        ).setOrigin(0,1);
+
+        
+        if (DEBUG) {
+            this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
+            this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+            { font: '30px Arial', 
+              fill: '#FFFFFF',
+              fontSize: "32px",
+              width: '38px',
+              "text-align": 'right',
+            });
+        }
+        
+        //  Event: addScore
+        this.ourGame.events.on('addScore', function (fruit) {
+
+            const ourScoreScene = this.scene.get('ScoreScene');
+
+            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                color: COLOR_SCORE,
+                'color': '#FCFFB2',
+                'font-weight': '400',
+                'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+                'font-size': '22px',
+                'font-family': 'Oxanium',
+                'padding': '3px 8px 0px 0px',
+            })).setOrigin(0,0);
+            
+            // Remove score text after a time period.
+            this.time.delayedCall(1000, event => {
+                scoreText.removeElement();
+            }, [], this);
+
+            this.tweens.add({
+                targets: scoreText,
+                alpha: { from: 1, to: 0.0 },
+                y: scoreText.y - 10,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+            
+            
+            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+            
+            if (timeLeft > BOOST_ADD_FLOOR) {
+                this.energyAmount += 25;
+            }
+            
+            if (timeLeft > SCORE_FLOOR) {
+                this.score += timeLeft;
+                scoreText.setText(`+${timeLeft}`);
+
+                // Record Score for Stats
+                this.scoreHistory.push(timeLeft);
+            } else {
+                this.score += SCORE_FLOOR;
+                scoreText.setText(`+${SCORE_FLOOR}`);
+
+                // Record Score for Stats
+                this.scoreHistory.push(SCORE_FLOOR);
+            }
+
+            // Calc Level Score
+            var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+            var lastHistory = this.scoreHistory.slice();
+            lastHistory.pop();
+            var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
+            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+
+            this.runningScore = this.score + calcBonus(baseScore);
+            var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
+
+            //this.deltaScoreUI.setText(
+            //    `LASTΔ : +`
+            //)
+            //this.deltaScoreLabelUI.setText(
+            //    `${deltaScore}`
+            //)
+            
+            /*this.runningScoreUI.setText(
+                `SCORE :`
+            );*/
+            this.runningScoreLabelUI.setText(
+                `${commaInt(this.runningScore.toString())}`
+            );
+            
+            
+
+
+            // Update UI
+
+            this.scoreUI.setText(`Stage`);
+            this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            
+            this.length += 1;
+            this.globalFruitCount += 1; // Run Wide Counter
+
+            var length = `${this.length}`;
+
+            this.bestScoreUI.setText(`Best`);
+            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
+            
+            // Exception for Bonus Levels when the Length Goal = 0
+            if (LENGTH_GOAL != 0) {
+                this.lengthGoalUI.setHTML(
+                    `${length.padStart(2, "0")}<br/>
+                    <hr style="font-size:3px"/>
+                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
+                )
+            }
+            else {
+                this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+            }
+            
+             // Restart Score Timer
+            if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
+                this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                    delay: MAX_SCORE * 100,
+                    paused: false
+                 });   
+            }
+            
+        }, this);
+
+        //  Event: saveScore
+        this.ourGame.events.on('saveScore', function () {
+            const ourTimeAttack = this.ourGame.scene.get('TimeAttackScene');
+            const ourScoreScene = this.ourGame.scene.get('ScoreScene');
+            const ourUIScene = this.ourGame.scene.get('UIScene');
+            const ourStartScene = this.scene.get('StartScene');
+
+
+            // Building StageData for Savin
+            var stageData = ourScoreScene.stageData;
+            
+
+            //console.log(stageData.toString());
+
+            var stageFound = false;
+            
+            var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
+            
+            // #region Do Unlock Calculation of all Best Logs
+            
+            var historicalLog = [];
+            if (ourStartScene.stageHistory.length > 1) {
+                ourStartScene.stageHistory.forEach( _stage => {
+                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestStageData`));
+                    if (stageBestLog) {
+                        historicalLog = [...historicalLog, ...stageBestLog];
+                    }
+                });
+                
+            }
+        
+            // make this an event?
+            ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
+        
+            // #endregion
+
+
+        }, this);
+
+        this.lastTimeTick = 0;
+        const ourGameScene = this.scene.get('GameScene');
+        // 9-Slice Panels
+        // We recalculate running score so it can be referenced for the 9-slice panel
+        var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+        this.runningScore = this.score + calcBonus(baseScore);
+        this.scoreDigitLength = this.runningScore.toString().length;
+        
+        this.scorePanel = this.add.nineslice(GRID * .125, 0, 
+            'uiGlassL', 'Glass', 
+            ((96) + (this.scoreDigitLength * 10)), 78, 
+            80, 18, 18, 18);
+        this.scorePanel.setDepth(100).setOrigin(0,0)
+
+        this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
+        this.progressPanel.setDepth(100).setOrigin(0,0)
+        
+
+        this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
+            this.bestScoreUI,this.bestScoreLabelUI,
+            this.runningScoreUI, this.runningScoreLabelUI])
+
+        if (this.startupAnim) {
+            this.progressPanel.setAlpha(0)
+            this.scorePanel.setAlpha(0)
+        }
+
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)*/
+        
+        if (this.startupAnim) {
+            
+            this.time.delayedCall(400, event => {
+                this.panelAppearTween = this.tweens.add({
+                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'sine.inout',
+                    yoyo: false,
+                    repeat: 0,
+                });
+            })
+        }
+
+        // dot matrix
+
+        if (this.startupAnim){
+
+            const hsv = Phaser.Display.Color.HSVColorWheel();
+
+            const gw = 32;
+            const gh = 32;
+            const bs = 24;
+
+            const group = this.add.group({
+                key: "megaAtlas",
+                frame: 'portalParticle01.png',
+                quantity: gw * gh,
+                gridAlign: {
+                    width: gw,
+                    height: gh,
+                    cellWidth: bs,
+                    cellHeight: bs,
+                    x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
+                    y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
+                },
+            }).setDepth(103).setAlpha(0);
+
+            const size = gw * gh;
+
+
+            //  set alpha
+            group.getChildren().forEach((child,) => {
+                child = this.make.image({},
+                    false);
+                /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
+                    ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
+                ) {
+                    child.setAlpha(1).setScale(1);
+                }*/
+            });
+
+            this.variations = [
+                [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
+            ];
+            this.getStaggerTween(0, group);
+        }
+    }
+
+    getStaggerTween (i, group)
+    {
+        const stagger = this.variations[i];
+        
+        this.tweens.add({
+            targets: group.getChildren(),
+            scale: [2,0],
+            alpha: [.5,0],
+            ease: 'power2',
+            duration: 800,
+            delay: this.tweens.stagger(...stagger),
+            completeDelay: 1000,
+            repeat: 0,
+            onComplete: () =>
+            {
+                group.getChildren().forEach(child => {
+
+                    child.destroy();
+
+                });
+            }
+        }); 
+    }
+    // #region UI Update
+    update(time) {
+        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        this.scoreDigitLength = this.runningScore.toString().length;
+        this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
+
+        
+        
+        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
+        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
+            // Temp Code for bonus level
+            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
+
+            this.scoreUI.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.bestScoreUI.setText(`Best  ${this.score}`);
+
+            this.scene.pause();
+
+            this.scene.start('ScoreScene');
+        }
+        // #endregion
+
+        if (!this.ourGame.checkWinCon() && !this.scoreTimer.paused) {
+            /***
+             * This is out of the Time Tick Loop because otherwise it won't pause 
+             * correctly during portaling. After the timer pauses at the Score Floor
+             *  the countdown timer will go to 0.
+             */
+            var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+    
+            if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
+                this.scoreTimer.paused = true;
+            }
+
+            this.countDown.setText(countDown.toString().padStart(3,"0"));
+        }
+
+        if (timeTick != this.lastTimeTick) {
+            this.lastTimeTick = timeTick;
+
+            if(!this.scoreTimer.paused) {
+                this.coinSpawnCounter -= 1;
+
+                if (this.coinSpawnCounter < 1) {
+                    console.log("COIN TIME YAY. SPAWN a new coin");
+
+                    var validLocations = this.ourGame.validSpawnLocations();
+                    var pos = Phaser.Math.RND.pick(validLocations)
+
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'megaAtlas', 'coinPickup01Anim.png'
+                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+
+                    // tween code not working @holden I am not sure what I am missing -James
+                    //this.tweens.add({
+                    //    targets: this.atoms,
+                    //    originY: .125,
+                    //    yoyo: true,
+                    //    ease: 'Sine.easeOutIn',
+                    //    duration: 1000,
+                    //    repeat: -1
+                    //});
+                    
+                    this.ourGame.coins.push(_coin);
+
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
+                }
+            }
+        }
+        
+
+
+        if (GState.PLAY === this.ourGame.gState) {
+            if (this.ourInputScene.spaceBar.isDown) {
+                // Has Boost Logic, Then Boost
+                if(this.energyAmount > 1){
+                    this.ourGame.moveInterval = SPEED_SPRINT;
+                    
+                    // Boost Stats
+                    this.ourInputScene.boostTime += 6;
+                    this.mask.setScale(this.energyAmount/100,1);
+                    this.energyAmount -= 1;
+                } else{
+                    //DISSIPATE LIVE ELECTRICITY
+                    this.ourGame.moveInterval = SPEED_WALK;
+                }
+        
+            } else {
+                this.ourGame.moveInterval = SPEED_WALK; // Less is Faster
+                this.mask.setScale(this.energyAmount/100,1);
+                this.energyAmount += .25; // Recharge Boost Slowly
+            }
+        } else if (GState.START_WAIT === this.ourGame.gState) {
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount += 1; // Recharge Boost Slowly
+
+        }
+
+        // Reset Energy if out of bounds.
+        if (this.energyAmount >= 100) {
+            this.energyAmount = 100;}
+        else if(this.energyAmount <= 0) {
+            this.energyAmount = 0;
+        }
+
+        //#endregion Boost Logic
+        
+        // #region Combo Logic
+
+        if (this.comboCounter > 0 && !this.comboActive) {
+            this.comboAppear();
+        }
+        else if (this.comboCounter == 0 && this.comboActive){
+            this.comboFade();
+        }
+        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
+            this.comboFade();
+        }
+    }
+
+    scoreTweenShow(){
+        if (this.UIScoreContainer.y === -20) {
+            console.log('showing')
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (0),
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+                this.tweens.add({
+                targets: this.scorePanel,
+                height: 78,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+              this.tweens.add({
+                targets: [this.bestScoreLabelUI, this.bestScoreUI],
+                alpha: 1,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+        }
+    }
+    scoreTweenHide(){
+        if (this.UIScoreContainer.y === 0) {
+            console.log('hiding')
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (-20),
+                ease: 'Sine.InOut',
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+              });
+            this.tweens.add({
+                targets: this.scorePanel,
+                height: 58,
+                ease: 'Sine.InOut',
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+              });
+            this.tweens.add({
+                targets: [this.bestScoreLabelUI, this.bestScoreUI],
+                alpha: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+        }
+    }
+
+    comboBounce(){
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            y: { from: GRID * 4, to: GRID * 3 },
+            ease: 'Sine.InOut',
+            duration: 200,
+            repeat: 0,
+            delay: this.tweens.stagger(60),
+            yoyo: true
+            });
+    }
+    comboAppear(){
+        console.log("appearing")
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+        });
+        this.comboActive = true;
+        }
+    comboFade(){
+        console.log("fading")
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 500,
+            repeat: 0,
+        });
+        this.comboActive = false;
+        this.comboCounter = 0;
+    }
+
+end() {
+
+    }
+    
+}
+
 // #region Input Scene
 class InputScene extends Phaser.Scene {
     
@@ -4977,76 +5725,75 @@ function loadSpriteSheetsAndAnims(scene) {
     })
 
 
-    /*
-    scene.textures.addSpriteSheetFromAtlas('boostTrailX', { atlas: 'megaAtlas', frameWidth: 24,frameHeight:72,
-        frame: 'boostTrailX01Anim.png'
-    }); scene.anims.create({
-      key: 'boostTrailX1',
-      frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+    
+    //scene.textures.addSpriteSheetFromAtlas('boostTrailX', { atlas: 'megaAtlas', frameWidth: 24,frameHeight:72,
+        //frame: 'boostTrailX01Anim.png'
+    scene.anims.create({
+      key: 'CapSpark1',
+      frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
       frameRate: 16,
       repeat: 0
     });
     scene.anims.create({
-        key: 'boostTrailX2',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
+        key: 'CapSpark2',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX3',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
+        key: 'CapSpark3',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX4',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
+        key: 'CapSpark4',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX5',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
+        key: 'CapSpark5',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX6',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
+        key: 'CapSpark6',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX7',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
+        key: 'CapSpark7',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX8',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
+        key: 'CapSpark8',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX9',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
+        key: 'CapSpark9',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX0',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
+        key: 'CapSpark0',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
         frameRate: 16,
         repeat: 0
       })
     scene.anims.create({
-        key: 'boostTrailXdissipate',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 10,11,12,13,14]}),
+        key: 'CapSparkDissipate',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
-    */
   }
 // #endregion
 
