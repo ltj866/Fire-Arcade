@@ -1221,34 +1221,8 @@ class GameScene extends Phaser.Scene {
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                                         'blackHole' 
                                     ).setDepth(10).setOrigin(0.4375,0.4375);
-
-
-                                    this.barrel = portalImage.postFX.addBarrel(.75);
                                     
                                     
-                                    this.portals.forEach(portal => {
-                                        this.portalBarrel = portal.postFX.addBarrel(.75);
-                                    });
-                                    this.cameras.main.setPostPipeline(this.barrel);
-                                    this.add.tween({
-                                        duration: 500,
-                                        repeatDelay: 0,
-                                        targets: this.barrel,
-                                        ease: 'Sine.easeOutIn',
-                                        amount: 1.25,
-                                        yoyo: true,
-                                        repeat: -1,
-                                        onStart: () => {
-                                            this.add.tween({
-                                                duration: 666,
-                                                repeatDelay: 0,
-                                                targets: this.portals,
-                                                ease: (value) => Math.round(value),
-                                                yoyo: true,
-                                                repeat: -1
-                                            })
-                                        }
-                                    });
                                     
                                     
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
@@ -1587,7 +1561,6 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        this.cameras.main.setPostPipeline(this.portalBarrel);
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
         //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
@@ -1932,8 +1905,8 @@ class GameScene extends Phaser.Scene {
 
         var snakeholeTween = this.tweens.add({
             targets: this.snake.body, 
-            x: 15 * GRID, //this.pathRegroup.vec.x,
-            y: 15 * GRID, //this.pathRegroup.vec.y,
+            x: this.snake.head.x,
+            y: this.snake.head.y,
             yoyo: false,
             duration: 500,
             ease: 'Sine.easeOutIn',
@@ -1945,8 +1918,8 @@ class GameScene extends Phaser.Scene {
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
-            x: 15 * GRID, //this.pathRegroup.vec.x,
-            y: 15 * GRID, //this.pathRegroup.vec.y,
+            x: this.snake.head.x,
+            y: this.snake.head.y,
             yoyo: false,
             duration: 500,
             ease: 'Sine.easeOutIn',
@@ -1962,7 +1935,7 @@ class GameScene extends Phaser.Scene {
             }, this);
 
 
-        blackholeTween.on('complete', () => {
+        snakeholeTween.on('complete', () => {
             this.nextStage(this.nextStages[nextStageIndex]);
         });
                     
