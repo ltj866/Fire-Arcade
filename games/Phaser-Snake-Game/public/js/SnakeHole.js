@@ -923,24 +923,24 @@ class GameScene extends Phaser.Scene {
         let _y = this.snake.head.y;
         
 
-        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 14)) {
+        if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('startArrowIdle');
             this.startingArrowsAnimN.setAlpha(0);
         }
-        if (!this.map.hasTileAtWorldXY(GRID * 15, GRID * 16)) {
+        if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('startArrowIdle');
             this.startingArrowsAnimS.setAlpha(0);
         }
-        if (!this.map.hasTileAtWorldXY(GRID * 16, GRID * 15)) {
+        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('startArrowIdle');
             this.startingArrowsAnimE.setAlpha(0);
         }
-        if (!this.map.hasTileAtWorldXY(GRID * 14, GRID * 15)) {
+        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('startArrowIdle');
@@ -950,6 +950,7 @@ class GameScene extends Phaser.Scene {
         const _arrowS = this.startingArrowsAnimS
         const _arrowE = this.startingArrowsAnimE
         const _arrowW = this.startingArrowsAnimW
+        console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY) {
