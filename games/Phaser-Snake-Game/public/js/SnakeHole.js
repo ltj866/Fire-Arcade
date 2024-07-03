@@ -3814,16 +3814,18 @@ class ScoreScene extends Phaser.Scene {
 
         this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 21, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
-            "font-style": 'bold',
+            //"font-style": 'italic',
+            //"font-weight": 'bold',
             })).setText(
                 `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
         ).setOrigin(0,0);
         
         this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 22.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
-            "font-style": 'bold',
+            //"font-style": 'italic',
+            //"font-weight": 'bold',
             })).setHTML(
-                `SUM OF BEST : <span style="color:goldenrod">${commaInt(ourPersist.sumOfBest)}</span>`
+                `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest)}</span>`
         ).setOrigin(0,0);
 
         // #region Help Card
