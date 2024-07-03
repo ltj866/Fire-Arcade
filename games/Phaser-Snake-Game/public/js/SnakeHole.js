@@ -1754,7 +1754,7 @@ class GameScene extends Phaser.Scene {
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
-       const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
+       //const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
 
        /*this.chargeUpTween = this.tweens.add({
             targets: fx1,
