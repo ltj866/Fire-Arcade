@@ -348,7 +348,8 @@ class StartScene extends Phaser.Scene {
         // Audio
         this.load.setPath('assets/audio');
 
-        this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3'])
+        this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
+        //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
             {
@@ -1049,6 +1050,8 @@ class GameScene extends Phaser.Scene {
         
         // Audio
         this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
+        //this.capSparkSFX = this.sound.add('capSpark');
+        
 
         //this.pointCollect = this.sound.add('pointCollect01');
         //this.pointCollect.play();
@@ -1962,6 +1965,7 @@ class GameScene extends Phaser.Scene {
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.energyAmount += 25;
                 
+                //ourGameScene.capSparkSFX.play();
                 ourGameScene.CapSpark.play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
                 .setDepth(100)
                 ourGameScene.CapSpark.setVisible(true);
