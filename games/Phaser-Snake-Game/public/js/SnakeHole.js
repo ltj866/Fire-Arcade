@@ -1003,11 +1003,11 @@ class GameScene extends Phaser.Scene {
 
         this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
 
-        this.CapSpark = this.add.sprite(GRID * 10, GRID).play("CapSpark1").setOrigin(.5,.5).setDepth(100).setAlpha(0)
+        this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
-
-            this.play(`CapSpark${Phaser.Math.Between(0,9)}`)
+            this.setVisible(false)
         })
 
         this.lightMasksContainer = this.make.container(0, 0);
@@ -1742,7 +1742,7 @@ class GameScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.5,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({ // name is unclear.
@@ -1872,7 +1872,7 @@ class GameScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(GRID*9 + 7, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -1883,12 +1883,12 @@ class GameScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUIIcon = this.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*24.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(GRID*22.75, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -1929,7 +1929,7 @@ class GameScene extends Phaser.Scene {
         //  Event: addScore
         this.events.on('addScore', function (fruit) {
 
-            const ourScoreScene = this.scene.get('ScoreScene');
+            const ourGameScene = this.scene.get('GameScene');
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
@@ -1961,6 +1961,10 @@ class GameScene extends Phaser.Scene {
             
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.energyAmount += 25;
+                
+                ourGameScene.CapSpark.play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+                .setDepth(100)
+                ourGameScene.CapSpark.setVisible(true);
             }
             
             if (timeLeft > SCORE_FLOOR) {
@@ -4533,7 +4537,7 @@ class UIScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.4,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({ // name is unclear.
@@ -5736,55 +5740,55 @@ function loadSpriteSheetsAndAnims(scene) {
     });
     scene.anims.create({
         key: 'CapSpark2',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark3',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark4',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark5',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark6',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark7',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark8',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark9',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
         key: 'CapSpark0',
-        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8,10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
