@@ -4901,16 +4901,19 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'atom01idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
       frameRate: 12,
+      duration: 1000,
       repeat: -1
     }); scene.anims.create({
       key: 'atom02idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
       frameRate: 8,
+      duration: 1000,
       repeat: -1
     }); scene.anims.create({
       key: 'atom03idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
       frameRate: 6,
+      duration: 6400,
       repeat: -1
     }); scene.anims.create({
       key: 'atom04idle',
@@ -4921,7 +4924,8 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'atom05spawn',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 48, 49, 50, 51, 52]}),
       frameRate: 4,
-      repeat: -1
+      delay: 200,
+      repeat: 0, // How long is the duration of this animation in milliseconds @ hodlen?
     })
 
 

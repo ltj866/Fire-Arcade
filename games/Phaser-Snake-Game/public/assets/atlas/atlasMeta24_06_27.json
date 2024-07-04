@@ -204,19 +204,19 @@
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 144,
+						"w": 288,
 						"h": 192
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 144,
+						"w": 288,
 						"h": 192
 					},
 					"frame": {
 						"x": 1128,
 						"y": 268,
-						"w": 144,
+						"w": 288,
 						"h": 192
 					}
 				},
@@ -263,27 +263,6 @@
 					}
 				},
 				{
-					"filename": "UI_boostMeterFrame.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 256,
-						"h": 48
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 256,
-						"h": 48
-					},
-					"frame": {
-						"x": 863,
-						"y": 316,
-						"w": 256,
-						"h": 48
-					}
-				},
-				{
 					"filename": "coinPickup01Anim.png",
 					"rotated": false,
 					"trimmed": false,
@@ -299,30 +278,9 @@
 					},
 					"frame": {
 						"x": 863,
-						"y": 364,
+						"y": 316,
 						"w": 256,
 						"h": 32
-					}
-				},
-				{
-					"filename": "comboLetters.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 216,
-						"h": 48
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 216,
-						"h": 48
-					},
-					"frame": {
-						"x": 863,
-						"y": 396,
-						"w": 216,
-						"h": 48
 					}
 				},
 				{
@@ -340,8 +298,8 @@
 						"h": 96
 					},
 					"frame": {
-						"x": 1272,
-						"y": 268,
+						"x": 863,
+						"y": 348,
 						"w": 96,
 						"h": 96
 					}
@@ -361,178 +319,10 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 1272,
-						"y": 364,
+						"x": 959,
+						"y": 348,
 						"w": 48,
 						"h": 72
-					}
-				},
-				{
-					"filename": "wrapBlockAnim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 2304,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 2304,
-						"h": 24
-					},
-					"frame": {
-						"x": 1272,
-						"y": 436,
-						"w": 2304,
-						"h": 24
-					}
-				},
-				{
-					"filename": "ranksSprite02.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 48,
-						"h": 72
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 48,
-						"h": 72
-					},
-					"frame": {
-						"x": 1320,
-						"y": 364,
-						"w": 48,
-						"h": 72
-					}
-				},
-				{
-					"filename": "UI_atomScoreFrame.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 64,
-						"h": 48
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 64,
-						"h": 48
-					},
-					"frame": {
-						"x": 1512,
-						"y": 460,
-						"w": 64,
-						"h": 48
-					}
-				},
-				{
-					"filename": "electronCloudAnim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 1144,
-						"h": 36
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 1144,
-						"h": 36
-					},
-					"frame": {
-						"x": 1576,
-						"y": 460,
-						"w": 1144,
-						"h": 36
-					}
-				},
-				{
-					"filename": "twinkle02Anim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 112,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 112,
-						"h": 16
-					},
-					"frame": {
-						"x": 1576,
-						"y": 496,
-						"w": 112,
-						"h": 16
-					}
-				},
-				{
-					"filename": "twinkle01Anim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 64,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 64,
-						"h": 16
-					},
-					"frame": {
-						"x": 1688,
-						"y": 496,
-						"w": 64,
-						"h": 16
-					}
-				},
-				{
-					"filename": "twinkle03Anim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 64,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 64,
-						"h": 16
-					},
-					"frame": {
-						"x": 1752,
-						"y": 496,
-						"w": 64,
-						"h": 16
-					}
-				},
-				{
-					"filename": "UI_ArrowDownAnim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 256,
-						"h": 32
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 256,
-						"h": 32
-					},
-					"frame": {
-						"x": 2720,
-						"y": 460,
-						"w": 256,
-						"h": 32
 					}
 				},
 				{
@@ -550,8 +340,8 @@
 						"h": 28
 					},
 					"frame": {
-						"x": 2976,
-						"y": 460,
+						"x": 1007,
+						"y": 348,
 						"w": 112,
 						"h": 28
 					}
@@ -571,77 +361,77 @@
 						"h": 28
 					},
 					"frame": {
-						"x": 3088,
-						"y": 460,
+						"x": 1007,
+						"y": 376,
 						"w": 112,
 						"h": 28
 					}
 				},
 				{
-					"filename": "ranksSprite03.png",
+					"filename": "twinkle02Anim.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 48,
-						"h": 72
+						"w": 112,
+						"h": 16
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 48,
-						"h": 72
+						"w": 112,
+						"h": 16
 					},
 					"frame": {
-						"x": 1368,
-						"y": 268,
-						"w": 48,
-						"h": 72
+						"x": 1007,
+						"y": 404,
+						"w": 112,
+						"h": 16
 					}
 				},
 				{
-					"filename": "ranksSprite04.png",
+					"filename": "twinkle01Anim.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 48,
-						"h": 72
+						"w": 64,
+						"h": 16
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 48,
-						"h": 72
+						"w": 64,
+						"h": 16
 					},
 					"frame": {
-						"x": 1368,
-						"y": 340,
-						"w": 48,
-						"h": 72
+						"x": 959,
+						"y": 420,
+						"w": 64,
+						"h": 16
 					}
 				},
 				{
-					"filename": "atomicPickup01Anim.png",
+					"filename": "twinkle03Anim.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 1152,
-						"h": 24
+						"w": 64,
+						"h": 16
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 1152,
-						"h": 24
+						"w": 64,
+						"h": 16
 					},
 					"frame": {
-						"x": 1368,
-						"y": 412,
-						"w": 1152,
-						"h": 24
+						"x": 1023,
+						"y": 420,
+						"w": 64,
+						"h": 16
 					}
 				},
 				{
-					"filename": "ranksSprite05.png",
+					"filename": "ranksSprite02.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -662,6 +452,111 @@
 					}
 				},
 				{
+					"filename": "ranksSprite03.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 48,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 48,
+						"h": 72
+					},
+					"frame": {
+						"x": 1416,
+						"y": 340,
+						"w": 48,
+						"h": 72
+					}
+				},
+				{
+					"filename": "UI_boostMeterFrame.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 268,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 268,
+						"h": 48
+					},
+					"frame": {
+						"x": 1416,
+						"y": 412,
+						"w": 268,
+						"h": 48
+					}
+				},
+				{
+					"filename": "comboLetters.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 216,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 216,
+						"h": 48
+					},
+					"frame": {
+						"x": 1512,
+						"y": 460,
+						"w": 216,
+						"h": 48
+					}
+				},
+				{
+					"filename": "wrapBlockAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 2304,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 2304,
+						"h": 24
+					},
+					"frame": {
+						"x": 1728,
+						"y": 48,
+						"w": 2304,
+						"h": 24
+					}
+				},
+				{
+					"filename": "ranksSprite04.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 48,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 48,
+						"h": 72
+					},
+					"frame": {
+						"x": 4032,
+						"y": 48,
+						"w": 48,
+						"h": 72
+					}
+				},
+				{
 					"filename": "background02.png",
 					"rotated": false,
 					"trimmed": false,
@@ -677,9 +572,51 @@
 					},
 					"frame": {
 						"x": 1489,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
+					}
+				},
+				{
+					"filename": "ranksSprite05.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 48,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 48,
+						"h": 72
+					},
+					"frame": {
+						"x": 1489,
+						"y": 48,
+						"w": 48,
+						"h": 72
+					}
+				},
+				{
+					"filename": "electronCloudAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1144,
+						"h": 36
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1144,
+						"h": 36
+					},
+					"frame": {
+						"x": 1464,
+						"y": 376,
+						"w": 1144,
+						"h": 36
 					}
 				},
 				{
@@ -698,7 +635,7 @@
 					},
 					"frame": {
 						"x": 1745,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
 					}
@@ -719,7 +656,7 @@
 					},
 					"frame": {
 						"x": 2001,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
 					}
@@ -740,7 +677,7 @@
 					},
 					"frame": {
 						"x": 2257,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
 					}
@@ -761,9 +698,72 @@
 					},
 					"frame": {
 						"x": 2513,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
+					}
+				},
+				{
+					"filename": "UI_atomScoreFrame.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 78,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 78,
+						"h": 48
+					},
+					"frame": {
+						"x": 1684,
+						"y": 412,
+						"w": 78,
+						"h": 48
+					}
+				},
+				{
+					"filename": "UI_ArrowDownAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 32
+					},
+					"frame": {
+						"x": 1537,
+						"y": 72,
+						"w": 256,
+						"h": 32
+					}
+				},
+				{
+					"filename": "atomicPickup01Anim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1272,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1272,
+						"h": 24
+					},
+					"frame": {
+						"x": 1793,
+						"y": 72,
+						"w": 1272,
+						"h": 24
 					}
 				},
 				{
@@ -782,7 +782,7 @@
 					},
 					"frame": {
 						"x": 2769,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
 					}
@@ -803,7 +803,7 @@
 					},
 					"frame": {
 						"x": 3025,
-						"y": 48,
+						"y": 120,
 						"w": 256,
 						"h": 256
 					}
@@ -814,6 +814,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:7e84707572de596e76d8c34df4ddfe30:5e5d292e33ac9ed408d2fdd13b969834:d6635e3491aee4cde7aacf45fed5bfc3$"
+		"smartupdate": "$TexturePacker:SmartUpdate:37ea986f076b92b2538c06d8320acb71:09a0558d18928195d79e44ee940dfb14:d6635e3491aee4cde7aacf45fed5bfc3$"
 	}
 }
