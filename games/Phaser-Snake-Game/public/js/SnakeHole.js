@@ -1415,8 +1415,6 @@ class GameScene extends Phaser.Scene {
             portalLayerX.destroy()
         }
 
-        var layers = this.map.layers;
-        //debugger
         // #endregion
 
         // #region Portal-N
