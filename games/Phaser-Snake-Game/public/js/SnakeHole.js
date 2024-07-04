@@ -1721,9 +1721,6 @@ class GameScene extends Phaser.Scene {
         this.UIScoreContainer.setAlpha(0);
         }
 
-        
-
-
 
        // UI Icons
        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head

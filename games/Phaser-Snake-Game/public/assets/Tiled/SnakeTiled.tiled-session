@@ -614,7 +614,7 @@
         },
         "Wrap_Stage-03.json": {
             "scale": 1,
-            "selectedLayer": 2,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 283.5,
                 "y": 318
@@ -628,7 +628,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 370.77631578947376,
-                "y": 370.36842105263156
+                "y": 369.55263157894746
             }
         },
         "Wrap_Stage-03b.json#tileSheetx24": {
@@ -749,7 +749,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 371.5921052631579,
-                "y": 371.1842105263158
+                "y": 370.36842105263156
             }
         },
         "rough-05-04b.json#tileSheetx24": {
@@ -782,7 +782,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 371.5921052631579,
-                "y": 371.1842105263158
+                "y": 370.36842105263156
             }
         },
         "rough-0r.json#tileSheetx24": {
