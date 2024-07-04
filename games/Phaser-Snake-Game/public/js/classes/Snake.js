@@ -229,7 +229,6 @@ var Snake = new Phaser.Class({
 
                 _coin.destroy();
                 scene.coins.splice(index,1);
-                console.log(scene.coins)
             }
         }
 

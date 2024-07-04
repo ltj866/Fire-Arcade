@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'zoolander-02-test'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -627,9 +627,9 @@ class PersistScene extends Phaser.Scene {
 
         // not all of these need to be interpolated; wastes processing
 
-        //this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+        //this.boostMask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             //(this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        //this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+        //this.boostMask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
             //(this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
 
         this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
@@ -755,7 +755,7 @@ class GameScene extends Phaser.Scene {
         this.scoreHistory = [];
 
         // BOOST METER
-        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
+        this.boostEnergy = 600; // Value from 0-1000 which directly dictates ability to boost and the boost mask target.
         this.comboCounter = 0;
 
 
@@ -1059,7 +1059,6 @@ class GameScene extends Phaser.Scene {
 
         // Starting Game State
         this.gState = GState.START_WAIT;
-        console.log("GSTATE === START_WAIT", this.gState === GState.START_WAIT);
 
         // Define keys       
 
@@ -1724,8 +1723,6 @@ class GameScene extends Phaser.Scene {
         this.UIScoreContainer.setAlpha(0);
         }
 
-       console.log("Startup animation on?", this.startupAnim);
-
         
 
 
@@ -1739,7 +1736,7 @@ class GameScene extends Phaser.Scene {
        this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
-       this.mask = this.make.image({ // name is unclear.
+       this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
            y: GRID,
            key: 'megaAtlas',
@@ -1752,7 +1749,23 @@ class GameScene extends Phaser.Scene {
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
-       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
+       this.boostMask.scaleX = 0;
+
+       const ourGame = this.scene.get("GameScene");
+
+       this.boostBarTween = this.tweens.add( {
+        targets: this.boostMask,
+        scaleX: this.boostEnergy/1000,
+        ease: 'linear',
+        duration: 2250, // Mariocart countdown timer is 750 milliseconds between beats.
+        yoyo: false,
+        repeat: -1,
+        persist: true,
+        onRepeat: function () {
+            this.updateTo("scaleX", this.parent.scene.boostEnergy/1000, true);
+        },
+       })
 
        //const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
 
@@ -1954,7 +1967,7 @@ class GameScene extends Phaser.Scene {
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
             
             if (timeLeft > BOOST_ADD_FLOOR) {
-                this.energyAmount += 25;
+                this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
             }
             
             if (timeLeft > SCORE_FLOOR) {
@@ -2191,10 +2204,8 @@ class GameScene extends Phaser.Scene {
         }
     
         
-        // Make all the unsafe places unsafe
+        // Set all the unsafe places unsafe
 
-        
-        console.log("CHECKING ALL TILES IN THE WALL LAYER");
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
@@ -2302,7 +2313,6 @@ class GameScene extends Phaser.Scene {
                 this.gState = GState.PORTAL;
                 this.scoreTimer.paused = true;
 
-                console.log("PORTALING", this.gState);
 
                 if (DEBUG) { console.log("PORTAL"); }
 
@@ -2332,7 +2342,6 @@ class GameScene extends Phaser.Scene {
                 _tween.on('complete',()=>{
                     this.gState = GState.PLAY;
                     this.scoreTimer.paused = false;
-                    console.log("Game State === PLAY", this.gState === GState.PLAY); // Will be set to PLAY
 
                     // Show portal snake body after head arrives.
                     if (this.snake.body.length > 2) {
@@ -2543,7 +2552,6 @@ class GameScene extends Phaser.Scene {
     }
     scoreTweenHide(){
         if (this.UIScoreContainer.y === 0) {
-            console.log('hiding')
             this.tweens.add({
                 targets: this.UIScoreContainer,
                 y: (-20),
@@ -2639,7 +2647,6 @@ class GameScene extends Phaser.Scene {
 
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
-        var energyAmountX = this.energyAmount; // this.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
         
         // Floating Electrons
@@ -2887,7 +2894,7 @@ class GameScene extends Phaser.Scene {
 
                 this.checkPortalAndMove()
 
-                if (energyAmountX < 1) {
+                if (this.boostEnergy < 1) {
                     // add the tail in.
                     this.boostOutlinesBody.push(this.boostOutlineTail);
     
@@ -3019,38 +3026,52 @@ class GameScene extends Phaser.Scene {
         
 
 
+        
+        
         if (GState.PLAY === this.gState) {
             if (ourInputScene.spaceBar.isDown) {
                 // Has Boost Logic, Then Boost
-                if(this.energyAmount > 1){
+                //console.log(this.boostEnergy);
+                if(this.boostEnergy > 0){
                     this.moveInterval = SPEED_SPRINT;
                     
                     // Boost Stats
                     ourInputScene.boostTime += 6;
-                    this.mask.setScale(this.energyAmount/100,1);
-                    this.energyAmount -= 1;
+                    //this.boostMask.setScale(this.boostEnergy/1000,1);
+                    this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
                 } else{
-                    //DISSIPATE LIVE ELECTRICITY
+                    // DISSIPATE LIVE ELECTRICITY
+                    //console.log("walking now", this.boostMask.scaleX);
+                    this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
                     this.moveInterval = SPEED_WALK;
                 }
         
             } else {
+                //console.log("spacebar not down");
                 this.moveInterval = SPEED_WALK; // Less is Faster
-                this.mask.setScale(this.energyAmount/100,1);
-                this.energyAmount += .25; // Recharge Boost Slowly
+                //this.boostMask.setScale(this.boostEnergy/1000,1);
+                this.boostEnergy = Math.min(this.boostEnergy + 1, 1000); // Recharge Boost Slowly
             }
-        } else if (GState.START_WAIT === this.gState) {
-            this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount += 1; // Recharge Boost Slowly
-
+            //var boostBarGap = (this.boostEnergy/1000 - this.boostMask.scaleX);
+            //console.log(this.boostEnergy, boostBarGap);
+            //debugger
+            //this.boostMask.scaleX += boostBarGap / 25;
+            //this.boostBarTween.restart();
+            this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
+            this.boostBarTween.updateTo("duration", 30000, true);
         }
+
+        
+
+        
+        
 
         // Reset Energy if out of bounds.
-        if (this.energyAmount >= 100) {
-            this.energyAmount = 100;}
-        else if(this.energyAmount <= 0) {
-            this.energyAmount = 0;
-        }
+        //if (this.boostEnergy >= 100) {
+        //    this.boostEnergy = 100;}
+        //else if(this.boostEnergy <= 0) {
+        //    this.boostEnergy = 0;
+        //}
 
         //#endregion Boost Logic
         
@@ -4716,7 +4737,6 @@ class InputScene extends Phaser.Scene {
 
             // Starting Game State
             gameScene.gState = GState.PLAY;
-            console.log("GSTATE === PLAY", gameScene.gState === GState.PLAY);
             gameScene.scoreTimer.paused = false;
                 
             // turn off arrows and move snake.
