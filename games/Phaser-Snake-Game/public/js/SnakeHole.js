@@ -1731,7 +1731,7 @@ class GameScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.scoreFrame = this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.boostMask = this.make.image({ // name is unclear.
@@ -1966,6 +1966,24 @@ class GameScene extends Phaser.Scene {
             
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
+     
+
+                var electronToCapacitor = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(0.5,0.5).setDepth(80);
+                electronToCapacitor.play("electronIdle");
+                electronToCapacitor.anims.msPerFrame = 66;
+
+                var movingElectronTween = this.tweens.add( {
+                    targets: electronToCapacitor,
+                    x: this.scoreFrame.getCenter().x,
+                    y: this.scoreFrame.getCenter().y,
+                    duration:300,
+                    onComplete: () => {
+                        electronToCapacitor.playAfterRepeat({ key: 'electronDispersion01' }, 0)
+
+                        //electronToCapacitor.play({ key: 'electronDispersion01' })
+                    }
+
+                });
             }
             
             if (timeLeft > SCORE_FLOOR) {
