@@ -61,7 +61,7 @@ var Food = new Phaser.Class({
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
-        //this.play('atom05spawn');
+        this.play('atom05spawn');
         this.chain(['atom05spawn', 'atom01idle']);
         
         
@@ -85,7 +85,7 @@ var Food = new Phaser.Class({
         //this.electrons.play("electronIdle");
         //this.electrons.anims.msPerFrame = 66; // Setting electron framerate here to reset it after slowing in delay 2
 
-        this.chain(['atom05spawn', 'atom']);
+        //this.chain(['atom05spawn', 'atom']);
 
             
         

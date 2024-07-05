@@ -276,10 +276,10 @@ var Snake = new Phaser.Class({
                 }
 
                 // Moves the eaten atom after a delay including the electron.
-                scene.time.delayedCall(400, function () {
+                scene.time.delayedCall(200, function () {
                     if (scene.gState != GState.TRANSITION) {
                         _atom.move(scene);
-                        _atom.play("atom01idle", true);
+                        //_atom.play("atom01idle", true);
                         _atom.visible = true;
                         _atom.electrons.visible = true;
                         _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.  

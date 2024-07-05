@@ -3051,7 +3051,7 @@ class GameScene extends Phaser.Scene {
                     });
                     break;
 
-                case 60: // Not settled
+                case 60: // Not settled 
                     this.atoms.forEach( atom => {
                         atom.play("atom03idle");
                     });
