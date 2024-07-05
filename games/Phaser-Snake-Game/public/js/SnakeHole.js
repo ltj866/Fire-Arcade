@@ -499,7 +499,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 24; // 4
+        this.coins = 1; // 4
     }
     
     preload(){
@@ -786,6 +786,8 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
+
+        this.snakeCritical = false;
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
@@ -1891,7 +1893,7 @@ class GameScene extends Phaser.Scene {
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*22.75, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(GRID*23, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -1928,6 +1930,7 @@ class GameScene extends Phaser.Scene {
               "text-align": 'right',
             });
         }
+
         
         //  Event: addScore
         this.events.on('addScore', function (fruit) {
@@ -2186,6 +2189,45 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.shake(300, .00625);
         }    
     }
+
+    snakeCriticalState(){
+        const coins = this.scene.get("PersistScene").coins
+        if (coins === 1 && this.snakeCritical === false){
+            console.log(this.scene.get("PersistScene").coins,this.snakeCritical)
+            this.snakeCriticalTween = this.tweens.addCounter({
+                from: 255,
+                to: 0,
+                yoyo: true,
+                duration: 1000,
+                ease: 'Linear',
+                repeat: -1,
+                onUpdate: tween =>{
+                    const value = Math.floor(tween.getValue());
+                    this.snake.body.forEach((part) => {
+                        part.setTint(Phaser.Display.Color.GetColor(255, value, value));
+                    })
+                }
+            });
+            this.snakeCritical = true
+
+        }
+        else if (coins > 1){ //null check
+            console.log('else',this.snakeCriticalTween.value)
+            this.snakeCriticalTween = this.tweens.addCounter({
+                yoyo: true,
+                duration: 1000,
+                ease: 'Linear',
+                repeat: -1,
+                onUpdate: tween =>{
+                    this.snake.body.forEach((part) => {
+                        part.setTint(Phaser.Display.Color.GetColor(255, 255, 255));
+                    })
+                }
+            });
+            this.snakeCritical = false
+        }
+    }
+
     transitionVisual () {
         
     }
@@ -2798,6 +2840,8 @@ class GameScene extends Phaser.Scene {
 
             this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
             this.snakeMaskW.y = this.snake.head.y
+
+
             //Phaser.Math.Between(0, 9);
 
             
@@ -2899,7 +2943,9 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
 
+                this.snakeCriticalState();
                 this.checkPortalAndMove()
+                
 
                 if (energyAmountX < 1) {
                     // add the tail in.
