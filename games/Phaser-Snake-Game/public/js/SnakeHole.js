@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1888,7 +1888,7 @@ class GameScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         //this.coinsUIIcon.setScale(0.5);
@@ -2193,18 +2193,17 @@ class GameScene extends Phaser.Scene {
     snakeCriticalState(){
         const coins = this.scene.get("PersistScene").coins
         if (coins === 1 && this.snakeCritical === false){
-            console.log(this.scene.get("PersistScene").coins,this.snakeCritical)
             this.snakeCriticalTween = this.tweens.addCounter({
                 from: 255,
                 to: 0,
                 yoyo: true,
-                duration: 1000,
+                duration: 500,
                 ease: 'Linear',
                 repeat: -1,
                 onUpdate: tween =>{
                     const value = Math.floor(tween.getValue());
                     this.snake.body.forEach((part) => {
-                        part.setTint(Phaser.Display.Color.GetColor(255, value, value));
+                        part.setTint(Phaser.Display.Color.GetColor(200, value, value));
                     })
                 }
             });
@@ -2496,7 +2495,7 @@ class GameScene extends Phaser.Scene {
     }
 
     snakeEating(){
-        
+
         var snakeEating = this.tweens.add({
             targets: this.snake.body, 
             scale: [1.25,1],
@@ -2508,6 +2507,14 @@ class GameScene extends Phaser.Scene {
         });
 
         return snakeEating
+    }
+    loseCoin(){
+        this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0);
+        this.coinsUICopy.setVelocity(Phaser.Math.Between(-100, 100), Phaser.Math.Between(-200, -400));
+        this.coinsUICopy.setGravity(0,400)
+        //TODO add coin flip here
+        //TODO trigger UI coin loader animation here
     }
 
     checkWinCon() { // Returns Bool

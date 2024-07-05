@@ -331,6 +331,7 @@ var Snake = new Phaser.Class({
         console.log(scene.gState, "BONK" , this.direction);
 
         scene.screenShake();
+        scene.loseCoin();
 
         if (!scene.winned) {
             ourPersistScene.coins += -1;
