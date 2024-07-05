@@ -499,7 +499,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 1; // 4
+        this.coins = 5; // 4
     }
     
     preload(){
@@ -2211,18 +2211,10 @@ class GameScene extends Phaser.Scene {
             this.snakeCritical = true
 
         }
-        else if (coins > 1){ //null check
-            console.log('else',this.snakeCriticalTween.value)
-            this.snakeCriticalTween = this.tweens.addCounter({
-                yoyo: true,
-                duration: 1000,
-                ease: 'Linear',
-                repeat: -1,
-                onUpdate: tween =>{
-                    this.snake.body.forEach((part) => {
-                        part.setTint(Phaser.Display.Color.GetColor(255, 255, 255));
-                    })
-                }
+        else if (coins > 1 && this.snakeCriticalTween != null){ //null check
+            this.snakeCriticalTween.destroy();
+            this.snake.body.forEach((part) => {
+                part.setTint(Phaser.Display.Color.GetColor(255, 255, 255));
             });
             this.snakeCritical = false
         }
