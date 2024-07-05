@@ -2994,7 +2994,8 @@ class GameScene extends Phaser.Scene {
             /***
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly during portaling. After the timer pauses at the Score Floor
-             *  the countdown timer will go to 0.
+             *  the countdown timer will go to 0.  
+             *  -Note: I could fix this with a Math.max() and put it back together again. It would be more efficient. 
              */
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
     
@@ -3034,6 +3035,35 @@ class GameScene extends Phaser.Scene {
 
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
+            }
+
+            // Update Atom Animation.
+            switch (timeTick) {
+                case MAX_SCORE: // 120
+                    this.atoms.forEach( atom => {
+                        atom.play("atom01idle");
+                    });
+                    break;
+
+                case BOOST_ADD_FLOOR: // 100 - should be higher imo -James
+                    this.atoms.forEach( atom => {
+                        atom.play("atom02idle");
+                    });
+                    break;
+
+                case 60: // Not settled
+                    this.atoms.forEach( atom => {
+                        atom.play("atom03idle");
+                    });
+                    break;
+                
+                case SCORE_FLOOR: // 1
+                    this.atoms.forEach( atom => {
+                        atom.play("atom04idle");
+                    });
+        
+                default:
+                    break;
             }
         }
         
@@ -4901,24 +4931,25 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'atom01idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
       frameRate: 12,
-      duration: 1000,
+      randomFrame: true,
       repeat: -1
     }); scene.anims.create({
       key: 'atom02idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
       frameRate: 8,
-      duration: 1000,
+      randomFrame: true,
       repeat: -1
     }); scene.anims.create({
       key: 'atom03idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
       frameRate: 6,
-      duration: 6400,
+      randomFrame: true,
       repeat: -1
     }); scene.anims.create({
       key: 'atom04idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
       frameRate: 4,
+      randomFrame: true,
       repeat: -1
     }); scene.anims.create({
       key: 'atom05spawn',

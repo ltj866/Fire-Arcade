@@ -294,16 +294,16 @@ var Snake = new Phaser.Class({
                 scene.atoms.forEach(__atom => {
                     if (__atom.x === 0 && __atom.y === 0) {
                         // Start decay timer for the eaten Apple now. 
-                        __atom.startDecay(scene);
+                        //__atom.startDecay(scene);
                         // The rest is called after the delay.
                     } 
                     else {
                     // For every other atom do everything now
-                    __atom.play("atom01idle", true);
+                    //__atom.play("atom01idle", true);
                     __atom.electrons.setVisible(true);
                     //this.electrons.anims.restart();
                     //__atom.absorbable = true;
-                    __atom.startDecay(scene);
+                    //__atom.startDecay(scene);
 
                     __atom.electrons.play("electronIdle", true);
                     __atom.electrons.anims.msPerFrame = 66
