@@ -34,11 +34,14 @@ export const SPEED_WALK = 99; // 99 In milliseconds
 export const SPEED_SPRINT = 33; // 24  // Also 16 is cool // 32 is the next
 
 
+// Make into a ENUM
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
-const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 const MAX_SCORE = 120;
+
+const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
+
 const NO_BONK_BASE = 1000;
 
 const STAGE_TOTAL = 21
