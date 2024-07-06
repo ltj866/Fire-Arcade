@@ -909,7 +909,6 @@ class GameScene extends Phaser.Scene {
         this.wallLayer.setDepth(25);
 
         if (this.map.getLayer('Ghost-1')) {
-            debugger
             this.hasGhostTiles = true;
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
@@ -1308,7 +1307,6 @@ class GameScene extends Phaser.Scene {
                             var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
                             
                             if (propObj.name === 'slug') {
-                                debugger
 
                                 if (STAGE_UNLOCKS[propObj.value] != undefined) {
                                     // Makes it so it only removes levels that have unlock slugs.
@@ -2826,6 +2824,10 @@ class GameScene extends Phaser.Scene {
 
             console.log("YOU WIN" , this.stage);
             this.winned = true;
+            this.atoms.forEach(atom => {
+                // So you can't see them during free play.
+                atom.electrons.visible = false;
+            })
 
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
             this.gState = GState.TRANSITION;

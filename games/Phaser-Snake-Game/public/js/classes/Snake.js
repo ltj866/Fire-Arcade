@@ -135,9 +135,7 @@ var Snake = new Phaser.Class({
             
             this.direction = STOP;
             if (scene.bonkable) {
-                this.bonk(scene);
-                debugger
-               
+                this.bonk(scene);  
             }
         }
 
@@ -149,9 +147,7 @@ var Snake = new Phaser.Class({
         
                 this.direction = STOP;
                 if (scene.bonkable) {
-                    this.bonk(scene);
-                    debugger
-                    
+                    this.bonk(scene);   
                 }
             }
         }
