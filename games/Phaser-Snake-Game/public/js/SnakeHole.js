@@ -12,10 +12,11 @@ import {PORTAL_COLORS} from './const.js';
 
 
 const GAME_VERSION = 'v0.7.06.21.012';
-export const GRID = 24;        //.................... Size of Sprites and GRID
-//var FRUIT = 5;                 //.................... Number of fruit to spawn
+export const GRID = 24;        //....................... Size of Sprites and GRID
+//var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
-const  STARTING_ATTEMPTS = 25;
+const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
+
 const DARK_MODE = false;
 const GHOST_WALLS = true;
 // #region DEBUG OPTIONS
@@ -39,6 +40,8 @@ export const COMBO_ADD_FLOOR = 108;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
+
+const STAGE_TOTAL = 21
 
 
 //debug stuff
@@ -235,7 +238,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -497,7 +500,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 24; // 4
+        this.coins = 4; // 4
     }
     
     preload(){
@@ -609,7 +612,7 @@ class PersistScene extends Phaser.Scene {
 
         if (this.bestOfStageData[targetStageName] != undefined ) {
             var resultRank = this.bestOfStageData[targetStageName].stageRank()
-            var bool = resultRank > rank
+            var bool = resultRank >= rank
             return  bool;
         } else {
             //debugger
@@ -745,9 +748,6 @@ class GameScene extends Phaser.Scene {
         this.bonks = 0;
         this.medals = {};
         this.zedLevel = 0;
-
-        var {lives = STARTING_ATTEMPTS } = props;
-        this.lives = lives;
 
         var {startupAnim = true } = props;
         this.startupAnim = startupAnim
@@ -905,6 +905,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer.setDepth(25);
 
         if (this.map.getLayer('Ghost-1')) {
+            debugger
             this.hasGhostTiles = true;
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
@@ -1179,39 +1180,97 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-N', e => {
             
             const STAGE_UNLOCKS = {
+                /* Template
+                '': function () {
+                    return ourPersist.checkCompletedRank("", );
+                },
+                */
+                'double-back-portals': function () {
+                    return true;
+                },
+                'unidirectional-portals': function () {
+                    return true;
+                },
+                'hardest----for-now': function () {
+                    return true;
+                },
+                'swirl-swirl': function () {
+                    return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
+                },
+                'eye': function () {
+                    return true;
+                },
+                'plus-plus': function () {
+                    return ourPersist.checkCompletedRank("World_4-4", GOLD);
+                },
+                'col': function () {
+                    return true;
+                },
+                'its-a-snek': function () {
+                    return true;
+                },
+                'now-a-fourth': function () {
+                    return true;
+                },
+                'vertical-uturns': function () {
+                    return true;
+                },
+                'horizontal-uturns': function () {
+                    return true;
+                },
+                'vertical-gaps': function () {
+                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                },
+                'horizontal-gaps': function () {
+                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                },
+                'first-medium': function () {
+                    return true;
+                    //return ourPersist.checkCompletedRank("", );
+                },
+                'lights-out': function () {
+                    return false;
+                },
+                'easy-racer': function () {
+                    return false;
+                },
+                'hello-ghosts': function () {
+                    return false;
+                },
+                'medium-happy': function () {
+                    return ourPersist.checkCompletedRank("World_2-4", SILVER); // SILVER
+                    return true;
+                },
+                'bidirectional-portals': function () {
+                    return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
+                    return true
+                },
                 'start': function ( ) { 
                     return true
                 },
                 'babies-first-wall': function () {
                     return true
                 },
-                'horz-row': function () {
+                'horz-rows': function () {
                     return true
                 },
                 'now-vertical': function () {
-                    return true
+                    return ourPersist.checkCompletedRank("World_1-4", COPPER);
                 },
                 'medium-wrap': function () {
-                    return ourPersist.checkCompletedRank("Stage-01", SILVER);
+                    //return ourPersist.checkCompletedRank("Stage-01", SILVER);
+                    return false;
                 },
                 'dark-precision': function () {
                     return true
                 },
                 'vert-rows': function () {
-                    return ourPersist.checkCompletedRank("Stage-02b", SILVER);
+                    return true;
                 }
             }
 
             if (this.winned) {
                 calcSumOfBest(ourPersist);
-
-
-                var debugStage = "Stage-01";
-                console.log("checking rank >",SILVER, debugStage , ourPersist.checkCompletedRank(debugStage , SILVER), "Stage rank = ",ourPersist.bestOfStageData[debugStage].stageRank() );
-        
-                this.nextStages.forEach( stageName => {
-                    
-                });
                 
                 
                 
@@ -1230,6 +1289,7 @@ class GameScene extends Phaser.Scene {
                             var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
                             
                             if (propObj.name === 'slug') {
+                                debugger
 
                                 if (STAGE_UNLOCKS[propObj.value] != undefined) {
                                     // Makes it so it only removes levels that have unlock slugs.
@@ -1276,6 +1336,7 @@ class GameScene extends Phaser.Scene {
                                                 portalImage.setTint(0xE5E4E2);
                                                 break;
                                             default:
+                                                // here is if you have never played a level before
                                                 portalImage.setTint(0xFFFFFF);    
                                                 break;
                                         }
@@ -2271,12 +2332,13 @@ class GameScene extends Phaser.Scene {
         //});
 
         this.atoms.forEach(_fruit => {
-            testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
+            testGrid[Math.floor(_fruit.x/GRID)][Math.floor(_fruit.y/GRID)] = false;
         });
 
         this.portals.forEach(_portal => {
-            testGrid[_portal.x/GRID][_portal.y/GRID] = false;
+            testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
         });
+
 
         this.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
@@ -3361,6 +3423,7 @@ class ScoreScene extends Phaser.Scene {
 
             this.stageData.newBest = true;
             
+            debugger
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             //calcSumOfBest(ourStartScene); // Note: This really should be an event.
@@ -3873,7 +3936,7 @@ class ScoreScene extends Phaser.Scene {
         
 
         calcSumOfBest(ourPersist);
-        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), 21);
+        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
 
         this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 21, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -3924,12 +3987,37 @@ class ScoreScene extends Phaser.Scene {
 
         this.prevZeds = this.scene.get("PersistScene").zeds;
 
+
+        // #region Save Best Run
+        var sumOfBase = 0;
+        var _histLog = [];
+        
+        ourStartScene.stageHistory.forEach( _stage => {
+            _histLog = [ ..._histLog, ..._stage.foodLog];
+            sumOfBase += _stage.calcBase();
+            ourGame.nextScore += _stage.calcTotal();
+
+        });
+
+        ourStartScene.globalFoodLog = _histLog;
+
+        if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
+            localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
+        }
+        // #endregion
+
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
             var continue_text = '[SPACE TO CONTINUE]';
 
-            if (ourGame.stage === END_STAGE) {
-                continue_text = '[SPACE TO WIN]';
+            var gameOver = false;
+
+            if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
+                debugger
+                continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
+                gameOver = true;
+                // Should restart here, with a popup that shows your run score info.
+                // Should be the same screen as the GameOver Screen.
             }
             
             var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.125,'div', Object.assign({}, STYLE_DEFAULT, {
@@ -3950,6 +4038,7 @@ class ScoreScene extends Phaser.Scene {
                 repeat: -1,
                 yoyo: true
               });
+
             
             // #region Space to Continue
             this.input.keyboard.on('keydown-SPACE', function() {     
@@ -3960,19 +4049,9 @@ class ScoreScene extends Phaser.Scene {
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 
-                var sumOfBase = 0;
-                var _histLog = [];
-                
-                ourStartScene.stageHistory.forEach( _stage => {
-                    _histLog = [ ..._histLog, ..._stage.foodLog];
-                    sumOfBase += _stage.calcBase();
-                    ourGame.nextScore += _stage.calcTotal();
 
-                });
 
-                ourStartScene.globalFoodLog = _histLog;
-
-                if (ourGame.stage != END_STAGE) {
+                if (!gameOver) {
                                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
                     ourGame.gState = GState.PLAY;
@@ -3996,9 +4075,7 @@ class ScoreScene extends Phaser.Scene {
                     
                 }
           
-                if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
-                    localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
-                }
+
 
             });
         }, [], this);
