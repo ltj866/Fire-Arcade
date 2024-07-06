@@ -1076,6 +1076,7 @@ class GameScene extends Phaser.Scene {
                 if(gState === GState.START_WAIT || gState === GState.WAIT_FOR_INPUT){
                     this.lastMoveTime = this.time.now;
                 }
+
                 ourInputScene.moveDirection(this, e);
                 //this.panelTweenCollapse.resume();
                 
@@ -1096,6 +1097,22 @@ class GameScene extends Phaser.Scene {
 
                     this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
                     this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+                }
+
+                
+ 
+                if (this.currentScoreTimer() === MAX_SCORE) {
+                    /**
+                     * This code is duplicated here to make sure that the electron 
+                     * animation is played as soon as you move from the start and wait state.
+                     * Removes varience with slower machines.  It is after the move state to 
+                     * have the input be more responsive.  - James
+                     */
+                    this.atoms.forEach( atom => {
+                        atom.electrons.play("electronIdle");
+                        atom.electrons.anims.msPerFrame = 66;
+                        
+                    });
                 }
             }
 
@@ -2508,6 +2525,14 @@ class GameScene extends Phaser.Scene {
 
 
     }
+
+    currentScoreTimer() {
+        /**
+         * Number between MAX_SCORE and MIN_SCORE.
+         * Always an Integer
+         */
+        return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+    }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
         if (this.tiledProperties.dark) {
@@ -3032,7 +3057,7 @@ class GameScene extends Phaser.Scene {
             this.comboCounter = 0;
         }
         */
-        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        var timeTick = this.currentScoreTimer()
         this.scoreDigitLength = this.runningScore.toString().length;
         this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
 
@@ -3100,33 +3125,54 @@ class GameScene extends Phaser.Scene {
             }
 
             // Update Atom Animation.
-            switch (timeTick) {
-                case MAX_SCORE: // 120
-                    this.atoms.forEach( atom => {
-                        atom.play("atom01idle");
-                    });
-                    break;
+            if (GState.START_WAIT != this.gState) {
+                switch (timeTick) {
+                    case MAX_SCORE: // 120
+                        this.atoms.forEach( atom => {
+                            debugger
+                            atom.play("atom01idle");
+                            atom.electrons.play("electronIdle");
+                            atom.electrons.anims.msPerFrame = 66;
+                        });
+                        break;
+                    
+                    case 110: {
+                        //debugger
+                        this.atoms.forEach( atom => {
+                            atom.electrons.anims.msPerFrame = 112;
+                        });
+                    }
 
-                case BOOST_ADD_FLOOR: // 100 - should be higher imo -James
-                    this.atoms.forEach( atom => {
-                        atom.play("atom02idle");
-                    });
-                    break;
+                    case 100: {
+                        this.atoms.forEach( atom => {
+                            atom.electrons.play("electronDispersion01");
+                        });
 
-                case 60: // Not settled 
-                    this.atoms.forEach( atom => {
-                        atom.play("atom03idle");
-                    });
-                    break;
+                    }
+    
+                    case BOOST_ADD_FLOOR: // 100 - should be higher imo -James
+                        this.atoms.forEach( atom => {
+                            atom.play("atom02idle");
+                        });
+                        break;
+    
+                    case 60: // Not settled 
+                        this.atoms.forEach( atom => {
+                            atom.play("atom03idle");
+                        });
+                        break;
+                    
+                    case SCORE_FLOOR: // 1
+                        this.atoms.forEach( atom => {
+                            atom.play("atom04idle");
+                        });
+            
+                    default:
+                        break;
+                }
                 
-                case SCORE_FLOOR: // 1
-                    this.atoms.forEach( atom => {
-                        atom.play("atom04idle");
-                    });
-        
-                default:
-                    break;
             }
+            
         }
         
 
@@ -5054,12 +5100,12 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'electronIdle',
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
       frameRate: 16,
-      repeat: -1
+      repeat: 1,
     }); scene.anims.create({
       key: 'electronDispersion01',
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
       frameRate: 16,
-      repeat: 0
+      repeat: 0,
     })
   
     scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
@@ -5068,7 +5114,7 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'increasing',
       frames: scene.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
       frameRate: 8,
-      repeat: -1
+      repeat: -1,
     });
   
     //WRAP_BLOCK_ANIMS

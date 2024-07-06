@@ -27,23 +27,23 @@ var Food = new Phaser.Class({
         
         
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(101);
-        this.electrons.play("electronIdle");
-        this.electrons.anims.msPerFrame = 66;
+        //this.electrons.play("electronIdle");
+        //this.electrons.anims.msPerFrame = 66;
         
 
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
-        this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000
-            this.electrons.anims.msPerFrame = 112;
+        //this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000
+            //this.electrons.anims.msPerFrame = 112;
             //this.play("atom02idle");
-        }, callbackScope: scene });
+        //}, callbackScope: scene });
 
-        this.decayStage02 = scene.time.addEvent({ delay: 2000, callback: fruit => { //was 7600
+        //his.decayStage02 = scene.time.addEvent({ delay: 2000, callback: fruit => { //was 7600
             //this.play("atom03idle");
-            this.electrons.play("electronDispersion01");
+            //this.electrons.play("electronDispersion01");
             //this.electrons.setVisible(false);
             //this.stop();
             //this.setTexture('blocks', 10).setDepth(10);
-        }, callbackScope: scene });
+        //}, callbackScope: scene });
 
         //this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
             //this.play("atom04idle");
@@ -61,8 +61,8 @@ var Food = new Phaser.Class({
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
-        this.play('atom05spawn');
-        this.chain(['atom05spawn', 'atom01idle']);
+        this.playAfterDelay('atom05spawn',Phaser.Math.RND.integerInRange(0,100));
+        this.chain(['atom01idle']);
         
         
         var validLocations = scene.validSpawnLocations();
@@ -89,22 +89,22 @@ var Food = new Phaser.Class({
 
             
         
-        this.decayStage01.destroy(); // Destory Old Timers
-        this.decayStage02.destroy();
+        //this.decayStage01.destroy(); // Destory Old Timers
+        //this.decayStage02.destroy();
 
-        this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => {
+        //this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => {
             //this.electrons.setVisible(false);
             //this.play("atom02idle");
-            this.electrons.anims.msPerFrame = 112;
-        }, callbackScope: scene });
+            //this.electrons.anims.msPerFrame = 112;
+        //}, callbackScope: scene });
 
-        this.decayStage02 = scene.time.addEvent({ delay:2000, callback: fruit => {
+        //this.decayStage02 = scene.time.addEvent({ delay:2000, callback: fruit => {
             //this.play("atom03idle");
-            this.electrons.play("electronDispersion01");
+            //this.electrons.play("electronDispersion01");
         //this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
             //this.play("atom04idle");
         //}, callbackScope: scene });
-        }, callbackScope: scene });
+        //}, callbackScope: scene });
 
     },
 

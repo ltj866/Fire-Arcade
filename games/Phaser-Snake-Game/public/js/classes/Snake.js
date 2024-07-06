@@ -262,9 +262,9 @@ var Snake = new Phaser.Class({
                 _atom.y = 0;
                 _atom.visible = false;
                 //_atom.electrons.visible = false;
-                _atom.electrons.play("electronIdle");
+                //_atom.electrons.play("electronIdle");
                 //_atom.electrons.setPosition(0, 0);
-                _atom.electrons.visible = false;
+                //_atom.electrons.visible = false;
             
                 if (scene.moveInterval = SPEED_WALK) {
                     // Play atom sound
@@ -283,8 +283,8 @@ var Snake = new Phaser.Class({
                         _atom.move(scene);
                         //_atom.play("atom01idle", true);
                         _atom.visible = true;
-                        _atom.electrons.visible = true;
-                        _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.  
+                        //_atom.electrons.visible = true;
+                        //_atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.  
                     }
 
                 }, [], this);
@@ -293,25 +293,25 @@ var Snake = new Phaser.Class({
                 // Setting electron framerate here to reset it after slowing in delay 2
                 
                 // Refresh decay on all atoms.
-                scene.atoms.forEach(__atom => {
-                    if (__atom.x === 0 && __atom.y === 0) {
+                //scene.atoms.forEach(__atom => {
+                    //if (__atom.x === 0 && __atom.y === 0) {
                         // Start decay timer for the eaten Apple now. 
                         //__atom.startDecay(scene);
                         // The rest is called after the delay.
-                    } 
-                    else {
+                    //} 
+                    //else {
                     // For every other atom do everything now
                     //__atom.play("atom01idle", true);
-                    __atom.electrons.setVisible(true);
+                    //__atom.electrons.setVisible(true);
                     //this.electrons.anims.restart();
                     //__atom.absorbable = true;
                     //__atom.startDecay(scene);
 
-                    __atom.electrons.play("electronIdle", true);
-                    __atom.electrons.anims.msPerFrame = 66
-                    }
+                    //__atom.electrons.play("electronIdle", true);
+                    //__atom.electrons.anims.msPerFrame = 66
+                    //}
 
-                });
+                //});
                 
                 if (DEBUG) {console.log(                         
                     "FRUITCOUNT=", scene.fruitCount,
