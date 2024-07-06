@@ -3125,7 +3125,7 @@ class GameScene extends Phaser.Scene {
             }
 
             // Update Atom Animation.
-            if (GState.START_WAIT != this.gState) {
+            if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
                     case MAX_SCORE: // 120
                         this.atoms.forEach( atom => {
