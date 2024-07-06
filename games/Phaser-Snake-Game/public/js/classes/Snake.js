@@ -331,9 +331,10 @@ var Snake = new Phaser.Class({
         console.log(scene.gState, "BONK" , this.direction);
 
         scene.screenShake();
-        scene.loseCoin();
+        
 
         if (!scene.winned) {
+            scene.loseCoin();
             ourPersistScene.coins += -1;
             scene.coinUIText.setHTML(
                 `${commaInt(ourPersistScene.coins)}`
