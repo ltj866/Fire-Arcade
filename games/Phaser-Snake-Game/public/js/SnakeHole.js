@@ -3129,7 +3129,6 @@ class GameScene extends Phaser.Scene {
                 switch (timeTick) {
                     case MAX_SCORE: // 120
                         this.atoms.forEach( atom => {
-                            debugger
                             atom.play("atom01idle");
                             atom.electrons.play("electronIdle");
                             atom.electrons.anims.msPerFrame = 66;
@@ -5100,7 +5099,7 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'electronIdle',
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
       frameRate: 16,
-      repeat: 1,
+      repeat: -1
     }); scene.anims.create({
       key: 'electronDispersion01',
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
