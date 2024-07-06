@@ -344,6 +344,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
+        this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 24, frameHeight: 48 });
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
 
@@ -1006,8 +1007,13 @@ class GameScene extends Phaser.Scene {
 
         this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
 
-        //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
+        this.CapSpark = this.add.sprite(GRID * 10, GRID).play("CapSpark1").setOrigin(.5,.5).setDepth(100).setAlpha(0)
         
+        this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+
+            this.play(`CapSpark${Phaser.Math.Between(0,9)}`)
+        })
+
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
@@ -5187,76 +5193,75 @@ function loadSpriteSheetsAndAnims(scene) {
     })
 
 
-    /*
-    scene.textures.addSpriteSheetFromAtlas('boostTrailX', { atlas: 'megaAtlas', frameWidth: 24,frameHeight:72,
-        frame: 'boostTrailX01Anim.png'
-    }); scene.anims.create({
-      key: 'boostTrailX1',
-      frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+    
+    //scene.textures.addSpriteSheetFromAtlas('boostTrailX', { atlas: 'megaAtlas', frameWidth: 24,frameHeight:72,
+        //frame: 'boostTrailX01Anim.png'
+    scene.anims.create({
+      key: 'CapSpark1',
+      frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
       frameRate: 16,
       repeat: 0
     });
     scene.anims.create({
-        key: 'boostTrailX2',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
+        key: 'CapSpark2',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX3',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
+        key: 'CapSpark3',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX4',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
+        key: 'CapSpark4',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX5',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
+        key: 'CapSpark5',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX6',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
+        key: 'CapSpark6',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX7',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
+        key: 'CapSpark7',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX8',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
+        key: 'CapSpark8',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX9',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
+        key: 'CapSpark9',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
         frameRate: 16,
         repeat: 0
       })
       scene.anims.create({
-        key: 'boostTrailX0',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
+        key: 'CapSpark0',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
         frameRate: 16,
         repeat: 0
       })
     scene.anims.create({
-        key: 'boostTrailXdissipate',
-        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 10,11,12,13,14]}),
+        key: 'CapSparkDissipate',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 10,11,12,13,14]}),
         frameRate: 16,
         repeat: 0
       })
-    */
   }
 // #endregion
 
