@@ -40,6 +40,7 @@ const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
 
+
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
 const NO_BONK_BASE = 1000;
@@ -1112,9 +1113,7 @@ class GameScene extends Phaser.Scene {
                      * have the input be more responsive.  - James
                      */
                     this.atoms.forEach( atom => {
-                        atom.electrons.play("electronIdle");
-                        atom.electrons.anims.msPerFrame = 66;
-                        
+                        atom.electrons.visible = true;
                     });
                 }
             }
@@ -3130,7 +3129,7 @@ class GameScene extends Phaser.Scene {
             // Update Atom Animation.
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
-                    case MAX_SCORE: // 120
+                    case MAX_SCORE:  // 120 {}
                         this.atoms.forEach( atom => {
                             atom.play("atom01idle");
                             atom.electrons.play("electronIdle");
@@ -3138,23 +3137,26 @@ class GameScene extends Phaser.Scene {
                         });
                         break;
                     
-                    case 110: {
-                        //debugger
+                    case 110: 
                         this.atoms.forEach( atom => {
                             atom.electrons.anims.msPerFrame = 112;
                         });
-                    }
+                        break;
+                    
 
-                    case 100: {
-                        this.atoms.forEach( atom => {
-                            atom.electrons.play("electronDispersion01");
-                        });
+                    //case 100: 
+                    //    debugger
+                    //    this.atoms.forEach( atom => {
+                    //        atom.electrons.play("electronDispersion01");
+                    //    });
+                    //    break;
 
-                    }
+                    
     
                     case BOOST_ADD_FLOOR: // 100 - should be higher imo -James
                         this.atoms.forEach( atom => {
                             atom.play("atom02idle");
+                            atom.electrons.play("electronDispersion01");
                         });
                         break;
     
@@ -5094,7 +5096,7 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
         frameRate: 8,
         repeat: -1
-    })
+    });
   
     scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 44 ,frameHeight: 36,
         frame: 'electronCloudAnim.png'
@@ -5108,7 +5110,18 @@ function loadSpriteSheetsAndAnims(scene) {
       frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
       frameRate: 16,
       repeat: 0,
-    })
+    });
+
+    /*
+    scene.textures.addSpriteSheetFromAtlas('electron2Test', { atlas: 'megaAtlas', frameWidth: 44 ,frameHeight: 36,
+        frame: 'electronCloudAnim.png'
+    });
+    scene.anims.create({
+        key: 'electronDispersion01',
+        frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
+        frameRate: 16,
+        repeat: 0,
+      }); */
   
     scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
         frame: 'UI_boostMeterAnim.png'

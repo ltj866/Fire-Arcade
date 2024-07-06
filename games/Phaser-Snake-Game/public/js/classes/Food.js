@@ -27,8 +27,9 @@ var Food = new Phaser.Class({
         
         
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(101);
-        //this.electrons.play("electronIdle");
-        //this.electrons.anims.msPerFrame = 66;
+        this.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30)*10);
+        this.electrons.anims.msPerFrame = 66;
+        this.electrons.visible = false;
         
 
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
