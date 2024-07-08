@@ -5909,7 +5909,7 @@ function loadSpriteSheetsAndAnims(scene) {
     }); scene.anims.create({
       key: 'atom05spawn',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 48, 49, 50, 51, 52]}),
-      frameRate: 4,
+      frameRate: 12,
       delay: 200,
       repeat: 0, // How long is the duration of this animation in milliseconds @ hodlen?
     })
