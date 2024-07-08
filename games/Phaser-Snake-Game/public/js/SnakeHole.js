@@ -1852,6 +1852,7 @@ class GameScene extends Phaser.Scene {
         },
        })
 
+       
        //const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
 
        /*this.chargeUpTween = this.tweens.add({
@@ -2286,6 +2287,16 @@ class GameScene extends Phaser.Scene {
             ];
             this.getStaggerTween(0, group);
         }
+
+        this.tweens.add( {
+            targets: this.coins,
+            originY: [.2,0.05],
+            ease: 'sine.inout',
+            duration: 1000, //
+            yoyo: true,
+            repeat: -1,
+           })
+    
         
     }
     screenShake(){
@@ -2737,6 +2748,8 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    
+
     comboBounce(){
         this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
@@ -2808,10 +2821,10 @@ class GameScene extends Phaser.Scene {
 
         
         // Floating Electrons
-        this.atoms.forEach(atom=> {
+        /*this.atoms.forEach(atom=> {
             atom.electrons.originY = atom.originY + .175
             
-        });
+        });*/
         
 
         if (this.gState === GState.PORTAL || this.gState === GState.BONK) { 
@@ -3173,6 +3186,15 @@ class GameScene extends Phaser.Scene {
 
                     var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim.png'
                     ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
+
+                    this.tweens.add( {
+                        targets: _coin,
+                        originY: [.2,0.05],
+                        ease: 'sine.inout',
+                        duration: 1000, //
+                        yoyo: true,
+                        repeat: -1,
+                       })
 
                     // tween code not working @holden I am not sure what I am missing -James
                     //this.tweens.add({
