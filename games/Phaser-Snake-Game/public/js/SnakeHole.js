@@ -5,6 +5,7 @@ import { Snake } from './classes/Snake.js';
 
 import {PORTAL_COLORS} from './const.js';
 
+
 //******************************************************************** */
 //                              SnakeHole
 //******************************************************************** */
@@ -400,6 +401,10 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+        gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
+        gameanalytics.GameAnalytics.setEnabledInfoLog(true);
+        gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
+
         /// Start Inital Game Settings
 
         const ourTimeAttack = this.scene.get('TimeAttackScene');
@@ -3482,6 +3487,18 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
+        var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
+
+        // #region StageAnalytics
+        debugger
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:SpeedBonus`, this.stageData.calcBonus());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:Bonks`, this.stageData.bonks);
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BoostTime`, this.stageData.boostFrames); // BoostFrames should probably be called boostTime now but I need to check the code first.
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BaseScore`, this.stageData.calcBase());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ScoreTotal`, this.stageData.calcTotal());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:StageRank`, this.stageData.stageRank());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount);
+
                // For properties that may not exist.
         if (ourGame.tiledProperties.slug != undefined) {
             this.stageData.slug = ourGame.tiledProperties.slug;
@@ -6105,6 +6122,8 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 }
 
 // region const Game
+
+
 export const game = new Phaser.Game(config);
 
 
