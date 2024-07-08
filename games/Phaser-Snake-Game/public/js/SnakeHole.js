@@ -339,7 +339,7 @@ class StartScene extends Phaser.Scene {
         // Animations
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
-        //this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 12, frameHeight: 20 });
         //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
@@ -510,7 +510,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     preload(){
-        //this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 12, frameHeight:20 });
 
     }
     
@@ -1425,8 +1425,10 @@ class GameScene extends Phaser.Scene {
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
-                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
-                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+                    //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
+                    //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'coinPickup01Anim', 'coinPickup01Anim.png' 
+                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
 
                     this.coins.push(_coin);
                 }
@@ -1973,8 +1975,10 @@ class GameScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0);
+        //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
+        //).play('coin01idle').setDepth(101).setOrigin(0,0);
+        this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -9, 4, 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2);
 
         //this.coinsUIIcon.setScale(0.5);
         
@@ -2618,7 +2622,7 @@ class GameScene extends Phaser.Scene {
     }
     loseCoin(){
         this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0);
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2.0);
         this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-200, -400));
         this.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
@@ -3167,8 +3171,8 @@ class GameScene extends Phaser.Scene {
                     var validLocations = this.validSpawnLocations();
                     var pos = Phaser.Math.RND.pick(validLocations)
 
-                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'megaAtlas', 'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim.png'
+                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
 
                     // tween code not working @holden I am not sure what I am missing -James
                     //this.tweens.add({
@@ -5282,8 +5286,8 @@ class UIScene extends Phaser.Scene {
                     var validLocations = this.ourGame.validSpawnLocations();
                     var pos = Phaser.Math.RND.pick(validLocations)
 
-                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'megaAtlas', 'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim.png'
+                    ).play('coin01idle').setDepth(21).setOrigin(-.125,0.1875).setScale(2);
 
                     // tween code not working @holden I am not sure what I am missing -James
                     //this.tweens.add({
@@ -5891,14 +5895,20 @@ function loadSpriteSheetsAndAnims(scene) {
 
 
 
-    scene.textures.addSpriteSheetFromAtlas('coinPickup01Anim', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
+    /*scene.textures.addSpriteSheetFromAtlas('coinPickup01Anim', { atlas: 'megaAtlas', frameWidth: 16, frameHeight: 20,
         frame: 'coinPickup01Anim.png'
     }); scene.anims.create({
         key: 'coin01idle',
         frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6]}),
         frameRate: 8,
         repeat: -1
-    });
+    });*/
+    scene.anims.create({
+        key: 'coin01idle',
+        frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6,7]}),
+        frameRate: 8,
+        repeat: -1
+      })
   
     scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 44 ,frameHeight: 36,
         frame: 'electronCloudAnim.png'
