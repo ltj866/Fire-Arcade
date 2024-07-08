@@ -403,7 +403,7 @@ class StartScene extends Phaser.Scene {
     create() {
         gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
         gameanalytics.GameAnalytics.setEnabledInfoLog(true);
-        gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
+        //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
 
         /// Start Inital Game Settings
 
@@ -2289,6 +2289,7 @@ class GameScene extends Phaser.Scene {
         }
         
     }
+    // #region .screenShake(
     screenShake(){
         if (this.moveInterval === SPEED_SPRINT) {
             this.cameras.main.shake(400, .01);
@@ -2298,6 +2299,7 @@ class GameScene extends Phaser.Scene {
         }    
     }
 
+    // #region .snakeCriticalState(
     snakeCriticalState(){
         const coins = this.scene.get("PersistScene").coins
         if (coins === 1 && this.snakeCritical === false){
@@ -2331,6 +2333,7 @@ class GameScene extends Phaser.Scene {
         
     }
 
+    // #region .validSpawnLocation(
     validSpawnLocations() {
         var testGrid = {};
 
@@ -2448,6 +2451,7 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    // #region .checkPortalandMove(
     checkPortalAndMove() {
         let snake = this.snake;
 
@@ -3490,7 +3494,7 @@ class ScoreScene extends Phaser.Scene {
         var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
 
         // #region StageAnalytics
-        debugger
+        
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:SpeedBonus`, this.stageData.calcBonus());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:Bonks`, this.stageData.bonks);
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BoostTime`, this.stageData.boostFrames); // BoostFrames should probably be called boostTime now but I need to check the code first.
@@ -3498,6 +3502,13 @@ class ScoreScene extends Phaser.Scene {
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ScoreTotal`, this.stageData.calcTotal());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:StageRank`, this.stageData.stageRank());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount);
+
+        for (let index = 0; index < this.stageData.foodLog.length; index++) {
+            const foodIndex = index + 1;
+            var eventID = `${designPrefix}:FoodLog-${foodIndex.toString().padStart(2, "0")}`
+            var eventValue = this.stageData.foodLog[index];
+            gameanalytics.GameAnalytics.addDesignEvent(eventID, eventValue)
+        }
 
                // For properties that may not exist.
         if (ourGame.tiledProperties.slug != undefined) {
