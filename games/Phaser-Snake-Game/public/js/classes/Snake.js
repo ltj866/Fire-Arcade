@@ -222,8 +222,11 @@ var Snake = new Phaser.Class({
                 //this.snakeCritical = false;
 
                 ourPersistScene.coins += 1;
+                if (ourPersistScene.coins > 0) {
+                    scene.coinsUIIcon.setVisible(true)
+                }
                 scene.coinUIText.setHTML(
-                    `${commaInt(ourPersistScene.coins)}`
+                    `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
                 )
 
                 _coin.destroy();
@@ -332,9 +335,10 @@ var Snake = new Phaser.Class({
 
         if (!scene.winned) {
             scene.loseCoin();
+            scene.coinsUIIcon.setVisible(false);
             ourPersistScene.coins += -1;
             scene.coinUIText.setHTML(
-                `${commaInt(ourPersistScene.coins)}`
+                `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
             );
         }
 

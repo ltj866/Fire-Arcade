@@ -318,6 +318,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
+        this.load.image('fuseFrame', 'assets/sprites/UI_fuseHolder.png');
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         //this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
@@ -511,7 +512,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 4; // 4
+        this.coins = 0; // 4
     }
     
     preload(){
@@ -1824,7 +1825,7 @@ class GameScene extends Phaser.Scene {
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
        this.scoreFrame = this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-
+       this.fuseFrame = this.add.image(GRID * 25.5 + 8,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5).setScale(2);
 
        this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
@@ -1970,7 +1971,7 @@ class GameScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 7, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -1983,21 +1984,27 @@ class GameScene extends Phaser.Scene {
 
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
-        this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -9, 4, 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2);
+
+        this.coinsUIIcon = this.add.sprite(GRID*21.5 -6, 4, 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2).setVisible(false);
+        if (this.scene.get("PersistScene").coins > 0) {
+            this.coinsUIIcon.setVisible(true)
+        }
+        
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*23, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(GRID*22.5 + 2, 11, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
             //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
             'font-size': '22px',
             'font-family': 'Oxanium',
+            'letter-spacing': '8px'
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
-                `${commaInt(this.scene.get("PersistScene").coins)}`
+                `${commaInt(this.scene.get("PersistScene").coins).padStart(2, '0')}`
         ).setOrigin(0,0);
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
@@ -2317,7 +2324,7 @@ class GameScene extends Phaser.Scene {
     // #region .snakeCriticalState(
     snakeCriticalState(){
         const coins = this.scene.get("PersistScene").coins
-        if (coins === 1 && this.snakeCritical === false){
+        if (coins === 0 && this.snakeCritical === false){
             this.snakeCriticalTween = this.tweens.addCounter({
                 from: 255,
                 to: 0,
@@ -2327,6 +2334,8 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
                 onUpdate: tween =>{
                     const value = Math.floor(tween.getValue());
+                    const color1 = Phaser.Display.Color.RGBToString(200, value, value);
+                    this.coinUIText.node.style.color = color1;
                     this.snake.body.forEach((part) => {
                         part.setTint(Phaser.Display.Color.GetColor(200, value, value));
                     })
@@ -2335,10 +2344,25 @@ class GameScene extends Phaser.Scene {
             this.snakeCritical = true
 
         }
-        else if (coins > 1 && this.snakeCriticalTween != null){ //null check
-            this.snakeCriticalTween.destroy();
-            this.snake.body.forEach((part) => {
-                part.setTint(Phaser.Display.Color.GetColor(255, 255, 255));
+        else if (coins > 0 && this.snakeCritical === true){ //null check
+            if (this.snakeCriticalTween != null){
+                this.snakeCriticalTween.destroy();
+            }
+            this.snakeCriticalTween = this.tweens.addCounter({
+                from: this.snakeCriticalTween.getValue(),
+                to: 255,
+                yoyo: false,
+                duration: 500,
+                ease: 'Linear',
+                repeat: 0,
+                onUpdate: tween =>{
+                    const value = Math.floor(tween.getValue());
+                    const color1 = Phaser.Display.Color.RGBToString(255, value, value);
+                    this.coinUIText.node.style.color = color1;
+                    this.snake.body.forEach((part) => {
+                        part.setTint(Phaser.Display.Color.GetColor(255, value, value));
+                    })
+                }
             });
             this.snakeCritical = false
         }
@@ -2641,7 +2665,7 @@ class GameScene extends Phaser.Scene {
         return snakeEating
     }
     loseCoin(){
-        this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 6,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2.0);
         this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-200, -400));
         this.coinsUICopy.setGravity(0,400)
@@ -2876,7 +2900,11 @@ class GameScene extends Phaser.Scene {
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
             this.tweenRespawn.on('complete', () => {
-    
+                
+                if (this.scene.get("PersistScene").coins > 0) {
+                    this.coinsUIIcon.setVisible(true)
+                }
+
                 // Turn back on arrows
                 this.startingArrowState = true;
                 if (this.startingArrowsAnimN != undefined){
@@ -4981,8 +5009,8 @@ class UIScene extends Phaser.Scene {
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0);
+        //this.coinsUIIcon = this.add.sprite(GRID*21.5, 6,'megaAtlas', 'coinPickup01Anim.png'
+        //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         //this.coinsUIIcon.setScale(0.5);
         
