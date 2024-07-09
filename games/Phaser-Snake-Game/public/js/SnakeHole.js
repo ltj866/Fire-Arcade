@@ -3515,7 +3515,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
-        var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
+        var designPrefix = `${this.stageData.uuid.split('-').join("")}:${this.stageData.stage}`;
 
         // #region StageAnalytics
         debugger
