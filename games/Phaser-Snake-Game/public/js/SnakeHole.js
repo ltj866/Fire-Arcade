@@ -407,8 +407,6 @@ class StartScene extends Phaser.Scene {
 
         /// Start Inital Game Settings
 
-        const ourTimeAttack = this.scene.get('TimeAttackScene');
-
         /*const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
         panel.setDepth(100)
         panel.setScale(0)
@@ -793,7 +791,6 @@ class GameScene extends Phaser.Scene {
         const ourInputScene = this.scene.get('InputScene');
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
-        const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
 
         this.snakeCritical = false;
@@ -814,7 +811,7 @@ class GameScene extends Phaser.Scene {
         _chargeUp.play();
 
         this.spaceKey = this.input.keyboard.addKey("Space");
-        console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
+        console.log("FIRST INIT", this.stage );
 
 
         // a = Global average best score + minScore 
@@ -2165,7 +2162,6 @@ class GameScene extends Phaser.Scene {
 
         //  Event: saveScore
         this.events.on('saveScore', function () {
-            const ourTimeAttack = this.scene.get('TimeAttackScene');
             const ourScoreScene = this.scene.get('ScoreScene');
             const ourStartScene = this.scene.get('StartScene');
 
@@ -2193,8 +2189,6 @@ class GameScene extends Phaser.Scene {
                 
             }
         
-            // make this an event?
-            ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
         
             // #endregion
 
@@ -3371,6 +3365,8 @@ var StageData = new Phaser.Class({
         
         this.foodHistory = props.foodHistory;
         this.moveHistory = props.moveHistory;
+        this.turnInputs = props.turnInputs;
+        this.turns = props.turns;
 
         this.medianSpeedBonus = 6000;
 
@@ -3487,7 +3483,6 @@ class ScoreScene extends Phaser.Scene {
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
-        const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
@@ -3509,9 +3504,12 @@ class ScoreScene extends Phaser.Scene {
             medals: ourGame.medals,
             moveCount: ourInputScene.moveCount,
             moveHistory: ourInputScene.moveHistory,
+            turnInputs: ourInputScene.turnInputs,
+            turns: ourInputScene.turns,
             stage:ourGame.stage,
             uuid:ourGame.stageUUID,
-            zedLevel: calcZedLevel(ourTimeAttack.zeds).level
+            zedLevel: calcZedLevel(ourPersist.zeds).level,
+            zeds: ourPersist.zeds
         }
 
 
@@ -3520,8 +3518,18 @@ class ScoreScene extends Phaser.Scene {
         var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
 
         // #region StageAnalytics
+        debugger
+        var temp = ourInputScene.turnInputs;
+
+        var extraFields = {
+            foodLog: this.stageData.foodLog.toString(),
+            //foodHistory: this.stageData.foodHistory.toString(),
+            //moveHistory: this.stageData.moveHistory.toString()
+        }
         
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BaseScore`, this.stageData.calcBase());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BaseScore`, this.stageData.calcBase(), 
+            { foodLog:this.stageData.foodLog.toString() }
+        );
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:SpeedBonus`, this.stageData.calcBonus());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:Bonks`, this.stageData.bonks);
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BonkBonus`, this.stageData.bonkBonus());
@@ -3531,9 +3539,13 @@ class ScoreScene extends Phaser.Scene {
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CornerBonus`, this.stageData.cornerBonus());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:DiffBonus`, this.stageData.diffBonus); 
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ScoreTotal`, this.stageData.calcTotal());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:medianSpeedBonus`, this.medianSpeedBonus);
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:medianSpeedBonus`, this.stageData.medianSpeedBonus);
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:StageRank`, this.stageData.stageRank());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount);
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount, 
+            { turnInputs:this.stageData.turnInputs.toString() }
+        );
+
+        
 
         for (let index = 0; index < this.stageData.foodLog.length; index++) {
             const foodIndex = index + 1;
@@ -3549,28 +3561,8 @@ class ScoreScene extends Phaser.Scene {
         
         console.log(JSON.stringify(this.stageData));
 
-        // #region Time Attack Compare
-        if (ourTimeAttack.inTimeAttack) {
-            ourStartScene.stageHistory.some( _stageData => {
-
-                if (ourGame.stage === _stageData.stage) {
-                    var oldScore = _stageData.calcTotal();
-                    var newScore = this.stageData.calcTotal();
-                    
-                    if (newScore > oldScore) {
-                        console.log("YEAH YOU DID BETTER", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
-                        _stageData = this.stageData; 
-                    }
-                    else {
-                        console.log("SORRY TRY AGAIN", "New=", newScore, "Old=", oldScore, "Lives Left=", this.lives);
-                    }
-                }
-            })
-        }
-        else {
-            //// Push New Stage Data
-            ourStartScene.stageHistory.push(this.stageData);
-        }
+        ourStartScene.stageHistory.push(this.stageData);
+    
 
         // #region Save Best To Local.
 
@@ -4277,7 +4269,6 @@ class ScoreScene extends Phaser.Scene {
 
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
-            const ourTimeAttack = this.scene.get("TimeAttackScene");
             
             //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
 
@@ -4383,7 +4374,6 @@ class TimeAttackScene extends Phaser.Scene{
         // Sets first time as an empty list. After this it will not be set again
         // Remember to reset manually on full game restart.
         const ourGame = this.scene.get('GameScene');
-        const ourTimeAttack = this.scene.get("TimeAttackScene");
         const ourStartScene = this.scene.get('StartScene');
 
 
@@ -5139,7 +5129,6 @@ class UIScene extends Phaser.Scene {
 
         //  Event: saveScore
         this.ourGame.events.on('saveScore', function () {
-            const ourTimeAttack = this.ourGame.scene.get('TimeAttackScene');
             const ourScoreScene = this.ourGame.scene.get('ScoreScene');
             const ourUIScene = this.ourGame.scene.get('UIScene');
             const ourStartScene = this.scene.get('StartScene');
@@ -5529,6 +5518,16 @@ class InputScene extends Phaser.Scene {
         this.cornerTime = 0; // Frames saved when cornering before the next Move Time.
         this.moveHistory = [];
         this.moveCount = 0;
+        this.turnInputs = {
+            w:0,
+            a:0,
+            s:0,
+            d:0,
+            up:0,
+            down:0,
+            left:0,
+            right:0,
+        }; // W A S D UP DOWN LEFT RIGHT
     }
 
     preload() {
@@ -5598,7 +5597,7 @@ class InputScene extends Phaser.Scene {
     }
 
 
-    moveUp(gameScene) {
+    moveUp(gameScene, key) {
         if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
@@ -5622,6 +5621,7 @@ class InputScene extends Phaser.Scene {
                 
             gameScene.snake.move(gameScene);
             gameScene.checkPortalAndMove();
+            this.turnInputs[key] += 1;
 
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means technically you can go as fast as you turn.
@@ -5630,7 +5630,7 @@ class InputScene extends Phaser.Scene {
         }
     }
 
-    moveDown(gameScene) {
+    moveDown(gameScene, key) {
         if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
            
@@ -5651,6 +5651,7 @@ class InputScene extends Phaser.Scene {
 
            gameScene.snake.move(gameScene);
            gameScene.checkPortalAndMove();
+           this.turnInputs[key] += 1;
 
            this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
            gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
@@ -5660,7 +5661,7 @@ class InputScene extends Phaser.Scene {
 
     }
 
-    moveLeft(gameScene) {
+    moveLeft(gameScene, key) {
         if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
             
@@ -5685,12 +5686,13 @@ class InputScene extends Phaser.Scene {
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
 
             gameScene.checkPortalAndMove();
+            this.turnInputs[key] += 1;
             
         }
 
     }
 
-    moveRight(gameScene) {
+    moveRight(gameScene, key) {
         if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
             gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
@@ -5713,6 +5715,7 @@ class InputScene extends Phaser.Scene {
             this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             gameScene.checkPortalAndMove();
+            this.turnInputs[key] += 1;
         }
 
     }
@@ -5726,35 +5729,35 @@ class InputScene extends Phaser.Scene {
         // #region MoveDirection
         switch (event.keyCode) {
             case 87: // w
-                this.moveUp(gameScene);
+                this.moveUp(gameScene, "w");
                 break;
 
             case 65: // a
-                this.moveLeft(gameScene);
+                this.moveLeft(gameScene, "a");
                 break;
 
             case 83: // s
-                this.moveDown(gameScene);
+                this.moveDown(gameScene, "s");
                 break;
 
             case 68: // d
-                this.moveRight(gameScene);
+                this.moveRight(gameScene, "d");
                 break;
 
             case 38: // UP
-                this.moveUp(gameScene);
+                this.moveUp(gameScene, "up");
                 break;
 
             case 37: // LEFT
-                this.moveLeft(gameScene);
+                this.moveLeft(gameScene, "down");
                 break;
 
             case 40: // DOWN
-                this.moveDown(gameScene);
+                this.moveDown(gameScene, "left");
                 break;
 
             case 39: // RIGHT
-                this.moveRight(gameScene);
+                this.moveRight(gameScene, "right");
                 break;
 
             case 32: // SPACE
