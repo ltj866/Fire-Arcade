@@ -401,10 +401,13 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+        gameanalytics.GameAnalytics.configureAvailableResourceCurrencies(["zeds", "points"]);
+        gameanalytics.GameAnalytics.configureAvailableResourceItemTypes(["Gameplay"]);
         gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
         gameanalytics.GameAnalytics.setEnabledInfoLog(true);
         //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
         //gameanalytics.GameAnalytics.configureBuild("0.10");
+        
 
         /// Start Inital Game Settings
 
@@ -4204,9 +4207,28 @@ class ScoreScene extends Phaser.Scene {
 
             
             // #region Space to Continue
-            this.input.keyboard.on('keydown-SPACE', function() {     
+            this.input.keyboard.on('keydown-SPACE', function() {  
+                
+                console.log()
+                debugger 
+                const zedObject = calcZedLevel(ourPersist.zeds)
+
+                var extraFields = {
+                    level: zedObject.level,
+                    zedsToNext: zedObject.zedsToNext,
+                    startingScore: ourScoreScene.stageData.calcTotal(),
+                    rollsLeft: ourScoreScene.foodLogSeed.slice(-1) 
+                }
 
                 localStorage.setItem("zeds", ourPersist.zeds);
+                gameanalytics.GameAnalytics.addResourceEvent(
+                    gameanalytics.EGAResourceFlowType.Source,
+                    "zeds",
+                    ourScoreScene.difficulty,
+                    "Gameplay",
+                    "CompleteStage",
+                    extraFields.toString(),
+                  );
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
@@ -4287,7 +4309,8 @@ class ScoreScene extends Phaser.Scene {
 
             // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
             // Which is a 50% chance.
-            for (let index = (this.difficulty + 1) * 2; index > 0 ; index--) {
+            
+            for (let index = 2**this.difficulty/50; index > 0 ; index--) {
                 var roll = Phaser.Math.RND.integer();
                 if (roll < this.bestHashInt) {
                     this.bestHashInt = roll;
@@ -4302,7 +4325,7 @@ class ScoreScene extends Phaser.Scene {
 
             // #region HashUI Update
 
-            this.rollSpeed = ROLL_SPEED[this.difficulty];
+            this.rollSpeed = 60 - this.difficulty;
 
             //console.log(ROLL_SPEED[difficulty]);
             this.hashUI.setHTML(
