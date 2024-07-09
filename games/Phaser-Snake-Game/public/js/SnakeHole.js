@@ -404,6 +404,7 @@ class StartScene extends Phaser.Scene {
         gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
         gameanalytics.GameAnalytics.setEnabledInfoLog(true);
         //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
+        //gameanalytics.GameAnalytics.configureBuild("0.10");
 
         /// Start Inital Game Settings
 
