@@ -340,7 +340,7 @@ class StartScene extends Phaser.Scene {
         // Animations
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
-        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 12, frameHeight: 20 });
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
@@ -515,7 +515,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     preload(){
-        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 12, frameHeight:20 });
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
 
     }
     
@@ -2295,9 +2295,9 @@ class GameScene extends Phaser.Scene {
 
         this.tweens.add( {
             targets: this.coins,
-            originY: [.2,0.05],
+            originY: [0.1875 - .0466,0.1875 + .0466],
             ease: 'sine.inout',
-            duration: 1000, //
+            duration: 500, //
             yoyo: true,
             repeat: -1,
            })
@@ -3198,9 +3198,9 @@ class GameScene extends Phaser.Scene {
 
                     this.tweens.add( {
                         targets: _coin,
-                        originY: [.2,0.05],
+                        originY: [0.1875 - .0466,0.1875 + .0466],
                         ease: 'sine.inout',
-                        duration: 1000, //
+                        duration: 500,
                         yoyo: true,
                         repeat: -1,
                        })
