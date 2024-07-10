@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.05.010';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -528,7 +528,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 0; // 4
+        this.coins = 4; // 4
     }
     
     preload(){
@@ -3793,6 +3793,24 @@ class ScoreScene extends Phaser.Scene {
                 `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
         ).setOrigin(1, 0.5).setDepth(20);
 
+        
+        this.ScoreContainerL.add(
+            [this.scorePanelL,
+            this.scorePanelLRank,
+            //_baseScore,]
+            preAdditiveValuesUI,
+            multLablesUI,
+            multValuesUI,
+            postAdditiveLablesUI,
+            postAdditiveValuesUI,
+            stageScoreUI,]
+            //this.lights,]
+            //this.letterRankCurve,
+            //this.letterRankPath,
+            //this.letterRankPath2,]
+            //this.spotlight,
+            //this.spotlight2]
+            )
         // #region Rank Sprites
 
         this.lights.enable();
@@ -3803,6 +3821,8 @@ class ScoreScene extends Phaser.Scene {
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
         ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+
+        this.ScoreContainerL.add(letterRank)
         
         this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -3843,7 +3863,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
+            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -3855,7 +3875,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = goldLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -3867,7 +3887,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = platLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
+            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -3883,24 +3903,6 @@ class ScoreScene extends Phaser.Scene {
         this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
         this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
         
-        this.ScoreContainerL.add(
-            [this.scorePanelL,
-            this.scorePanelLRank,
-            //_baseScore,]
-            preAdditiveValuesUI,
-            multLablesUI,
-            multValuesUI,
-            postAdditiveLablesUI,
-            postAdditiveValuesUI,
-            stageScoreUI,
-            //this.lights,
-            letterRank,]
-            //this.letterRankCurve,
-            //this.letterRankPath,
-            //this.letterRankPath2,]
-            //this.spotlight,
-            //this.spotlight2]
-            )
 
         // #region Atomic Food List
         var atomList = this.stageData.foodLog.slice();
