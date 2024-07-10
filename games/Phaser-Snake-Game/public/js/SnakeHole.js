@@ -11,6 +11,10 @@ import {PORTAL_COLORS} from './const.js';
 //******************************************************************** */
 // GameSettings 
 
+const IS_DEV = true;
+const ANALYTICS_VERS = "0.3.240705"
+const DEV_BRANCH = "dev"
+
 
 const GAME_VERSION = 'v0.7.07.05.010';
 export const GRID = 24;        //....................... Size of Sprites and GRID
@@ -401,12 +405,20 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+        
+        var gaVersion;
+        if (IS_DEV) {
+            gaVersion = DEV_BRANCH;
+        } else {
+            gaVersion = ANALYTICS_VERS;
+        }
+        gameanalytics.GameAnalytics.configureBuild(gaVersion);
         gameanalytics.GameAnalytics.configureAvailableResourceCurrencies(["zeds", "points"]);
         gameanalytics.GameAnalytics.configureAvailableResourceItemTypes(["Gameplay"]);
         gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
         gameanalytics.GameAnalytics.setEnabledInfoLog(true);
         //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
-        //gameanalytics.GameAnalytics.configureBuild("0.10");
+        
         
 
         /// Start Inital Game Settings
@@ -3522,7 +3534,6 @@ class ScoreScene extends Phaser.Scene {
         var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
 
         // #region StageAnalytics
-        debugger
         var temp = ourInputScene.turnInputs;
 
         var extraFields = {
