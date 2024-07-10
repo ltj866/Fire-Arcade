@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.05.010';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -418,8 +418,29 @@ class StartScene extends Phaser.Scene {
         gameanalytics.GameAnalytics.configureBuild(gaVersion);
         gameanalytics.GameAnalytics.configureAvailableResourceCurrencies(["zeds", "points"]);
         gameanalytics.GameAnalytics.configureAvailableResourceItemTypes(["Gameplay"]);
+        gameanalytics.GameAnalytics.configureAvailableCustomDimensions01( 
+            "00",
+            "01",
+            "02",
+            "03",
+            "04",
+            "05-09",
+            "10s",
+            "20s",
+            "30s",
+            "40s",
+            "50s",
+            "60s",
+            "70s",
+            "80s",
+            "90s",
+            "100s",
+            "110s",
+            "120s",
+            "130s"
+        );
         gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
-        gameanalytics.GameAnalytics.setEnabledInfoLog(false);
+        gameanalytics.GameAnalytics.setEnabledInfoLog(true);
         //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
         
         
@@ -528,7 +549,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 0; // 4
+        this.coins = 4; // 4
     }
     
     preload(){
@@ -3632,6 +3653,19 @@ class ScoreScene extends Phaser.Scene {
 
         // #region StageAnalytics
 
+        // Set Zed Dimension
+        var dimensionSlug;
+
+        if (this.stageData.zedLevel > 9) {
+            dimensionSlug = `${Math.floor(this.stageData.zedLevel/10) * 10}s`;
+        } else if ( this.stageData.zedLevel > 4) {
+            dimensionSlug = "05-09";
+        } else {
+            dimensionSlug = `0${this.stageData.zedLevel}`;
+        }
+        debugger
+        gameanalytics.GameAnalytics.setCustomDimension01(dimensionSlug);
+
         var extraFields = {
             foodLog: this.stageData.foodLog.toString(),
             //foodHistory: this.stageData.foodHistory.toString(),
@@ -3656,9 +3690,16 @@ class ScoreScene extends Phaser.Scene {
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount, 
             { turnInputs:this.stageData.turnInputs.toString() }
         );
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CoinsLeft`, ourPersist.coins);
+
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestBase`, bestLog.calcBase());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestSpeedBonus`, bestLog.calcBonus());
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestTotal`, bestLog.calcTotal());
+
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ZedLevel`, this.stageData.zedLevel);
+
+
+        
 
         // Panels
 
@@ -4260,8 +4301,17 @@ class ScoreScene extends Phaser.Scene {
 
             // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
             // Which is a 50% chance.
+
+
+            var temp = 2**this.difficulty
+            var innerRollNum = Math.ceil(2**this.difficulty/10)
             
-            for (let index = 2**this.difficulty/50; index > 0 ; index--) {
+            //debugger
+            
+            for (let index = innerRollNum; index > 0 ; index--) {
+                
+                
+
                 var roll = Phaser.Math.RND.integer();
                 if (roll < this.bestHashInt) {
                     this.bestHashInt = roll;
@@ -4276,7 +4326,7 @@ class ScoreScene extends Phaser.Scene {
 
             // #region HashUI Update
 
-            this.rollSpeed = 50 - this.difficulty;
+            this.rollSpeed = Math.max(1, 20 - this.difficulty);
 
             //console.log(ROLL_SPEED[difficulty]);
             this.hashUI.setHTML(
