@@ -13,7 +13,7 @@ var Snake = new Phaser.Class({
         this.body = [];
 
         this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
-        this.head.setOrigin(0,0).setDepth(99);
+        this.head.setOrigin(0,0).setDepth(48);
         
         this.body.unshift(this.head);
 
@@ -63,7 +63,7 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.sprite(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
-        newPart.setOrigin(0,0).setDepth(15).setPipeline('Light2D');
+        newPart.setOrigin(0,0).setDepth(47).setPipeline('Light2D');
         
 
         if (this.body.length > 1){
@@ -222,8 +222,11 @@ var Snake = new Phaser.Class({
                 //this.snakeCritical = false;
 
                 ourPersistScene.coins += 1;
+                if (ourPersistScene.coins > 0) {
+                    scene.coinsUIIcon.setVisible(true)
+                }
                 scene.coinUIText.setHTML(
-                    `${commaInt(ourPersistScene.coins)}`
+                    `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
                 )
 
                 _coin.destroy();
@@ -332,9 +335,10 @@ var Snake = new Phaser.Class({
 
         if (!scene.winned) {
             scene.loseCoin();
+            scene.coinsUIIcon.setVisible(false);
             ourPersistScene.coins += -1;
             scene.coinUIText.setHTML(
-                `${commaInt(ourPersistScene.coins)}`
+                `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
             );
         }
 

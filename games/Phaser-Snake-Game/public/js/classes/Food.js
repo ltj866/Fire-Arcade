@@ -23,10 +23,10 @@ var Food = new Phaser.Class({
         }
 
         this.setOrigin(0,-.0625);
-        this.setDepth(75);
+        this.setDepth(47);
         
         
-        this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(101);
+        this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(48);
         this.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30)*10);
         this.electrons.anims.msPerFrame = 66;
         this.electrons.visible = false;
