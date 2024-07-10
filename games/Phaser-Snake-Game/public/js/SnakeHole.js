@@ -3540,8 +3540,8 @@ class ScoreScene extends Phaser.Scene {
         ourGame.countDown.style = style*/
         ourGame.countDown.setHTML('0FF');
 
-        this.ScoreContainerL= this.make.container(0,0)
-        this.ScoreContainerR= this.make.container(0,0)
+        this.ScoreContainerL = this.make.container(0,0)
+        this.ScoreContainerR = this.make.container(0,0)
 
         var stageDataJSON = {
             bonks: ourGame.bonks,
@@ -3697,52 +3697,7 @@ class ScoreScene extends Phaser.Scene {
             ease: 'sine.inout'
         });
 
-        // #region Atomic Food List
-        var atomList = this.stageData.foodLog.slice();
 
-        var count = 0;
-        
-        for (let i = 0; i < atomList.length; i++) {
-            
-            var logTime = atomList[i];
-            let _x,_y;
-            let anim;
-
-            if (i < 14) {
-                _x = (GRID * (7.2667 - .25)) + (i * 16);
-                _y = GRID * 8.75
-            }
-            else {
-                _x = (-GRID * (2.0667 + .25)) + (i * 16);
-                _y = (GRID * 8.75) + 16;
-            }
-
-            switch (true) {
-                case logTime > COMBO_ADD_FLOOR:
-                    anim = "atom01idle";
-                    if (i != 0) { // First Can't Connect
-                        this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
-                        ).setOrigin(0,0.5).setDepth(20);
-                    }
-                    break
-                case logTime > BOOST_ADD_FLOOR:
-                    console.log(logTime, "Boost", i);
-                    anim = "atom02idle";
-                    break
-                case logTime > SCORE_FLOOR:
-                    console.log(logTime, "Boost", i);
-                    anim = "atom03idle";
-                    break
-                default:
-                    console.log(logTime, "dud", i);
-                    anim = "atom04idle";
-                    break
-            }
-
-            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
-            ).play(anim).setDepth(21).setScale(.5);
-            
-        }
 
         //STAGE CLEAR
         this.add.dom(SCREEN_WIDTH/2, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -3921,27 +3876,78 @@ class ScoreScene extends Phaser.Scene {
         this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
         this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
         
-        this.ScoreContainerL.add(this.scorePanelL,
+        this.ScoreContainerL.add(
+            [this.scorePanelL,
             this.scorePanelLRank,
-            this.atomScoreIcon,
-            preAdditiveLablesUI,
+            //_baseScore,]
             preAdditiveValuesUI,
             multLablesUI,
             multValuesUI,
             postAdditiveLablesUI,
             postAdditiveValuesUI,
             stageScoreUI,
-            this.lights,
-            letterRank,
-            this.letterRankCurve,
-            this.letterRankPath,
-            this.letterRankPath2,
-            this.spotlight,
-            this.spotlight2
+            //this.lights,
+            letterRank,]
+            //this.letterRankCurve,
+            //this.letterRankPath,
+            //this.letterRankPath2,]
+            //this.spotlight,
+            //this.spotlight2]
             )
-        //this.scorePanelL.x -= GRID * 2
 
-        // #region Stat Cards
+        // #region Atomic Food List
+        var atomList = this.stageData.foodLog.slice();
+
+        var count = 0;
+        
+        for (let i = 0; i < atomList.length; i++) {
+            
+            var logTime = atomList[i];
+            let _x,_y;
+            let anim;
+
+            if (i < 14) {
+                _x = (GRID * (7.2667 - .25)) + (i * 16);
+                _y = GRID * 8.75
+            }
+            else {
+                _x = (-GRID * (2.0667 + .25)) + (i * 16);
+                _y = (GRID * 8.75) + 16;
+            }
+
+            switch (true) {
+                case logTime > COMBO_ADD_FLOOR:
+                    anim = "atom01idle";
+                    if (i != 0) { // First Can't Connect
+                        var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
+                        ).setOrigin(0,0.5).setDepth(20);
+                        this.ScoreContainerL.add(rectangle)
+                    }
+                    break
+                case logTime > BOOST_ADD_FLOOR:
+                    console.log(logTime, "Boost", i);
+                    anim = "atom02idle";
+                    break
+                case logTime > SCORE_FLOOR:
+                    console.log(logTime, "Boost", i);
+                    anim = "atom03idle";
+                    break
+                default:
+                    console.log(logTime, "dud", i);
+                    anim = "atom04idle";
+                    break
+            }
+
+            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
+            ).play(anim).setDepth(21).setScale(.5);
+            this.ScoreContainerL.add(this.atomScoreIcon)  
+        }
+
+        this.ScoreContainerL.x -= GRID * 1
+
+        
+
+        // #region Stat Cards (Right Side)
 
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
         console.log(ourInputScene.cornerTime)
@@ -4031,6 +4037,12 @@ class ScoreScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-UP', function() {
             stageStats.node.scrollTop -= 36;
         })
+
+        this.ScoreContainerR.add(
+            [this.scorePanelR,
+            stageStats,]
+        )
+        this.ScoreContainerR.x -= GRID * 1;
         
 
         // #region Hash Display Code
