@@ -15,7 +15,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.07.05.010';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -315,6 +315,8 @@ class StartScene extends Phaser.Scene {
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
         this.load.atlas('uiGlassL', 'assets/sprites/UI_Glass_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiGlassR', 'assets/sprites/UI_Glass_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiPanelL', 'assets/sprites/UI_Panel_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
@@ -403,7 +405,7 @@ class StartScene extends Phaser.Scene {
 
     create() {
         gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
-        gameanalytics.GameAnalytics.setEnabledInfoLog(true);
+        gameanalytics.GameAnalytics.setEnabledInfoLog(false);
         //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
 
         /// Start Inital Game Settings
@@ -3570,7 +3572,7 @@ class ScoreScene extends Phaser.Scene {
             gameanalytics.GameAnalytics.addDesignEvent(eventID, eventValue)
         }
 
-               // For properties that may not exist.
+        // For properties that may not exist.
         if (ourGame.tiledProperties.slug != undefined) {
             this.stageData.slug = ourGame.tiledProperties.slug;
         }
@@ -3602,7 +3604,6 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Save Best To Local.
 
-        
         var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
         if (bestLogRaw) {
             // is false if best log has never existed
@@ -3634,45 +3635,6 @@ class ScoreScene extends Phaser.Scene {
 
         // #endregion
 
-        
-        // #region
-        // Dream walls for Horizontal Wrap
-                
-        /*for (let index = 2; index < END_Y - 1; index++) {
-            if (!DREAMWALLSKIP.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
-                wallShimmerRight.play('wrapBlock05');
-                //this.dreamWalls.push(wallShimmerRight);
-                
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
-                wallShimmerLeft.play('wrapBlock04');
-                //this.dreamWalls.push(wallShimmerLeft);
-            }
-        }
-
-        // Dream walls for Vertical Wrap
-        for (let index = 1; index < END_X; index++) {
-            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
-            wallShimmerTop.play('wrapBlock02');
-            //this.dreamWalls.push(wallShimmerTop);
-                
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(10).setOrigin(0,0);
-            wallShimmerBottom.play('wrapBlock07');
-            //this.dreamWalls.push(wallShimmerBottom);
-        
-        }
-
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
-        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
-        // #endregion*/
-
-        this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
-        this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
-        var scrollArrowDown = this.add.sprite(GRID * 22.5, GRID * 19,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
-        
-
         // Pre Calculate needed values
         var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
 
@@ -3685,11 +3647,34 @@ class ScoreScene extends Phaser.Scene {
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
+        // Panels
 
-        //var stageAverage = stageScore();
+        this.scorePanelL = this.add.nineslice(GRID * 4.75, GRID * 7.75, 
+            'uiPanelL', 'Glass', 
+            GRID * 12, GRID * 11.5, 
+            8, 8, 8, 8);
+        this.scorePanelL.setDepth(10).setOrigin(0,0)
+
+        this.scorePanelLRank = this.add.nineslice(GRID * 4.5, GRID * 17.5 +2, 
+            'uiPanelL', 'Glass', 
+            GRID * 3, GRID * 4, 
+            8, 8, 8, 8);
+        this.scorePanelLRank.setDepth(11).setOrigin(.5,.5)
+
+        this.scorePanelR = this.add.nineslice(GRID * 17.25, GRID * 7.75, 
+            'uiPanelR', 'Glass', 
+            GRID * 11.25, GRID * 11.5, 
+            8, 8, 8, 8);
+        this.scorePanelR.setDepth(10).setOrigin(0,0)
+
+        var scrollArrowDown = this.add.sprite(GRID * 22.5, GRID * 19 +4,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
+
+        //megaAtlas code reference
+        //this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
+        //this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
         
         // Scene Background Color
-        ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x412D43, .88);
+        ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x323353, .67);
         ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
         ourGame.stageBackGround.alpha = 0;
 
@@ -3702,15 +3687,10 @@ class ScoreScene extends Phaser.Scene {
             ease: 'sine.inout'
         });
 
-
         // #region Atomic Food List
         var atomList = this.stageData.foodLog.slice();
-        // dead atom = 1 
-        //const BOOST_ADD_FLOOR = 100;
-        //const COMBO_ADD_FLOOR = 108;
-        //console.log(atomList)
-        var count = 0;
 
+        var count = 0;
         
         for (let i = 0; i < atomList.length; i++) {
             
@@ -3719,11 +3699,11 @@ class ScoreScene extends Phaser.Scene {
             let anim;
 
             if (i < 14) {
-                _x = (GRID * (7.2667)) + (i * 16);
+                _x = (GRID * (7.2667 - .25)) + (i * 16);
                 _y = GRID * 8.75
             }
             else {
-                _x = (-GRID * 2.0667) + (i * 16);
+                _x = (-GRID * (2.0667 + .25)) + (i * 16);
                 _y = (GRID * 8.75) + 16;
             }
 
@@ -3754,11 +3734,7 @@ class ScoreScene extends Phaser.Scene {
             
         }
 
-        /*atomList.forEach(element => {
-            this.add.sprite((GRID * 4), GRID * 10, 'atomicPickup01Anim').play('atom01idle').setDepth(20).setScale(.5)
-        });*/
-        ///////
-
+        //STAGE CLEAR
         this.add.dom(SCREEN_WIDTH/2, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "4px 4px 0px #000000",
             "font-size":'32px',
@@ -3771,7 +3747,6 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(0.5, 0);
 
         
-
         // #region Main Stats
 
         var bonkBonus = NO_BONK_BASE/(ourGame.bonks+1);
@@ -3788,12 +3763,10 @@ class ScoreScene extends Phaser.Scene {
         
         const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
-            
             })).setHTML(
                 `BASE SCORE:
                 SPEED BONUS:`
         ).setOrigin(1, 0);
-
 
         var _baseScore = this.stageData.calcBase();
         var _speedbonus = calcBonus(this.stageData.calcBase());
@@ -3850,24 +3823,8 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 `STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
         ).setOrigin(1, 0.5).setDepth(20);
-        
-        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.calcTotal()),
-        //{ fontFamily: "Sono", fontStyle: 'bold',
-        //fontSize: 28, color: '#ffff00', align: 'right' })
-        //.setOrigin(0.5, 0.5).setDepth(20);
-
-        //const fx1 = stageScore.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
-        /*this.tweens.add({
-            targets: fx1,
-            outerStrength: 2,
-            yoyo: true,
-            loop: -1,
-            ease: 'sine.inout'
-        });*/
-
 
         // #region Rank Sprites
-        //var tilesprite = this.add.tileSprite(400, 300, 800, 600, 'brick').setPipeline('Light2D');
 
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
@@ -3953,7 +3910,9 @@ class ScoreScene extends Phaser.Scene {
 
         this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
         this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
+        
         // #region Stat Cards
+
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
         console.log(ourInputScene.cornerTime)
         var boostTimeSec = (ourInputScene.boostTime * 0.01666).toFixed(3)
@@ -3972,17 +3931,17 @@ class ScoreScene extends Phaser.Scene {
             "font-size": '14px',
             "max-height": '236px',
             "font-weight": 300,
-            "padding": '12px 12px 12px 12px',
+            "padding": '12px 22px 12px 12px',
             "text-align": 'left', 
             "word-wrap": 'break-word',
             "white-space": 'pre-line',
             'overflow-y': 'scroll',
             //'scroll-behavior': 'smooth', smooth scroll stutters when arrow key down/up is held
-            'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
+            //'mask-image': 'linear-gradient(to bottom, black calc(100% - 48px), transparent 100%)'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
-        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 4, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
                 //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
@@ -4020,10 +3979,10 @@ class ScoreScene extends Phaser.Scene {
                 STAGE FOOD LOG:
                 [${ourGame.scoreHistory.slice().sort().reverse()}]
                 </br>`
-                
-                
+                    
         ).setOrigin(0,0).setVisible(true);
 
+        // Stats Scroll Logic
         stageStats.addListener('scroll');
         stageStats.on('scroll', () =>  {
             //console.log(stageStats.node.scrollTop)
@@ -4042,75 +4001,6 @@ class ScoreScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-UP', function() {
             stageStats.node.scrollTop -= 36;
         })
-        /*
-        const extraStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
-            styleCard, {
-
-            })).setHTML(
-                `----------- < <span style="color:${COLOR_TERTIARY};">○ ● ○</span> > -----------</br>
-                </br>
-                EXTRA STAGE STATS - ${ourGame.stage}</br>
-                <hr/>
-                TOTAL TURNS: ${ourInputScene.turns}</br>
-                CORNER TIME: ${ourInputScene.cornerTime} FRAMES</br>
-                </br>
-                BOOST TIME: ${ourInputScene.boostTime} FRAMES</br>
-                </br>
-                BETA: ${GAME_VERSION}</br>
-                </br>
-                BONK RESETS: ${ourGame.bonks}</br>
-                TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds</br>`
-        ).setOrigin(0,0).setVisible(false);
-
-
-        
-        const bestStats = this.add.dom(SCREEN_WIDTH/2 +  GRID *2, GRID * cardY, 'div',  Object.assign({}, STYLE_DEFAULT, 
-            styleCard, {
-
-            })).setHTML(
-                `----------- < <span style="color:${COLOR_TERTIARY};">○ ○ ●</span> > -----------</br>
-                </br>
-                BEST STATS - ${ourGame.stage}</br>
-                <hr>
-                BASE SCORE: ${bestLocal}</br>
-                SPEED BONUS: ${bestBonus}</br>
-                </br>
-                BEST SCORE: ${bestLocal + bestBonus}</br>
-                </br>
-                BEST FOOD LOG ...... AVE: [${bestAve.toFixed(2)}]</br>
-                [${bestLog.slice().sort().reverse()}]`
-        ).setOrigin(0,0).setVisible(false);
-        */
-
-        var sIndex = 1 // Default Card
-        var statsCards = [stageStats];
-
-        //statsCards[sIndex].setVisible(true);
-        //this.statCards.setMask(ourScoreScene.mask)
-        /*var arrowsE = this.add.sprite(GRID * 29, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
-        arrowsE.angle = 90;
-        arrowsE.play('startArrowIdle');
-
-        var arrowsW = this.add.sprite(GRID * 15, GRID * 11).setDepth(15).setOrigin(0.5,0.5);
-        arrowsW.angle = 270;
-        arrowsW.play('startArrowIdle');*/
-        
-
-        /*this.input.keyboard.on('keydown-RIGHT', function() {
-            statsCards[sIndex].setVisible(false);
-            sIndex = Phaser.Math.Wrap(sIndex + 1, -1, statsCards.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
-
-            statsCards[sIndex].setVisible(true);
-        }, [], this);
-
-        this.input.keyboard.on('keydown-LEFT', function() {
-            statsCards[sIndex].setVisible(false);
-            sIndex = Phaser.Math.Wrap(sIndex - 1, 0, statsCards.length); // No idea why -1 works here. But it works so leave it until it doesn't/
-
-            statsCards[sIndex].setVisible(true);   
-        }, [], this);*/
-
-
         
 
         // #region Hash Display Code
@@ -4131,8 +4021,6 @@ class ScoreScene extends Phaser.Scene {
 
 
     
-        
-
         calcSumOfBest(ourPersist);
         var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
@@ -4163,8 +4051,6 @@ class ScoreScene extends Phaser.Scene {
         ourStartScene.stageHistory.forEach( stageData => {
             totalScore += stageData.calcTotal();
         });
-
-
 
         const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
@@ -4221,9 +4107,9 @@ class ScoreScene extends Phaser.Scene {
             var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.125,'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize":'32px',
                 "font-family": '"Press Start 2P", system-ui',
-                //"text-shadow": "4px 4px 0px #000000",
+                "text-shadow": "4px 4px 0px #000000",
                 //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
-                "text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
+                //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
                 }
             )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
 

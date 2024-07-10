@@ -4,8 +4,8 @@
 			"image": "UI_Glass_9SliceLEFT",
 			"format": "RGBA8888",
 			"size": {
-				"w": 288,
-				"h": 192
+				"w": 144,
+				"h": 144
 			},
 			"scale": 1,
 			"frames": [
