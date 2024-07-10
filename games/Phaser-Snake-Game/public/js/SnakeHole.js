@@ -3519,7 +3519,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
-        var designPrefix = `${this.stageData.uuid.split('-').join("")}:${this.stageData.stage}`;
+        var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
 
         // #region StageAnalytics
         debugger
@@ -4217,7 +4217,7 @@ class ScoreScene extends Phaser.Scene {
                     level: zedObject.level,
                     zedsToNext: zedObject.zedsToNext,
                     startingScore: ourScoreScene.stageData.calcTotal(),
-                    rollsLeft: ourScoreScene.foodLogSeed.slice(-1) 
+                    rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
                 }
 
                 localStorage.setItem("zeds", ourPersist.zeds);
@@ -4325,7 +4325,7 @@ class ScoreScene extends Phaser.Scene {
 
             // #region HashUI Update
 
-            this.rollSpeed = 60 - this.difficulty;
+            this.rollSpeed = 50 - this.difficulty;
 
             //console.log(ROLL_SPEED[difficulty]);
             this.hashUI.setHTML(
