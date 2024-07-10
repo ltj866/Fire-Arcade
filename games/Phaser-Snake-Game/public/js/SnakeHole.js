@@ -3529,6 +3529,9 @@ class ScoreScene extends Phaser.Scene {
         ourGame.countDown.style = style*/
         ourGame.countDown.setHTML('0FF');
 
+        this.ScoreContainerL= this.make.container(0,0)
+        this.ScoreContainerR= this.make.container(0,0)
+
         var stageDataJSON = {
             bonks: ourGame.bonks,
             boostFrames: ourInputScene.boostTime,
@@ -3729,7 +3732,7 @@ class ScoreScene extends Phaser.Scene {
                     break
             }
 
-            this.add.sprite(_x, _y,'atomicPickup01Anim'
+            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
             ).play(anim).setDepth(21).setScale(.5);
             
         }
@@ -3911,6 +3914,26 @@ class ScoreScene extends Phaser.Scene {
         this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
         this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
         
+        this.ScoreContainerL.add(this.scorePanelL,
+            this.scorePanelLRank,
+            this.atomScoreIcon,
+            preAdditiveLablesUI,
+            preAdditiveValuesUI,
+            multLablesUI,
+            multValuesUI,
+            postAdditiveLablesUI,
+            postAdditiveValuesUI,
+            stageScoreUI,
+            this.lights,
+            letterRank,
+            this.letterRankCurve,
+            this.letterRankPath,
+            this.letterRankPath2,
+            this.spotlight,
+            this.spotlight2
+            )
+        //this.scorePanelL.x -= GRID * 2
+
         // #region Stat Cards
 
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
