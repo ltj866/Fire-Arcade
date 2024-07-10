@@ -3564,34 +3564,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
-        var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
-
-        // #region StageAnalytics
-        var temp = ourInputScene.turnInputs;
-
-        var extraFields = {
-            foodLog: this.stageData.foodLog.toString(),
-            //foodHistory: this.stageData.foodHistory.toString(),
-            //moveHistory: this.stageData.moveHistory.toString()
-        }
-        
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BaseScore`, this.stageData.calcBase(), 
-            { foodLog:this.stageData.foodLog.toString() }
-        );
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:SpeedBonus`, this.stageData.calcBonus());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:Bonks`, this.stageData.bonks);
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BonkBonus`, this.stageData.bonkBonus());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BoostTime`, this.stageData.boostFrames); // BoostFrames should probably be called boostTime now but I need to check the code first.
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BoostBonus`, this.stageData.boostBonus());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CornerTime`, this.stageData.cornerTime);
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CornerBonus`, this.stageData.cornerBonus());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:DiffBonus`, this.stageData.diffBonus); 
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ScoreTotal`, this.stageData.calcTotal());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:medianSpeedBonus`, this.stageData.medianSpeedBonus);
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:StageRank`, this.stageData.stageRank());
-        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount, 
-            { turnInputs:this.stageData.turnInputs.toString() }
-        );
+    
 
         
 
@@ -3656,6 +3629,36 @@ class ScoreScene extends Phaser.Scene {
 
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
+
+        // #region StageAnalytics
+
+        var extraFields = {
+            foodLog: this.stageData.foodLog.toString(),
+            //foodHistory: this.stageData.foodHistory.toString(),
+            //moveHistory: this.stageData.moveHistory.toString()
+        }
+        var designPrefix = `${this.stageData.uuid}:${this.stageData.stage}`;
+        
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BaseScore`, this.stageData.calcBase(), 
+            { foodLog:this.stageData.foodLog.toString() }
+        );
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:SpeedBonus`, this.stageData.calcBonus());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:Bonks`, this.stageData.bonks);
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BonkBonus`, this.stageData.bonkBonus());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BoostTime`, this.stageData.boostFrames); // BoostFrames should probably be called boostTime now but I need to check the code first.
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:BoostBonus`, this.stageData.boostBonus());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CornerTime`, this.stageData.cornerTime);
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CornerBonus`, this.stageData.cornerBonus());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:DiffBonus`, this.stageData.diffBonus); 
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ScoreTotal`, this.stageData.calcTotal());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:medianSpeedBonus`, this.stageData.medianSpeedBonus);
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:StageRank`, this.stageData.stageRank());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:MoveCount`, this.stageData.moveCount, 
+            { turnInputs:this.stageData.turnInputs.toString() }
+        );
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestBase`, bestLog.calcBase());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestSpeedBonus`, bestLog.calcBonus());
+        gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestTotal`, bestLog.calcTotal());
 
         // Panels
 
