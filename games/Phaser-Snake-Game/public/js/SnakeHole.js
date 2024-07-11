@@ -185,6 +185,7 @@ const STYLE_DEFAULT = {
     'font-family': 'Oxanium',
     'font-weight': '200',
     'text-align': 'center',
+    'letter-spacing': "1px",
     //'text-shadow': ' #FF8FEE 1px 0 2px'
 }
 
