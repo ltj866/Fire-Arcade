@@ -469,13 +469,13 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('PersistScene');
 
 
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
         var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
 
         //card.setScale(1)
-        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
+        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
         
         this.tweens.add({
             targets: continueText,
@@ -569,7 +569,11 @@ class PersistScene extends Phaser.Scene {
     // for changing bg sprites
     this.bgTimer = 0;
     this.bgTick = 0;
-    
+
+             // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
+            this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+            this.UIbackground.setScale(32); 
+
             // Furthest BG Object
             this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             this.bg0.tileScaleX = 3;
@@ -3842,19 +3846,13 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL.add(
             [this.scorePanelL,
             this.scorePanelLRank,
-            //_baseScore,]
             preAdditiveValuesUI,
+            preAdditiveLablesUI,
             multLablesUI,
             multValuesUI,
             postAdditiveLablesUI,
             postAdditiveValuesUI,
             stageScoreUI,]
-            //this.lights,]
-            //this.letterRankCurve,
-            //this.letterRankPath,
-            //this.letterRankPath2,]
-            //this.spotlight,
-            //this.spotlight2]
             )
         // #region Rank Sprites
 
