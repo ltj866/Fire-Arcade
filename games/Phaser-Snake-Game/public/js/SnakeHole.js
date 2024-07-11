@@ -571,9 +571,9 @@ class PersistScene extends Phaser.Scene {
     this.bgTick = 0;
 
              // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-            this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-            this.UIbackground.setScale(32); 
-            this.UIbackground.setVisible(false);  // TEMP while working on game screen size. @holden @James
+            //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+            //this.UIbackground.setScale(32); 
+            //this.UIbackground.setVisible(false);  // TEMP while working on game screen size. @holden @James
 
             // Furthest BG Object
             this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
@@ -621,23 +621,24 @@ class PersistScene extends Phaser.Scene {
     this.zeds = Number(JSON.parse(rawZeds));
     var zedsObj = calcZedLevel(this.zeds);
     
+    // This is an important step, don't leave it out.
     calcSumOfBest(this);
 
     const styleBottomText = {
-        "font-size": '12px',
+        "font-size": '8px',
         "font-weight": 400,
         "text-align": 'right',
     }   
 
-    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
             `<span style ="color: limegreen;
-            font-size: 16px;
+            font-size: 10px;
             border: limegreen solid 1px;
             border-radius: 5px;
             padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
-    ).setOrigin(0,0.5);
+    ).setOrigin(0, 1);
 
 
     /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -653,7 +654,8 @@ class PersistScene extends Phaser.Scene {
     ).setOrigin(0,0.5);*/
 
     this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '12px',
+        'font-size': '8px',
+        'letter-spacing': '3px',
         })).setText(
             `portalsnake.${GAME_VERSION}`
     ).setOrigin(1,1);
@@ -884,6 +886,7 @@ class GameScene extends Phaser.Scene {
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
         this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
+        this.UIbackground.setVisible(false);
 
         // #region TileMap
 
