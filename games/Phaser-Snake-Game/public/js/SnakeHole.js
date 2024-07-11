@@ -3841,19 +3841,13 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL.add(
             [this.scorePanelL,
             this.scorePanelLRank,
-            //_baseScore,]
             preAdditiveValuesUI,
+            preAdditiveLablesUI,
             multLablesUI,
             multValuesUI,
             postAdditiveLablesUI,
             postAdditiveValuesUI,
             stageScoreUI,]
-            //this.lights,]
-            //this.letterRankCurve,
-            //this.letterRankPath,
-            //this.letterRankPath2,]
-            //this.spotlight,
-            //this.spotlight2]
             )
         // #region Rank Sprites
 
