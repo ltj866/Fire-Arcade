@@ -468,7 +468,7 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('PersistScene');
 
 
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
         var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
@@ -649,7 +649,7 @@ class PersistScene extends Phaser.Scene {
     this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
         'font-size': '12px',
         })).setText(
-            `snakehole.${GAME_VERSION}`
+            `portalsnake.${GAME_VERSION}`
     ).setOrigin(1,1);
 
     this.scene.moveBelow("StartScene", "PersistScene");
@@ -926,7 +926,7 @@ class GameScene extends Phaser.Scene {
         this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
-        ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
+        ourPersist.gameVersionUI.setText(`portalsnake.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -1308,7 +1308,7 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'medium-happy': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", SILVER); // SILVER
+                    return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
                     return true;
                 },
                 'bidirectional-portals': function () {
