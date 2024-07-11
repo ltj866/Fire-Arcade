@@ -573,6 +573,7 @@ class PersistScene extends Phaser.Scene {
              // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
             this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
             this.UIbackground.setScale(32); 
+            this.UIbackground.setVisible(false);  // TEMP while working on game screen size. @holden @James
 
             // Furthest BG Object
             this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
@@ -1094,9 +1095,9 @@ class GameScene extends Phaser.Scene {
             wallShimmerTop.play('wrapBlock02');
             this.dreamWalls.push(wallShimmerTop);
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(-10).setOrigin(0,0);
-            wallShimmerBottom.play('wrapBlock07');
-            this.dreamWalls.push(wallShimmerBottom);
+            //var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(-10).setOrigin(0,0);
+            //wallShimmerBottom.play('wrapBlock07');
+            //this.dreamWalls.push(wallShimmerBottom);
         
         }
         
