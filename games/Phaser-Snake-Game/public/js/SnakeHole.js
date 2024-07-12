@@ -564,6 +564,7 @@ class StartScene extends Phaser.Scene {
                 //var ourGameScene = this.scene.get("GameScene");
                 //console.log(e)
             }
+            ourPersist.starterTween.stop();
             ourPersist.openingTween(this.tweenValue);
             this.openingTweenStart.stop();
             this.scene.stop();
@@ -643,7 +644,7 @@ class PersistScene extends Phaser.Scene {
 
     const graphics = this.add.graphics();
         
-    this.tweens.addCounter({
+    this.starterTween = this.tweens.addCounter({
         from: 0,
         to: 330,
         ease: 'Sine.InOut',
@@ -914,6 +915,27 @@ class GameScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
 
         this.snakeCritical = false;
+
+        this.graphics = this.add.graphics();
+        var tween = this.tweens.addCounter({
+            from: 330,
+            to: 600,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    this.graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.cameras.main.setMask(geomask1,true)
+                }
+        });
+        tween.on('complete', ()=>{ //need this or else visual bugs occur
+            this.cameras.main.setMask(false)
+        });
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
@@ -958,6 +980,8 @@ class GameScene extends Phaser.Scene {
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
         this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
+
+       
 
         // #region TileMap
 
@@ -1991,13 +2015,13 @@ class GameScene extends Phaser.Scene {
 
        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
-       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
-       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
-       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
-       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
+       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(51).setAlpha(0);
+       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(51).setAlpha(0);
+       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(51).setAlpha(0);
+       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(51).setAlpha(0);
+       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(51).setAlpha(0);
        
        // #endregion
 
