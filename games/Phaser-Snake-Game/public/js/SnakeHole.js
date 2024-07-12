@@ -356,7 +356,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 24, frameHeight: 48 });
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
-
+        this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
 
         //WRAP BLOCKS:
         //this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
@@ -498,6 +498,8 @@ class StartScene extends Phaser.Scene {
 
         this.selectedPanel = 1;
         
+        this.tutWASD = this.add.sprite(SCREEN_HEIGHT/2 - 190, SCREEN_WIDTH/2 + 190).setDepth(103).setOrigin(0.5,0.5);
+        this.tutWASD.play('tutIdle').setScale(3);
 
         const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
         panel1.setDepth(100)
@@ -535,7 +537,7 @@ class StartScene extends Phaser.Scene {
         panel3.setDepth(100)
 
         this.panels = []
-        this.panels.push(panel1,panel2,panel3)
+        this.panels.push(panel1,this.tutWASD,panel2,panel3)
 
         this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(this.panels)
@@ -6127,6 +6129,13 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: -1
     });
+
+    scene.anims.create({
+        key: 'tutIdle',
+        frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 0]}),
+        frameRate: 1,
+        repeat: 0
+      });
     
     scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
         frame: 'portalAnim.png'
