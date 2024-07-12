@@ -410,6 +410,31 @@ class StartScene extends Phaser.Scene {
 
     create() {
         
+        //this.cameras.main.setBackgroundColor(0x111111);
+        // Masks
+
+
+        const graphics = this.add.graphics();
+        
+        this.tweenValue = 0;
+        this.openingTweenStart = this.tweens.addCounter({
+            from: 0,
+            to: 330,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.cameras.main.setMask(geomask1,true)
+                    
+                }
+        });
+
         var gaVersion;
         if (IS_DEV) {
             gaVersion = DEV_BRANCH;
@@ -462,11 +487,16 @@ class StartScene extends Phaser.Scene {
             repeat: 0,
         });*/
         ///
+
+        
         
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
         this.scene.launch('PersistScene');
+
+ 
+
 
 
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
@@ -487,6 +517,7 @@ class StartScene extends Phaser.Scene {
           });
 
         this.input.keyboard.on('keydown', e => {
+            const ourPersist = this.scene.get('PersistScene');
 
             // #region SCORE DEBUG
             if (SCORE_SCENE_DEBUG) {
@@ -529,9 +560,12 @@ class StartScene extends Phaser.Scene {
                 
                 //this.scene.launch('UIScene');
                 this.scene.launch('GameScene');
+                
                 //var ourGameScene = this.scene.get("GameScene");
                 //console.log(e)
             }
+            ourPersist.openingTween(this.tweenValue);
+            this.openingTweenStart.stop();
             this.scene.stop();
         })
     }
@@ -562,7 +596,8 @@ class PersistScene extends Phaser.Scene {
 
     // #region Persist Scene
 
-    
+    this.cameras.main.setBackgroundColor(0x111111);
+
 
     // # Backgrounds
 
@@ -606,7 +641,26 @@ class PersistScene extends Phaser.Scene {
             this.scrollFactorY = 0;
             this.bgCoords = new Phaser.Math.Vector2(0,0);
 
-    
+    const graphics = this.add.graphics();
+        
+    this.tweens.addCounter({
+        from: 0,
+        to: 330,
+        ease: 'Sine.InOut',
+        duration: 1000,
+        onUpdate: tween =>
+            {   
+                graphics.clear();
+                var value = (tween.getValue());
+                this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                var geomask1 = this.shape1.createGeometryMask();
+                
+                this.bg.setMask(geomask1,true)
+                this.bg0.setMask(geomask1,true)
+                this.bg2.setMask(geomask1,true)
+                this.bg3.setMask(geomask1,true)
+            }
+    });
     
     
     
@@ -659,7 +713,28 @@ class PersistScene extends Phaser.Scene {
 
     this.scene.moveBelow("StartScene", "PersistScene");
 
+    this.graphics = this.add.graphics();
+    }
 
+    openingTween(tweenValue){
+        this.tweens.addCounter({
+            from: tweenValue,
+            to: 600,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    this.graphics.clear();
+                    var value = (tween.getValue());
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.bg.setMask(geomask1,true)
+                    this.bg0.setMask(geomask1,true)
+                    this.bg2.setMask(geomask1,true)
+                    this.bg3.setMask(geomask1,true)
+                }
+        });
     }
 
     checkCompletedRank = function (targetStageName, rank) {
@@ -675,7 +750,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     update(time, delta) {
-
+        console.log()
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;
 
@@ -4281,7 +4356,6 @@ class ScoreScene extends Phaser.Scene {
 
             });
         }, [], this);
-        //this.graphics = this.add.graphics();
     }
 
     // #region Score - Update
