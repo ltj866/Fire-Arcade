@@ -542,15 +542,17 @@ class StartScene extends Phaser.Scene {
         
 
 
-        var hasPlayedBefore = false;
-        if (!hasPlayedBefore) {
+        this.hasPlayedBefore = false;
+        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        this.continueText.setVisible(false)
+        if (!this.hasPlayedBefore) {
             //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
         }
         else{
-            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
-        }
-        this.tweens.add({
-            targets: continueText,
+            this.continueText.setVisible(true)        }
+        
+            this.tweens.add({
+            targets: this.continueText,
             alpha: { from: 0, to: 1 },
             ease: 'Sine.InOut',
             duration: 1000,
@@ -566,7 +568,6 @@ class StartScene extends Phaser.Scene {
         this.panelArrowL.play('startArrowIdle');
         this.panelArrowL.angle = 270;
         this.panelArrowL.setVisible(false);
-       
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             const ourStartScene = this.scene.get('StartScene');
@@ -587,6 +588,7 @@ class StartScene extends Phaser.Scene {
                     this.panelContainerX = -1250;
                     ourStartScene.panelArrowL.setVisible(true)
                     ourStartScene.panelArrowR.setVisible(false)
+                    this.continueText.setVisible(true)
                     break;
             }
             
@@ -638,7 +640,8 @@ class StartScene extends Phaser.Scene {
         })
 
         this.input.keyboard.on('keydown-SPACE', e => {
-            const ourPersist = this.scene.get('PersistScene');
+            if (this.continueText.visible === true) {
+                const ourPersist = this.scene.get('PersistScene');
 
             // #region SCORE DEBUG
             if (SCORE_SCENE_DEBUG) {
@@ -689,7 +692,9 @@ class StartScene extends Phaser.Scene {
             ourPersist.openingTween(this.tweenValue);
             this.openingTweenStart.stop();
             this.scene.stop();
-        })
+        
+            }
+        })   
     }
 
     end() {
