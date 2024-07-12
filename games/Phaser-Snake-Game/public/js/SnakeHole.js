@@ -410,30 +410,7 @@ class StartScene extends Phaser.Scene {
 
     create() {
         
-        //this.cameras.main.setBackgroundColor(0x111111);
-        // Masks
-
-
-        const graphics = this.add.graphics();
         
-        this.tweenValue = 0;
-        this.openingTweenStart = this.tweens.addCounter({
-            from: 0,
-            to: 330,
-            ease: 'Sine.InOut',
-            duration: 1000,
-            onUpdate: tween =>
-                {   
-                    graphics.clear();
-                    var value = (tween.getValue());
-                    this.tweenValue = value
-                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                    var geomask1 = this.shape1.createGeometryMask();
-                    
-                    this.cameras.main.setMask(geomask1,true)
-                    
-                }
-        });
 
         var gaVersion;
         if (IS_DEV) {
@@ -473,19 +450,8 @@ class StartScene extends Phaser.Scene {
 
         /// Start Inital Game Settings
 
-        /*const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
-        panel.setDepth(100)
-        panel.setScale(0)
-        this.tweens.add({
-            targets: panel,
-            scale: 1,
-            width: 450,
-            height: 500,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });*/
+
+        
         ///
 
         
@@ -501,12 +467,88 @@ class StartScene extends Phaser.Scene {
 
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
+        //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
 
         //card.setScale(1)
-        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+
+        // Masks
+
+
+        const graphics = this.add.graphics();
+
+        this.tweenValue = 0;
+        this.openingTweenStart = this.tweens.addCounter({
+            from: 0,
+            to: 600,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.cameras.main.setMask(geomask1,true)
+                    
+                }
+        });
+
+        this.selectedPanel = 1;
         
+
+        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
+        panel1.setDepth(100)
+        panel1.setScale(0)
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel1,
+                scale: 1,
+                width: 550,
+                height: 500,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
+        panel2.setDepth(100)
+        panel2.setScale(0)
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel2,
+                scale: 1,
+                width: 550,
+                height: 500,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 550, 500, 72,72,72,72);
+        panel3.setDepth(100)
+
+        this.panels = []
+        this.panels.push(panel1,panel2,panel3)
+
+        this.panelsContainer = this.make.container(0, 0);
+        this.panelsContainer.add(this.panels)
+        
+
+
+        var hasPlayedBefore = false;
+        if (!hasPlayedBefore) {
+            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        }
+        else{
+            var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        }
         this.tweens.add({
             targets: continueText,
             alpha: { from: 0, to: 1 },
@@ -515,8 +557,75 @@ class StartScene extends Phaser.Scene {
             repeat: -1,
             yoyo: true
           });
+        
+        this.panelArrowR = this.add.sprite(SCREEN_HEIGHT/2 +300, SCREEN_WIDTH/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowR.play('startArrowIdle');
+        this.panelArrowR.angle = 90;
+        
+        this.panelArrowL = this.add.sprite(SCREEN_HEIGHT/2 -300, SCREEN_WIDTH/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL.play('startArrowIdle');
+        this.panelArrowL.angle = 270;
+        this.panelArrowL.setVisible(false);
+       
 
-        this.input.keyboard.on('keydown', e => {
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            if (this.selectedPanel < 3) {
+                this.selectedPanel += 1
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    this.panelContainerX = 0;
+                    break;
+                case 2:
+                    this.panelContainerX = -625;
+                    break;
+                case 3:
+                    this.panelContainerX = -1250;
+                    break;
+            }
+            const ourStartScene = this.scene.get('StartScene');
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+                onComplete: function () {
+                    ourStartScene.panelArrowL.setVisible(true);
+                }
+            });   
+        })
+        this.input.keyboard.on('keydown-LEFT', e => {
+            if (this.selectedPanel > 0) {
+                this.selectedPanel -= 1
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    this.panelContainerX = 0;
+                    break;
+                case 2:
+                    this.panelContainerX = -625;
+                    break;
+                case 3:
+                    this.panelContainerX = -1250;
+                    break;
+            }
+            const ourStartScene = this.scene.get('StartScene');
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+                onComplete: function () {
+                    ourStartScene.panelArrowL.setVisible(true);
+                }
+            });   
+        })
+
+        this.input.keyboard.on('keydown-SPACE', e => {
             const ourPersist = this.scene.get('PersistScene');
 
             // #region SCORE DEBUG
@@ -607,26 +716,26 @@ class PersistScene extends Phaser.Scene {
     this.bgTick = 0;
 
              // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-            this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-            this.UIbackground.setScale(32); 
+            //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+            //this.UIbackground.setScale(32); 
 
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            this.bg0 = this.add.tileSprite(0, 0, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             this.bg0.tileScaleX = 3;
             this.bg0.tileScaleY = 3;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            this.bg = this.add.tileSprite(0, 0, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             this.bg.tileScaleX = 3;
             this.bg.tileScaleY = 3;
             
             // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            this.bg2 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
             this.bg2.tileScaleX = 3;
             this.bg2.tileScaleY = 3;
             
             // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            this.bg3 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
             this.bg3.tileScaleX = 3;
             this.bg3.tileScaleY = 3;
     
@@ -646,7 +755,7 @@ class PersistScene extends Phaser.Scene {
         
     this.starterTween = this.tweens.addCounter({
         from: 0,
-        to: 330,
+        to: 600,
         ease: 'Sine.InOut',
         duration: 1000,
         onUpdate: tween =>
