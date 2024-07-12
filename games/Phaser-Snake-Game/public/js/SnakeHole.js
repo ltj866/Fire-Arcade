@@ -329,6 +329,7 @@ class StartScene extends Phaser.Scene {
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
+        this.load.image('tutSnakeWASD', 'assets/HowToCards/tutorial_snake_WASD.png');
         //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -497,9 +498,28 @@ class StartScene extends Phaser.Scene {
         });
 
         this.selectedPanel = 1;
+
+        this.tutText1 = this.add.text(SCREEN_WIDTH/2, GRID * 6,
+             'Press arrow keys to move.',
+             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0);
         
-        this.tutWASD = this.add.sprite(SCREEN_HEIGHT/2 - 190, SCREEN_WIDTH/2 + 190).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutIdle').setScale(3);
+        this.tutWASD = this.add.sprite(SCREEN_HEIGHT/2 - 180,
+             SCREEN_WIDTH/2 + 180).setDepth(103).setOrigin(0.5,0.5);
+        this.tutWASD.play('tutAll').setScale(3).setAlpha(0);
+
+        this.tutSnake = this.add.sprite(SCREEN_HEIGHT/2,
+             SCREEN_WIDTH/2,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(3).setAlpha(0);
+
+        this.time.delayedCall(600, event => {
+            this.tweens.add({
+                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
+                alpha: {from: 0, to: 1},
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
 
         const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
         panel1.setDepth(100)
@@ -537,7 +557,7 @@ class StartScene extends Phaser.Scene {
         panel3.setDepth(100)
 
         this.panels = []
-        this.panels.push(panel1,this.tutWASD,panel2,panel3)
+        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1, panel2, panel3)
 
         this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(this.panels)
@@ -563,13 +583,13 @@ class StartScene extends Phaser.Scene {
           });
         
         this.panelArrowR = this.add.sprite(SCREEN_HEIGHT/2 +300, SCREEN_WIDTH/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowR.play('startArrowIdle');
+        this.panelArrowR.play('startArrowIdle').setAlpha(0);
         this.panelArrowR.angle = 90;
         
         this.panelArrowL = this.add.sprite(SCREEN_HEIGHT/2 -300, SCREEN_WIDTH/2).setDepth(103).setOrigin(0.5,0.5);
         this.panelArrowL.play('startArrowIdle');
         this.panelArrowL.angle = 270;
-        this.panelArrowL.setVisible(false);
+        this.panelArrowL.setVisible(false).setAlpha(0);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             const ourStartScene = this.scene.get('StartScene');
@@ -883,15 +903,6 @@ class PersistScene extends Phaser.Scene {
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;
 
-        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
-        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
-
-        // not all of these need to be interpolated; wastes processing
-
-        //this.boostMask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            //(this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        //this.boostMask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            //(this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
 
         this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
@@ -6136,6 +6147,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 1,
         repeat: 0
       });
+    scene.anims.create({
+    key: 'tutAll',
+    frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 1,2,1,3,4,3,5,6,5,7,8,7]}),
+    frameRate: 12,
+    repeat: -1
+    });
     
     scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
         frame: 'portalAnim.png'
