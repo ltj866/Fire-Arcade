@@ -569,6 +569,7 @@ class StartScene extends Phaser.Scene {
        
 
         this.input.keyboard.on('keydown-RIGHT', e => {
+            const ourStartScene = this.scene.get('StartScene');
             if (this.selectedPanel < 3) {
                 this.selectedPanel += 1
             }
@@ -576,43 +577,48 @@ class StartScene extends Phaser.Scene {
             switch (this.selectedPanel){
                 case 1:
                     this.panelContainerX = 0;
+                    ourStartScene.panelArrowL.setVisible(false)
                     break;
                 case 2:
                     this.panelContainerX = -625;
+                    ourStartScene.panelArrowL.setVisible(true)
                     break;
                 case 3:
                     this.panelContainerX = -1250;
+                    ourStartScene.panelArrowL.setVisible(true)
+                    ourStartScene.panelArrowR.setVisible(false)
                     break;
             }
-            const ourStartScene = this.scene.get('StartScene');
             
             this.tweens.add({
                 targets: this.panelsContainer,
                 x: this.panelContainerX,
                 ease: 'Sine.InOut',
                 duration: 500,
-                onComplete: function () {
-                    ourStartScene.panelArrowL.setVisible(true);
-                }
             });   
         })
         this.input.keyboard.on('keydown-LEFT', e => {
-            if (this.selectedPanel > 0) {
+            const ourStartScene = this.scene.get('StartScene');
+            if (this.selectedPanel > 1) {
                 this.selectedPanel -= 1
             }
             this.panelContainerX = 0
             switch (this.selectedPanel){
                 case 1:
                     this.panelContainerX = 0;
+                    ourStartScene.panelArrowL.setVisible(false)
+                    ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 2:
                     this.panelContainerX = -625;
+                    ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 3:
                     this.panelContainerX = -1250;
+                    ourStartScene.panelArrowR.setVisible(true)
                     break;
             }
-            const ourStartScene = this.scene.get('StartScene');
+            
             
             this.tweens.add({
                 targets: this.panelsContainer,
@@ -620,7 +626,13 @@ class StartScene extends Phaser.Scene {
                 ease: 'Sine.InOut',
                 duration: 500,
                 onComplete: function () {
-                    ourStartScene.panelArrowL.setVisible(true);
+                    if (ourStartScene.selectedPanel < 3) {
+                        ourStartScene.panelArrowR.setVisible(true);
+                    }
+                    else{
+                        ourStartScene.panelArrowR.setVisible(false);
+                    }
+                    
                 }
             });   
         })
