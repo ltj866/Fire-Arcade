@@ -470,11 +470,9 @@ class StartScene extends Phaser.Scene {
         
         //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
-
         //card.setScale(1)
 
         // Masks
-
 
         const graphics = this.add.graphics();
 
@@ -497,18 +495,26 @@ class StartScene extends Phaser.Scene {
                 }
         });
 
+        // Tutorial Panels
+
         this.selectedPanel = 1;
 
         this.tutText1 = this.add.text(SCREEN_WIDTH/2, GRID * 6,
              'Press arrow keys to move.',
              {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0);
+        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 6,
+            'Collect atoms to grow longer.',
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
+        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 6,
+            'Use portals to bend spacetime.',
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
         
         this.tutWASD = this.add.sprite(SCREEN_HEIGHT/2 - 180,
              SCREEN_WIDTH/2 + 180).setDepth(103).setOrigin(0.5,0.5);
         this.tutWASD.play('tutAll').setScale(3).setAlpha(0);
 
         this.tutSnake = this.add.sprite(SCREEN_HEIGHT/2,
-             SCREEN_WIDTH/2,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(3).setAlpha(0);
+             SCREEN_WIDTH/2,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(2).setAlpha(0);
 
         this.time.delayedCall(600, event => {
             this.tweens.add({
@@ -556,8 +562,14 @@ class StartScene extends Phaser.Scene {
         const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 550, 500, 72,72,72,72);
         panel3.setDepth(100)
 
+        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 550, 500, 72,72,72,72);
+        panel4.setDepth(100)
+
         this.panels = []
-        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1, panel2, panel3)
+        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
+            panel2, this.tutText2,
+            panel3, this.tutText3,
+            panel4)
 
         this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(this.panels)
@@ -593,7 +605,7 @@ class StartScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             const ourStartScene = this.scene.get('StartScene');
-            if (this.selectedPanel < 3) {
+            if (this.selectedPanel < 4) {
                 this.selectedPanel += 1
             }
             this.panelContainerX = 0
@@ -608,6 +620,10 @@ class StartScene extends Phaser.Scene {
                     break;
                 case 3:
                     this.panelContainerX = -1250;
+                    ourStartScene.panelArrowL.setVisible(true)
+                    break;
+                case 4:
+                    this.panelContainerX = -1870;
                     ourStartScene.panelArrowL.setVisible(true)
                     ourStartScene.panelArrowR.setVisible(false)
                     this.continueText.setVisible(true)
@@ -641,6 +657,10 @@ class StartScene extends Phaser.Scene {
                     this.panelContainerX = -1250;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
+                case 4:
+                    this.panelContainerX = -1870;
+                    ourStartScene.panelArrowR.setVisible(true)
+                    break;
             }
             
             
@@ -650,7 +670,7 @@ class StartScene extends Phaser.Scene {
                 ease: 'Sine.InOut',
                 duration: 500,
                 onComplete: function () {
-                    if (ourStartScene.selectedPanel < 3) {
+                    if (ourStartScene.selectedPanel < 4) {
                         ourStartScene.panelArrowR.setVisible(true);
                     }
                     else{
