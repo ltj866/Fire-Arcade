@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 //******************************************************************** */
 // GameSettings 
 
-const IS_DEV = false;
+const IS_DEV = true;
 const ANALYTICS_VERS = "0.3.240705"
 const DEV_BRANCH = "dev"
 
@@ -248,7 +248,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'r-07-10-6'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1051,14 +1051,75 @@ class GameScene extends Phaser.Scene {
                     });
             }
         });
-        
 
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
-        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
+        this.map.getLayer(this.wallVarient);
+        this.map.forEachTile( tile => {
+            switch (tile.index) {
+                // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
+                case 550:
+                    var wallShimmerTop = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerTop.play('wrapBlock02');
+                    this.dreamWalls.push(wallShimmerTop);
+                    tile.index = -1;
+                    break;
 
-        this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
+                case 614:
+                    var wallShimmerBottom = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerBottom.play('wrapBlock07');
+                    this.dreamWalls.push(wallShimmerBottom);
+                    tile.index = -1;
+                    break;
+
+                case 581:
+                    var wallShimmerLeft = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerLeft.play('wrapBlock04');
+                    this.dreamWalls.push(wallShimmerLeft);
+                    tile.index = -1;
+                    break;
+
+                case 583:
+                    var wallShimmerRight = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerRight.play('wrapBlock05');
+                    this.dreamWalls.push(wallShimmerRight);
+                    tile.index = -1;
+                    break;
+
+                case 549:
+                    var wrapBlock01 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock01);
+                    tile.index = -1;
+                    break;
+
+                case 551:
+                    var wrapBlock03 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock03);
+                    tile.index = -1;
+                    break;
+                
+                case 613:
+                    var wrapBlock06 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock06);
+                    tile.index = -1;
+                    break;
+
+                case 615:
+                    var wrapBlock08 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock08);
+                    tile.index = -1;
+                    break;
+            
+                default:
+                    break;
+            }
+        });
 
         this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
@@ -1082,25 +1143,17 @@ class GameScene extends Phaser.Scene {
         // Dream walls for Horizontal Wrap
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(-10).setOrigin(0,0);
-                wallShimmerRight.play('wrapBlock05');
-                this.dreamWalls.push(wallShimmerRight);
                 
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(-10).setOrigin(0,0);
-                wallShimmerLeft.play('wrapBlock04');
-                this.dreamWalls.push(wallShimmerLeft);
+                
+                
             }
         }
 
         // Dream walls for Vertical Wrap
         for (let index = 1; index < END_X; index++) {
-            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(-10).setOrigin(0,0);
-            wallShimmerTop.play('wrapBlock02');
-            this.dreamWalls.push(wallShimmerTop);
+            
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - 1).setDepth(0).setOrigin(0,0);
-            wallShimmerBottom.play('wrapBlock07');
-            this.dreamWalls.push(wallShimmerBottom);
+            
         
         }
         
@@ -2473,7 +2526,6 @@ class GameScene extends Phaser.Scene {
 
 
 
-
         // This version for if we decide to build the wall index once and check against only wall values.
         //this.walls.forEach(wall => {
         //    if (wall.x < SCREEN_WIDTH) {
@@ -2495,6 +2547,7 @@ class GameScene extends Phaser.Scene {
         this.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
         });
+
 
         // Don't let fruit spawn on dreamwall blocks
         //scene.dreamWalls.forEach(_dreamWall => {
