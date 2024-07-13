@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 //******************************************************************** */
 // GameSettings 
 
-const IS_DEV = false;
+const IS_DEV = true;
 const ANALYTICS_VERS = "0.3.240705"
 const DEV_BRANCH = "dev"
 
@@ -161,15 +161,15 @@ var tileset2;
 const FADE_OUT_TILES = [104];
 
 //  Direction consts
-export const LEFT = 3;
-export const RIGHT = 4;
-export const UP = 1;
-export const DOWN = 2;
+//export const LEFT = 3;
+//export const RIGHT = 4;
+//export const UP = 1;
+//export const DOWN = 2;
 const START_SPRINT = 5;
 const STOP_SPRINT = 6;
-export const STOP = 0;
+//export const STOP = 0;
 
-const DIRS = Object.freeze({ 
+export const DIRS = Object.freeze({ 
     UP: 1, 
     DOWN: 2, 
     LEFT: 3, 
@@ -248,7 +248,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'r-07-10-6'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -571,8 +571,9 @@ class PersistScene extends Phaser.Scene {
     this.bgTick = 0;
 
              // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-            this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-            this.UIbackground.setScale(32); 
+            //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+            //this.UIbackground.setScale(32); 
+            //this.UIbackground.setVisible(false);  // TEMP while working on game screen size. @holden @James
 
             // Furthest BG Object
             this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
@@ -620,23 +621,24 @@ class PersistScene extends Phaser.Scene {
     this.zeds = Number(JSON.parse(rawZeds));
     var zedsObj = calcZedLevel(this.zeds);
     
+    // This is an important step, don't leave it out.
     calcSumOfBest(this);
 
     const styleBottomText = {
-        "font-size": '12px',
+        "font-size": '8px',
         "font-weight": 400,
         "text-align": 'right',
     }   
 
-    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 1, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
             `<span style ="color: limegreen;
-            font-size: 16px;
+            font-size: 9px;
             border: limegreen solid 1px;
             border-radius: 5px;
             padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
-    ).setOrigin(0,0.5);
+    ).setOrigin(0, 1);
 
 
     /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -652,7 +654,8 @@ class PersistScene extends Phaser.Scene {
     ).setOrigin(0,0.5);*/
 
     this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '12px',
+        'font-size': '8px',
+        'letter-spacing': '3px',
         })).setText(
             `portalsnake.${GAME_VERSION}`
     ).setOrigin(1,1);
@@ -883,6 +886,7 @@ class GameScene extends Phaser.Scene {
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
         this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
+        this.UIbackground.setVisible(false);
 
         // #region TileMap
 
@@ -894,7 +898,7 @@ class GameScene extends Phaser.Scene {
         spawnTile.index = -1; // Set to empty tile
 
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
-        this.snake.direction = STOP;
+        this.snake.direction = DIRS.STOP;
         
 
         this.tiledProperties = {};
@@ -1047,14 +1051,75 @@ class GameScene extends Phaser.Scene {
                     });
             }
         });
-        
 
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
-        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
+        this.map.getLayer(this.wallVarient);
+        this.map.forEachTile( tile => {
+            switch (tile.index) {
+                // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
+                case 550:
+                    var wallShimmerTop = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerTop.play('wrapBlock02');
+                    this.dreamWalls.push(wallShimmerTop);
+                    tile.index = -1;
+                    break;
 
-        this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
+                case 614:
+                    var wallShimmerBottom = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerBottom.play('wrapBlock07');
+                    this.dreamWalls.push(wallShimmerBottom);
+                    tile.index = -1;
+                    break;
+
+                case 581:
+                    var wallShimmerLeft = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerLeft.play('wrapBlock04');
+                    this.dreamWalls.push(wallShimmerLeft);
+                    tile.index = -1;
+                    break;
+
+                case 583:
+                    var wallShimmerRight = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    wallShimmerRight.play('wrapBlock05');
+                    this.dreamWalls.push(wallShimmerRight);
+                    tile.index = -1;
+                    break;
+
+                case 549:
+                    var wrapBlock01 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock01);
+                    tile.index = -1;
+                    break;
+
+                case 551:
+                    var wrapBlock03 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock03);
+                    tile.index = -1;
+                    break;
+                
+                case 613:
+                    var wrapBlock06 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock06);
+                    tile.index = -1;
+                    break;
+
+                case 615:
+                    var wrapBlock08 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock08);
+                    tile.index = -1;
+                    break;
+            
+                default:
+                    break;
+            }
+        });
 
         this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
@@ -1078,25 +1143,17 @@ class GameScene extends Phaser.Scene {
         // Dream walls for Horizontal Wrap
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(-10).setOrigin(0,0);
-                wallShimmerRight.play('wrapBlock05');
-                this.dreamWalls.push(wallShimmerRight);
                 
-                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(-10).setOrigin(0,0);
-                wallShimmerLeft.play('wrapBlock04');
-                this.dreamWalls.push(wallShimmerLeft);
+                
+                
             }
         }
 
         // Dream walls for Vertical Wrap
         for (let index = 1; index < END_X; index++) {
-            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(-10).setOrigin(0,0);
-            wallShimmerTop.play('wrapBlock02');
-            this.dreamWalls.push(wallShimmerTop);
+            
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(-10).setOrigin(0,0);
-            wallShimmerBottom.play('wrapBlock07');
-            this.dreamWalls.push(wallShimmerBottom);
+            
         
         }
         
@@ -2469,7 +2526,6 @@ class GameScene extends Phaser.Scene {
 
 
 
-
         // This version for if we decide to build the wall index once and check against only wall values.
         //this.walls.forEach(wall => {
         //    if (wall.x < SCREEN_WIDTH) {
@@ -2491,6 +2547,7 @@ class GameScene extends Phaser.Scene {
         this.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
         });
+
 
         // Don't let fruit spawn on dreamwall blocks
         //scene.dreamWalls.forEach(_dreamWall => {
@@ -5648,14 +5705,14 @@ class InputScene extends Phaser.Scene {
 
 
     moveUp(gameScene, key) {
-        if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
-            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+        if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
             this.setPLAY(gameScene);
             
                 // At anytime you can update the direction of the snake.
             gameScene.snake.head.setTexture('snakeDefault', 6);
-            gameScene.snake.direction = UP;
+            gameScene.snake.direction = DIRS.UP;
             
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
             this.turns += 1;
@@ -5681,13 +5738,13 @@ class InputScene extends Phaser.Scene {
     }
 
     moveDown(gameScene, key) {
-        if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
-            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+        if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
            
 
                this.setPLAY(gameScene);
                gameScene.snake.head.setTexture('snakeDefault', 7);
-           gameScene.snake.direction = DOWN;
+           gameScene.snake.direction = DIRS.DOWN;
 
            this.turns += 1;
            this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -5712,13 +5769,13 @@ class InputScene extends Phaser.Scene {
     }
 
     moveLeft(gameScene, key) {
-        if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
+        if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
             
                 this.setPLAY(gameScene);
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
-            gameScene.snake.direction = LEFT;
+            gameScene.snake.direction = DIRS.LEFT;
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -5743,12 +5800,12 @@ class InputScene extends Phaser.Scene {
     }
 
     moveRight(gameScene, key) {
-        if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
-            gameScene.snake.direction  === STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+        if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
                 this.setPLAY(gameScene);
                 gameScene.snake.head.setTexture('snakeDefault', 5);
-            gameScene.snake.direction = RIGHT;
+            gameScene.snake.direction = DIRS.RIGHT;
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);

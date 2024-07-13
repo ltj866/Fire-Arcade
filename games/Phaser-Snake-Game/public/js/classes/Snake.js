@@ -1,5 +1,5 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
-    LEFT, RIGHT, UP, DOWN, STOP, DEBUG, commaInt,
+    DIRS, DEBUG, commaInt,
     LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
@@ -101,39 +101,49 @@ var Snake = new Phaser.Class({
         this.snakeLightW.x = x - SCREEN_WIDTH
         this.snakeLightW.y = y
 
+        // wrapping tiles
+        scene.map.setLayer(scene.wallVarient);
+        
+        
+
 
         // Look ahead for bonks
+        
 
         var xN = this.head.x;
         var yN = this.head.y;
 
         
-    if (this.direction === LEFT)
+    if (this.direction === DIRS.LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
             ourPersistScene.bgCoords.x -= .25;
         }
-        else if (this.direction === RIGHT)
+        else if (this.direction === DIRS.RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x + GRID, 0, SCREEN_WIDTH);
             ourPersistScene.bgCoords.x += .25;
         }
-        else if (this.direction === UP)
+        else if (this.direction === DIRS.UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
             ourPersistScene.bgCoords.y -= .25;
         }
-        else if (this.direction === DOWN)
+        else if (this.direction === DIRS.DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 1 );
             ourPersistScene.bgCoords.y += .25;
         }
+
         
         // #region Bonk Walls
         scene.map.setLayer(scene.wallVarient);
-        if (scene.map.getTileAtWorldXY( xN, yN )) {
+        var nextTile = scene.map.getTileAtWorldXY( xN, yN);
+        debugger
+        
+        if (nextTile != null && nextTile.properties.hasCollision) {
             
-            this.direction = STOP;
+            this.direction = DIRS.STOP;
             if (scene.bonkable) {
                 this.bonk(scene);  
             }
@@ -145,7 +155,7 @@ var Snake = new Phaser.Class({
             if (scene.map.getTileAtWorldXY( xN, yN )) {
             
         
-                this.direction = STOP;
+                this.direction = DIRS.STOP;
                 if (scene.bonkable) {
                     this.bonk(scene);   
                 }
@@ -198,7 +208,7 @@ var Snake = new Phaser.Class({
         }
     
         // Actually Move the Snake Head
-        if (scene.gState != GState.BONK && this.direction != STOP) {
+        if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
         
@@ -327,7 +337,7 @@ var Snake = new Phaser.Class({
         const ourPersistScene = scene.scene.get('PersistScene');
         
         scene.gState = GState.BONK;
-        this.direction = STOP;
+        this.direction = DIRS.STOP;
         console.log(scene.gState, "BONK" , this.direction);
 
         scene.screenShake();
