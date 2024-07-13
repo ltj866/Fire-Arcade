@@ -141,7 +141,7 @@ var Snake = new Phaser.Class({
         var nextTile = scene.map.getTileAtWorldXY( xN, yN);
         debugger
         
-        if (nextTile != null && nextTile.properties.noCollision === false) {
+        if (nextTile != null && nextTile.properties.hasCollision) {
             
             this.direction = DIRS.STOP;
             if (scene.bonkable) {
