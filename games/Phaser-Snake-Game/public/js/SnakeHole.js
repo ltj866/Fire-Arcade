@@ -5670,8 +5670,8 @@ class InputScene extends Phaser.Scene {
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(SCREEN_WIDTH / 2, 38 * GRID, 'upWASD', 0
-    ).setDepth(50).setOrigin(0.38,1).setScale(7).setInteractive();
+    this.upWASD = this.add.sprite(SCREEN_WIDTH / 2, 39 * GRID, 'upWASD', 0
+    ).setDepth(50).setOrigin(0.38,1).setScale(14).setInteractive();
     this.upWASD.on('pointerdown', function (pointer)
     {
 
@@ -5689,8 +5689,8 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.downWASD = this.add.sprite(SCREEN_WIDTH / 2, 38 * GRID, 'downWASD', 0
-    ).setDepth(50).setOrigin(0.5,0).setScale(7).setInteractive();
+    this.downWASD = this.add.sprite(SCREEN_WIDTH / 2, 39 * GRID, 'downWASD', 0
+    ).setDepth(50).setOrigin(0.5,0).setScale(14).setInteractive();
     this.downWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
@@ -5708,8 +5708,8 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.leftWASD = this.add.sprite(SCREEN_WIDTH / 2 - 42, 38 * GRID - 7, 'leftWASD', 0
-    ).setDepth(50).setOrigin(1,0).setScale(7).setInteractive();
+    this.leftWASD = this.add.sprite(SCREEN_WIDTH / 2 - 100, 39 * GRID - 7, 'leftWASD', 0
+    ).setDepth(50).setOrigin(1,0).setScale(14).setInteractive();
     this.leftWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
@@ -5727,8 +5727,8 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.rightWASD = this.add.sprite(SCREEN_WIDTH / 2 + 42, 38 * GRID - 7, 'rightWASD', 0
-    ).setDepth(50).setOrigin(0,0).setScale(7).setInteractive();
+    this.rightWASD = this.add.sprite(SCREEN_WIDTH / 2 + 100, 39 * GRID - 7, 'rightWASD', 0
+    ).setDepth(50).setOrigin(0,0).setScale(14).setInteractive();
     this.rightWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
@@ -5751,7 +5751,7 @@ class InputScene extends Phaser.Scene {
     
 
 
-    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 43 * GRID, 'spaceWASD', 0
+    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 46 * GRID, 'spaceWASD', 0
     ).setDepth(50).setOrigin(0.5,0).setScale(4).setInteractive();
     this.spaceWASD.on('pointerdown', function (pointer)
     {
@@ -6372,10 +6372,10 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 744 + 15 * GRID
+        height: 744 + 18 * GRID
     },
     width: 744, 
-    height: 744 + 15 * GRID,
+    height: 744 + 18 * GRID,
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
