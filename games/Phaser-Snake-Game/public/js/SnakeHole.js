@@ -476,7 +476,8 @@ class StartScene extends Phaser.Scene {
         //card.setOrigin(0,0);
 
         //card.setScale(1)
-        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}
+        ).setOrigin(0.5,0).setInteractive();
         
         this.tweens.add({
             targets: continueText,
@@ -488,53 +489,60 @@ class StartScene extends Phaser.Scene {
           });
 
         this.input.keyboard.on('keydown', e => {
-
-            // #region SCORE DEBUG
-            if (SCORE_SCENE_DEBUG) {
-                
-
-                var ourGame = this.scene.get("GameScene");
-                var ourInput = this.scene.get("InputScene");
-            
-
-                ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
-                ourGame.stageDiffBonus = 140;
-                ourGame.stage = END_STAGE;
-                //END_STAGE = "Stage-01";
-
-                this.score = 12345;
-                this.bonks = 3;
-                this.length = 28;
-                this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
-                this.zedLevel = 77;
-                this.medals = {
-                    "fast":'silver',
-                    "Rank":'gold'
-                }
-
-                ourInput.turns = 79;
-                ourInput.cornerTime = 190;
-                ourInput.boostTime = 400;
-
-                var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
-                var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
-                var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
-
-                this.stageHistory = [stage01, stage02, stage03];
-                this.scene.start('ScoreScene');
-            }
-            else {
-                                                
-                this.scene.setVisible(false);
-                //this.scene.get("UIScene").setVisible(false);
-                
-                //this.scene.launch('UIScene');
-                this.scene.launch('GameScene');
-                //var ourGameScene = this.scene.get("GameScene");
-                //console.log(e)
-            }
-            this.scene.stop();
+            this.onInput();
         })
+        this.input.on('pointerdown', e => {
+            this.onInput();
+        });
+    }
+
+    onInput() {
+        // #region SCORE DEBUG
+        if (SCORE_SCENE_DEBUG) {
+                
+
+            var ourGame = this.scene.get("GameScene");
+            var ourInput = this.scene.get("InputScene");
+        
+
+            ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
+            ourGame.stageDiffBonus = 140;
+            ourGame.stage = END_STAGE;
+            //END_STAGE = "Stage-01";
+
+            this.score = 12345;
+            this.bonks = 3;
+            this.length = 28;
+            this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+            this.zedLevel = 77;
+            this.medals = {
+                "fast":'silver',
+                "Rank":'gold'
+            }
+
+            ourInput.turns = 79;
+            ourInput.cornerTime = 190;
+            ourInput.boostTime = 400;
+
+            var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
+            var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
+            var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
+
+            this.stageHistory = [stage01, stage02, stage03];
+            this.scene.start('ScoreScene');
+        }
+        else {
+                                            
+            this.scene.setVisible(false);
+            //this.scene.get("UIScene").setVisible(false);
+            
+            //this.scene.launch('UIScene');
+            this.scene.launch('GameScene');
+            //var ourGameScene = this.scene.get("GameScene");
+            //console.log(e)
+        }
+        this.scene.stop();
+
     }
 
     end() {
@@ -5642,8 +5650,8 @@ class InputScene extends Phaser.Scene {
         this.load.image('upWASD', 'assets/sprites/upWASD.png')
         this.load.image('downWASD', 'assets/sprites/downWASD.png');
         this.load.image('leftWASD', 'assets/sprites/leftWASD.png');
-        this.load.image('rightWASD', 'assets/sprites/rightWASD');
-        this.load.image('spaceWASD', 'assets/sprites/spaceWASD');
+        this.load.image('rightWASD', 'assets/sprites/rightWASD.png');
+        this.load.image('spaceWASD', 'assets/sprites/spaceWASD.png');
 
     }
     create() {
@@ -5653,7 +5661,7 @@ class InputScene extends Phaser.Scene {
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     this.upWASD = this.add.sprite(18 * GRID, 32 * GRID, 'upWASD', 0
-    ).setDepth(50).setOrigin(0,0).setScale(4).setInteractive();
+    ).setDepth(50).setOrigin(0,0).setScale(6).setInteractive();
 
 
     this.upWASD.on('pointerdown', function (pointer)
@@ -5672,6 +5680,32 @@ class InputScene extends Phaser.Scene {
     });
 
     this.upWASD.on('pointerup', function (pointer)
+    {
+
+        this.clearTint();
+
+    });
+
+
+    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 36 * GRID, 'spaceWASD', 0
+    ).setDepth(50).setOrigin(0.5,0).setScale(4).setInteractive();
+    this.spaceWASD
+    this.spaceWASD.on('pointerdown', function (pointer)
+    {
+
+        this.setTint(0xff0000);
+        ourInput.moveUp(ourGame, "upUI")
+
+    });
+
+    this.spaceWASD.on('pointerout', function (pointer)
+    {
+
+        this.clearTint();
+
+    });
+
+    this.spaceWASD.on('pointerup', function (pointer)
     {
 
         this.clearTint();
