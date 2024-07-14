@@ -5670,10 +5670,8 @@ class InputScene extends Phaser.Scene {
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(18 * GRID, 32 * GRID, 'upWASD', 0
-    ).setDepth(50).setOrigin(0,0).setScale(6).setInteractive();
-
-
+    this.upWASD = this.add.sprite(SCREEN_WIDTH / 2, 38 * GRID, 'upWASD', 0
+    ).setDepth(50).setOrigin(0.38,1).setScale(7).setInteractive();
     this.upWASD.on('pointerdown', function (pointer)
     {
 
@@ -5681,43 +5679,94 @@ class InputScene extends Phaser.Scene {
         ourInput.moveUp(ourGame, "upUI")
 
     });
-
     this.upWASD.on('pointerout', function (pointer)
     {
-
         this.clearTint();
-
     });
-
     this.upWASD.on('pointerup', function (pointer)
     {
-
         this.clearTint();
-
     });
 
 
-    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 36 * GRID, 'spaceWASD', 0
+    this.downWASD = this.add.sprite(SCREEN_WIDTH / 2, 38 * GRID, 'downWASD', 0
+    ).setDepth(50).setOrigin(0.5,0).setScale(7).setInteractive();
+    this.downWASD.on('pointerdown', function (pointer)
+    {
+        this.setTint(0xff0000);
+        ourInput.moveDown(ourGame, "downUI")
+    });
+
+    this.downWASD.on('pointerout', function (pointer)
+    {
+        this.clearTint();
+    });
+
+    this.downWASD.on('pointerup', function (pointer)
+    {
+        this.clearTint();
+    });
+
+
+    this.leftWASD = this.add.sprite(SCREEN_WIDTH / 2 - 42, 38 * GRID - 7, 'leftWASD', 0
+    ).setDepth(50).setOrigin(1,0).setScale(7).setInteractive();
+    this.leftWASD.on('pointerdown', function (pointer)
+    {
+        this.setTint(0xff0000);
+        ourInput.moveLeft(ourGame, "leftUI")
+    });
+
+    this.leftWASD.on('pointerout', function (pointer)
+    {
+        this.clearTint();
+    });
+
+    this.leftWASD.on('pointerup', function (pointer)
+    {
+        this.clearTint();
+    });
+
+
+    this.rightWASD = this.add.sprite(SCREEN_WIDTH / 2 + 42, 38 * GRID - 7, 'rightWASD', 0
+    ).setDepth(50).setOrigin(0,0).setScale(7).setInteractive();
+    this.rightWASD.on('pointerdown', function (pointer)
+    {
+        this.setTint(0xff0000);
+        ourInput.moveRight(ourGame, "rightUI")
+    });
+
+    this.rightWASD.on('pointerout', function (pointer)
+    {
+        this.clearTint();
+    });
+
+    this.rightWASD.on('pointerup', function (pointer)
+    {
+        this.clearTint();
+    });
+
+
+
+
+    
+
+
+    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 43 * GRID, 'spaceWASD', 0
     ).setDepth(50).setOrigin(0.5,0).setScale(4).setInteractive();
-    this.spaceWASD
     this.spaceWASD.on('pointerdown', function (pointer)
     {
-
         this.setTint(0xff0000);
         ourInput.moveUp(ourGame, "upUI")
-
     });
 
     this.spaceWASD.on('pointerout', function (pointer)
     {
-
         this.clearTint();
 
     });
 
     this.spaceWASD.on('pointerup', function (pointer)
     {
-
         this.clearTint();
 
     });
@@ -6323,10 +6372,10 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 744 + 8 * GRID
+        height: 744 + 15 * GRID
     },
     width: 744, 
-    height: 744 + 8 * GRID,
+    height: 744 + 15 * GRID,
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
