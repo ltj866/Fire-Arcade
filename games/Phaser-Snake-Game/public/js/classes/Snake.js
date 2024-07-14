@@ -44,6 +44,10 @@ var Snake = new Phaser.Class({
     // #region Grow
     grow: function (scene)
     {
+        
+        scene.scale.gameSize.height += 24;
+        scene.scale.refresh()
+        //debugger
         if (scene.boostOutlinesBody.length > 0) {
             //newPart.setTint(0xFF00FF);
             // Make the new one
@@ -139,7 +143,7 @@ var Snake = new Phaser.Class({
         // #region Bonk Walls
         scene.map.setLayer(scene.wallVarient);
         var nextTile = scene.map.getTileAtWorldXY( xN, yN);
-        debugger
+        //debugger
         
         if (nextTile != null && nextTile.properties.hasCollision) {
             

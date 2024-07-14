@@ -6245,10 +6245,10 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 744
+        height: 864
     },
     width: 744, 
-    height: 744,
+    height: 864,
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
@@ -6278,7 +6278,7 @@ var config = {
 
 // #region Screen Settings
 export const SCREEN_WIDTH = config.width;
-export const SCREEN_HEIGHT = config.height; 
+export const SCREEN_HEIGHT = 31 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
 
 // Edge locations for X and Y
 export const END_X = SCREEN_WIDTH/GRID - 1;
