@@ -329,6 +329,7 @@ class StartScene extends Phaser.Scene {
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
+
         //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -5638,11 +5639,44 @@ class InputScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('upWASD', 'assets/sprites/upWASD.png')
+        this.load.image('downWASD', 'assets/sprites/downWASD.png');
+        this.load.image('leftWASD', 'assets/sprites/leftWASD.png');
+        this.load.image('rightWASD', 'assets/sprites/rightWASD');
+        this.load.image('spaceWASD', 'assets/sprites/spaceWASD');
 
     }
     create() {
+    const ourGame = this.scene.get("GameScene");
+    const ourInput = this.scene.get("InputScene");
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    this.upWASD = this.add.sprite(18 * GRID, 32 * GRID, 'upWASD', 0
+    ).setDepth(50).setOrigin(0,0).setScale(4).setInteractive();
+
+
+    this.upWASD.on('pointerdown', function (pointer)
+    {
+
+        this.setTint(0xff0000);
+        ourInput.moveUp(ourGame, "upUI")
+
+    });
+
+    this.upWASD.on('pointerout', function (pointer)
+    {
+
+        this.clearTint();
+
+    });
+
+    this.upWASD.on('pointerup', function (pointer)
+    {
+
+        this.clearTint();
+
+    });
     /*
     const ourGame = this.scene.get('GameScene');
 
@@ -6245,10 +6279,10 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 864
+        height: 744 + 8 * GRID
     },
     width: 744, 
-    height: 864,
+    height: 744 + 8 * GRID,
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
