@@ -6238,13 +6238,22 @@ function loadSpriteSheetsAndAnims(scene) {
 // #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
-    width: 744,
+    //min: {
+    //    width: 480,
+    //    height: 480
+
+    //},
+    max : {
+        width: 744,
+        height: 744
+    },
+    width: 744, 
     height: 744,
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
-        //mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.FIT,
     },
     parent: 'phaser-example',
     physics: {
@@ -6277,6 +6286,7 @@ export const END_Y = SCREEN_HEIGHT/GRID - 1;
 
 // Collision only works if GRID is whole divisor of HEIGHT and WIDTH
 if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
+    debugger
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
