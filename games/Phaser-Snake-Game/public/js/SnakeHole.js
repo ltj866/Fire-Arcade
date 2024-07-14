@@ -488,11 +488,21 @@ class StartScene extends Phaser.Scene {
             yoyo: true
           });
 
+        var onInput = function () {
+            this.onInput();
+
+        }
+
         this.input.keyboard.on('keydown', e => {
             this.onInput();
-        })
-        this.input.on('pointerdown', e => {
+        });
+
+
+        continueText.on('pointerdown', e =>
+        {
             this.onInput();
+            //ourInput.moveUp(ourGame, "upUI")
+    
         });
     }
 
