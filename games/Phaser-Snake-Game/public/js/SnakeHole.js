@@ -330,6 +330,8 @@ class StartScene extends Phaser.Scene {
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
         this.load.image('tutSnakeWASD', 'assets/HowToCards/tutorial_snake_WASD.png');
+        this.load.image('tutSnakePortal1', 'assets/HowToCards/tutorial_snake_portal1.png');
+        this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
         //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -358,6 +360,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
         this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
+        this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 16 });
 
         //WRAP BLOCKS:
         //this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
@@ -466,7 +469,7 @@ class StartScene extends Phaser.Scene {
 
 
 
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+        this.add.text(SCREEN_WIDTH/2, GRID * 5.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
         //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
@@ -499,22 +502,25 @@ class StartScene extends Phaser.Scene {
 
         this.selectedPanel = 1;
 
-        this.tutText1 = this.add.text(SCREEN_WIDTH/2, GRID * 6,
+        this.tutText1 = this.add.text(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 20,
              'Press arrow keys to move.',
              {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0);
-        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 6,
+        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 11,
             'Collect atoms to grow longer.',
             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
-        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 6,
+        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 20,
             'Use portals to bend spacetime.',
             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
+        this.tutText4 = this.add.text((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 20,
+            'Boost with spacebar.',
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
         
-        this.tutWASD = this.add.sprite(SCREEN_HEIGHT/2 - 180,
-             SCREEN_WIDTH/2 + 180).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutAll').setScale(3).setAlpha(0);
+        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
+             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutWASD.play('tutAll').setScale(2).setAlpha(0);
 
         this.tutSnake = this.add.sprite(SCREEN_HEIGHT/2,
-             SCREEN_WIDTH/2,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(2).setAlpha(0);
+             SCREEN_WIDTH/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(2).setAlpha(0);
 
         this.time.delayedCall(600, event => {
             this.tweens.add({
@@ -534,8 +540,8 @@ class StartScene extends Phaser.Scene {
             this.tweens.add({
                 targets: panel1,
                 scale: 1,
-                width: 550,
-                height: 500,
+                width: 480,
+                height: 320,
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
@@ -550,8 +556,8 @@ class StartScene extends Phaser.Scene {
             this.tweens.add({
                 targets: panel2,
                 scale: 1,
-                width: 550,
-                height: 500,
+                width: 400,
+                height: 280,
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
@@ -559,17 +565,49 @@ class StartScene extends Phaser.Scene {
             });
         });
 
-        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 550, 500, 72,72,72,72);
+        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomSmall.play('atom04idle')
+        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomMedium.play('atom03idle')
+        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomLarge.play('atom02idle')
+        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomCharged.play('atom01idle')
+        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomElectrons.play('electronIdle')
+
+        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
         panel3.setDepth(100)
 
-        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 550, 500, 72,72,72,72);
+        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
+            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal1.play('portalIdle')
+        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal2.play('portalIdle')
+
+        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(2);
+        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(2);
+
+        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
         panel4.setDepth(100)
+
+        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
+            SCREEN_HEIGHT/2 + GRID  * 4.75).setDepth(103).setOrigin(0.5,0.5);
+       this.tutSPACE.play('tutSpace').setScale(2);
 
         this.panels = []
         this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
-            panel2, this.tutText2,
-            panel3, this.tutText3,
-            panel4)
+            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
+            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
+            panel4, this.tutText4,this.tutSPACE)
 
         this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(this.panels)
@@ -577,7 +615,7 @@ class StartScene extends Phaser.Scene {
 
 
         this.hasPlayedBefore = false;
-        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
         this.continueText.setVisible(false)
         if (!this.hasPlayedBefore) {
             //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
@@ -594,17 +632,18 @@ class StartScene extends Phaser.Scene {
             yoyo: true
           });
         
-        this.panelArrowR = this.add.sprite(SCREEN_HEIGHT/2 +300, SCREEN_WIDTH/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 +300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
         this.panelArrowR.play('startArrowIdle').setAlpha(0);
         this.panelArrowR.angle = 90;
         
-        this.panelArrowL = this.add.sprite(SCREEN_HEIGHT/2 -300, SCREEN_WIDTH/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 -300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
         this.panelArrowL.play('startArrowIdle');
         this.panelArrowL.angle = 270;
         this.panelArrowL.setVisible(false).setAlpha(0);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             const ourStartScene = this.scene.get('StartScene');
+            const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel < 4) {
                 this.selectedPanel += 1
             }
@@ -615,14 +654,17 @@ class StartScene extends Phaser.Scene {
                     ourStartScene.panelArrowL.setVisible(false)
                     break;
                 case 2:
+                    ourPersist.bgCoords.x += 20;
                     this.panelContainerX = -625;
                     ourStartScene.panelArrowL.setVisible(true)
                     break;
                 case 3:
+                    ourPersist.bgCoords.x += 20;
                     this.panelContainerX = -1250;
                     ourStartScene.panelArrowL.setVisible(true)
                     break;
                 case 4:
+                    ourPersist.bgCoords.x = 60;
                     this.panelContainerX = -1870;
                     ourStartScene.panelArrowL.setVisible(true)
                     ourStartScene.panelArrowR.setVisible(false)
@@ -639,25 +681,30 @@ class StartScene extends Phaser.Scene {
         })
         this.input.keyboard.on('keydown-LEFT', e => {
             const ourStartScene = this.scene.get('StartScene');
+            const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel > 1) {
                 this.selectedPanel -= 1
             }
             this.panelContainerX = 0
             switch (this.selectedPanel){
                 case 1:
+                    ourPersist.bgCoords.x = 0;
                     this.panelContainerX = 0;
                     ourStartScene.panelArrowL.setVisible(false)
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 2:
+                    ourPersist.bgCoords.x -= 20;
                     this.panelContainerX = -625;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 3:
+                    ourPersist.bgCoords.x -= 20;
                     this.panelContainerX = -1250;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 4:
+                    ourPersist.bgCoords.x -= 20;
                     this.panelContainerX = -1870;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
@@ -6173,6 +6220,12 @@ function loadSpriteSheetsAndAnims(scene) {
     frameRate: 12,
     repeat: -1
     });
+    scene.anims.create({
+        key: 'tutSpace',
+        frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [ 0,0,0,0,1,2,2,2,2,1]}),
+        frameRate: 12,
+        repeat: -1
+        });
     
     scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
         frame: 'portalAnim.png'
