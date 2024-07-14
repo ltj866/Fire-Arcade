@@ -248,7 +248,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'r07-14'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -5758,7 +5758,11 @@ class InputScene extends Phaser.Scene {
     this.spaceWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
-        ourInput.moveUp(ourGame, "upUI")
+        debugger  
+        //ourGame.scale.setHeight(744);
+        //ourGame.cameras.main.setViewport(0,0,744,744);
+              
+       
     });
 
     this.spaceWASD.on('pointerout', function (pointer)
