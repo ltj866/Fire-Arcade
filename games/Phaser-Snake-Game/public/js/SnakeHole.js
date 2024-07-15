@@ -330,6 +330,7 @@ class StartScene extends Phaser.Scene {
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
         this.load.image('tutSnakeWASD', 'assets/HowToCards/tutorial_snake_WASD.png');
+        this.load.image('tutSnakeSPACE', 'assets/HowToCards/tutorial_snake_SPACE.png');
         this.load.image('tutSnakePortal1', 'assets/HowToCards/tutorial_snake_portal1.png');
         this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
         //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
@@ -360,7 +361,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
         this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
-        this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 16 });
+        this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
 
         //WRAP BLOCKS:
         //this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
@@ -477,6 +478,7 @@ class StartScene extends Phaser.Scene {
 
         // Masks
 
+
         const graphics = this.add.graphics();
 
         this.tweenValue = 0;
@@ -591,9 +593,9 @@ class StartScene extends Phaser.Scene {
             SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
         this.tutPortal2.play('portalIdle')
 
-        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
+        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
         SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(2);
-        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
+        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
         SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(2);
 
         const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
@@ -603,11 +605,14 @@ class StartScene extends Phaser.Scene {
             SCREEN_HEIGHT/2 + GRID  * 4.75).setDepth(103).setOrigin(0.5,0.5);
        this.tutSPACE.play('tutSpace').setScale(2);
 
+       this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
+        SCREEN_WIDTH/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(2);
+
         this.panels = []
         this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
             panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
             panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
-            panel4, this.tutText4,this.tutSPACE)
+            panel4, this.tutText4,this.tutSPACE,this.tutSnake4)
 
         this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(this.panels)
@@ -1123,25 +1128,28 @@ class GameScene extends Phaser.Scene {
         this.snakeCritical = false;
 
         this.graphics = this.add.graphics();
-        var tween = this.tweens.addCounter({
-            from: 330,
-            to: 600,
-            ease: 'Sine.InOut',
-            duration: 1000,
-            onUpdate: tween =>
-                {   
-                    this.graphics.clear();
-                    var value = (tween.getValue());
-                    this.tweenValue = value
-                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                    var geomask1 = this.shape1.createGeometryMask();
-                    
-                    this.cameras.main.setMask(geomask1,true)
-                }
-        });
-        tween.on('complete', ()=>{ //need this or else visual bugs occur
-            this.cameras.main.setMask(false)
-        });
+        if (this.startupAnim) {
+            var tween = this.tweens.addCounter({
+                from: 0,
+                to: 600,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                onUpdate: tween =>
+                    {   
+                        this.graphics.clear();
+                        var value = (tween.getValue());
+                        this.tweenValue = value
+                        this.shape1 = this.make.graphics().fillCircle(this.snake.head.x, this.snake.head.y, value);
+                        var geomask1 = this.shape1.createGeometryMask();
+                        
+                        this.cameras.main.setMask(geomask1,true)
+                    }
+            });
+            tween.on('complete', ()=>{ //need this or else visual bugs occur
+                this.cameras.main.setMask(false)
+            });
+        }
+        
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
@@ -2564,8 +2572,10 @@ class GameScene extends Phaser.Scene {
             80, 18, 18, 18);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
+
         this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
+        
         
 
         this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
@@ -2600,7 +2610,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // dot matrix
-
+        
         if (this.startupAnim){
 
             const hsv = Phaser.Display.Color.HSVColorWheel();
@@ -2956,11 +2966,28 @@ class GameScene extends Phaser.Scene {
         snakeholeTween.on('complete', () => {
             this.nextStage(this.nextStages[nextStageIndex]);
         });
+        /*var tween = this.tweens.addCounter({
+            from: 600,
+            to: 0,
+            ease: 'Sine.InOut',
+            duration: 2000,
+            onUpdate: tween =>
+                {   
+                    this.graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(this.snake.head.x, this.snake.head.y, value);
+                    var geomask1 = this.shape1.createGeometryMask();
                     
-                
-            
-
-
+                    this.cameras.main.setMask(geomask1,true)
+                    //this.cameras.main.ignore(this.scorePanel)
+                }
+        });
+        tween.on('complete', ()=>{
+            this.cameras.main.setMask(false)
+            this.nextStage(this.nextStages[nextStageIndex]);
+        });*/
+                    
     }
 
     currentScoreTimer() {
