@@ -145,12 +145,18 @@ var Snake = new Phaser.Class({
         var nextTile = scene.map.getTileAtWorldXY( xN, yN);
         //debugger
         
-        if (nextTile != null && nextTile.properties.hasCollision) {
+        if (nextTile != null && nextTile.properties.hasCollision && !scene.winned) {
             
             this.direction = DIRS.STOP;
             if (scene.bonkable) {
                 this.bonk(scene);  
             }
+        }
+
+        var onTile = scene.map.getTileAtWorldXY( this.head.x, this.head.y);
+        if (GState.PLAY === scene.gState && onTile != null && onTile.properties.hasCollision){
+            
+            console.log("Playing Sound now cause I am boss and won.")
         }
 
         // #region Bonk Ghost Walls

@@ -321,49 +321,4 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="548">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="549">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="550">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="580">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="581">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="582">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="612">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="613">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="614">
-  <properties>
-   <property name="noCollision" type="bool" value="true"/>
-  </properties>
- </tile>
 </tileset>

@@ -188,7 +188,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 127.54749945402924,
-                "y": 368.2900196549465
+                "y": 368.29001965494643
             }
         },
         "Racing_Stage-02.json#tileSheetx24": {
@@ -774,7 +774,7 @@
             "scale": 1.3509408602150537,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.7032136105861,
+                "x": 372.70321361058603,
                 "y": 366.41130235797436
             }
         },
@@ -785,8 +785,8 @@
             "scale": 1.522043010752688,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 327.5203108442247,
-                "y": 365.9554927587425
+                "x": 327.52031084422464,
+                "y": 365.9554927587426
             }
         },
         "World_4-2.json#tileSheetx24": {
@@ -796,7 +796,7 @@
             "scale": 1.3509408602150537,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 372.7032136105861,
+                "x": 372.70321361058603,
                 "y": 366.41130235797436
             }
         },
@@ -1101,6 +1101,29 @@
             }
         },
         "r-07-10.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r07-14-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 423.5,
+                "y": 277
+            }
+        },
+        "r07-14-2.json#tileSheetx24": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "r07-14.json": {
+            "scale": 1.5935483870967742,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 371.81174089068827,
+                "y": 372.12550607287454
+            }
+        },
+        "r07-14.json#tileSheetx24": {
             "scaleInDock": 1
         },
         "rough-01.json": {
