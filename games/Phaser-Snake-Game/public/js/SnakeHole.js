@@ -1673,7 +1673,8 @@ class GameScene extends Phaser.Scene {
 
         
         
-
+        this.blackholes = [];
+        this.blackholeLabels = [];
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
             
@@ -1804,17 +1805,19 @@ class GameScene extends Phaser.Scene {
 
                                     var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
                                         stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
-                                    ).setDepth(50).setOrigin(0,0);
+                                    ).setDepth(50).setOrigin(0,0).setAlpha(0);
                                     
                                     var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
-                                    ).setDepth(49).setOrigin(0,0).setAlpha(.8);
+                                    ).setDepth(49).setOrigin(0,0).setAlpha(0);
 
                                     r1.setStrokeStyle(2, 0x4d9be6);
 
                                     
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                                         'blackHole' 
-                                    ).setDepth(10).setOrigin(0.425,0.425);
+                                    ).setDepth(10).setOrigin(0.425,0.425).setScale(0);
+                                    this.blackholes.push(portalImage)
+                                    this.blackholeLabels.push(stageText,r1)
 
                                     //line code doesn't work yet
                                     //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
@@ -1848,6 +1851,20 @@ class GameScene extends Phaser.Scene {
                                     
                                     this.nextStagePortals.push(portalImage);
                                 }
+                                this.tweens.add({
+                                    targets: this.blackholes,
+                                    scale: {from: 0, to: 1},
+                                    ease: 'Sine.easeOutIn',
+                                    duration: 500,
+                                    delay: this.tweens.stagger(360)
+                                });
+                                this.tweens.add({
+                                    targets: this.blackholeLabels,
+                                    alpha: {from: 0, to: 1},
+                                    ease: 'Sine.easeOutIn',
+                                    duration: 300,
+                                    delay: this.tweens.stagger(360)
+                                });
                             }
                         });
 
