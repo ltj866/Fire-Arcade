@@ -1005,7 +1005,7 @@ class PersistScene extends Phaser.Scene {
                 {   
                     this.graphics.clear();
                     var value = (tween.getValue());
-                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, value);
                     var geomask1 = this.shape1.createGeometryMask();
                     
                     this.bg.setMask(geomask1,true)
@@ -1197,7 +1197,6 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
-
         const ourInputScene = this.scene.get('InputScene');
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
@@ -1206,6 +1205,8 @@ class GameScene extends Phaser.Scene {
         this.snakeCritical = false;
 
         this.graphics = this.add.graphics();
+        
+        
         if (this.startupAnim) {
             var tween = this.tweens.addCounter({
                 from: 0,
@@ -1217,7 +1218,7 @@ class GameScene extends Phaser.Scene {
                         this.graphics.clear();
                         var value = (tween.getValue());
                         this.tweenValue = value
-                        this.shape1 = this.make.graphics().fillCircle(this.snake.head.x, this.snake.head.y, value);
+                        this.shape1 = this.make.graphics().fillCircle(this.snake.head.x + GRID * .5, this.snake.head.y + GRID * .5, value);
                         var geomask1 = this.shape1.createGeometryMask();
                         
                         this.cameras.main.setMask(geomask1,true)
@@ -1227,6 +1228,13 @@ class GameScene extends Phaser.Scene {
                 this.cameras.main.setMask(false)
             });
         }
+        //this.cameras.main.setAlpha(1)
+        this.time.delayedCall(1, function() {
+            ourGameScene.cameras.main.setAlpha(0)
+        });
+        this.time.delayedCall(17, function() {
+            ourGameScene.cameras.main.setAlpha(1)
+        });
         
         
         //loadAnimations(this);
@@ -1794,18 +1802,23 @@ class GameScene extends Phaser.Scene {
                                     
                                     console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
 
-                                    var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
-                                        stageName
+                                    var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
+                                        stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
                                     ).setDepth(50).setOrigin(0,0);
+                                    
+                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
+                                    ).setDepth(49).setOrigin(0,0).setAlpha(.8);
 
+                                    r1.setStrokeStyle(2, 0x4d9be6);
 
-
+                                    
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                                         'blackHole' 
                                     ).setDepth(10).setOrigin(0.425,0.425);
-                                    
-                                    
-                                    
+
+                                    //line code doesn't work yet
+                                    //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
+                                    //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, portalImage.x,portalImage.y, r1.x,r1.y[0x000000],1)
                                     
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
                                         switch (ourPersist.bestOfStageData[stageName].stageRank()) {
@@ -2436,7 +2449,9 @@ class GameScene extends Phaser.Scene {
             'padding': '2px 7px 0px 0px',
             })).setHTML(
                 countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0.5);
+        ).setOrigin(1,0.5).setAlpha(0);
+
+        
 
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
@@ -2461,7 +2476,18 @@ class GameScene extends Phaser.Scene {
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
                 `${commaInt(this.scene.get("PersistScene").coins).padStart(2, '0')}`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0).setAlpha(0);
+
+        this.time.delayedCall(1000, event => {
+            const ourGameScene = this.scene.get('GameScene');
+            this.tweens.add({
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 500,
+              });
+        });
+        
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
         //    `LASTΔ :`
@@ -2763,8 +2789,7 @@ class GameScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1,
            })
-    
-        
+
     }
     // #region .screenShake(
     screenShake(){
@@ -4171,7 +4196,6 @@ class ScoreScene extends Phaser.Scene {
         ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x323353, .75);
         ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
         ourGame.stageBackGround.alpha = 0;
-        //herehere
 
         ourGame.bgTween = ourGame.tweens.add({
             targets: [ourGame.stageBackGround, ourGame.continueBanner],
