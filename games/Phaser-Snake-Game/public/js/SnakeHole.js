@@ -416,7 +416,8 @@ class StartScene extends Phaser.Scene {
 
     create() {
         const ourPersist = this.scene.get("PersistScene");
-        const ourGame = this.scene.get("GamesScene")
+        const ourGame = this.scene.get("GamesScene");
+        const ourStartScene = this.scene.get("StartScene");
         
         
 
@@ -782,9 +783,9 @@ class StartScene extends Phaser.Scene {
         this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
 
-        this.input.keyboard.on('keydown-SPACE', e => {
-            if (this.continueText.visible === true) {
-                const ourPersist = this.scene.get('PersistScene');
+        const onInput = function (scene) {
+            if (scene.continueText.visible === true) {
+                const ourPersist = scene.scene.get('PersistScene');
         //continueText.on('pointerdown', e =>
         //{
         //    this.onInput();
@@ -825,7 +826,7 @@ class StartScene extends Phaser.Scene {
 
             }
             ourPersist.closingTween();
-            this.tweens.addCounter({
+            scene.tweens.addCounter({
                 from: 600,
                 to: 0,
                 ease: 'Sine.InOut',
@@ -834,30 +835,46 @@ class StartScene extends Phaser.Scene {
                     {   
                         graphics.clear();
                         var value = (tween.getValue());
-                        this.tweenValue = value
-                        this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                        var geomask1 = this.shape1.createGeometryMask();
+                        scene.tweenValue = value
+                        scene.shape1 = scene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                        var geomask1 = scene.shape1.createGeometryMask();
                         
-                        this.cameras.main.setMask(geomask1,true)
+                        scene.cameras.main.setMask(geomask1,true)
                     },
                 onComplete: () => {
-                    this.scene.setVisible(false);
+                    scene.scene.setVisible(false);
                     //this.scene.get("UIScene").setVisible(false);
                     
                     //this.scene.launch('UIScene');
-                    this.scene.launch('GameScene');
+                    scene.scene.launch('GameScene');
                     ourPersist.starterTween.stop();
-                    ourPersist.openingTween(this.tweenValue);
-                    this.openingTweenStart.stop();
-                    this.scene.stop();
+                    ourPersist.openingTween(scene.tweenValue);
+                    scene.openingTweenStart.stop();
+                    scene.scene.stop();
                     
                     //var ourGameScene = this.scene.get("GameScene");
                     //console.log(e)
                 }
             });
+
+        }
+
+        this.continueText.on('pointerdown', e => {
+            console.log("I CLICK");
+            if (this.continueText.visible === true) {
+                console.log("I click and continue");
+                onInput(ourStartScene);
+            }
+        });
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            onInput(ourStartScene);
+
         });   
     }
 
+
+    /* Don't use the method here.
     onInput() {
         // #region SCORE DEBUG
         if (SCORE_SCENE_DEBUG) {
@@ -905,7 +922,7 @@ class StartScene extends Phaser.Scene {
         }
         this.scene.stop();
     }
-
+    */
     end() {
 
     }
@@ -6209,7 +6226,7 @@ class InputScene extends Phaser.Scene {
 
     var tempButtonScale = 10;
     var tempInOffSet = 8;
-    var tempInputHeight = 32;
+    var tempInputHeight = 34;
 
     this.input.addPointer(4);
 
@@ -6296,7 +6313,7 @@ class InputScene extends Phaser.Scene {
     
 
 
-    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 39 * GRID, 'spaceWASD', 0
+    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 41 * GRID, 'spaceWASD', 0
     ).setDepth(50).setOrigin(0.5,0).setScale(4).setInteractive();
     this.spaceWASD.on('pointerdown', function (pointer)
     {
@@ -6930,7 +6947,7 @@ function loadSpriteSheetsAndAnims(scene) {
   }
 // #endregion
 
-var tempHeightDiff = 12;
+var tempHeightDiff = 16;
 
 // #region Config
 var config = {
@@ -6946,6 +6963,7 @@ var config = {
     },
     width: 744, 
     height: 744 + tempHeightDiff * GRID,
+    backgroundColor: '#4488aa',
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
