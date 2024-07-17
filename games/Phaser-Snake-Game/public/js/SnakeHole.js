@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.001';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 100; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1205,7 +1205,7 @@ class GameScene extends Phaser.Scene {
 
         // Special flags
         this.ghosting = false;
-        this.bonkable = true; // No longer bonks when you hit yourself or a wall
+        this.bonkable = false; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         
         this.lightMasks = [];
@@ -6207,12 +6207,16 @@ class InputScene extends Phaser.Scene {
     const ourGame = this.scene.get("GameScene");
     const ourInput = this.scene.get("InputScene");
 
+    var tempButtonScale = 10;
+    var tempInOffSet = 8;
+    var tempInputHeight = 32;
+
     this.input.addPointer(4);
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(SCREEN_WIDTH / 2, 40 * GRID, 'upWASD', 0
-    ).setDepth(50).setOrigin(0.38,1).setScale(17).setInteractive();
+    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID, 'upWASD', 0
+    ).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
     this.upWASD.on('pointerdown', function (pointer)
     {
 
@@ -6230,8 +6234,8 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.downWASD = this.add.sprite(SCREEN_WIDTH / 2, 40 * GRID, 'downWASD', 0
-    ).setDepth(50).setOrigin(0.5,0).setScale(17).setInteractive();
+    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID, 'downWASD', 0
+    ).setDepth(50).setOrigin(1,0).setScale(tempButtonScale).setInteractive();
     this.downWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
@@ -6249,8 +6253,8 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.leftWASD = this.add.sprite(SCREEN_WIDTH / 2 - 120, 40 * GRID - 7, 'leftWASD', 0
-    ).setDepth(50).setOrigin(1,0).setScale(17).setInteractive();
+    this.leftWASD = this.add.sprite(10, tempInputHeight * GRID - 7, 'leftWASD', 0
+    ).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
     this.leftWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
@@ -6268,8 +6272,8 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.rightWASD = this.add.sprite(SCREEN_WIDTH / 2 + 120, 40 * GRID - 7, 'rightWASD', 0
-    ).setDepth(50).setOrigin(0,0).setScale(17).setInteractive();
+    this.rightWASD = this.add.sprite(SCREEN_WIDTH, tempInputHeight * GRID - 7, 'rightWASD', 0
+    ).setDepth(50).setOrigin(1,0).setScale(tempButtonScale).setInteractive();
     this.rightWASD.on('pointerdown', function (pointer)
     {
         this.setTint(0xff0000);
@@ -6292,7 +6296,7 @@ class InputScene extends Phaser.Scene {
     
 
 
-    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 48 * GRID, 'spaceWASD', 0
+    this.spaceWASD = this.add.sprite(SCREEN_WIDTH / 2, 39 * GRID, 'spaceWASD', 0
     ).setDepth(50).setOrigin(0.5,0).setScale(4).setInteractive();
     this.spaceWASD.on('pointerdown', function (pointer)
     {
@@ -6926,6 +6930,8 @@ function loadSpriteSheetsAndAnims(scene) {
   }
 // #endregion
 
+var tempHeightDiff = 12;
+
 // #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
@@ -6936,10 +6942,10 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 744 + 19 * GRID
+        height: 744 + tempHeightDiff * GRID
     },
     width: 744, 
-    height: 744 + 19 * GRID,
+    height: 744 + tempHeightDiff * GRID,
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
