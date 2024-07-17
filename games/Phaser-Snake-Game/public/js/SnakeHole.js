@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.05.010';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1676,8 +1676,9 @@ class GameScene extends Phaser.Scene {
         this.blackholes = [];
         this.blackholeLabels = [];
         // #region Transition Visual
-        this.input.keyboard.on('keydown-N', e => {
-            
+        this.input.keyboard.on('keydown-SPACE', e => {
+
+
             const STAGE_UNLOCKS = {
                 /* Template
                 '': function () {
@@ -3501,6 +3502,12 @@ class GameScene extends Phaser.Scene {
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
             // #region Check Update
+            if (this.snake.direction != STOP) {
+                this.startingArrowsAnimN.setAlpha(0);
+                this.startingArrowsAnimS.setAlpha(0);
+                this.startingArrowsAnimE.setAlpha(0);
+                this.startingArrowsAnimW.setAlpha(0);
+            }
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -4701,7 +4708,30 @@ class ScoreScene extends Phaser.Scene {
             
             // #region Space to Continue
             this.input.keyboard.on('keydown-SPACE', function() {  
+                ourGame.generateBlackholes = true;
                 
+                if (ourGame.snake.direction != DOWN) {
+                    ourGame.startingArrowsAnimN.setAlpha(1)
+                }
+                if (ourGame.snake.direction != UP) {
+                    ourGame.startingArrowsAnimS.setAlpha(1)
+                }
+                if (ourGame.snake.direction != LEFT) {
+                    ourGame.startingArrowsAnimE.setAlpha(1)
+                }
+                if (ourGame.snake.direction != RIGHT) {
+                    ourGame.startingArrowsAnimW.setAlpha(1)
+                }
+                ourGame.startingArrowsAnimN.x = ourGame.snake.head.x + GRID * .5
+                ourGame.startingArrowsAnimN.y = ourGame.snake.head.y - GRID
+                ourGame.startingArrowsAnimS.x = ourGame.snake.head.x + GRID * .5
+                ourGame.startingArrowsAnimS.y = ourGame.snake.head.y + GRID * 2
+                ourGame.startingArrowsAnimE.x = ourGame.snake.head.x + GRID * 2
+                ourGame.startingArrowsAnimE.y = ourGame.snake.head.y + GRID * .5
+                ourGame.startingArrowsAnimW.x = ourGame.snake.head.x - GRID
+                ourGame.startingArrowsAnimW.y = ourGame.snake.head.y + GRID * .5
+
+                ourGame.snake.direction = STOP;
                 console.log()
                 debugger 
                 const zedObject = calcZedLevel(ourPersist.zeds)
@@ -4727,6 +4757,7 @@ class ScoreScene extends Phaser.Scene {
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 
+                
 
 
                 if (!gameOver) {
@@ -4742,19 +4773,15 @@ class ScoreScene extends Phaser.Scene {
                         ease: 'sine.inout'
                     });
 
-                    ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
+                    /*ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
 
                         })).setHTML(
                             
                             `Free Play </br>
                             Press "n" to warp to the next stage.`
-                    ).setOrigin(0.5,0.5);
-                  
+                    ).setOrigin(0.5,0.5);*/
                     
                 }
-          
-
-
             });
         }, [], this);
     }
@@ -4773,6 +4800,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.spotlight2.x = this.letterRankPath2.vec.x;
         this.spotlight2.y = this.letterRankPath2.vec.y;
+
 
         /*this.graphics.clear(); //Used to debug where light is
         this.graphics.lineStyle(2, 0xffffff, 1);
