@@ -415,6 +415,7 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+        const ourPersist = this.scene.get("PersistScene");
         
         
 
@@ -617,10 +618,20 @@ class StartScene extends Phaser.Scene {
 
         this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(this.panels)
+
+
+
         
+        
+        if (localStorage["version"] === undefined) {
+            this.hasPlayedBefore = false;
+            console.log("Testing LOCAL STORAGE. Has not played.", );
 
+        } else {
+            this.hasPlayedBefore = true;
+            console.log("Testing LOCAL STORAGE Has played.", );
+        }
 
-        this.hasPlayedBefore = false;
         this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive();
         this.continueText.setVisible(false)
         if (!this.hasPlayedBefore) {
