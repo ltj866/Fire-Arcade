@@ -416,6 +416,7 @@ class StartScene extends Phaser.Scene {
 
     create() {
         const ourPersist = this.scene.get("PersistScene");
+        const ourGame = this.scene.get("GamesScene")
         
         
 
@@ -790,6 +791,8 @@ class StartScene extends Phaser.Scene {
         //    //ourInput.moveUp(ourGame, "upUI")
     
         //});
+                
+                /*** to run when skipping to score screen.
                 ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
                 ourGame.stageDiffBonus = 140;
                 ourGame.stage = END_STAGE;
@@ -815,6 +818,7 @@ class StartScene extends Phaser.Scene {
 
                 this.stageHistory = [stage01, stage02, stage03];
                 this.scene.start('ScoreScene');
+                */
             }
             else {
                                                 
@@ -3615,7 +3619,7 @@ class GameScene extends Phaser.Scene {
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
             // #region Check Update
-            if (this.snake.direction != STOP) {
+            if (this.snake.direction != DIRS.STOP) {
                 this.startingArrowsAnimN.setAlpha(0);
                 this.startingArrowsAnimS.setAlpha(0);
                 this.startingArrowsAnimE.setAlpha(0);
@@ -4839,7 +4843,7 @@ class ScoreScene extends Phaser.Scene {
                 ourGame.startingArrowsAnimW.x = ourGame.snake.head.x - GRID
                 ourGame.startingArrowsAnimW.y = ourGame.snake.head.y + GRID * .5
 
-                ourGame.snake.direction = STOP;
+                ourGame.snake.direction = DIRS.STOP;
                 console.log()
                 debugger 
                 const zedObject = calcZedLevel(ourPersist.zeds)
