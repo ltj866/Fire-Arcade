@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.001';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 100; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1222,7 +1222,7 @@ class GameScene extends Phaser.Scene {
 
         // Special flags
         this.ghosting = false;
-        this.bonkable = false; // No longer bonks when you hit yourself or a wall
+        this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         
         this.lightMasks = [];
@@ -6225,7 +6225,7 @@ class InputScene extends Phaser.Scene {
     const ourInput = this.scene.get("InputScene");
 
     var tempButtonScale = 10;
-    var tempInOffSet = 8;
+    var tempInOffSet = 8.5;
     var tempInputHeight = 34;
 
     this.input.addPointer(4);
