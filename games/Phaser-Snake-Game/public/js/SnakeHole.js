@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.001';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -264,6 +264,7 @@ class StartScene extends Phaser.Scene {
         // #region StartScene()
         this.stageHistory = [];
         this.globalFoodLog = [];
+        
     }
 
     preload() {
@@ -329,7 +330,10 @@ class StartScene extends Phaser.Scene {
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
         //this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
-
+        this.load.image('tutSnakeWASD', 'assets/HowToCards/tutorial_snake_WASD.png');
+        this.load.image('tutSnakeSPACE', 'assets/HowToCards/tutorial_snake_SPACE.png');
+        this.load.image('tutSnakePortal1', 'assets/HowToCards/tutorial_snake_portal1.png');
+        this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
         //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -357,7 +361,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 24, frameHeight: 48 });
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
-
+        this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
+        this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
 
         //WRAP BLOCKS:
         //this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
@@ -411,6 +416,8 @@ class StartScene extends Phaser.Scene {
 
     create() {
         
+        
+
         var gaVersion;
         if (IS_DEV) {
             gaVersion = DEV_BRANCH;
@@ -449,61 +456,391 @@ class StartScene extends Phaser.Scene {
 
         /// Start Inital Game Settings
 
-        /*const panel = this.add.nineslice(GRID * 15.5, GRID * 15, 'uiGlass', 'Glass', 0, 0, 72,72,72,72);
-        panel.setDepth(100)
-        panel.setScale(0)
-        this.tweens.add({
-            targets: panel,
-            scale: 1,
-            width: 450,
-            height: 500,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });*/
+
+        
         ///
+
+        
         
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
         this.scene.launch('PersistScene');
 
+ 
 
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+
+
+        this.add.text(SCREEN_WIDTH/2, GRID * 5.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
+        //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
-
         //card.setScale(1)
-        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}
-        ).setOrigin(0.5,0).setInteractive();
+
+        // Masks
+
+
+        const graphics = this.add.graphics();
+
+        this.tweenValue = 0;
+        this.openingTweenStart = this.tweens.addCounter({
+            from: 0,
+            to: 600,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.cameras.main.setMask(geomask1,true)
+                    
+                }
+        });
+
+        // Tutorial Panels
+
+        this.selectedPanel = 1;
+
+        this.tutText1 = this.add.text(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 20,
+             'Press arrow keys to move.',
+             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0);
+        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 11,
+            'Collect atoms to grow longer.',
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
+        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 20,
+            'Use portals to bend spacetime.',
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
+        this.tutText4 = this.add.text((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 20,
+            'Boost with spacebar.',
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
+        
+        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
+             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutWASD.play('tutAll').setScale(2).setAlpha(0);
+
+        this.tutSnake = this.add.sprite(SCREEN_HEIGHT/2,
+             SCREEN_WIDTH/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(2).setAlpha(0);
+
+        this.time.delayedCall(600, event => {
+            this.tweens.add({
+                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
+                alpha: {from: 0, to: 1},
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
+        panel1.setDepth(100)
+        panel1.setScale(0)
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel1,
+                scale: 1,
+                width: 480,
+                height: 320,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
+        panel2.setDepth(100)
+        panel2.setScale(0)
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel2,
+                scale: 1,
+                width: 400,
+                height: 280,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomSmall.play('atom04idle')
+        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomMedium.play('atom03idle')
+        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomLarge.play('atom02idle')
+        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomCharged.play('atom01idle')
+        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomElectrons.play('electronIdle')
+
+        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
+        panel3.setDepth(100)
+
+        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
+            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal1.play('portalIdle')
+        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal2.play('portalIdle')
+
+        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(2);
+        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(2);
+
+        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
+        panel4.setDepth(100)
+
+        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
+            SCREEN_HEIGHT/2 + GRID  * 4.75).setDepth(103).setOrigin(0.5,0.5);
+       this.tutSPACE.play('tutSpace').setScale(2);
+
+       this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
+        SCREEN_WIDTH/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(2);
+
+        this.panels = []
+        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
+            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
+            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
+            panel4, this.tutText4,this.tutSPACE,this.tutSnake4)
+
+        this.panelsContainer = this.make.container(0, 0);
+        this.panelsContainer.add(this.panels)
+        
+
+
+        this.hasPlayedBefore = false;
+        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive();
+        this.continueText.setVisible(false)
+        if (!this.hasPlayedBefore) {
+            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        }
+        else {
+            this.continueText.setVisible(true)        
+        }
         
         this.tweens.add({
-            targets: continueText,
+            targets: this.continueText,
             alpha: { from: 0, to: 1 },
             ease: 'Sine.InOut',
             duration: 1000,
             repeat: -1,
             yoyo: true
-          });
+        });
+        
+        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 +300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowR.play('startArrowIdle').setAlpha(0);
+        this.panelArrowR.angle = 90;
+        
+        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 -300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL.play('startArrowIdle');
+        this.panelArrowL.angle = 270;
+        this.panelArrowL.setVisible(false).setAlpha(0);
 
-        var onInput = function () {
-            this.onInput();
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            const ourStartScene = this.scene.get('StartScene');
+            const ourPersist = this.scene.get('PersistScene');
+            if (this.selectedPanel < 4) {
+                this.selectedPanel += 1
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    this.panelContainerX = 0;
+                    ourStartScene.panelArrowL.setVisible(false)
+                    break;
+                case 2:
+                    ourPersist.bgCoords.x += 20;
+                    this.panelContainerX = -625;
+                    ourStartScene.panelArrowL.setVisible(true)
+                    break;
+                case 3:
+                    ourPersist.bgCoords.x += 20;
+                    this.panelContainerX = -1250;
+                    ourStartScene.panelArrowL.setVisible(true)
+                    break;
+                case 4:
+                    ourPersist.bgCoords.x = 60;
+                    this.panelContainerX = -1870;
+                    ourStartScene.panelArrowL.setVisible(true)
+                    ourStartScene.panelArrowR.setVisible(false)
+                    this.continueText.setVisible(true)
+                    break;
+            }
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+            });   
+        })
+        this.input.keyboard.on('keydown-LEFT', e => {
+            const ourStartScene = this.scene.get('StartScene');
+            const ourPersist = this.scene.get('PersistScene');
+            if (this.selectedPanel > 1) {
+                this.selectedPanel -= 1
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    ourPersist.bgCoords.x = 0;
+                    this.panelContainerX = 0;
+                    ourStartScene.panelArrowL.setVisible(false)
+                    ourStartScene.panelArrowR.setVisible(true)
+                    break;
+                case 2:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -625;
+                    ourStartScene.panelArrowR.setVisible(true)
+                    break;
+                case 3:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -1250;
+                    ourStartScene.panelArrowR.setVisible(true)
+                    break;
+                case 4:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -1870;
+                    ourStartScene.panelArrowR.setVisible(true)
+                    break;
+            }
+            
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+                onComplete: function () {
+                    if (ourStartScene.selectedPanel < 4) {
+                        ourStartScene.panelArrowR.setVisible(true);
+                    }
+                    else{
+                        ourStartScene.panelArrowR.setVisible(false);
+                    }
+                    
+                }
+            });   
+        })
 
+        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
+        var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(50);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(50);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(50);
+
+        this.dreamWalls = [wrapBlock01, wrapBlock03, wrapBlock06, wrapBlock08];
+
+        // Dream walls for Horizontal Wrap
+        for (let index = 2; index < END_Y - 1; index++) {
+            if (!DREAMWALLSKIP.includes(index)) {
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(50).setOrigin(0,0);
+                wallShimmerRight.play('wrapBlock05');
+                this.dreamWalls.push(wallShimmerRight);
+                
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(50).setOrigin(0,0);
+                wallShimmerLeft.play('wrapBlock04');
+                this.dreamWalls.push(wallShimmerLeft);
+            }
         }
 
-        this.input.keyboard.on('keydown', e => {
-            this.onInput();
-        });
+        // Dream walls for Vertical Wrap
+        for (let index = 1; index < END_X; index++) {
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(50).setOrigin(0,0);
+            wallShimmerTop.play('wrapBlock02');
+            this.dreamWalls.push(wallShimmerTop);
+                
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(50).setOrigin(0,0);
+            wallShimmerBottom.play('wrapBlock07');
+            this.dreamWalls.push(wallShimmerBottom);
+        
+        }
 
+        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+        this.UIbackground.setScale(32); 
 
-        continueText.on('pointerdown', e =>
-        {
-            this.onInput();
-            //ourInput.moveUp(ourGame, "upUI")
+        this.input.keyboard.on('keydown-SPACE', e => {
+            if (this.continueText.visible === true) {
+                const ourPersist = this.scene.get('PersistScene');
+        //continueText.on('pointerdown', e =>
+        //{
+        //    this.onInput();
+        //    //ourInput.moveUp(ourGame, "upUI")
     
-        });
+        //});
+                ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
+                ourGame.stageDiffBonus = 140;
+                ourGame.stage = END_STAGE;
+                //END_STAGE = "Stage-01";
+
+                this.score = 12345;
+                this.bonks = 3;
+                this.length = 28;
+                this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+                this.zedLevel = 77;
+                this.medals = {
+                    "fast":'silver',
+                    "Rank":'gold'
+                }
+
+                ourInput.turns = 79;
+                ourInput.cornerTime = 190;
+                ourInput.boostTime = 400;
+
+                var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
+                var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
+                var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
+
+                this.stageHistory = [stage01, stage02, stage03];
+                this.scene.start('ScoreScene');
+            }
+            else {
+                                                
+
+            }
+            ourPersist.closingTween();
+            this.tweens.addCounter({
+                from: 600,
+                to: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                onUpdate: tween =>
+                    {   
+                        graphics.clear();
+                        var value = (tween.getValue());
+                        this.tweenValue = value
+                        this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                        var geomask1 = this.shape1.createGeometryMask();
+                        
+                        this.cameras.main.setMask(geomask1,true)
+                    },
+                onComplete: () => {
+                    this.scene.setVisible(false);
+                    //this.scene.get("UIScene").setVisible(false);
+                    
+                    //this.scene.launch('UIScene');
+                    this.scene.launch('GameScene');
+                    ourPersist.starterTween.stop();
+                    ourPersist.openingTween(this.tweenValue);
+                    this.openingTweenStart.stop();
+                    this.scene.stop();
+                    
+                    //var ourGameScene = this.scene.get("GameScene");
+                    //console.log(e)
+                }
+            });
+        });   
     }
 
     onInput() {
@@ -552,7 +889,6 @@ class StartScene extends Phaser.Scene {
             //console.log(e)
         }
         this.scene.stop();
-
     }
 
     end() {
@@ -581,7 +917,8 @@ class PersistScene extends Phaser.Scene {
 
     // #region Persist Scene
 
-    
+    this.cameras.main.setBackgroundColor(0x111111);
+
 
     // # Backgrounds
 
@@ -592,25 +929,24 @@ class PersistScene extends Phaser.Scene {
              // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
             //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
             //this.UIbackground.setScale(32); 
-            //this.UIbackground.setVisible(false);  // TEMP while working on game screen size. @holden @James
 
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            this.bg0 = this.add.tileSprite(0, 0, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             this.bg0.tileScaleX = 3;
             this.bg0.tileScaleY = 3;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            this.bg = this.add.tileSprite(0, 0, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             this.bg.tileScaleX = 3;
             this.bg.tileScaleY = 3;
             
             // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            this.bg2 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
             this.bg2.tileScaleX = 3;
             this.bg2.tileScaleY = 3;
             
             // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            this.bg3 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
             this.bg3.tileScaleX = 3;
             this.bg3.tileScaleY = 3;
     
@@ -626,7 +962,26 @@ class PersistScene extends Phaser.Scene {
             this.scrollFactorY = 0;
             this.bgCoords = new Phaser.Math.Vector2(0,0);
 
-    
+    const graphics = this.add.graphics();
+        
+    this.starterTween = this.tweens.addCounter({
+        from: 0,
+        to: 600,
+        ease: 'Sine.InOut',
+        duration: 1000,
+        onUpdate: tween =>
+            {   
+                graphics.clear();
+                var value = (tween.getValue());
+                this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                var geomask1 = this.shape1.createGeometryMask();
+                
+                this.bg.setMask(geomask1,true)
+                this.bg0.setMask(geomask1,true)
+                this.bg2.setMask(geomask1,true)
+                this.bg3.setMask(geomask1,true)
+            }
+    });
     
     
     
@@ -681,7 +1036,48 @@ class PersistScene extends Phaser.Scene {
 
     this.scene.moveBelow("StartScene", "PersistScene");
 
+    this.graphics = this.add.graphics();
+    }
 
+    openingTween(tweenValue){
+        this.tweens.addCounter({
+            from: tweenValue,
+            to: 600,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    this.graphics.clear();
+                    var value = (tween.getValue());
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.bg.setMask(geomask1,true)
+                    this.bg0.setMask(geomask1,true)
+                    this.bg2.setMask(geomask1,true)
+                    this.bg3.setMask(geomask1,true)
+                }
+        });
+    }
+    closingTween(){
+        this.tweens.addCounter({
+            from: 600,
+            to: 0,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    this.graphics.clear();
+                    var value = (tween.getValue());
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.bg.setMask(geomask1,true)
+                    this.bg0.setMask(geomask1,true)
+                    this.bg2.setMask(geomask1,true)
+                    this.bg3.setMask(geomask1,true)
+                }
+        });
     }
 
     checkCompletedRank = function (targetStageName, rank) {
@@ -697,19 +1093,10 @@ class PersistScene extends Phaser.Scene {
     }
     
     update(time, delta) {
-
+        console.log()
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;
 
-        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
-        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
-
-        // not all of these need to be interpolated; wastes processing
-
-        //this.boostMask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            //(this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        //this.boostMask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            //(this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
 
         this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
@@ -854,13 +1241,45 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
-
         const ourInputScene = this.scene.get('InputScene');
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
         this.snakeCritical = false;
+
+        this.graphics = this.add.graphics();
+        
+        
+        if (this.startupAnim) {
+            var tween = this.tweens.addCounter({
+                from: 0,
+                to: 600,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                onUpdate: tween =>
+                    {   
+                        this.graphics.clear();
+                        var value = (tween.getValue());
+                        this.tweenValue = value
+                        this.shape1 = this.make.graphics().fillCircle(this.snake.head.x + GRID * .5, this.snake.head.y + GRID * .5, value);
+                        var geomask1 = this.shape1.createGeometryMask();
+                        
+                        this.cameras.main.setMask(geomask1,true)
+                    }
+            });
+            tween.on('complete', ()=>{ //need this or else visual bugs occur
+                this.cameras.main.setMask(false)
+            });
+        }
+        //this.cameras.main.setAlpha(1)
+        this.time.delayedCall(1, function() {
+            ourGameScene.cameras.main.setAlpha(0)
+        });
+        this.time.delayedCall(17, function() {
+            ourGameScene.cameras.main.setAlpha(1)
+        });
+        
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
@@ -906,6 +1325,8 @@ class GameScene extends Phaser.Scene {
         this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
         this.UIbackground.setVisible(false);
+
+       
 
         // #region TileMap
 
@@ -1076,28 +1497,28 @@ class GameScene extends Phaser.Scene {
             switch (tile.index) {
                 // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
                 case 550:
-                    var wallShimmerTop = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    var wallShimmerTop = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
                     wallShimmerTop.play('wrapBlock02');
                     this.dreamWalls.push(wallShimmerTop);
                     tile.index = -1;
                     break;
 
                 case 614:
-                    var wallShimmerBottom = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    var wallShimmerBottom = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
                     wallShimmerBottom.play('wrapBlock07');
                     this.dreamWalls.push(wallShimmerBottom);
                     tile.index = -1;
                     break;
 
                 case 581:
-                    var wallShimmerLeft = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    var wallShimmerLeft = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
                     wallShimmerLeft.play('wrapBlock04');
                     this.dreamWalls.push(wallShimmerLeft);
                     tile.index = -1;
                     break;
 
                 case 583:
-                    var wallShimmerRight = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(10).setOrigin(0,0);
+                    var wallShimmerRight = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
                     wallShimmerRight.play('wrapBlock05');
                     this.dreamWalls.push(wallShimmerRight);
                     tile.index = -1;
@@ -1139,6 +1560,30 @@ class GameScene extends Phaser.Scene {
                     break;
             }
         });
+
+        for (let index = 2; index < END_Y - 1; index++) {
+            if (!DREAMWALLSKIP.includes(index)) {
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(50).setOrigin(0,0);
+                wallShimmerRight.play('wrapBlock05');
+                this.dreamWalls.push(wallShimmerRight);
+                
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(50).setOrigin(0,0);
+                wallShimmerLeft.play('wrapBlock04');
+                this.dreamWalls.push(wallShimmerLeft);
+            }
+        }
+
+        // Dream walls for Vertical Wrap
+        for (let index = 1; index < END_X; index++) {
+            var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(50).setOrigin(0,0);
+            wallShimmerTop.play('wrapBlock02');
+            this.dreamWalls.push(wallShimmerTop);
+                
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(50).setOrigin(0,0);
+            wallShimmerBottom.play('wrapBlock07');
+            this.dreamWalls.push(wallShimmerBottom);
+        
+        }
 
         this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
@@ -1325,183 +1770,210 @@ class GameScene extends Phaser.Scene {
         });
 
         
-        
-
+        this.generateBlackholes = false
+        this.blackholes = [];
+        this.blackholeLabels = [];
         // #region Transition Visual
-        this.input.keyboard.on('keydown-N', e => {
-            
-            const STAGE_UNLOCKS = {
-                /* Template
-                '': function () {
-                    return ourPersist.checkCompletedRank("", );
-                },
-                */
-                'double-back-portals': function () {
-                    return true;
-                },
-                'unidirectional-portals': function () {
-                    return true;
-                },
-                'hardest----for-now': function () {
-                    return true;
-                },
-                'swirl-swirl': function () {
-                    return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
-                },
-                'eye': function () {
-                    return true;
-                },
-                'plus-plus': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", GOLD);
-                },
-                'col': function () {
-                    return true;
-                },
-                'its-a-snek': function () {
-                    return true;
-                },
-                'now-a-fourth': function () {
-                    return true;
-                },
-                'vertical-uturns': function () {
-                    return true;
-                },
-                'horizontal-uturns': function () {
-                    return true;
-                },
-                'vertical-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
-                },
-                'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
-                },
-                'first-medium': function () {
-                    return true;
-                    //return ourPersist.checkCompletedRank("", );
-                },
-                'lights-out': function () {
-                    return false;
-                },
-                'easy-racer': function () {
-                    return false;
-                },
-                'hello-ghosts': function () {
-                    return false;
-                },
-                'medium-happy': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
-                    return true;
-                },
-                'bidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
-                    return true
-                },
-                'start': function ( ) { 
-                    return true
-                },
-                'babies-first-wall': function () {
-                    return true
-                },
-                'horz-rows': function () {
-                    return true
-                },
-                'now-vertical': function () {
-                    return ourPersist.checkCompletedRank("World_1-4", COPPER);
-                },
-                'medium-wrap': function () {
-                    //return ourPersist.checkCompletedRank("Stage-01", SILVER);
-                    return false;
-                },
-                'dark-precision': function () {
-                    return true
-                },
-                'vert-rows': function () {
-                    return true;
+        this.input.keyboard.on('keydown-SPACE', e => {
+            if (this.generateBlackholes === true) {
+                this.generateBlackholes = false
+                console.log('working')
+                const STAGE_UNLOCKS = {
+                    /* Template
+                    '': function () {
+                        return ourPersist.checkCompletedRank("", );
+                    },
+                    */
+                    'double-back-portals': function () {
+                        return true;
+                    },
+                    'unidirectional-portals': function () {
+                        return true;
+                    },
+                    'hardest----for-now': function () {
+                        return true;
+                    },
+                    'swirl-swirl': function () {
+                        return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
+                    },
+                    'eye': function () {
+                        return true;
+                    },
+                    'plus-plus': function () {
+                        return ourPersist.checkCompletedRank("World_4-4", GOLD);
+                    },
+                    'col': function () {
+                        return true;
+                    },
+                    'its-a-snek': function () {
+                        return true;
+                    },
+                    'now-a-fourth': function () {
+                        return true;
+                    },
+                    'vertical-uturns': function () {
+                        return true;
+                    },
+                    'horizontal-uturns': function () {
+                        return true;
+                    },
+                    'vertical-gaps': function () {
+                        return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                    },
+                    'horizontal-gaps': function () {
+                        return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                    },
+                    'first-medium': function () {
+                        return true;
+                        //return ourPersist.checkCompletedRank("", );
+                    },
+                    'lights-out': function () {
+                        return false;
+                    },
+                    'easy-racer': function () {
+                        return false;
+                    },
+                    'hello-ghosts': function () {
+                        return false;
+                    },
+                    'medium-happy': function () {
+                        return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
+                        return true;
+                    },
+                    'bidirectional-portals': function () {
+                        return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
+                        return true
+                    },
+                    'start': function ( ) { 
+                        return true
+                    },
+                    'babies-first-wall': function () {
+                        return true
+                    },
+                    'horz-rows': function () {
+                        return true
+                    },
+                    'now-vertical': function () {
+                        return ourPersist.checkCompletedRank("World_1-4", COPPER);
+                    },
+                    'medium-wrap': function () {
+                        //return ourPersist.checkCompletedRank("Stage-01", SILVER);
+                        return false;
+                    },
+                    'dark-precision': function () {
+                        return true
+                    },
+                    'vert-rows': function () {
+                        return true;
+                    }
                 }
-            }
-
-            if (this.winned) {
-                calcSumOfBest(ourPersist);
-                
-                
-                
-                if (this.map.getLayer('Next')) {
-
-                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
-                    var tiledIndex = 641; // First column in the row.
-                    //debugger;
-                    this.nextStages.forEach( stageName => {
-
-                        var dataName = `${stageName}data`;
-                        var data = this.cache.json.get(dataName);
+    
+                if (this.winned) {
+                    calcSumOfBest(ourPersist);
                     
-                        data.forEach( propObj => {
-                            
-                            var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
-                            
-                            if (propObj.name === 'slug') {
-
-                                if (STAGE_UNLOCKS[propObj.value] != undefined) {
-                                    // Makes it so it only removes levels that have unlock slugs.
-                                    // Easier to debug which levels don't have slugs formatted correctly.
-                                    tile.index = -1;
-                                }
+                    
+                    
+                    if (this.map.getLayer('Next')) {
+    
+                        this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
+                        var tiledIndex = 641; // First column in the row.
+                        //debugger;
+                        this.nextStages.forEach( stageName => {
+    
+                            var dataName = `${stageName}data`;
+                            var data = this.cache.json.get(dataName);
+                        
+                            data.forEach( propObj => {
                                 
-                                var temp = STAGE_UNLOCKS[propObj.value];
+                                var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
                                 
-
-                                if (STAGE_UNLOCKS[propObj.value].call()) {
-                                    // Now we know the Stage is unlocked, so make the black hole tile.
-                                    
-                                    console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
-
-                                    var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
-                                        stageName
-                                    ).setDepth(50).setOrigin(0,0);
-
-
-
-                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
-                                        'blackHole' 
-                                    ).setDepth(10).setOrigin(0.4375,0.4375);
-                                    
-                                    
-                                    
-                                    
-                                    if (ourPersist.bestOfStageData[stageName] != undefined) {
-                                        switch (ourPersist.bestOfStageData[stageName].stageRank()) {
-                                            case COPPER:
-                                                portalImage.setTint(0xB87333);
-                                                break;
-                                            case BRONZE:
-                                                portalImage.setTint(0xCD7F32);
-                                                break;
-                                            case SILVER:
-                                                portalImage.setTint(0xC0C0C0);
-                                                break;
-                                            case GOLD:
-                                                portalImage.setTint(0xDAA520);
-                                                break;
-                                            case PLATINUM:
-                                                portalImage.setTint(0xE5E4E2);
-                                                break;
-                                            default:
-                                                // here is if you have never played a level before
-                                                portalImage.setTint(0xFFFFFF);    
-                                                break;
-                                        }
-                                    } else {
-                                        portalImage.setTint(0xFFFFFF);
+                                if (propObj.name === 'slug') {
+    
+                                    if (STAGE_UNLOCKS[propObj.value] != undefined) {
+                                        // Makes it so it only removes levels that have unlock slugs.
+                                        // Easier to debug which levels don't have slugs formatted correctly.
+                                        tile.index = -1;
                                     }
                                     
-                                    this.nextStagePortals.push(portalImage);
+                                    var temp = STAGE_UNLOCKS[propObj.value];
+                                    
+    
+                                    if (STAGE_UNLOCKS[propObj.value].call()) {
+                                        // Now we know the Stage is unlocked, so make the black hole tile.
+                                        
+                                        console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
+    
+                                        var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
+                                            stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
+                                        ).setDepth(50).setOrigin(0,0).setAlpha(0);
+                                        
+                                        var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
+                                        ).setDepth(49).setOrigin(0,0).setAlpha(0);
+    
+                                        r1.setStrokeStyle(2, 0x4d9be6);
+    
+                                        
+                                        var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
+                                            'blackHole' 
+                                        ).setDepth(10).setOrigin(0.425,0.425).setScale(0);
+                                        this.blackholes.push(portalImage)
+                                        this.blackholeLabels.push(stageText,r1)
+    
+                                        //line code doesn't work yet
+                                        //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
+                                        //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, portalImage.x,portalImage.y, r1.x,r1.y[0x000000],1)
+                                        
+                                        if (ourPersist.bestOfStageData[stageName] != undefined) {
+                                            switch (ourPersist.bestOfStageData[stageName].stageRank()) {
+                                                case COPPER:
+                                                    portalImage.setTint(0xB87333);
+                                                    break;
+                                                case BRONZE:
+                                                    portalImage.setTint(0xCD7F32);
+                                                    break;
+                                                case SILVER:
+                                                    portalImage.setTint(0xC0C0C0);
+                                                    break;
+                                                case GOLD:
+                                                    portalImage.setTint(0xDAA520);
+                                                    break;
+                                                case PLATINUM:
+                                                    portalImage.setTint(0xE5E4E2);
+                                                    break;
+                                                default:
+                                                    // here is if you have never played a level before
+                                                    portalImage.setTint(0xFFFFFF);    
+                                                    break;
+                                            }
+                                        } else {
+                                            portalImage.setTint(0xFFFFFF);
+                                        }
+                                        
+                                        this.nextStagePortals.push(portalImage);
+                                    }
+                                    this.tweens.add({
+                                        targets: this.blackholes,
+                                        scale: {from: 0, to: 1},
+                                        ease: 'Sine.easeOutIn',
+                                        duration: 500,
+                                        delay: this.tweens.stagger(360)
+                                    });
+                                    this.tweens.add({
+                                        targets: this.blackholeLabels,
+                                        alpha: {from: 0, to: 1},
+                                        ease: 'Sine.easeOutIn',
+                                        duration: 300,
+                                        delay: this.tweens.stagger(360)
+                                    });
                                 }
-                            }
+                            });
+    
+                            tiledIndex++;
                         });
+    
+            }
 
-                        tiledIndex++;
-                    });
-
+            
 
                 }
 
@@ -1992,13 +2464,13 @@ class GameScene extends Phaser.Scene {
 
        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
-       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
-       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
-       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
-       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
+       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(51).setAlpha(0);
+       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(51).setAlpha(0);
+       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(51).setAlpha(0);
+       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(51).setAlpha(0);
+       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(51).setAlpha(0);
        
        // #endregion
 
@@ -2088,7 +2560,7 @@ class GameScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(GRID*9 + 11, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -2097,7 +2569,9 @@ class GameScene extends Phaser.Scene {
             'padding': '2px 7px 0px 0px',
             })).setHTML(
                 countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0.5);
+        ).setOrigin(1,0.5).setAlpha(0);
+
+        
 
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
@@ -2122,7 +2596,18 @@ class GameScene extends Phaser.Scene {
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
                 `${commaInt(this.scene.get("PersistScene").coins).padStart(2, '0')}`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0).setAlpha(0);
+
+        this.time.delayedCall(1000, event => {
+            const ourGameScene = this.scene.get('GameScene');
+            this.tweens.add({
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 500,
+              });
+        });
+        
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
         //    `LASTΔ :`
@@ -2335,8 +2820,10 @@ class GameScene extends Phaser.Scene {
             80, 18, 18, 18);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
+
         this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
         this.progressPanel.setDepth(100).setOrigin(0,0)
+        
         
 
         this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
@@ -2371,7 +2858,7 @@ class GameScene extends Phaser.Scene {
         }
 
         // dot matrix
-
+        
         if (this.startupAnim){
 
             const hsv = Phaser.Display.Color.HSVColorWheel();
@@ -2422,8 +2909,7 @@ class GameScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1,
            })
-    
-        
+
     }
     // #region .screenShake(
     screenShake(){
@@ -2727,11 +3213,28 @@ class GameScene extends Phaser.Scene {
         snakeholeTween.on('complete', () => {
             this.nextStage(this.nextStages[nextStageIndex]);
         });
+        /*var tween = this.tweens.addCounter({
+            from: 600,
+            to: 0,
+            ease: 'Sine.InOut',
+            duration: 2000,
+            onUpdate: tween =>
+                {   
+                    this.graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(this.snake.head.x, this.snake.head.y, value);
+                    var geomask1 = this.shape1.createGeometryMask();
                     
-                
-            
-
-
+                    this.cameras.main.setMask(geomask1,true)
+                    //this.cameras.main.ignore(this.scorePanel)
+                }
+        });
+        tween.on('complete', ()=>{
+            this.cameras.main.setMask(false)
+            this.nextStage(this.nextStages[nextStageIndex]);
+        });*/
+                    
     }
 
     currentScoreTimer() {
@@ -3101,6 +3604,12 @@ class GameScene extends Phaser.Scene {
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
             // #region Check Update
+            if (this.snake.direction != STOP) {
+                this.startingArrowsAnimN.setAlpha(0);
+                this.startingArrowsAnimS.setAlpha(0);
+                this.startingArrowsAnimE.setAlpha(0);
+                this.startingArrowsAnimW.setAlpha(0);
+            }
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -4267,6 +4776,7 @@ class ScoreScene extends Phaser.Scene {
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
+            ourGame.generateBlackholes = true;
             var continue_text = '[SPACE TO CONTINUE]';
 
             var gameOver = false;
@@ -4300,8 +4810,25 @@ class ScoreScene extends Phaser.Scene {
 
             
             // #region Space to Continue
-            this.input.keyboard.on('keydown-SPACE', function() {  
+            this.input.keyboard.on('keydown-SPACE', function() { 
+               
                 
+
+                ourGame.startingArrowsAnimN.setAlpha(1)
+                ourGame.startingArrowsAnimS.setAlpha(1)
+                ourGame.startingArrowsAnimE.setAlpha(1)
+                ourGame.startingArrowsAnimW.setAlpha(1)
+                
+                ourGame.startingArrowsAnimN.x = ourGame.snake.head.x + GRID * .5
+                ourGame.startingArrowsAnimN.y = ourGame.snake.head.y - GRID
+                ourGame.startingArrowsAnimS.x = ourGame.snake.head.x + GRID * .5
+                ourGame.startingArrowsAnimS.y = ourGame.snake.head.y + GRID * 2
+                ourGame.startingArrowsAnimE.x = ourGame.snake.head.x + GRID * 2
+                ourGame.startingArrowsAnimE.y = ourGame.snake.head.y + GRID * .5
+                ourGame.startingArrowsAnimW.x = ourGame.snake.head.x - GRID
+                ourGame.startingArrowsAnimW.y = ourGame.snake.head.y + GRID * .5
+
+                ourGame.snake.direction = STOP;
                 console.log()
                 debugger 
                 const zedObject = calcZedLevel(ourPersist.zeds)
@@ -4327,6 +4854,7 @@ class ScoreScene extends Phaser.Scene {
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 
+                
 
 
                 if (!gameOver) {
@@ -4342,22 +4870,17 @@ class ScoreScene extends Phaser.Scene {
                         ease: 'sine.inout'
                     });
 
-                    ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
+                    /*ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
 
                         })).setHTML(
                             
                             `Free Play </br>
                             Press "n" to warp to the next stage.`
-                    ).setOrigin(0.5,0.5);
-                  
+                    ).setOrigin(0.5,0.5);*/
                     
                 }
-          
-
-
             });
         }, [], this);
-        //this.graphics = this.add.graphics();
     }
 
     // #region Score - Update
@@ -4374,6 +4897,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.spotlight2.x = this.letterRankPath2.vec.x;
         this.spotlight2.y = this.letterRankPath2.vec.y;
+
 
         /*this.graphics.clear(); //Used to debug where light is
         this.graphics.lineStyle(2, 0xffffff, 1);
@@ -6093,6 +6617,25 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: -1
     });
+
+    scene.anims.create({
+        key: 'tutIdle',
+        frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 0]}),
+        frameRate: 1,
+        repeat: 0
+      });
+    scene.anims.create({
+    key: 'tutAll',
+    frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 1,2,1,3,4,3,5,6,5,7,8,7]}),
+    frameRate: 12,
+    repeat: -1
+    });
+    scene.anims.create({
+        key: 'tutSpace',
+        frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [ 0,0,0,0,1,2,2,2,2,1]}),
+        frameRate: 12,
+        repeat: -1
+        });
     
     scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
         frame: 'portalAnim.png'
