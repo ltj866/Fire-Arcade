@@ -1678,6 +1678,8 @@ class GameScene extends Phaser.Scene {
         // #region Transition Visual
         this.input.keyboard.on('keydown-SPACE', e => {
             if (this.generateBlackholes === true) {
+                this.generateBlackholes = false
+                console.log('working')
                 const STAGE_UNLOCKS = {
                     /* Template
                     '': function () {
