@@ -16,7 +16,7 @@ const ANALYTICS_VERS = "0.3.240705"
 const DEV_BRANCH = "dev"
 
 
-const GAME_VERSION = 'v0.7.07.13.001';
+const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
@@ -71,7 +71,11 @@ var calcBonus = function (scoreInput) {
     return _speedBonus
 }
 
-var calcSumOfBest = function(scene) {
+var updateSumOfBest = function(scene) {
+    /***
+     *  This most important thing this function does is update the bestOfStageData object.
+     *  That is used to check if a black hole should be spawned to a new level.
+     */
     let entries = Object.entries(localStorage);
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
@@ -248,7 +252,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1031,7 +1035,7 @@ class PersistScene extends Phaser.Scene {
     var zedsObj = calcZedLevel(this.zeds);
     
     // This is an important step, don't leave it out.
-    calcSumOfBest(this);
+    updateSumOfBest(this);
 
     const styleBottomText = {
         "font-size": '8px',
@@ -1281,7 +1285,7 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
-        this.snakeCritical = false;
+        this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
         
@@ -1904,7 +1908,7 @@ class GameScene extends Phaser.Scene {
                 }
     
                 if (this.winned) {
-                    calcSumOfBest(ourPersist);
+                    updateSumOfBest(ourPersist);
                     
                     
                     
@@ -4736,7 +4740,7 @@ class ScoreScene extends Phaser.Scene {
 
 
     
-        calcSumOfBest(ourPersist);
+        updateSumOfBest(ourPersist);
         var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
 
@@ -4831,7 +4835,7 @@ class ScoreScene extends Phaser.Scene {
                 //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
                 //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
                 }
-            )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
+            )).setText(continue_text).setOrigin(0.5,0).setDepth(25).setInteractive();
 
 
             this.tweens.add({
@@ -4843,12 +4847,8 @@ class ScoreScene extends Phaser.Scene {
                 yoyo: true
               });
 
-            
-            // #region Space to Continue
-            this.input.keyboard.on('keydown-SPACE', function() { 
-               
-                
-
+            const onContinue = function (scene) {
+    
                 ourGame.startingArrowsAnimN.setAlpha(1)
                 ourGame.startingArrowsAnimS.setAlpha(1)
                 ourGame.startingArrowsAnimE.setAlpha(1)
@@ -4883,7 +4883,7 @@ class ScoreScene extends Phaser.Scene {
                     "Gameplay",
                     "CompleteStage",
                     extraFields.toString(),
-                  );
+                    );
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
@@ -4912,9 +4912,18 @@ class ScoreScene extends Phaser.Scene {
                             `Free Play </br>
                             Press "n" to warp to the next stage.`
                     ).setOrigin(0.5,0.5);*/
-                    
-                }
+                } 
+            }
+            // #region Space to Continue
+            this.input.keyboard.on('keydown-SPACE', function() { 
+                onContinue(ourGame);
             });
+
+            continueText.on('pointerdown', e => {
+                onContinue(ourGame);
+            });
+
+
         }, [], this);
     }
 
@@ -6228,14 +6237,14 @@ class InputScene extends Phaser.Scene {
     const ourInput = this.scene.get("InputScene");
 
     var tempButtonScale = 10;
-    var tempInOffSet = 8.5;
-    var tempInputHeight = 34;
+    var tempInOffSet = 8;
+    var tempInputHeight = 35.5;
 
     this.input.addPointer(4);
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID, 'upWASD', 0
+    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'upWASD', 0
     ).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
     this.upWASD.on('pointerdown', function (pointer)
     {
@@ -6254,7 +6263,7 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID, 'downWASD', 0
+    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'downWASD', 0
     ).setDepth(50).setOrigin(1,0).setScale(tempButtonScale).setInteractive();
     this.downWASD.on('pointerdown', function (pointer)
     {
