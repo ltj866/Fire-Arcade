@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -252,7 +252,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1809,217 +1809,218 @@ class GameScene extends Phaser.Scene {
         });
 
         
-        this.generateBlackholes = false
         this.blackholes = [];
         this.blackholeLabels = [];
-        // #region Transition Visual
-        this.input.keyboard.on('keydown-SPACE', e => {
-            if (this.generateBlackholes === true) {
-                this.generateBlackholes = false
-                console.log('working')
-                const STAGE_UNLOCKS = {
-                    /* Template
-                    '': function () {
-                        return ourPersist.checkCompletedRank("", );
-                    },
-                    */
-                    'double-back-portals': function () {
-                        return true;
-                    },
-                    'unidirectional-portals': function () {
-                        return true;
-                    },
-                    'hardest----for-now': function () {
-                        return true;
-                    },
-                    'swirl-swirl': function () {
-                        return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
-                    },
-                    'eye': function () {
-                        return true;
-                    },
-                    'plus-plus': function () {
-                        return ourPersist.checkCompletedRank("World_4-4", GOLD);
-                    },
-                    'col': function () {
-                        return true;
-                    },
-                    'its-a-snek': function () {
-                        return true;
-                    },
-                    'now-a-fourth': function () {
-                        return true;
-                    },
-                    'vertical-uturns': function () {
-                        return true;
-                    },
-                    'horizontal-uturns': function () {
-                        return true;
-                    },
-                    'vertical-gaps': function () {
-                        return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
-                    },
-                    'horizontal-gaps': function () {
-                        return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
-                    },
-                    'first-medium': function () {
-                        return true;
-                        //return ourPersist.checkCompletedRank("", );
-                    },
-                    'lights-out': function () {
-                        return false;
-                    },
-                    'easy-racer': function () {
-                        return false;
-                    },
-                    'hello-ghosts': function () {
-                        return false;
-                    },
-                    'medium-happy': function () {
-                        return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
-                        return true;
-                    },
-                    'bidirectional-portals': function () {
-                        return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
-                        return true
-                    },
-                    'start': function ( ) { 
-                        return true
-                    },
-                    'babies-first-wall': function () {
-                        return true
-                    },
-                    'horz-rows': function () {
-                        return true
-                    },
-                    'now-vertical': function () {
-                        return ourPersist.checkCompletedRank("World_1-4", COPPER);
-                    },
-                    'medium-wrap': function () {
-                        //return ourPersist.checkCompletedRank("Stage-01", SILVER);
-                        return false;
-                    },
-                    'dark-precision': function () {
-                        return true
-                    },
-                    'vert-rows': function () {
-                        return true;
-                    }
+
+        this.events.on('spawnBlackholes', function (thingWePass) {
+
+            const STAGE_UNLOCKS = {
+                /* Template
+                '': function () {
+                    return ourPersist.checkCompletedRank("", );
+                },
+                */
+                'double-back-portals': function () {
+                    return true;
+                },
+                'unidirectional-portals': function () {
+                    return true;
+                },
+                'hardest----for-now': function () {
+                    return true;
+                },
+                'swirl-swirl': function () {
+                    return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
+                },
+                'eye': function () {
+                    return true;
+                },
+                'plus-plus': function () {
+                    return ourPersist.checkCompletedRank("World_4-4", GOLD);
+                },
+                'col': function () {
+                    return true;
+                },
+                'its-a-snek': function () {
+                    return true;
+                },
+                'now-a-fourth': function () {
+                    return true;
+                },
+                'vertical-uturns': function () {
+                    return true;
+                },
+                'horizontal-uturns': function () {
+                    return true;
+                },
+                'vertical-gaps': function () {
+                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                },
+                'horizontal-gaps': function () {
+                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                },
+                'first-medium': function () {
+                    return true;
+                    //return ourPersist.checkCompletedRank("", );
+                },
+                'lights-out': function () {
+                    return false;
+                },
+                'easy-racer': function () {
+                    return false;
+                },
+                'hello-ghosts': function () {
+                    return false;
+                },
+                'medium-happy': function () {
+                    return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
+                    return true;
+                },
+                'bidirectional-portals': function () {
+                    return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
+                    return true
+                },
+                'start': function ( ) { 
+                    return true
+                },
+                'babies-first-wall': function () {
+                    return true
+                },
+                'horz-rows': function () {
+                    return true
+                },
+                'now-vertical': function () {
+                    return ourPersist.checkCompletedRank("World_1-4", COPPER);
+                },
+                'medium-wrap': function () {
+                    //return ourPersist.checkCompletedRank("Stage-01", SILVER);
+                    return false;
+                },
+                'dark-precision': function () {
+                    return true
+                },
+                'vert-rows': function () {
+                    return true;
                 }
-    
-                if (this.winned) {
-                    updateSumOfBest(ourPersist);
+            }
+
+            if (this.winned) {
+                updateSumOfBest(ourPersist);
+                
+                
+                
+                if (this.map.getLayer('Next')) {
+
+                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
+                    var tiledIndex = 641; // First column in the row.
+                    //debugger;
+                    this.nextStages.forEach( stageName => {
+
+                        var dataName = `${stageName}data`;
+                        var data = this.cache.json.get(dataName);
                     
-                    
-                    
-                    if (this.map.getLayer('Next')) {
-    
-                        this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
-                        var tiledIndex = 641; // First column in the row.
-                        //debugger;
-                        this.nextStages.forEach( stageName => {
-    
-                            var dataName = `${stageName}data`;
-                            var data = this.cache.json.get(dataName);
-                        
-                            data.forEach( propObj => {
-                                
-                                var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
-                                
-                                if (propObj.name === 'slug') {
-    
-                                    if (STAGE_UNLOCKS[propObj.value] != undefined) {
-                                        // Makes it so it only removes levels that have unlock slugs.
-                                        // Easier to debug which levels don't have slugs formatted correctly.
-                                        tile.index = -1;
-                                    }
-                                    
-                                    var temp = STAGE_UNLOCKS[propObj.value];
-                                    
-    
-                                    if (STAGE_UNLOCKS[propObj.value].call()) {
-                                        // Now we know the Stage is unlocked, so make the black hole tile.
-                                        
-                                        console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
-    
-                                        var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
-                                            stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
-                                        ).setDepth(50).setOrigin(0,0).setAlpha(0);
-                                        
-                                        var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
-                                        ).setDepth(49).setOrigin(0,0).setAlpha(0);
-    
-                                        r1.setStrokeStyle(2, 0x4d9be6);
-    
-                                        
-                                        var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
-                                            'blackHole' 
-                                        ).setDepth(10).setOrigin(0.425,0.425).setScale(0);
-                                        this.blackholes.push(portalImage)
-                                        this.blackholeLabels.push(stageText,r1)
-    
-                                        //line code doesn't work yet
-                                        //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
-                                        //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, portalImage.x,portalImage.y, r1.x,r1.y[0x000000],1)
-                                        
-                                        if (ourPersist.bestOfStageData[stageName] != undefined) {
-                                            switch (ourPersist.bestOfStageData[stageName].stageRank()) {
-                                                case COPPER:
-                                                    portalImage.setTint(0xB87333);
-                                                    break;
-                                                case BRONZE:
-                                                    portalImage.setTint(0xCD7F32);
-                                                    break;
-                                                case SILVER:
-                                                    portalImage.setTint(0xC0C0C0);
-                                                    break;
-                                                case GOLD:
-                                                    portalImage.setTint(0xDAA520);
-                                                    break;
-                                                case PLATINUM:
-                                                    portalImage.setTint(0xE5E4E2);
-                                                    break;
-                                                default:
-                                                    // here is if you have never played a level before
-                                                    portalImage.setTint(0xFFFFFF);    
-                                                    break;
-                                            }
-                                        } else {
-                                            portalImage.setTint(0xFFFFFF);
-                                        }
-                                        
-                                        this.nextStagePortals.push(portalImage);
-                                    }
-                                    this.tweens.add({
-                                        targets: this.blackholes,
-                                        scale: {from: 0, to: 1},
-                                        ease: 'Sine.easeOutIn',
-                                        duration: 500,
-                                        delay: this.tweens.stagger(360)
-                                    });
-                                    this.tweens.add({
-                                        targets: this.blackholeLabels,
-                                        alpha: {from: 0, to: 1},
-                                        ease: 'Sine.easeOutIn',
-                                        duration: 300,
-                                        delay: this.tweens.stagger(360)
-                                    });
+                        data.forEach( propObj => {
+                            
+                            var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
+                            
+                            if (propObj.name === 'slug') {
+
+                                if (STAGE_UNLOCKS[propObj.value] != undefined) {
+                                    // Makes it so it only removes levels that have unlock slugs.
+                                    // Easier to debug which levels don't have slugs formatted correctly.
+                                    tile.index = -1;
                                 }
-                            });
-    
-                            tiledIndex++;
+                                
+                                var temp = STAGE_UNLOCKS[propObj.value];
+                                
+
+                                if (STAGE_UNLOCKS[propObj.value].call()) {
+                                    // Now we know the Stage is unlocked, so make the black hole tile.
+                                    
+                                    console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
+
+                                    var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
+                                        stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
+                                    ).setDepth(50).setOrigin(0,0).setAlpha(0);
+                                    
+                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
+                                    ).setDepth(49).setOrigin(0,0).setAlpha(0);
+
+                                    r1.setStrokeStyle(2, 0x4d9be6);
+
+                                    
+                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
+                                        'blackHole' 
+                                    ).setDepth(10).setOrigin(0.425,0.425).setScale(0);
+                                    this.blackholes.push(portalImage)
+                                    this.blackholeLabels.push(stageText,r1)
+
+                                    //line code doesn't work yet
+                                    //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
+                                    //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, portalImage.x,portalImage.y, r1.x,r1.y[0x000000],1)
+                                    
+                                    if (ourPersist.bestOfStageData[stageName] != undefined) {
+                                        switch (ourPersist.bestOfStageData[stageName].stageRank()) {
+                                            case COPPER:
+                                                portalImage.setTint(0xB87333);
+                                                break;
+                                            case BRONZE:
+                                                portalImage.setTint(0xCD7F32);
+                                                break;
+                                            case SILVER:
+                                                portalImage.setTint(0xC0C0C0);
+                                                break;
+                                            case GOLD:
+                                                portalImage.setTint(0xDAA520);
+                                                break;
+                                            case PLATINUM:
+                                                portalImage.setTint(0xE5E4E2);
+                                                break;
+                                            default:
+                                                // here is if you have never played a level before
+                                                portalImage.setTint(0xFFFFFF);    
+                                                break;
+                                        }
+                                    } else {
+                                        portalImage.setTint(0xFFFFFF);
+                                    }
+                                    
+                                    this.nextStagePortals.push(portalImage);
+                                }
+                                this.tweens.add({
+                                    targets: this.blackholes,
+                                    scale: {from: 0, to: 1},
+                                    ease: 'Sine.easeOutIn',
+                                    duration: 500,
+                                    delay: this.tweens.stagger(360)
+                                });
+                                this.tweens.add({
+                                    targets: this.blackholeLabels,
+                                    alpha: {from: 0, to: 1},
+                                    ease: 'Sine.easeOutIn',
+                                    duration: 300,
+                                    delay: this.tweens.stagger(360)
+                                });
+                            }
                         });
-    
-            }
 
-            
-
+                        tiledIndex++;
+                    });
+        
                 }
 
+    
             }
-            
- 
-        });
+                
+     
+        
+        }, this);
+
+
+        // #region Transition Visual /*
+
+
+        
 
         // #endregion
 
@@ -4815,7 +4816,6 @@ class ScoreScene extends Phaser.Scene {
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
-            ourGame.generateBlackholes = true;
             var continue_text = '[SPACE TO CONTINUE]';
 
             var gameOver = false;
@@ -4849,6 +4849,9 @@ class ScoreScene extends Phaser.Scene {
 
             const onContinue = function (scene) {
     
+                ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+                debugger
+                
                 ourGame.startingArrowsAnimN.setAlpha(1)
                 ourGame.startingArrowsAnimS.setAlpha(1)
                 ourGame.startingArrowsAnimE.setAlpha(1)
@@ -4888,7 +4891,7 @@ class ScoreScene extends Phaser.Scene {
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
-                
+                ourGame.events.off('spawnBlackholes');
                 
 
 
