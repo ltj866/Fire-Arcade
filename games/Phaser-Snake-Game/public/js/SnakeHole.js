@@ -1220,7 +1220,7 @@ class GameScene extends Phaser.Scene {
         const { stage = START_STAGE } = props 
         this.stage = stage;
         
-        this.startingArrowState = true; // Deprecate
+        //this.startingArrowState = true; // Deprecate
 
         this.moveInterval = SPEED_WALK;
 
@@ -1493,37 +1493,34 @@ class GameScene extends Phaser.Scene {
 
         if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN.play('startArrowIdle');
-            this.startingArrowsAnimN.setAlpha(0);
+            this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('startArrowIdle');
-            this.startingArrowsAnimS.setAlpha(0);
+            this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('startArrowIdle');
-            this.startingArrowsAnimE.setAlpha(0);
+            this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('startArrowIdle');
-            this.startingArrowsAnimW.setAlpha(0);
+            this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
-        const _arrowN = this.startingArrowsAnimN
-        const _arrowS = this.startingArrowsAnimS
-        const _arrowE = this.startingArrowsAnimE
-        const _arrowW = this.startingArrowsAnimW
+        this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
+        this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
+        this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
+        this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
         console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY) {
                 ourGameScene.arrowTween =  this.tweens.add({
-                    targets: [_arrowN,_arrowS,_arrowE,_arrowW],
+                    targets: [this.startingArrowsAnimN,this.startingArrowsAnimS,
+                        this.startingArrowsAnimE,this.startingArrowsAnimW],
                     alpha: 1,
                     duration: 500,
                     ease: 'linear',
@@ -1943,8 +1940,9 @@ class GameScene extends Phaser.Scene {
                                         stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
                                     ).setDepth(50).setOrigin(0,0).setAlpha(0);
                                     
-                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
+                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - 26, stageText.width + 8, 24, 0x1a1a1a  
                                     ).setDepth(49).setOrigin(0,0).setAlpha(0);
+                                    //debugger
 
                                     r1.setStrokeStyle(2, 0x4d9be6);
 
@@ -3556,6 +3554,23 @@ class GameScene extends Phaser.Scene {
              * Checks for Tween complete on each frame.
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
+            if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
+                this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
+                this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
+                this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
+                this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
+            }
+            
+           /* this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS.flipY = true;
+            this.startingArrowsAnimS.play('startArrowIdle')
+            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE.angle = 90;
+            this.startingArrowsAnimE.play('startArrowIdle')
+            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW.angle = 270;
+            this.startingArrowsAnimW.play('startArrowIdle')*/
+            
             this.tweenRespawn.on('complete', () => {
                 
                 if (this.scene.get("PersistScene").coins > 0) {
@@ -3563,7 +3578,7 @@ class GameScene extends Phaser.Scene {
                 }
 
                 // Turn back on arrows
-                this.startingArrowState = true;
+                //this.startingArrowState = true;
                 if (this.startingArrowsAnimN != undefined){
                 this.startingArrowsAnimN.setAlpha(1)
                 }
@@ -3644,12 +3659,12 @@ class GameScene extends Phaser.Scene {
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
             // #region Check Update
-            if (this.snake.direction != DIRS.STOP) {
+            /*if (this.snake.direction != DIRS.STOP) {
                 this.startingArrowsAnimN.setAlpha(0);
                 this.startingArrowsAnimS.setAlpha(0);
                 this.startingArrowsAnimE.setAlpha(0);
                 this.startingArrowsAnimW.setAlpha(0);
-            }
+            }*/
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -6974,7 +6989,7 @@ var config = {
         height: 744 + tempHeightDiff * GRID
     },
     width: 744, 
-    height: 744 + tempHeightDiff * GRID,
+    height: 744,// + tempHeightDiff * GRID,
     backgroundColor: '#4488aa',
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
