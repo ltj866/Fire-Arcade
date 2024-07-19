@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1531,8 +1531,29 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        
+        // TODO Move out of here
+        // Reserves two rows in the tilesheet for making portal areas.
+        const PORTAL_TILE_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
+        const PORTAL_TILE_DIFF = 32;
+        var portalArrayX = [];
+        
         this.map.getLayer(this.wallVarient);
         this.map.forEachTile( tile => {
+
+            // Make Portal Spawning List
+            if (tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + PORTAL_TILE_DIFF * 2) {
+                if (portalArrayX[tile.index]) {
+                    portalArrayX[tile.index].push([tile.x, tile.y]);
+                }
+                else {
+                    portalArrayX[tile.index] = [[tile.x, tile.y]];
+                }
+                tile.index = -1;
+                
+            }
+
+            // Draw Dream walls
             switch (tile.index) {
                 // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
                 case 550:
@@ -1600,6 +1621,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        /*
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(50).setOrigin(0,0);
@@ -1623,6 +1645,7 @@ class GameScene extends Phaser.Scene {
             this.dreamWalls.push(wallShimmerBottom);
         
         }
+        */
 
         this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
@@ -2092,9 +2115,7 @@ class GameScene extends Phaser.Scene {
             //p2.setFrame(randomStart)
         }
 
-        // TODO Move out of here
-        const PORTAL_X_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
-        const PORTAL_N_DIFF = 32;
+
 
 
         var portalVarient = ""
@@ -2105,40 +2126,34 @@ class GameScene extends Phaser.Scene {
         }
 
         // #region Portal-X
-        if (this.map.getLayer(`${portalVarient}-X`)) {
-            var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
-            var portalArrayX = [];
+        //var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
+        //this.map.getLayer(`${this.wallVarient}`) // Navigate to wall.
+        //var portalArrayX = [];
 
-            portalLayerX.forEachTile(tile => {
+        //portalLayerX.forEachTile(tile => {
 
-                if (tile.index > 0) {
-    
-                    if (portalArrayX[tile.index]) {
-                        portalArrayX[tile.index].push([tile.x, tile.y]);
-                    }
-                    else {
-                        portalArrayX[tile.index] = [[tile.x, tile.y]];
-                    }
-                } 
-            });
+            //if (tile.index > 0) {
 
-            let toIndex;
+                
+            //} 
+        //});
 
-            for (let index = PORTAL_X_START + 1; index < PORTAL_X_START + 1 + PORTAL_N_DIFF; index++) {
-    
-                if (portalArrayX[index]) {
-                    // consider throwing an error if a portal doesn't have a correctly defined _to or _from
-                    
-                    toIndex = index + PORTAL_N_DIFF
-                    let _from = Phaser.Math.RND.pick(portalArrayX[index]);
-                    let _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
-                    //console.log("Portal X Logic: FROM TO",_from, _to);
-                    makePair(this, _to, _from);
-                }
+        let toIndex;
+
+        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 1 + PORTAL_TILE_DIFF; index++) {
+
+            if (portalArrayX[index]) {
+                // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                
+                toIndex = index + PORTAL_TILE_DIFF
+                let _from = Phaser.Math.RND.pick(portalArrayX[index]);
+                let _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
+                //console.log("Portal X Logic: FROM TO",_from, _to);
+                makePair(this, _to, _from);
             }
-
-            portalLayerX.destroy()
         }
+
+        //portalLayerX.destroy()
 
         // #endregion
 
