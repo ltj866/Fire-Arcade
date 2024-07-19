@@ -4293,7 +4293,6 @@ class ScoreScene extends Phaser.Scene {
         } else {
             dimensionSlug = `0${this.stageData.zedLevel}`;
         }
-        debugger
         gameanalytics.GameAnalytics.setCustomDimension01(dimensionSlug);
 
         var extraFields = {
@@ -4850,7 +4849,6 @@ class ScoreScene extends Phaser.Scene {
             const onContinue = function (scene) {
     
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
-                debugger
                 
                 ourGame.startingArrowsAnimN.setAlpha(1)
                 ourGame.startingArrowsAnimS.setAlpha(1)
@@ -4866,9 +4864,8 @@ class ScoreScene extends Phaser.Scene {
                 ourGame.startingArrowsAnimW.x = ourGame.snake.head.x - GRID
                 ourGame.startingArrowsAnimW.y = ourGame.snake.head.y + GRID * .5
 
-                ourGame.snake.direction = DIRS.STOP;
+                
                 console.log()
-                debugger 
                 const zedObject = calcZedLevel(ourPersist.zeds)
 
                 var extraFields = {
@@ -4898,7 +4895,8 @@ class ScoreScene extends Phaser.Scene {
                 if (!gameOver) {
                                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
-                    ourGame.gState = GState.PLAY;
+                    debugger
+                    ourGame.gState = GState.START_WAIT;
                     ourGame.bgTween = ourGame.tweens.add({
                         targets: [ourGame.stageBackGround, ourGame.continueBanner],
                         alpha: 0,
@@ -6393,6 +6391,7 @@ class InputScene extends Phaser.Scene {
 
         switch (true) {
             case up:
+                console.log("I'm Facing Up");
                 gameScene.snake.head.setTexture('snakeDefault', 6); 
                 gameScene.snake.direction = DIRS.UP
                 break;
@@ -6415,6 +6414,8 @@ class InputScene extends Phaser.Scene {
     moveUp(gameScene, key) {
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+
+            console.log("I'm Moving Up");
             
             this.setPLAY(gameScene);
             
@@ -6583,33 +6584,29 @@ class InputScene extends Phaser.Scene {
     }
     setPLAY(gameScene) {
 
-        if (gameScene.startingArrowState == true){
-
             // Starting Game State
             gameScene.gState = GState.PLAY;
             gameScene.scoreTimer.paused = false;
                 
             // turn off arrows and move snake.
             
-            gameScene.startingArrowState = false;
-            if (gameScene.arrowTween != undefined) {
+        if (gameScene.arrowTween != undefined) {
                 gameScene.arrowTween.destroy();
-            }
+        }
             
             gameScene.startingArrowsAnimN.setAlpha(0);
             gameScene.startingArrowsAnimS.setAlpha(0);
-            }
-            if (gameScene.startingArrowsAnimE != undefined){
+ 
+        if (gameScene.startingArrowsAnimE != undefined){
             gameScene.startingArrowsAnimE.setAlpha(0);
-            }
-            if (gameScene.startingArrowsAnimW != undefined){
+        }
+        if (gameScene.startingArrowsAnimW != undefined){
             gameScene.startingArrowsAnimW.setAlpha(0);
-            }
+        }
 
 
             //ourInputScene.moveDirection(this, e);
-        }
-
+    }
 }
 
 
