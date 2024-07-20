@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -310,7 +310,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         
-        //this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
+        this.load.image('electronParticle','assets/sprites/electronParticle.png')
         // Tilemap
         this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
 
@@ -356,6 +356,7 @@ class StartScene extends Phaser.Scene {
 
         // Animations
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
+        this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
@@ -2711,19 +2712,48 @@ class GameScene extends Phaser.Scene {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
      
 
-                var electronToCapacitor = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(0.5,0.5).setDepth(80);
-                electronToCapacitor.play("electronIdle");
-                electronToCapacitor.anims.msPerFrame = 66;
+                var electronToCapacitor = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                var electronToCapacitor2 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                var electronToCapacitor3 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                //electronToCapacitor.play("electronIdle");
+                //electronToCapacitor.anims.msPerFrame = 66;
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: this.scoreFrame.getCenter().x,
+                    x: this.scoreFrame.getCenter().x -7,
                     y: this.scoreFrame.getCenter().y,
                     duration:300,
+                    delay: 0,
+                    ease: 'Sine.in',
                     onComplete: () => {
-                        electronToCapacitor.playAfterRepeat({ key: 'electronDispersion01' }, 0)
-
+                        electronToCapacitor.playAfterRepeat({ key: 'CapElectronDispersion' }, 0).setScale(2);
                         //electronToCapacitor.play({ key: 'electronDispersion01' })
+                    }
+                });
+                var movingElectronTween2 = this.tweens.add( {
+                    targets: electronToCapacitor2,
+                    x: this.scoreFrame.getCenter().x -7,
+                    y: this.scoreFrame.getCenter().y,
+                    duration:300,
+                    delay: 33.3,
+                    ease: 'Sine.in',
+                    onComplete: () => {
+                        electronToCapacitor2.destroy();
+                    }
+
+                });
+                var movingElectronTween3 = this.tweens.add( {
+                    targets: electronToCapacitor3,
+                    x: this.scoreFrame.getCenter().x -7,
+                    y: this.scoreFrame.getCenter().y,
+                    duration:300,
+                    delay: 66.7,
+                    ease: 'Sine.in',
+                    onComplete: () => {
+                        electronToCapacitor3.destroy();
                     }
 
                 });
@@ -6839,6 +6869,13 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: 0,
       }); */
+    scene.anims.create({
+    key: 'CapElectronDispersion',
+    frames: scene.anims.generateFrameNumbers('CapElectronDispersion',{ frames: [ 0,1,2,3,4,5,6,7,8,9]}),
+    frameRate: 16,
+    repeat: 0,
+    hideOnComplete: true
+    });
   
     scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
         frame: 'UI_boostMeterAnim.png'
@@ -6986,7 +7023,7 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 744 + tempHeightDiff * GRID
+        height: 744// + tempHeightDiff * GRID
     },
     width: 744, 
     height: 744,// + tempHeightDiff * GRID,
@@ -6995,7 +7032,7 @@ var config = {
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
-        mode: Phaser.Scale.FIT,
+        //mode: Phaser.Scale.FIT,
     },
     parent: 'phaser-example',
     physics: {
