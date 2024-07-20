@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1950,7 +1950,7 @@ class GameScene extends Phaser.Scene {
                                     
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                                         'blackHole' 
-                                    ).setDepth(10).setOrigin(0.425,0.425).setScale(0);
+                                    ).setDepth(10).setOrigin(0.4125,0.4125).setScale(0);
                                     this.blackholes.push(portalImage)
                                     this.blackholeLabels.push(stageText,r1)
 
@@ -1988,7 +1988,7 @@ class GameScene extends Phaser.Scene {
                                 }
                                 this.tweens.add({
                                     targets: this.blackholes,
-                                    scale: {from: 0, to: 1},
+                                    scale: {from: 0, to: 2},
                                     ease: 'Sine.easeOutIn',
                                     duration: 500,
                                     delay: this.tweens.stagger(360)
