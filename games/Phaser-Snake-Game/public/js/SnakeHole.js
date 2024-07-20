@@ -4468,21 +4468,31 @@ class ScoreScene extends Phaser.Scene {
                 `${commaInt(_baseScore)}</span>`
         ).setOrigin(1, 0);
 
-        var preAdditiveSpeedScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
-            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
+            })).setHTML( //_baseScore
                 `
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(0)}</span>
+                `
+        ).setOrigin(1, 0);
+
+        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore + _speedbonus
+                `
+                
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
         ).setOrigin(1, 0);
 
         _baseScore = this.stageData.calcBase();
         _speedbonus = calcBonus(this.stageData.calcBase());
 
+        var atomList = this.stageData.foodLog.slice();
+
         this.tweens.addCounter({
             from: 0,
             to: _baseScore,
-            duration: 1600,
+            duration: atomList.length * 66.7,
             ease: 'linear',
             onUpdate: tween =>
             {
@@ -4496,39 +4506,168 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  _speedbonus,
-            duration: 1600,
+            duration: atomList.length * 66.7,
             ease: 'linear',
-            delay: 1600,
+            delay: atomList.length * 66.7,
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
-                preAdditiveSpeedScoreUI.setHTML(
+                preAdditiveSpeedScoreUI1.setHTML(
                     `
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(value)}</span>
+                `
+            ).setOrigin(1, 0);
+            }
+        });
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  _speedbonus,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay:atomList.length * 100,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                preAdditiveSpeedScoreUI2.setHTML(
+                    `
+                
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + value)}</span>`
             ).setOrigin(1, 0);
             }
         });
         
 
-        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
-            })).setHTML(
-                `DIFFICULTY +${this.stageData.diffBonus}%
-                ZED LVL +${Number(this.stageData.zedLevelBonus() * 100).toFixed(1)}%
-                MEDAL +${this.stageData.medalBonus() * 100}%
+            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                `DIFFICULTY +${0}%
+
+
+                `
+        ).setOrigin(1,0);
+        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                "font-size":'12px'
+            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                `
+                ZED LVL +${0}%
+
+                `
+        ).setOrigin(1,0);
+        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                "font-size":'12px'
+            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                `
+
+                MEDAL +${0}%
                 `
         ).setOrigin(1,0);
         
+        this.tweens.addCounter({
+            from: 0,
+            to:  ourScoreScene.stageData.diffBonus,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value1 = Math.round(tween.getValue());
+                multLablesUI1.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    `DIFFICULTY +${value1}%
+
+                    `
+                
+            ).setOrigin(1, 0);
+            }
+        });
+        this.tweens.addCounter({
+            from: 0,
+            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(1),
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value2 = Math.round(tween.getValue());
+                multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    `
+                    ZED LVL +${value2}%
+
+                    `
+                
+            ).setOrigin(1, 0);
+            }
+        });
+        this.tweens.addCounter({
+            from: 0,
+            to:  ourScoreScene.stageData.medalBonus() * 100,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value3 = Math.round(tween.getValue());
+                multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    `
+
+                    MEDAL +${value3}%
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+        
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
-        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `x ${Number(_bonusMult * 100).toFixed(1)}%
-                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`
+                `x ${0}%
+                `
         ).setOrigin(1, 0);
+
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `
+                <hr style="font-size:3px"/><span style="font-size:16px">${0}</span>`
+        ).setOrigin(1, 0);
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  Number(_bonusMult * 100).toFixed(1),
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                multValuesUI1.setHTML(
+                    `x ${value}%
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                multValuesUI2.setHTML(
+                    `
+                    <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
+            ).setOrigin(1, 0);
+            debugger
+            }
+        });
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
@@ -4538,14 +4677,88 @@ class ScoreScene extends Phaser.Scene {
                 NO-BONK BONUS:`
         ).setOrigin(1,0);
 
-        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
-                `+${this.stageData.cornerBonus()}
-                +${this.stageData.boostBonus()}
-                +${this.stageData.bonkBonus()}`
+                `${0}
+                
+                `
         ).setOrigin(1, 0);
+        const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                //"font-size": '18px',
+            })).setHTML(
+                `
+                ${0}
+                `
+        ).setOrigin(1, 0);
+        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                //"font-size": '18px',
+            })).setHTML(
+                `
+                
+                ${0}`
+        ).setOrigin(1, 0);
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.cornerBonus(),
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 167.7,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI1.setHTML(
+                    `+${value}
+                    
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+        
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.boostBonus(),
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 167.7,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI2.setHTML(
+                    `
+                    +${value}
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+        
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.bonkBonus(),
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 167.7,
+            onComplete: () =>
+                {
+                letterRank.setAlpha(1)
+                stageScoreUI.setAlpha(1)
+                },
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI3.setHTML(
+                    `
+                    
+                    +${value}`
+                    
+            ).setOrigin(1, 0);
+            }
+            
+        });
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
@@ -4564,12 +4777,18 @@ class ScoreScene extends Phaser.Scene {
             [this.scorePanelL,
             this.scorePanelLRank,
             preAdditiveBaseScoreUI,
-            preAdditiveSpeedScoreUI,
+            preAdditiveSpeedScoreUI1,
+            preAdditiveSpeedScoreUI2,
             preAdditiveLablesUI,
-            multLablesUI,
-            multValuesUI,
+            multLablesUI1,
+            multLablesUI2,
+            multLablesUI3,
+            multValuesUI1,
+            multValuesUI2,
             postAdditiveLablesUI,
-            postAdditiveValuesUI,
+            postAdditiveValuesUI1,
+            postAdditiveValuesUI2,
+            postAdditiveValuesUI3,
             stageScoreUI,]
             )
         // #region Rank Sprites
@@ -4666,7 +4885,7 @@ class ScoreScene extends Phaser.Scene {
         
 
         // #region Atomic Food List
-        var atomList = this.stageData.foodLog.slice();
+       
         var scoreAtoms = [];
 
         var count = 0;
