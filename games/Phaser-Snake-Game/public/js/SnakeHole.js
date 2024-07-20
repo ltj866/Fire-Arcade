@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev"
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4452,15 +4452,63 @@ class ScoreScene extends Phaser.Scene {
                 SPEED BONUS:`
         ).setOrigin(1, 0);
 
-        var _baseScore = this.stageData.calcBase();
-        var _speedbonus = calcBonus(this.stageData.calcBase());
-        const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var _baseScore = 0;
+        var _speedbonus = 0
+        /*var preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
-            })).setHTML(
+            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(_baseScore)}</span>
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
+        ).setOrigin(1, 0);*/
+
+        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
+                `${commaInt(_baseScore)}</span>`
         ).setOrigin(1, 0);
+
+        var preAdditiveSpeedScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
+                `
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(0)}</span>
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
+        ).setOrigin(1, 0);
+
+        _baseScore = this.stageData.calcBase();
+        _speedbonus = calcBonus(this.stageData.calcBase());
+
+        this.tweens.addCounter({
+            from: 0,
+            to: _baseScore,
+            duration: 1600,
+            ease: 'linear',
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                preAdditiveBaseScoreUI.setHTML(
+                    `${commaInt(value)}</span>`
+            ).setOrigin(1, 0);
+            }
+        });
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  _speedbonus,
+            duration: 1600,
+            ease: 'linear',
+            delay: 1600,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                preAdditiveSpeedScoreUI.setHTML(
+                    `
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(value)}</span>
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + value)}</span>`
+            ).setOrigin(1, 0);
+            }
+        });
         
 
         const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -4509,13 +4557,14 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
-        ).setOrigin(1, 0.5).setDepth(20);
+        ).setOrigin(1, 0.5).setDepth(20).setAlpha(0);
 
         
         this.ScoreContainerL.add(
             [this.scorePanelL,
             this.scorePanelLRank,
-            preAdditiveValuesUI,
+            preAdditiveBaseScoreUI,
+            preAdditiveSpeedScoreUI,
             preAdditiveLablesUI,
             multLablesUI,
             multValuesUI,
@@ -4532,7 +4581,7 @@ class ScoreScene extends Phaser.Scene {
         //rank = 4; // Temp override.
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
-        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D').setAlpha(0);
 
         this.ScoreContainerL.add(letterRank)
         
@@ -4618,6 +4667,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Atomic Food List
         var atomList = this.stageData.foodLog.slice();
+        var scoreAtoms = [];
 
         var count = 0;
         
@@ -4641,8 +4691,9 @@ class ScoreScene extends Phaser.Scene {
                     anim = "atom01idle";
                     if (i != 0) { // First Can't Connect
                         var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
-                        ).setOrigin(0,0.5).setDepth(20);
+                        ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
                         this.ScoreContainerL.add(rectangle)
+                        scoreAtoms.push(rectangle)
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
@@ -4660,12 +4711,26 @@ class ScoreScene extends Phaser.Scene {
             }
 
             this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
-            ).play(anim).setDepth(21).setScale(.5);
+            ).play(anim).setDepth(21).setScale(.5).setAlpha(0);
             this.ScoreContainerL.add(this.atomScoreIcon)  
+            scoreAtoms.push(this.atomScoreIcon)
         }
 
-        this.ScoreContainerL.x -= GRID * 1
+        this.tweens.add({ //shows score screen atoms one by one
+            targets: scoreAtoms,
+            alpha: 1,
+            ease: 'Linear',
+            duration: 100,
+            delay: this.tweens.stagger(33.3)
+        });
 
+        this.ScoreContainerL.x -= SCREEN_WIDTH
+        this.tweens.add({
+            targets: this.ScoreContainerL,
+            x: -GRID * 1,
+            ease: 'Sine.InOut',
+            duration: 500,
+        });
         
 
         // #region Stat Cards (Right Side)
@@ -4698,6 +4763,7 @@ class ScoreScene extends Phaser.Scene {
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
+
         const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
@@ -4724,7 +4790,7 @@ class ScoreScene extends Phaser.Scene {
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
                 <hr/>
 
-                BASE SCORE: <span style = "float: right">${bestLog.calcBase()}</span>
+                BASE SCORE: <span style = "float: right">${_baseScore}</span>
                 SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
                 </br>
 
@@ -4738,6 +4804,9 @@ class ScoreScene extends Phaser.Scene {
                 </br>`
                     
         ).setOrigin(0,0).setVisible(true);
+
+
+        
 
         // Stats Scroll Logic
         stageStats.addListener('scroll');
@@ -4764,7 +4833,13 @@ class ScoreScene extends Phaser.Scene {
             scrollArrowDown,
             stageStats,]
         )
-        this.ScoreContainerR.x -= GRID * 1;
+        this.ScoreContainerR.x += SCREEN_WIDTH//GRID * 1;
+        this.tweens.add({
+            targets: this.ScoreContainerR,
+            x: -GRID * 1,
+            ease: 'Sine.InOut',
+            duration: 500,
+        });
         
 
         // #region Hash Display Code
@@ -4781,7 +4856,7 @@ class ScoreScene extends Phaser.Scene {
         this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div',  Object.assign({}, STYLE_DEFAULT, {
             width:'335px',
             "fontSize":'18px',
-        })).setOrigin(.5, 0);
+        })).setOrigin(.5, 0).setAlpha(0);
 
 
     
@@ -4797,7 +4872,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setText(
                 `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0).setAlpha(0);
         
         this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
@@ -4807,7 +4882,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest)}</span>`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0).setAlpha(0);
 
         // #region Help Card
         /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
