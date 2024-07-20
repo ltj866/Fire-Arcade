@@ -1518,7 +1518,7 @@ class GameScene extends Phaser.Scene {
         console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
-            if (this.gState != GState.PLAY) {
+            if (this.gState != GState.PLAY && !this.winned) {
                 ourGameScene.arrowTween =  this.tweens.add({
                     targets: [this.startingArrowsAnimN,this.startingArrowsAnimS,
                         this.startingArrowsAnimE,this.startingArrowsAnimW],
