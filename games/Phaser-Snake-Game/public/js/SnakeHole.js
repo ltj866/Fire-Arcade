@@ -866,6 +866,7 @@ class StartScene extends Phaser.Scene {
             });
 
         }
+        var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");
 
         this.continueText.on('pointerdown', e => {
             console.log("I CLICK");
@@ -2924,6 +2925,7 @@ class GameScene extends Phaser.Scene {
                 });
             })
         }
+        
 
         // dot matrix
         
@@ -4506,7 +4508,7 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  _speedbonus,
-            duration: atomList.length * 66.7,
+            duration: atomList.length * 33.3,
             ease: 'linear',
             delay: atomList.length * 66.7,
             onUpdate: tween =>
@@ -4517,10 +4519,23 @@ class ScoreScene extends Phaser.Scene {
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(value)}</span>
                 `
             ).setOrigin(1, 0);
-            }
+            },
+            /*onComplete: () => {
+                this.tweens.add({ 
+                    targets: preAdditiveSpeedScoreUI2,
+                    alpha: 1,
+                    ease: 'Linear',
+                    duration: 100,
+                    delay: this.tweens.stagger(33.3)
+                });
+                preAdditiveSpeedScoreUI2.setHTML(
+                    `
+                
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
+            )}*/
         });
 
-        this.tweens.addCounter({
+        /*this.tweens.addCounter({
             from: 0,
             to:  _speedbonus,
             duration: atomList.length * 66.7,
@@ -4535,7 +4550,7 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + value)}</span>`
             ).setOrigin(1, 0);
             }
-        });
+        });*/
         
 
         var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
