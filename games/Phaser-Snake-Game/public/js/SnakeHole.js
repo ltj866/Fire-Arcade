@@ -4009,10 +4009,13 @@ class GameScene extends Phaser.Scene {
                 if(this.boostEnergy > 0){
                     this.moveInterval = SPEED_SPRINT;
                     
-                    // Boost Stats
-                    ourInputScene.boostTime += 6;
-                    //this.boostMask.setScale(this.boostEnergy/1000,1);
-                    this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
+                    if (!this.winned) {
+                        // Boost Stats
+                        ourInputScene.boostTime += 6;
+                        //this.boostMask.setScale(this.boostEnergy/1000,1);
+
+                        this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
+                    } 
                 } else{
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
