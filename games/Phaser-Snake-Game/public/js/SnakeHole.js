@@ -2811,25 +2811,11 @@ class GameScene extends Phaser.Scene {
             this.scoreUI.setText(`Stage`);
             this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
-            this.length += 1;
-            this.globalFruitCount += 1; // Run Wide Counter
 
-            var length = `${this.length}`;
 
             this.bestScoreUI.setText(`Best`);
             this.bestScoreLabelUI.setText(this.bestBase);
-            
-            // Exception for Bonus Levels when the Length Goal = 0
-            if (LENGTH_GOAL != 0) {
-                this.lengthGoalUI.setHTML(
-                    `${length.padStart(2, "0")}<br/>
-                    <hr style="font-size:3px"/>
-                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
-                )
-            }
-            else {
-                this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
-            }
+
             
              // Restart Score Timer
             if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
