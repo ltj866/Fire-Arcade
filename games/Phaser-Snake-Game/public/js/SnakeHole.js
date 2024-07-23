@@ -4543,19 +4543,21 @@ class ScoreScene extends Phaser.Scene {
                 `
             ).setOrigin(1, 0);
             },
-            /*onComplete: () => {
+            onComplete: () => {
+                //SFX
                 this.tweens.add({ 
                     targets: preAdditiveSpeedScoreUI2,
-                    alpha: 1,
+                    alpha: 0,
                     ease: 'Linear',
-                    duration: 100,
-                    delay: this.tweens.stagger(33.3)
+                    duration: 500,
+                    loop: 0,
+                    yoyo: true,
                 });
                 preAdditiveSpeedScoreUI2.setHTML(
                     `
                 
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
-            )}*/
+            )}
         });
 
         /*this.tweens.addCounter({
@@ -4687,10 +4689,23 @@ class ScoreScene extends Phaser.Scene {
                     `x ${value}%
                     `
             ).setOrigin(1, 0);
+            },
+            onComplete: () => {
+                multValuesUI2.setHTML(
+                    `
+                    <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
+                this.tweens.add({ 
+                    targets: multValuesUI2,
+                    alpha: 0,
+                    ease: 'Linear',
+                    duration: 500,
+                    loop: 0,
+                    yoyo: true,
+                });
             }
         });
 
-        this.tweens.addCounter({
+        /*this.tweens.addCounter({
             from: 0,
             to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
             duration: atomList.length * 66.7,
@@ -4703,9 +4718,8 @@ class ScoreScene extends Phaser.Scene {
                     `
                     <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
             ).setOrigin(1, 0);
-            debugger
-            }
-        });
+            },
+        });*/
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
@@ -4745,7 +4759,7 @@ class ScoreScene extends Phaser.Scene {
             to:  this.stageData.cornerBonus(),
             duration: atomList.length * 33.3,
             ease: 'linear',
-            delay: atomList.length * 167.7,
+            delay: atomList.length * 233,
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4762,7 +4776,7 @@ class ScoreScene extends Phaser.Scene {
             to:  this.stageData.boostBonus(),
             duration: atomList.length * 33.3,
             ease: 'linear',
-            delay: atomList.length * 167.7,
+            delay: atomList.length * 233,
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4779,7 +4793,7 @@ class ScoreScene extends Phaser.Scene {
             to:  this.stageData.bonkBonus(),
             duration: atomList.length * 33.3,
             ease: 'linear',
-            delay: atomList.length * 167.7,
+            delay: atomList.length * 233,
             onComplete: () =>
                 {
                 letterRank.setAlpha(1)
