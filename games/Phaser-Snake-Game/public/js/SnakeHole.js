@@ -879,7 +879,41 @@ class StartScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', e => {
             onInput(ourStartScene);
 
-        });   
+        });
+        
+        // #region Pre-roll Zeds
+
+        console.time("Full Roll");
+
+        var lowestNum = 4294967295; // Start at Max Int
+        //var rolls = this.stageData.calcTotal();
+        var rolls = 22119;
+        console.log("Rolling for zeds", rolls);
+
+        do {
+        var _nextInt = Phaser.Math.RND.integer();
+
+        if (_nextInt < lowestNum) {
+            lowestNum = _nextInt;
+            
+            // Check for more zeds.
+            var leadingZeros = intToBinHash(lowestNum).split('1').reverse().pop();
+            var zedsToAdd = leadingZeros.length * (leadingZeros.length + 1) / 2
+            console.log("new lowest num:", lowestNum, "Zeros:", leadingZeros.length, (lowestNum >>> 0).toString(2).padStart(32, '0'), "zeds:", zedsToAdd);
+        }
+
+
+        rolls--;
+        } while (rolls > 0);
+
+
+
+        console.timeEnd("Full Roll");
+
+        // #endregion
+        
+        
+
     }
 
 
@@ -5156,6 +5190,11 @@ class ScoreScene extends Phaser.Scene {
         }
         // #endregion
 
+
+
+
+
+
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
             var continue_text = '[SPACE TO CONTINUE]';
@@ -5269,6 +5308,8 @@ class ScoreScene extends Phaser.Scene {
 
 
         }, [], this);
+
+
     }
 
     // #region Score - Update
@@ -5319,7 +5360,7 @@ class ScoreScene extends Phaser.Scene {
             var temp = 2**this.difficulty
             var innerRollNum = Math.ceil(2**this.difficulty/10)
             
-            //debugger
+            
             
             for (let index = innerRollNum; index > 0 ; index--) {
                 
