@@ -4412,7 +4412,7 @@ class ScoreScene extends Phaser.Scene {
             'uiPanelL', 'Glass', 
             GRID * 3, GRID * 4, 
             8, 8, 8, 8);
-        this.scorePanelLRank.setDepth(11).setOrigin(.5,.5)
+        this.scorePanelLRank.setDepth(11).setOrigin(.5,.5).setAlpha(0)
 
         this.scorePanelR = this.add.nineslice(GRID * 17.25, GRID * 7.75, 
             'uiPanelR', 'Glass', 
@@ -4798,6 +4798,7 @@ class ScoreScene extends Phaser.Scene {
                 {
                 letterRank.setAlpha(1)
                 stageScoreUI.setAlpha(1)
+                this.scorePanelLRank.setAlpha(1)
                 },
             onUpdate: tween =>
             {
@@ -4889,6 +4890,8 @@ class ScoreScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
+        console.log("rank", rank)
+        rank -= 1; //this needs to be set back to rank-1 from being +1'd earlier
 
         // region Particle Emitter
         if(rank >= SILVER){
@@ -4900,7 +4903,7 @@ class ScoreScene extends Phaser.Scene {
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
                 lifespan: 1000,
-            }).setFrequency(500,[1]).setDepth(20);
+            }).setFrequency(500,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
         if(rank === GOLD){
@@ -4912,14 +4915,15 @@ class ScoreScene extends Phaser.Scene {
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
                 lifespan: 1000,
-            }).setFrequency(1332,[1]).setDepth(20);
+            }).setFrequency(1332,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
         if(rank === PLATINUM){
+            
             lightColor = platLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
+            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle0Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -4928,7 +4932,7 @@ class ScoreScene extends Phaser.Scene {
                 alpha:{start: 1, end: 0 },
                 lifespan: 3000,
                 gravityY: -5,
-            }).setFrequency(667,[1]).setDepth(20);
+            }).setFrequency(667,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
 
