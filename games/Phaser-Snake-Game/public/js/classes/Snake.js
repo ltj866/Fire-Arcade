@@ -45,8 +45,25 @@ var Snake = new Phaser.Class({
     grow: function (scene)
     {
         
-        scene.scale.gameSize.height += 24;
-        scene.scale.refresh()
+        scene.length += 1;
+        scene.globalFruitCount += 1; // Run Wide Counter
+
+        var length = `${scene.length}`;
+        
+        // Exception for Bonus Levels when the Length Goal = 0
+        if (LENGTH_GOAL != 0) {
+            scene.lengthGoalUI.setHTML(
+                `${length.padStart(2, "0")}<br/>
+                <hr style="font-size:3px"/>
+                ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            )
+        }
+        else {
+            scene.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+        }
+
+        //scene.scale.gameSize.height += 24;
+        //scene.scale.refresh()
         //debugger
         if (scene.boostOutlinesBody.length > 0) {
             //newPart.setTint(0xFF00FF);

@@ -310,7 +310,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         
-        //this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
+        this.load.image('electronParticle','assets/sprites/electronParticle.png')
         // Tilemap
         this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
 
@@ -356,6 +356,7 @@ class StartScene extends Phaser.Scene {
 
         // Animations
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
+        this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
@@ -865,6 +866,7 @@ class StartScene extends Phaser.Scene {
             });
 
         }
+        var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");
 
         this.continueText.on('pointerdown', e => {
             console.log("I CLICK");
@@ -877,7 +879,41 @@ class StartScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', e => {
             onInput(ourStartScene);
 
-        });   
+        });
+        
+        // #region Pre-roll Zeds
+
+        console.time("Full Roll");
+
+        var lowestNum = 4294967295; // Start at Max Int
+        //var rolls = this.stageData.calcTotal();
+        var rolls = 22119;
+        console.log("Rolling for zeds", rolls);
+
+        do {
+        var _nextInt = Phaser.Math.RND.integer();
+
+        if (_nextInt < lowestNum) {
+            lowestNum = _nextInt;
+            
+            // Check for more zeds.
+            var leadingZeros = intToBinHash(lowestNum).split('1').reverse().pop();
+            var zedsToAdd = leadingZeros.length * (leadingZeros.length + 1) / 2
+            console.log("new lowest num:", lowestNum, "Zeros:", leadingZeros.length, (lowestNum >>> 0).toString(2).padStart(32, '0'), "zeds:", zedsToAdd);
+        }
+
+
+        rolls--;
+        } while (rolls > 0);
+
+
+
+        console.timeEnd("Full Roll");
+
+        // #endregion
+        
+        
+
     }
 
 
@@ -1220,7 +1256,7 @@ class GameScene extends Phaser.Scene {
         const { stage = START_STAGE } = props 
         this.stage = stage;
         
-        this.startingArrowState = true; // Deprecate
+        //this.startingArrowState = true; // Deprecate
 
         this.moveInterval = SPEED_WALK;
 
@@ -1493,37 +1529,34 @@ class GameScene extends Phaser.Scene {
 
         if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
             this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN.play('startArrowIdle');
-            this.startingArrowsAnimN.setAlpha(0);
+            this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
             this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('startArrowIdle');
-            this.startingArrowsAnimS.setAlpha(0);
+            this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('startArrowIdle');
-            this.startingArrowsAnimE.setAlpha(0);
+            this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('startArrowIdle');
-            this.startingArrowsAnimW.setAlpha(0);
+            this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
-        const _arrowN = this.startingArrowsAnimN
-        const _arrowS = this.startingArrowsAnimS
-        const _arrowE = this.startingArrowsAnimE
-        const _arrowW = this.startingArrowsAnimW
+        this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
+        this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
+        this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
+        this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
         console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
-            if (this.gState != GState.PLAY) {
+            if (this.gState != GState.PLAY && !this.winned) {
                 ourGameScene.arrowTween =  this.tweens.add({
-                    targets: [_arrowN,_arrowS,_arrowE,_arrowW],
+                    targets: [this.startingArrowsAnimN,this.startingArrowsAnimS,
+                        this.startingArrowsAnimE,this.startingArrowsAnimW],
                     alpha: 1,
                     duration: 500,
                     ease: 'linear',
@@ -1966,15 +1999,16 @@ class GameScene extends Phaser.Scene {
                                         stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
                                     ).setDepth(50).setOrigin(0,0).setAlpha(0);
                                     
-                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - GRID, stageName.length * 10, 20, 0x1a1a1a  
+                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - 26, stageText.width + 8, 24, 0x1a1a1a  
                                     ).setDepth(49).setOrigin(0,0).setAlpha(0);
+                                    //debugger
 
                                     r1.setStrokeStyle(2, 0x4d9be6);
 
                                     
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                                         'blackHole' 
-                                    ).setDepth(10).setOrigin(0.425,0.425).setScale(0);
+                                    ).setDepth(10).setOrigin(0.4125,0.4125).setScale(0);
                                     this.blackholes.push(portalImage)
                                     this.blackholeLabels.push(stageText,r1)
 
@@ -2012,7 +2046,7 @@ class GameScene extends Phaser.Scene {
                                 }
                                 this.tweens.add({
                                     targets: this.blackholes,
-                                    scale: {from: 0, to: 1},
+                                    scale: {from: 0, to: 2},
                                     ease: 'Sine.easeOutIn',
                                     duration: 500,
                                     delay: this.tweens.stagger(360)
@@ -2728,19 +2762,48 @@ class GameScene extends Phaser.Scene {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
      
 
-                var electronToCapacitor = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(0.5,0.5).setDepth(80);
-                electronToCapacitor.play("electronIdle");
-                electronToCapacitor.anims.msPerFrame = 66;
+                var electronToCapacitor = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                var electronToCapacitor2 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                var electronToCapacitor3 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                //electronToCapacitor.play("electronIdle");
+                //electronToCapacitor.anims.msPerFrame = 66;
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: this.scoreFrame.getCenter().x,
+                    x: this.scoreFrame.getCenter().x -7,
                     y: this.scoreFrame.getCenter().y,
                     duration:300,
+                    delay: 0,
+                    ease: 'Sine.in',
                     onComplete: () => {
-                        electronToCapacitor.playAfterRepeat({ key: 'electronDispersion01' }, 0)
-
+                        electronToCapacitor.playAfterRepeat({ key: 'CapElectronDispersion' }, 0).setScale(2);
                         //electronToCapacitor.play({ key: 'electronDispersion01' })
+                    }
+                });
+                var movingElectronTween2 = this.tweens.add( {
+                    targets: electronToCapacitor2,
+                    x: this.scoreFrame.getCenter().x -7,
+                    y: this.scoreFrame.getCenter().y,
+                    duration:300,
+                    delay: 33.3,
+                    ease: 'Sine.in',
+                    onComplete: () => {
+                        electronToCapacitor2.destroy();
+                    }
+
+                });
+                var movingElectronTween3 = this.tweens.add( {
+                    targets: electronToCapacitor3,
+                    x: this.scoreFrame.getCenter().x -7,
+                    y: this.scoreFrame.getCenter().y,
+                    duration:300,
+                    delay: 66.7,
+                    ease: 'Sine.in',
+                    onComplete: () => {
+                        electronToCapacitor3.destroy();
                     }
 
                 });
@@ -2797,25 +2860,11 @@ class GameScene extends Phaser.Scene {
             this.scoreUI.setText(`Stage`);
             this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
-            this.length += 1;
-            this.globalFruitCount += 1; // Run Wide Counter
 
-            var length = `${this.length}`;
 
             this.bestScoreUI.setText(`Best`);
             this.bestScoreLabelUI.setText(this.bestBase);
-            
-            // Exception for Bonus Levels when the Length Goal = 0
-            if (LENGTH_GOAL != 0) {
-                this.lengthGoalUI.setHTML(
-                    `${length.padStart(2, "0")}<br/>
-                    <hr style="font-size:3px"/>
-                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
-                )
-            }
-            else {
-                this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
-            }
+
             
              // Restart Score Timer
             if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
@@ -2911,6 +2960,7 @@ class GameScene extends Phaser.Scene {
                 });
             })
         }
+        
 
         // dot matrix
         
@@ -3571,6 +3621,23 @@ class GameScene extends Phaser.Scene {
              * Checks for Tween complete on each frame.
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
+            if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
+                this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
+                this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
+                this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
+                this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
+            }
+            
+           /* this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS.flipY = true;
+            this.startingArrowsAnimS.play('startArrowIdle')
+            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE.angle = 90;
+            this.startingArrowsAnimE.play('startArrowIdle')
+            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW.angle = 270;
+            this.startingArrowsAnimW.play('startArrowIdle')*/
+            
             this.tweenRespawn.on('complete', () => {
                 
                 if (this.scene.get("PersistScene").coins > 0) {
@@ -3578,7 +3645,7 @@ class GameScene extends Phaser.Scene {
                 }
 
                 // Turn back on arrows
-                this.startingArrowState = true;
+                //this.startingArrowState = true;
                 if (this.startingArrowsAnimN != undefined){
                 this.startingArrowsAnimN.setAlpha(1)
                 }
@@ -3659,12 +3726,12 @@ class GameScene extends Phaser.Scene {
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
             // #region Check Update
-            if (this.snake.direction != DIRS.STOP) {
+            /*if (this.snake.direction != DIRS.STOP) {
                 this.startingArrowsAnimN.setAlpha(0);
                 this.startingArrowsAnimS.setAlpha(0);
                 this.startingArrowsAnimE.setAlpha(0);
                 this.startingArrowsAnimW.setAlpha(0);
-            }
+            }*/
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -3991,10 +4058,13 @@ class GameScene extends Phaser.Scene {
                 if(this.boostEnergy > 0){
                     this.moveInterval = SPEED_SPRINT;
                     
-                    // Boost Stats
-                    ourInputScene.boostTime += 6;
-                    //this.boostMask.setScale(this.boostEnergy/1000,1);
-                    this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
+                    if (!this.winned) {
+                        // Boost Stats
+                        ourInputScene.boostTime += 6;
+                        //this.boostMask.setScale(this.boostEnergy/1000,1);
+
+                        this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
+                    } 
                 } else{
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
@@ -4422,35 +4492,249 @@ class ScoreScene extends Phaser.Scene {
                 SPEED BONUS:`
         ).setOrigin(1, 0);
 
-        var _baseScore = this.stageData.calcBase();
-        var _speedbonus = calcBonus(this.stageData.calcBase());
-        const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var _baseScore = 0;
+        var _speedbonus = 0
+        /*var preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
-            })).setHTML(
+            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(_baseScore)}</span>
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
+        ).setOrigin(1, 0);*/
+
+        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
+                `${commaInt(_baseScore)}</span>`
         ).setOrigin(1, 0);
+
+        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore
+                `
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(0)}</span>
+                `
+        ).setOrigin(1, 0);
+
+        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore + _speedbonus
+                `
+                
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
+        ).setOrigin(1, 0);
+
+        _baseScore = this.stageData.calcBase();
+        _speedbonus = calcBonus(this.stageData.calcBase());
+
+        var atomList = this.stageData.foodLog.slice();
+
+        this.tweens.addCounter({
+            from: 0,
+            to: _baseScore,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                preAdditiveBaseScoreUI.setHTML(
+                    `${commaInt(value)}</span>`
+            ).setOrigin(1, 0);
+            }
+        });
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  _speedbonus,
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 66.7,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                preAdditiveSpeedScoreUI1.setHTML(
+                    `
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(value)}</span>
+                `
+            ).setOrigin(1, 0);
+            },
+            onComplete: () => {
+                //SFX
+                this.tweens.add({ 
+                    targets: preAdditiveSpeedScoreUI2,
+                    alpha: 0,
+                    ease: 'Linear',
+                    duration: 500,
+                    loop: 0,
+                    yoyo: true,
+                });
+                preAdditiveSpeedScoreUI2.setHTML(
+                    `
+                
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
+            )}
+        });
+
+        /*this.tweens.addCounter({
+            from: 0,
+            to:  _speedbonus,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay:atomList.length * 100,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                preAdditiveSpeedScoreUI2.setHTML(
+                    `
+                
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + value)}</span>`
+            ).setOrigin(1, 0);
+            }
+        });*/
         
 
-        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
-            })).setHTML(
-                `DIFFICULTY +${this.stageData.diffBonus}%
-                ZED LVL +${Number(this.stageData.zedLevelBonus() * 100).toFixed(1)}%
-                MEDAL +${this.stageData.medalBonus() * 100}%
+            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                `DIFFICULTY +${0}%
+
+
+                `
+        ).setOrigin(1,0);
+        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                "font-size":'12px'
+            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                `
+                ZED LVL +${0}%
+
+                `
+        ).setOrigin(1,0);
+        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                "font-size":'12px'
+            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                `
+
+                MEDAL +${0}%
                 `
         ).setOrigin(1,0);
         
+        this.tweens.addCounter({
+            from: 0,
+            to:  ourScoreScene.stageData.diffBonus,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value1 = Math.round(tween.getValue());
+                multLablesUI1.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    `DIFFICULTY +${value1}%
+
+                    `
+                
+            ).setOrigin(1, 0);
+            }
+        });
+        this.tweens.addCounter({
+            from: 0,
+            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(1),
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value2 = Math.round(tween.getValue());
+                multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    `
+                    ZED LVL +${value2}%
+
+                    `
+                
+            ).setOrigin(1, 0);
+            }
+        });
+        this.tweens.addCounter({
+            from: 0,
+            to:  ourScoreScene.stageData.medalBonus() * 100,
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value3 = Math.round(tween.getValue());
+                multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    `
+
+                    MEDAL +${value3}%
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+        
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
-        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `x ${Number(_bonusMult * 100).toFixed(1)}%
-                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`
+                `x ${0}%
+                `
         ).setOrigin(1, 0);
+
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `
+                <hr style="font-size:3px"/><span style="font-size:16px">${0}</span>`
+        ).setOrigin(1, 0);
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  Number(_bonusMult * 100).toFixed(1),
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                multValuesUI1.setHTML(
+                    `x ${value}%
+                    `
+            ).setOrigin(1, 0);
+            },
+            onComplete: () => {
+                multValuesUI2.setHTML(
+                    `
+                    <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
+                this.tweens.add({ 
+                    targets: multValuesUI2,
+                    alpha: 0,
+                    ease: 'Linear',
+                    duration: 500,
+                    loop: 0,
+                    yoyo: true,
+                });
+            }
+        });
+
+        /*this.tweens.addCounter({
+            from: 0,
+            to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                multValuesUI2.setHTML(
+                    `
+                    <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
+            ).setOrigin(1, 0);
+            },
+        });*/
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
@@ -4460,14 +4744,88 @@ class ScoreScene extends Phaser.Scene {
                 NO-BONK BONUS:`
         ).setOrigin(1,0);
 
-        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
-                `+${this.stageData.cornerBonus()}
-                +${this.stageData.boostBonus()}
-                +${this.stageData.bonkBonus()}`
+                `${0}
+                
+                `
         ).setOrigin(1, 0);
+        const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                //"font-size": '18px',
+            })).setHTML(
+                `
+                ${0}
+                `
+        ).setOrigin(1, 0);
+        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+                //"font-size": '18px',
+            })).setHTML(
+                `
+                
+                ${0}`
+        ).setOrigin(1, 0);
+
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.cornerBonus(),
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 233,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI1.setHTML(
+                    `+${value}
+                    
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+        
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.boostBonus(),
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 233,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI2.setHTML(
+                    `
+                    +${value}
+                    `
+            ).setOrigin(1, 0);
+            }
+        });
+        
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.bonkBonus(),
+            duration: atomList.length * 33.3,
+            ease: 'linear',
+            delay: atomList.length * 233,
+            onComplete: () =>
+                {
+                letterRank.setAlpha(1)
+                stageScoreUI.setAlpha(1)
+                },
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI3.setHTML(
+                    `
+                    
+                    +${value}`
+                    
+            ).setOrigin(1, 0);
+            }
+            
+        });
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
@@ -4479,18 +4837,25 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
-        ).setOrigin(1, 0.5).setDepth(20);
+        ).setOrigin(1, 0.5).setDepth(20).setAlpha(0);
 
         
         this.ScoreContainerL.add(
             [this.scorePanelL,
             this.scorePanelLRank,
-            preAdditiveValuesUI,
+            preAdditiveBaseScoreUI,
+            preAdditiveSpeedScoreUI1,
+            preAdditiveSpeedScoreUI2,
             preAdditiveLablesUI,
-            multLablesUI,
-            multValuesUI,
+            multLablesUI1,
+            multLablesUI2,
+            multLablesUI3,
+            multValuesUI1,
+            multValuesUI2,
             postAdditiveLablesUI,
-            postAdditiveValuesUI,
+            postAdditiveValuesUI1,
+            postAdditiveValuesUI2,
+            postAdditiveValuesUI3,
             stageScoreUI,]
             )
         // #region Rank Sprites
@@ -4502,7 +4867,7 @@ class ScoreScene extends Phaser.Scene {
         //rank = 4; // Temp override.
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
-        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D').setAlpha(0);
 
         this.ScoreContainerL.add(letterRank)
         
@@ -4587,7 +4952,8 @@ class ScoreScene extends Phaser.Scene {
         
 
         // #region Atomic Food List
-        var atomList = this.stageData.foodLog.slice();
+       
+        var scoreAtoms = [];
 
         var count = 0;
         
@@ -4611,8 +4977,9 @@ class ScoreScene extends Phaser.Scene {
                     anim = "atom01idle";
                     if (i != 0) { // First Can't Connect
                         var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
-                        ).setOrigin(0,0.5).setDepth(20);
+                        ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
                         this.ScoreContainerL.add(rectangle)
+                        scoreAtoms.push(rectangle)
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
@@ -4630,12 +4997,26 @@ class ScoreScene extends Phaser.Scene {
             }
 
             this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
-            ).play(anim).setDepth(21).setScale(.5);
+            ).play(anim).setDepth(21).setScale(.5).setAlpha(0);
             this.ScoreContainerL.add(this.atomScoreIcon)  
+            scoreAtoms.push(this.atomScoreIcon)
         }
 
-        this.ScoreContainerL.x -= GRID * 1
+        this.tweens.add({ //shows score screen atoms one by one
+            targets: scoreAtoms,
+            alpha: 1,
+            ease: 'Linear',
+            duration: 100,
+            delay: this.tweens.stagger(33.3)
+        });
 
+        this.ScoreContainerL.x -= SCREEN_WIDTH
+        this.tweens.add({
+            targets: this.ScoreContainerL,
+            x: -GRID * 1,
+            ease: 'Sine.InOut',
+            duration: 500,
+        });
         
 
         // #region Stat Cards (Right Side)
@@ -4668,6 +5049,7 @@ class ScoreScene extends Phaser.Scene {
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
+
         const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
@@ -4694,7 +5076,7 @@ class ScoreScene extends Phaser.Scene {
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
                 <hr/>
 
-                BASE SCORE: <span style = "float: right">${bestLog.calcBase()}</span>
+                BASE SCORE: <span style = "float: right">${_baseScore}</span>
                 SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
                 </br>
 
@@ -4708,6 +5090,9 @@ class ScoreScene extends Phaser.Scene {
                 </br>`
                     
         ).setOrigin(0,0).setVisible(true);
+
+
+        
 
         // Stats Scroll Logic
         stageStats.addListener('scroll');
@@ -4734,7 +5119,13 @@ class ScoreScene extends Phaser.Scene {
             scrollArrowDown,
             stageStats,]
         )
-        this.ScoreContainerR.x -= GRID * 1;
+        this.ScoreContainerR.x += SCREEN_WIDTH//GRID * 1;
+        this.tweens.add({
+            targets: this.ScoreContainerR,
+            x: -GRID * 1,
+            ease: 'Sine.InOut',
+            duration: 500,
+        });
         
 
         // #region Hash Display Code
@@ -4751,7 +5142,7 @@ class ScoreScene extends Phaser.Scene {
         this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div',  Object.assign({}, STYLE_DEFAULT, {
             width:'335px',
             "fontSize":'18px',
-        })).setOrigin(.5, 0);
+        })).setOrigin(.5, 0).setAlpha(0);
 
 
     
@@ -4767,7 +5158,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setText(
                 `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0).setAlpha(0);
         
         this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
@@ -4777,7 +5168,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest)}</span>`
-        ).setOrigin(0,0);
+        ).setOrigin(0,0).setAlpha(0);
 
         // #region Help Card
         /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
@@ -4827,6 +5218,11 @@ class ScoreScene extends Phaser.Scene {
             localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
         }
         // #endregion
+
+
+
+
+
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -4941,6 +5337,8 @@ class ScoreScene extends Phaser.Scene {
 
 
         }, [], this);
+
+
     }
 
     // #region Score - Update
@@ -4991,7 +5389,7 @@ class ScoreScene extends Phaser.Scene {
             var temp = 2**this.difficulty
             var innerRollNum = Math.ceil(2**this.difficulty/10)
             
-            //debugger
+            
             
             for (let index = innerRollNum; index > 0 ; index--) {
                 
@@ -6839,6 +7237,13 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: 0,
       }); */
+    scene.anims.create({
+    key: 'CapElectronDispersion',
+    frames: scene.anims.generateFrameNumbers('CapElectronDispersion',{ frames: [ 0,1,2,3,4,5,6,7,8,9]}),
+    frameRate: 16,
+    repeat: 0,
+    hideOnComplete: true
+    });
   
     scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
         frame: 'UI_boostMeterAnim.png'
@@ -6986,16 +7391,18 @@ var config = {
     //},
     max : {
         width: 744,
-        height: 744 + tempHeightDiff * GRID
+        height: 744// + tempHeightDiff * GRID
     },
     width: 744, 
-    height: 744 + tempHeightDiff * GRID,
+    height: 744,// + tempHeightDiff * GRID,
     backgroundColor: '#4488aa',
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
+    //roundPixels: true,
+    //pixelArt: true,
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
-        mode: Phaser.Scale.FIT,
+        //mode: Phaser.Scale.FIT,
     },
     parent: 'phaser-example',
     physics: {
