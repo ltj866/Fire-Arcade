@@ -4799,6 +4799,8 @@ class ScoreScene extends Phaser.Scene {
                 letterRank.setAlpha(1)
                 stageScoreUI.setAlpha(1)
                 this.scorePanelLRank.setAlpha(1)
+                this.sumOfBestUI.setAlpha(1)
+                this.stagesCompleteUI.setAlpha(1)
                 },
             onUpdate: tween =>
             {
