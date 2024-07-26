@@ -4477,20 +4477,10 @@ class ScoreScene extends Phaser.Scene {
                 SPEED BONUS:`
         ).setOrigin(1, 0);
 
-        var _baseScore = 0;
-        var _speedbonus = 0
-        /*var preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
-                `${commaInt(_baseScore)}</span>
-                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
-                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
-        ).setOrigin(1, 0);*/
-
         var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
-                `${commaInt(_baseScore)}</span>`
+                `${commaInt(0)}</span>`
         ).setOrigin(1, 0);
 
         var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -4509,16 +4499,18 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
         ).setOrigin(1, 0);
 
-        _baseScore = this.stageData.calcBase();
-        _speedbonus = calcBonus(this.stageData.calcBase());
+        var frameTime = 16.667
+
+        var _baseScore = this.stageData.calcBase();
+        var _speedbonus = calcBonus(this.stageData.calcBase());
 
         var atomList = this.stageData.foodLog.slice();
 
         this.tweens.addCounter({
             from: 0,
             to: _baseScore,
-            duration: atomList.length * 66.7,
-            ease: 'linear',
+            duration: atomList.length * (frameTime * 4), //66.7ms
+            ease: 'Sine.InOut',
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4531,9 +4523,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  _speedbonus,
-            duration: atomList.length * 33.3,
-            ease: 'linear',
-            delay: atomList.length * 66.7,
+            duration: atomList.length * (frameTime * 2), //33.3ms
+            ease: 'Sine.InOut',
+            delay: atomList.length * (frameTime * 4), //66.7ms
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4549,7 +4541,7 @@ class ScoreScene extends Phaser.Scene {
                     targets: preAdditiveSpeedScoreUI2,
                     alpha: 0,
                     ease: 'Linear',
-                    duration: 500,
+                    duration: 250,
                     loop: 0,
                     yoyo: true,
                 });
@@ -4698,7 +4690,7 @@ class ScoreScene extends Phaser.Scene {
                     targets: multValuesUI2,
                     alpha: 0,
                     ease: 'Linear',
-                    duration: 500,
+                    duration: 250,
                     loop: 0,
                     yoyo: true,
                 });
@@ -4970,7 +4962,7 @@ class ScoreScene extends Phaser.Scene {
                         var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
                         ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
                         this.ScoreContainerL.add(rectangle)
-                        scoreAtoms.push(rectangle)
+                        //scoreAtoms.push(rectangle)
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
@@ -4992,17 +4984,42 @@ class ScoreScene extends Phaser.Scene {
             this.ScoreContainerL.add(this.atomScoreIcon)  
             scoreAtoms.push(this.atomScoreIcon)
         }
+        var _frame = 0
+        var __frame = 0
+        this.tweens.addCounter({
+            from: 0,
+            to:  atomList.length * 8,
+            duration: (frameTime * 4) * atomList.length,
+            ease: 'Linear',
+            delay: this.tweens.stagger(frameTime * 2),
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                __frame += 1
+                if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
+                    _frame += 1
+                    var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
+                    console.log(__frame)
+                    
+                    scoreAtoms[_frame-1].setAlpha(1);
+                    ourGame.atomSounds[_index].play()
+                }
+                
+                //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
+            }
+        });
 
-        this.tweens.add({ //shows score screen atoms one by one
+
+        /*this.tweens.add({ //shows score screen atoms one by one
             targets: scoreAtoms,
             alpha: 1,
             ease: 'Linear',
-            duration: 100,
-            delay: this.tweens.stagger(33.3)
-        });
+            duration: 0,
+            delay: this.tweens.stagger(frameTime * 2),
+        });*/
 
         this.ScoreContainerL.x -= SCREEN_WIDTH
-        this.tweens.add({
+        this.tweens.add({ //brings left score container into camera frame
             targets: this.ScoreContainerL,
             x: -GRID * 1,
             ease: 'Sine.InOut',
