@@ -239,6 +239,10 @@ var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
 var SOUND_RANK = [
+    ['rankD', [ 'rankD.ogg', 'rankD.mp3' ]],
+    ['rankC', [ 'rankD.ogg', 'rankD.mp3' ]],
+    ['rankB', [ 'rankB.ogg', 'rankB.mp3' ]],
+    ['rankA', [ 'rankB.ogg', 'rankB.mp3' ]],
     ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]]
 ]
 
@@ -379,6 +383,7 @@ class StartScene extends Phaser.Scene {
         this.load.setPath('assets/audio');
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
+        this.load.audio('pop01', [ 'pop01.ogg', 'pop01.mp3']);
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
@@ -474,7 +479,8 @@ class StartScene extends Phaser.Scene {
 
         
         ///
-
+        // AUDIO
+        this.pop01 = this.sound.add('pop01')
         
         
 
@@ -677,9 +683,11 @@ class StartScene extends Phaser.Scene {
         this.panelArrowL.setVisible(false).setAlpha(0);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
+            
             const ourStartScene = this.scene.get('StartScene');
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel < 4) {
+                this.pop01.play();
                 this.selectedPanel += 1
             }
             this.panelContainerX = 0
@@ -719,6 +727,7 @@ class StartScene extends Phaser.Scene {
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel > 1) {
                 this.selectedPanel -= 1
+                this.pop01.play();
             }
             this.panelContainerX = 0
             switch (this.selectedPanel){
@@ -5058,7 +5067,7 @@ class ScoreScene extends Phaser.Scene {
             delay:2500,
             onComplete: () =>
                 {
-                    this.rankSounds[0].play();
+                    this.rankSounds[rank].play();
                 },
         });
 
