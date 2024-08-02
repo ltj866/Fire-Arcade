@@ -238,6 +238,9 @@ var SOUND_POINT_COLLECT = [
 var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
+var SOUND_RANK = [
+    ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]]
+]
 
 export const GState = Object.freeze({ 
     START_WAIT: 1, 
@@ -379,6 +382,10 @@ class StartScene extends Phaser.Scene {
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        SOUND_RANK.forEach(soundID =>
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
@@ -4339,6 +4346,13 @@ class ScoreScene extends Phaser.Scene {
 
         // #endregion
 
+        // SOUND
+        this.rankSounds = [];
+
+        SOUND_RANK.forEach(soundID => {
+            this.rankSounds.push(this.sound.add(soundID[0]));
+            });
+
         // Pre Calculate needed values
         var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
 
@@ -5042,7 +5056,13 @@ class ScoreScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             duration: 500,
             delay:2500,
+            onComplete: () =>
+                {
+                    this.rankSounds[0].play();
+                },
         });
+
+
         this.tweens.add({
             targets: this.scorePanelLRank,
             x: GRID * 4.5,
