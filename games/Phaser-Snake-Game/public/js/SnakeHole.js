@@ -383,7 +383,7 @@ class StartScene extends Phaser.Scene {
         this.load.setPath('assets/audio');
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
-        this.load.audio('pop01', [ 'pop01.ogg', 'pop01.mp3']);
+        this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
@@ -480,7 +480,7 @@ class StartScene extends Phaser.Scene {
         
         ///
         // AUDIO
-        this.pop01 = this.sound.add('pop01')
+        this.pop02 = this.sound.add('pop02')
         
         
 
@@ -687,7 +687,7 @@ class StartScene extends Phaser.Scene {
             const ourStartScene = this.scene.get('StartScene');
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel < 4) {
-                this.pop01.play();
+                this.pop02.play();
                 this.selectedPanel += 1
             }
             this.panelContainerX = 0
@@ -727,7 +727,7 @@ class StartScene extends Phaser.Scene {
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel > 1) {
                 this.selectedPanel -= 1
-                this.pop01.play();
+                this.pop02.play();
             }
             this.panelContainerX = 0
             switch (this.selectedPanel){
