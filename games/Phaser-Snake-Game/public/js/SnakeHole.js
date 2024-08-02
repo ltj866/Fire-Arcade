@@ -4529,11 +4529,14 @@ class ScoreScene extends Phaser.Scene {
 
         var atomList = this.stageData.foodLog.slice();
 
+        var delayStart = 600;
+
         this.tweens.addCounter({
             from: 0,
             to: _baseScore,
             duration: atomList.length * (frameTime * 4) * this.scoreTimeScale, //66.7ms
             ease: 'Sine.InOut',
+            delay: delayStart,
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4548,7 +4551,7 @@ class ScoreScene extends Phaser.Scene {
             to:  _speedbonus,
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'Sine.InOut',
-            delay: atomList.length * (frameTime * 4) * this.scoreTimeScale, //66.7ms
+            delay: atomList.length * (frameTime * 4) * this.scoreTimeScale + delayStart, //66.7ms
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4626,7 +4629,7 @@ class ScoreScene extends Phaser.Scene {
             to:  ourScoreScene.stageData.diffBonus,
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale, //133.3ms
+            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
                 const value1 = Math.round(tween.getValue());
@@ -4643,7 +4646,7 @@ class ScoreScene extends Phaser.Scene {
             to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(1),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale, //133.3ms
+            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
                 const value2 = Math.round(tween.getValue());
@@ -4661,7 +4664,7 @@ class ScoreScene extends Phaser.Scene {
             to:  ourScoreScene.stageData.medalBonus() * 100,
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale, //133.3ms
+            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
                 const value3 = Math.round(tween.getValue());
@@ -4696,7 +4699,7 @@ class ScoreScene extends Phaser.Scene {
             to:  Number(_bonusMult * 100).toFixed(1),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale, //?
+            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4774,7 +4777,7 @@ class ScoreScene extends Phaser.Scene {
             to:  this.stageData.cornerBonus(),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 14) * this.scoreTimeScale, //?
+            delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4791,7 +4794,7 @@ class ScoreScene extends Phaser.Scene {
             to:  this.stageData.boostBonus(),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale, //?
+            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4808,7 +4811,7 @@ class ScoreScene extends Phaser.Scene {
             to:  this.stageData.bonkBonus(),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * (frameTime * 16) * this.scoreTimeScale, //?
+            delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
             onComplete: () =>
                 {
                 letterRank.setAlpha(1)
@@ -5009,12 +5012,14 @@ class ScoreScene extends Phaser.Scene {
         }
         var _frame = 0
         var __frame = 0
+
         var scoreAtomsTween = this.tweens.addCounter({
             from: 0,
             to:  atomList.length,
+            delay: delayStart,
             duration: (frameTime * 4) * atomList.length,
             ease: 'Linear',
-            delay: this.tweens.stagger(frameTime * 2),
+            
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
