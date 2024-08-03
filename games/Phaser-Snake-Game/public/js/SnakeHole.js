@@ -7384,27 +7384,27 @@ var tempHeightDiff = 16;
 // #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
-    //min: {
-    //    width: 480,
-    //    height: 480
-
-    //},
-    max : {
-        width: 744, // 1280
-        height: 720// + tempHeightDiff * GRID
-    },
-    width: 744, 
+    backgroundColor: '#bbbbbb', //'#4488aa'
+    width: 1280, 
     height: 720,// + tempHeightDiff * GRID,
-    backgroundColor: '#4488aa',
-    renderer: Phaser.AUTO,
+    min: {
+        width: 640,
+        height: 360
+    },
+    snap: {
+        width: 640,
+        height: 360
+    },
+    
+    //renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     //roundPixels: true,
     //pixelArt: true,
     scale: {
-        zoom: Phaser.Scale.MAX_ZOOM,
-        //mode: Phaser.Scale.FIT,
+        //zoom: Phaser.Scale.MAX_ZOOM,
+        mode: Phaser.Scale.FIT,
     },
-    parent: 'phaser-example',
+    //parent: 'phaser-example',
     physics: {
         default: 'arcade',
         arcade: {
@@ -7434,9 +7434,9 @@ export const END_X = SCREEN_WIDTH/GRID - 1;
 export const END_Y = SCREEN_HEIGHT/GRID - 1;
 
 // Collision only works if GRID is whole divisor of HEIGHT and WIDTH
-if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
+if (SCREEN_HEIGHT % GRID != 0) {
     debugger
-    throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
+    throw "SCREEN HEIGHT DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
 // region const Game
