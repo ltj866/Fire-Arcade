@@ -903,7 +903,7 @@ class StartScene extends Phaser.Scene {
 
         var lowestNum = 4294967295; // Start at Max Int
         //var rolls = this.stageData.calcTotal();
-        var rolls = 22119;
+        var rolls = Phaser.Math.Between(14000,24000);
         console.log("Rolling for zeds", rolls);
 
         do {
