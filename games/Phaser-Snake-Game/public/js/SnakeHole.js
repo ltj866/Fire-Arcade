@@ -7399,7 +7399,7 @@ var config = {
     //renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     //roundPixels: true,
-    //pixelArt: true,
+    pixelArt: true,
     scale: {
         //zoom: Phaser.Scale.MAX_ZOOM,
         mode: Phaser.Scale.FIT,
@@ -7421,7 +7421,6 @@ var config = {
         createContainer: true,
     },
     
-    //scene: [ StartScene, InputScene]
     scene: [ StartScene, PersistScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
 };
 
