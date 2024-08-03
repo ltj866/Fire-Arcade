@@ -7,8 +7,8 @@
     "distDir": "../public"
   },
   "package": {
-    "productName": "Portal Snake",
-    "version": "0.1.0"
+    "productName": "Portal Snake (demo)",
+    "version": "0.3.40719"
   },
   "tauri": {
     "allowlist": {
@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.portalsnake.scorev1",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 744,
         "resizable": true,
-        "title": "Portal Snake",
-        "width": 800
+        "title": "Portal Snake (Demo) ver-0.3.40719",
+        "width": 744
       }
     ]
   }
