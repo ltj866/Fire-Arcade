@@ -7397,6 +7397,7 @@ var config = {
     },
     
     //renderer: Phaser.AUTO,
+    parent: 'phaser-example',
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     //roundPixels: true,
     pixelArt: true,
