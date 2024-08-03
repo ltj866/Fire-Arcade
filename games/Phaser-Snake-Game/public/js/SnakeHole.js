@@ -7390,11 +7390,11 @@ var config = {
 
     //},
     max : {
-        width: 744,
-        height: 744// + tempHeightDiff * GRID
+        width: 744, // 1280
+        height: 720// + tempHeightDiff * GRID
     },
     width: 744, 
-    height: 744,// + tempHeightDiff * GRID,
+    height: 720,// + tempHeightDiff * GRID,
     backgroundColor: '#4488aa',
     renderer: Phaser.AUTO,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
