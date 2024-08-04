@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     DIRS, DEBUG, commaInt,
-    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR
+    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR, X_OFFSET,
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 
@@ -12,7 +12,8 @@ var Snake = new Phaser.Class({
     {
         this.body = [];
 
-        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
+        this.head = scene.add.image(x , y , 'snakeDefault', 0).setPipeline('Light2D');
+        debugger
         this.head.setOrigin(0,0).setDepth(48);
         
         this.body.unshift(this.head);
