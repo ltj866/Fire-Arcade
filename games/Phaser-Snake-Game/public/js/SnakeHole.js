@@ -252,7 +252,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1475,7 +1475,7 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset]).setPipeline('Light2D');
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], 300).setPipeline('Light2D');
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
@@ -1546,11 +1546,11 @@ class GameScene extends Phaser.Scene {
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
-        this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
-        this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
-        this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
-        this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
-        console.log(this.gState)
+        //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
+        //this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
+        //this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
+        //this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
+        //console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY && !this.winned) {
@@ -3621,12 +3621,13 @@ class GameScene extends Phaser.Scene {
              * Checks for Tween complete on each frame.
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
-            if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
-                this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
-                this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
-                this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
-                this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
-            }
+           
+            //if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
+            //    this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
+            //    this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
+            //    this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
+            //    this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
+            //}
             
            /* this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;

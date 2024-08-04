@@ -1901,5 +1901,6 @@
         "World_4-3-iii.json",
         "World_4-4.json"
     ],
+    "resizeMap.removeObjects": false,
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
 }
