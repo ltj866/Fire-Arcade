@@ -321,11 +321,11 @@ class StartScene extends Phaser.Scene {
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         // Tilemap
-        this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
+        this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png']);
 
         // Load Tilemap as Sprite sheet to allow conversion to Sprites later.
         // Doesn't need to be GPU optimized unless we use it more regularly.
-        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
         this.load.image('blackHole', '/assets/sprites/blackHole.png');
@@ -1473,7 +1473,7 @@ a
         ourPersist.gameVersionUI.setText(`portalsnake.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
-        this.tileset = this.map.addTilesetImage('tileSheetx24');
+        this.tileset = this.map.addTilesetImage('tileSheetx12');
 
         // #region Wall Varients
         if (this.map.getLayer('Wall_1')) {
