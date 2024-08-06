@@ -238,6 +238,13 @@ var SOUND_POINT_COLLECT = [
 var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
+var SOUND_RANK = [
+    ['rankD', [ 'rankD.ogg', 'rankD.mp3' ]],
+    ['rankC', [ 'rankD.ogg', 'rankD.mp3' ]],
+    ['rankB', [ 'rankB.ogg', 'rankB.mp3' ]],
+    ['rankA', [ 'rankB.ogg', 'rankB.mp3' ]],
+    ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]]
+]
 
 export const GState = Object.freeze({ 
     START_WAIT: 1, 
@@ -376,9 +383,14 @@ class StartScene extends Phaser.Scene {
         this.load.setPath('assets/audio');
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
+        this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        SOUND_RANK.forEach(soundID =>
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
@@ -467,7 +479,8 @@ class StartScene extends Phaser.Scene {
 
         
         ///
-
+        // AUDIO
+        this.pop02 = this.sound.add('pop02')
         
         
 
@@ -670,9 +683,11 @@ class StartScene extends Phaser.Scene {
         this.panelArrowL.setVisible(false).setAlpha(0);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
+            
             const ourStartScene = this.scene.get('StartScene');
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel < 4) {
+                this.pop02.play();
                 this.selectedPanel += 1
             }
             this.panelContainerX = 0
@@ -712,6 +727,7 @@ class StartScene extends Phaser.Scene {
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel > 1) {
                 this.selectedPanel -= 1
+                this.pop02.play();
             }
             this.panelContainerX = 0
             switch (this.selectedPanel){
@@ -887,7 +903,7 @@ class StartScene extends Phaser.Scene {
 
         var lowestNum = 4294967295; // Start at Max Int
         //var rolls = this.stageData.calcTotal();
-        var rolls = 22119;
+        var rolls = Phaser.Math.Between(14000,24000);
         console.log("Rolling for zeds", rolls);
 
         do {
@@ -4304,12 +4320,12 @@ class ScoreScene extends Phaser.Scene {
 
         
 
-        for (let index = 0; index < this.stageData.foodLog.length; index++) {
+        /*for (let index = 0; index < this.stageData.foodLog.length; index++) {
             const foodIndex = index + 1;
             var eventID = `${designPrefix}:FoodLog-${foodIndex.toString().padStart(2, "0")}`
             var eventValue = this.stageData.foodLog[index];
             gameanalytics.GameAnalytics.addDesignEvent(eventID, eventValue)
-        }
+        }*/
 
         // For properties that may not exist.
         if (ourGame.tiledProperties.slug != undefined) {
@@ -4354,6 +4370,13 @@ class ScoreScene extends Phaser.Scene {
 
         // #endregion
 
+        // SOUND
+        this.rankSounds = [];
+
+        SOUND_RANK.forEach(soundID => {
+            this.rankSounds.push(this.sound.add(soundID[0]));
+            });
+
         // Pre Calculate needed values
         var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
 
@@ -4378,7 +4401,7 @@ class ScoreScene extends Phaser.Scene {
         } else {
             dimensionSlug = `0${this.stageData.zedLevel}`;
         }
-        gameanalytics.GameAnalytics.setCustomDimension01(dimensionSlug);
+        /*gameanalytics.GameAnalytics.setCustomDimension01(dimensionSlug);
 
         var extraFields = {
             foodLog: this.stageData.foodLog.toString(),
@@ -4411,7 +4434,7 @@ class ScoreScene extends Phaser.Scene {
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:CurrentBestTotal`, bestLog.calcTotal());
 
         gameanalytics.GameAnalytics.addDesignEvent(`${designPrefix}:ZedLevel`, this.stageData.zedLevel);
-
+*/
 
         
 
@@ -4423,11 +4446,11 @@ class ScoreScene extends Phaser.Scene {
             8, 8, 8, 8);
         this.scorePanelL.setDepth(10).setOrigin(0,0)
 
-        this.scorePanelLRank = this.add.nineslice(GRID * 4.5, GRID * 17.5 +2, 
+        this.scorePanelLRank = this.add.nineslice(-SCREEN_WIDTH/2, GRID * 17.5 +2, 
             'uiPanelL', 'Glass', 
             GRID * 3, GRID * 4, 
             8, 8, 8, 8);
-        this.scorePanelLRank.setDepth(11).setOrigin(.5,.5)
+        this.scorePanelLRank.setDepth(11).setOrigin(.5,.5);
 
         this.scorePanelR = this.add.nineslice(GRID * 17.25, GRID * 7.75, 
             'uiPanelR', 'Glass', 
@@ -4456,7 +4479,7 @@ class ScoreScene extends Phaser.Scene {
             ease: 'sine.inout'
         });
 
-
+        this.scoreTimeScale = .25;
 
         //STAGE CLEAR
         this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -4492,20 +4515,10 @@ class ScoreScene extends Phaser.Scene {
                 SPEED BONUS:`
         ).setOrigin(1, 0);
 
-        var _baseScore = 0;
-        var _speedbonus = 0
-        /*var preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
-                `${commaInt(_baseScore)}</span>
-                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
-                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
-        ).setOrigin(1, 0);*/
-
         var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
-                `${commaInt(_baseScore)}</span>`
+                `${commaInt(0)}</span>`
         ).setOrigin(1, 0);
 
         var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -4524,16 +4537,21 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
         ).setOrigin(1, 0);
 
-        _baseScore = this.stageData.calcBase();
-        _speedbonus = calcBonus(this.stageData.calcBase());
+        var frameTime = 16.667
+
+        var _baseScore = this.stageData.calcBase();
+        var _speedbonus = calcBonus(this.stageData.calcBase());
 
         var atomList = this.stageData.foodLog.slice();
+
+        var delayStart = 600;
 
         this.tweens.addCounter({
             from: 0,
             to: _baseScore,
-            duration: atomList.length * 66.7,
-            ease: 'linear',
+            duration: atomList.length * (frameTime * 4) * this.scoreTimeScale, //66.7ms
+            ease: 'Sine.InOut',
+            delay: delayStart,
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4546,9 +4564,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  _speedbonus,
-            duration: atomList.length * 33.3,
-            ease: 'linear',
-            delay: atomList.length * 66.7,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            ease: 'Sine.InOut',
+            delay: atomList.length * (frameTime * 4) * this.scoreTimeScale + delayStart, //66.7ms
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4564,7 +4582,7 @@ class ScoreScene extends Phaser.Scene {
                     targets: preAdditiveSpeedScoreUI2,
                     alpha: 0,
                     ease: 'Linear',
-                    duration: 500,
+                    duration: 250,
                     loop: 0,
                     yoyo: true,
                 });
@@ -4624,9 +4642,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  ourScoreScene.stageData.diffBonus,
-            duration: atomList.length * 66.7,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 133.3,
+            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
                 const value1 = Math.round(tween.getValue());
@@ -4641,9 +4659,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(1),
-            duration: atomList.length * 66.7,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 133.3,
+            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
                 const value2 = Math.round(tween.getValue());
@@ -4659,9 +4677,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  ourScoreScene.stageData.medalBonus() * 100,
-            duration: atomList.length * 66.7,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 133.3,
+            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
                 const value3 = Math.round(tween.getValue());
@@ -4694,9 +4712,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  Number(_bonusMult * 100).toFixed(1),
-            duration: atomList.length * 66.7,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 133.3,
+            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4713,7 +4731,7 @@ class ScoreScene extends Phaser.Scene {
                     targets: multValuesUI2,
                     alpha: 0,
                     ease: 'Linear',
-                    duration: 500,
+                    duration: 250,
                     loop: 0,
                     yoyo: true,
                 });
@@ -4772,9 +4790,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.cornerBonus(),
-            duration: atomList.length * 33.3,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 233,
+            delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4789,9 +4807,9 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.boostBonus(),
-            duration: atomList.length * 33.3,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 233,
+            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -4806,13 +4824,16 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.bonkBonus(),
-            duration: atomList.length * 33.3,
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: atomList.length * 233,
+            delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
             onComplete: () =>
                 {
                 letterRank.setAlpha(1)
-                stageScoreUI.setAlpha(1)
+                //stageScoreUI.setAlpha(1)
+                //this.scorePanelLRank.setAlpha(1)
+                this.sumOfBestUI.setAlpha(1)
+                this.stagesCompleteUI.setAlpha(1)
                 },
             onUpdate: tween =>
             {
@@ -4827,7 +4848,7 @@ class ScoreScene extends Phaser.Scene {
             
         });
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -4837,7 +4858,7 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
-        ).setOrigin(1, 0.5).setDepth(20).setAlpha(0);
+        ).setOrigin(1, 0.5).setDepth(20);
 
         
         this.ScoreContainerL.add(
@@ -4855,8 +4876,7 @@ class ScoreScene extends Phaser.Scene {
             postAdditiveLablesUI,
             postAdditiveValuesUI1,
             postAdditiveValuesUI2,
-            postAdditiveValuesUI3,
-            stageScoreUI,]
+            postAdditiveValuesUI3,]
             )
         // #region Rank Sprites
 
@@ -4867,7 +4887,7 @@ class ScoreScene extends Phaser.Scene {
         //rank = 4; // Temp override.
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
-        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D').setAlpha(0);
+        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         this.ScoreContainerL.add(letterRank)
         
@@ -4875,7 +4895,8 @@ class ScoreScene extends Phaser.Scene {
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
         this.letterRankPath2 = { t: .5, vec: new Phaser.Math.Vector2() };
 
-
+        letterRank.x = -SCREEN_WIDTH/2
+        
         var lightColor = 0xFFFFFF;
         var lightColor2 = 0xFFFFFF;
         const platLightColor = 0xEEA8EE;
@@ -4904,6 +4925,8 @@ class ScoreScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
+        console.log("rank", rank)
+        rank -= 1; //this needs to be set back to rank-1 from being +1'd earlier
 
         // region Particle Emitter
         if(rank >= SILVER){
@@ -4915,7 +4938,7 @@ class ScoreScene extends Phaser.Scene {
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
                 lifespan: 1000,
-            }).setFrequency(500,[1]).setDepth(20);
+            }).setFrequency(500,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
         if(rank === GOLD){
@@ -4927,14 +4950,15 @@ class ScoreScene extends Phaser.Scene {
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
                 lifespan: 1000,
-            }).setFrequency(1332,[1]).setDepth(20);
+            }).setFrequency(1332,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
         if(rank === PLATINUM){
+            
             lightColor = platLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
+            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle0Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -4943,7 +4967,7 @@ class ScoreScene extends Phaser.Scene {
                 alpha:{start: 1, end: 0 },
                 lifespan: 3000,
                 gravityY: -5,
-            }).setFrequency(667,[1]).setDepth(20);
+            }).setFrequency(667,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
 
@@ -4979,7 +5003,7 @@ class ScoreScene extends Phaser.Scene {
                         var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
                         ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
                         this.ScoreContainerL.add(rectangle)
-                        scoreAtoms.push(rectangle)
+                        //scoreAtoms.push(rectangle)
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
@@ -5001,21 +5025,79 @@ class ScoreScene extends Phaser.Scene {
             this.ScoreContainerL.add(this.atomScoreIcon)  
             scoreAtoms.push(this.atomScoreIcon)
         }
+        var _frame = 0
+        var __frame = 0
 
-        this.tweens.add({ //shows score screen atoms one by one
+        var scoreAtomsTween = this.tweens.addCounter({
+            from: 0,
+            to:  atomList.length,
+            delay: delayStart,
+            duration: (frameTime * 4) * atomList.length,
+            ease: 'Linear',
+            
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                __frame += 1
+                if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
+                    _frame += 1
+                    var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
+                    console.log(__frame)
+                    
+                    scoreAtoms[_frame-1].setAlpha(1);
+                    ourGame.atomSounds[_index].play()
+                }
+                
+                //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
+            }
+        });
+
+        //console.log(scoreAtomsTween.timeScale)
+        //debugger;
+        //scoreAtomsTween.timeScale = 8;
+
+
+        /*this.tweens.add({ //shows score screen atoms one by one
             targets: scoreAtoms,
             alpha: 1,
             ease: 'Linear',
-            duration: 100,
-            delay: this.tweens.stagger(33.3)
-        });
+            duration: 0,
+            delay: this.tweens.stagger(frameTime * 2),
+        });*/
 
         this.ScoreContainerL.x -= SCREEN_WIDTH
-        this.tweens.add({
+        this.tweens.add({ //brings left score container into camera frame
             targets: this.ScoreContainerL,
             x: -GRID * 1,
             ease: 'Sine.InOut',
             duration: 500,
+        });
+        this.tweens.add({
+            targets: stageScoreUI,
+            x: SCREEN_WIDTH/2,
+            ease: 'Sine.InOut',
+            duration: 500,
+            delay:2000,
+        });
+        this.tweens.add({
+            targets: letterRank,
+            x: GRID * 3.5,
+            ease: 'Sine.InOut',
+            duration: 500,
+            delay:2500,
+            onComplete: () =>
+                {
+                    this.rankSounds[rank].play();
+                },
+        });
+
+
+        this.tweens.add({
+            targets: this.scorePanelLRank,
+            x: GRID * 4.5,
+            ease: 'Sine.InOut',
+            duration: 500,
+            delay:2500,
         });
         
 
@@ -5167,7 +5249,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-style": 'italic',
             //"font-weight": 'bold',
             })).setHTML(
-                `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest)}</span>`
+                `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
         ).setOrigin(0,0).setAlpha(0);
 
         // #region Help Card
@@ -5219,7 +5301,15 @@ class ScoreScene extends Phaser.Scene {
         }
         // #endregion
 
-
+        this.input.keyboard.on('keydown-SPACE', function() { 
+            //ourScoreScene.scoreAtomsTween.setTimeScale(8); //doesn't do anything
+            //scoreAtomsTween.timeScale = 8;
+            //debugger
+            this.scoreTimeScale= 0.25;
+        });
+        /*this.input.keyboard.on('keyup-SPACE', function(scoreAtomsTween) { 
+            //scoreAtomsTween.timeScale = 1 //doesn't do anything
+        });*/
 
 
 
