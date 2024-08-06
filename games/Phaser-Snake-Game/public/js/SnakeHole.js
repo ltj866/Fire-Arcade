@@ -1344,7 +1344,7 @@ class GameScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
         
         
-        if (this.startupAnim) {
+        /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
                 from: 0,
                 to: 600,
@@ -1364,7 +1364,7 @@ class GameScene extends Phaser.Scene {
             tween.on('complete', ()=>{ //need this or else visual bugs occur
                 this.cameras.main.setMask(false)
             });
-        }
+        }*/
         //this.cameras.main.setAlpha(1)
         this.time.delayedCall(1, function() {
             ourGameScene.cameras.main.setAlpha(0)
