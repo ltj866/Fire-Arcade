@@ -1024,24 +1024,24 @@ class PersistScene extends Phaser.Scene {
             //this.UIbackground.setScale(32); 
 
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(0, 0, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-            this.bg0.tileScaleX = 3;
-            this.bg0.tileScaleY = 3;
+            this.bg0 = this.add.tileSprite(X_OFFSET, 0, 372, 372,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            this.bg0.tileScaleX = 2;
+            this.bg0.tileScaleY = 2;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(0, 0, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-            this.bg.tileScaleX = 3;
-            this.bg.tileScaleY = 3;
+            this.bg = this.add.tileSprite(X_OFFSET, 0, 372, 372, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            this.bg.tileScaleX = 2;
+            this.bg.tileScaleY = 2;
             
             // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            this.bg2.tileScaleX = 3;
-            this.bg2.tileScaleY = 3;
+            this.bg2 = this.add.tileSprite(X_OFFSET, 0, 372, 372, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            this.bg2.tileScaleX = 2;
+            this.bg2.tileScaleY = 2;
             
             // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-            this.bg3.tileScaleX = 3;
-            this.bg3.tileScaleY = 3;
+            this.bg3 = this.add.tileSprite(X_OFFSET, 0, 372, 372, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            this.bg3.tileScaleX = 2;
+            this.bg3.tileScaleY = 2;
     
             // Hue Shift
             this.fx = this.bg.preFX.addColorMatrix();
@@ -3424,7 +3424,7 @@ a
     }
     loseCoin(){
         this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 6,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2.0);
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
         this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-200, -400));
         this.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
@@ -4484,7 +4484,7 @@ class ScoreScene extends Phaser.Scene {
         //megaAtlas code reference
         //this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
         //this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
-        ourGame.continueBanner = ourGame.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(2);
+        ourGame.continueBanner = ourGame.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
 
         // Scene Background Color
         ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x323353, .75);
@@ -4912,7 +4912,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.ScoreContainerL.add(letterRank)
         
-        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
+        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 12, letterRank.y + 16, 48);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
         this.letterRankPath2 = { t: .5, vec: new Phaser.Math.Vector2() };
 
@@ -7163,7 +7163,7 @@ function loadSpriteSheetsAndAnims(scene) {
      *   Thank you samme from Phaser for both solutions!
      */
 
-    const snakeSpriteSheet = scene.textures.addSpriteSheetFromAtlas('snakeDefault', { atlas: 'megaAtlas', frameWidth: 24 ,frameHeight: 24 ,
+    const snakeSpriteSheet = scene.textures.addSpriteSheetFromAtlas('snakeDefault', { atlas: 'megaAtlas', frameWidth: 12 ,frameHeight: 12 ,
         frame: 'snakeSheetDefault.png'
     }); 
     snakeSpriteSheet.setDataSource(
@@ -7175,13 +7175,13 @@ function loadSpriteSheetsAndAnims(scene) {
 
 
     // Sprite Sheets that don't have animations.
-    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 36 ,frameHeight: 48 ,
+    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 18 ,frameHeight: 24 ,
         frame: 'comboLetters.png'
     });
 
 
     // Sprite Sheets and add Animations
-    scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 48, frameHeight: 48,
+    scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
         frame: 'startingArrowsAnim.png'
     }); scene.anims.create({
         key: 'startArrowIdle',
@@ -7209,7 +7209,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
         });
     
-    scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
+    scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
         frame: 'portalAnim.png'
     }); scene.anims.create({
         key: 'portalIdle',
@@ -7218,7 +7218,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
     
-    scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
+    scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 16, frameHeight: 16,
         frame: 'UI_ArrowDownAnim.png'
     }); scene.anims.create({
         key: 'downArrowIdle',
@@ -7227,7 +7227,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
     
-    scene.textures.addSpriteSheetFromAtlas('twinkle01Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16,
+    scene.textures.addSpriteSheetFromAtlas('twinkle01Anim', { atlas: 'megaAtlas', frameWidth: 8 ,frameHeight: 8,
         frame: 'twinkle01Anim.png'
     }); scene.anims.create({
         key: 'twinkle01',
@@ -7236,7 +7236,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: 0
     });
     
-    scene.textures.addSpriteSheetFromAtlas('twinkle02Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16 ,
+    scene.textures.addSpriteSheetFromAtlas('twinkle02Anim', { atlas: 'megaAtlas', frameWidth: 8 ,frameHeight: 8 ,
         frame: 'twinkle02Anim.png'
     }); scene.anims.create({
         key: 'twinkle02',
@@ -7245,7 +7245,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: 0
     });
 
-    scene.textures.addSpriteSheetFromAtlas('twinkle03Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16 ,
+    scene.textures.addSpriteSheetFromAtlas('twinkle03Anim', { atlas: 'megaAtlas', frameWidth: 8 ,frameHeight: 8 ,
         frame: 'twinkle03Anim.png'
     }); scene.anims.create({
         key: 'twinkle03',
@@ -7254,7 +7254,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
     
-    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoosting', { atlas: 'megaAtlas', frameWidth: 28,frameHeight: 28,
+    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoosting', { atlas: 'megaAtlas', frameWidth: 14,frameHeight: 14,
         frame: 'snakeOutlineAnim.png'
     }); scene.anims.create({
         key: 'snakeOutlineAnim',
@@ -7263,7 +7263,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
 
-    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoostingSmall', { atlas: 'megaAtlas', frameWidth: 28,frameHeight: 28,
+    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoostingSmall', { atlas: 'megaAtlas', frameWidth: 14,frameHeight: 14,
         frame: 'snakeOutlineSmallAnim.png'
     }); scene.anims.create({
         key: 'snakeOutlineSmallAnim',
@@ -7272,7 +7272,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     })
 
-    scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
+    scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 12, frameHeight: 12,
         frame: 'atomicPickup01Anim.png'
     }); scene.anims.create({
       key: 'atom01idle',
@@ -7324,7 +7324,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
       })
   
-    scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 44 ,frameHeight: 36,
+    scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 22 ,frameHeight: 18,
         frame: 'electronCloudAnim.png'
     }); scene.anims.create({
       key: 'electronIdle',
@@ -7356,7 +7356,7 @@ function loadSpriteSheetsAndAnims(scene) {
     hideOnComplete: true
     });
   
-    scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
+    scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 128 , frameHeight: 24,
         frame: 'UI_boostMeterAnim.png'
     }); scene.anims.create({
       key: 'increasing',
@@ -7366,7 +7366,7 @@ function loadSpriteSheetsAndAnims(scene) {
     });
   
     //WRAP_BLOCK_ANIMS
-    scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 24,frameHeight: 24,
+    scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 12,frameHeight: 12,
         frame: 'wrapBlockAnim.png'
     }); scene.anims.create({
       key: 'wrapBlock01',
