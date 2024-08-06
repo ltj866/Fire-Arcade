@@ -256,11 +256,17 @@
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
- "tileheight":24,
+ "tileheight":12,
  "tilesets":[
         {
          "columns":32,
          "firstgid":1,
+         "grid":
+            {
+             "height":12,
+             "orientation":"orthogonal",
+             "width":12
+            },
          "image":"tileSheetx24.png",
          "imageheight":768,
          "imagewidth":768,
@@ -850,7 +856,7 @@
                 }],
          "tilewidth":24
         }],
- "tilewidth":24,
+ "tilewidth":12,
  "type":"map",
  "version":"1.10",
  "width":29

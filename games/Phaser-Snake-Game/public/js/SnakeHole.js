@@ -17,7 +17,7 @@ const DEV_BRANCH = "dev";
 
 
 const GAME_VERSION = 'v0.7.07.13.002';
-export const GRID = 24;        //....................... Size of Sprites and GRID
+export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
@@ -44,8 +44,8 @@ const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
-export const X_OFFSET = 268;
-export const Y_OFFSET = 72;
+export const X_OFFSET = 268 / 2;
+export const Y_OFFSET = 72 / 2;
 
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
@@ -7408,8 +7408,8 @@ var tempHeightDiff = 16;
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     backgroundColor: '#bbbbbb', //'#4488aa'
-    width: 1280, 
-    height: 720,// + tempHeightDiff * GRID,
+    width: 640, 
+    height: 360,// + tempHeightDiff * GRID,
     min: {
         width: 640,
         height: 360
@@ -7450,7 +7450,7 @@ var config = {
 
 // #region Screen Settings
 export const SCREEN_WIDTH = config.width;
-export const SCREEN_HEIGHT = 31 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
+export const SCREEN_HEIGHT = 29 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
 
 // Edge locations for X and Y
 export const END_X = SCREEN_WIDTH/GRID - 1;
