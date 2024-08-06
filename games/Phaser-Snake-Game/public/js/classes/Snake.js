@@ -1,6 +1,8 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     DIRS, DEBUG, commaInt,
-    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR
+    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR,
+    X_OFFSET,
+    Y_OFFSET
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 
@@ -12,8 +14,10 @@ var Snake = new Phaser.Class({
     {
         this.body = [];
 
-        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
+        this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
         this.head.setOrigin(0,0).setDepth(48);
+
+        this.head.scale = 0.5
         
         this.body.unshift(this.head);
 
@@ -111,15 +115,15 @@ var Snake = new Phaser.Class({
         this.snakeLight.y = y + GRID/2;
 
         this.snakeLightN.x = x
-        this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3)
+        this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3) // TODO IS WRONG
 
-        this.snakeLightE.x = x + SCREEN_WIDTH
+        this.snakeLightE.x = x + SCREEN_WIDTH  // TODO IS WRONG
         this.snakeLightE.y = y
 
         this.snakeLightS.x = x
-        this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)
+        this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)  // TODO IS WRONG
 
-        this.snakeLightW.x = x - SCREEN_WIDTH
+        this.snakeLightW.x = x - SCREEN_WIDTH  // TODO IS WRONG
         this.snakeLightW.y = y
 
         // wrapping tiles
@@ -137,22 +141,22 @@ var Snake = new Phaser.Class({
         
     if (this.direction === DIRS.LEFT)
         {
-            xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
             ourPersistScene.bgCoords.x -= .25;
         }
         else if (this.direction === DIRS.RIGHT)
         {
-            xN = Phaser.Math.Wrap(this.head.x + GRID, 0, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
             ourPersistScene.bgCoords.x += .25;
         }
         else if (this.direction === DIRS.UP)
         {
-            yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+            yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
             ourPersistScene.bgCoords.y -= .25;
         }
         else if (this.direction === DIRS.DOWN)
         {
-            yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 1 );
+            yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
             ourPersistScene.bgCoords.y += .25;
         }
 
@@ -170,6 +174,7 @@ var Snake = new Phaser.Class({
             }
         }
 
+        
         var onTile = scene.map.getTileAtWorldXY( this.head.x, this.head.y);
         if (GState.PLAY === scene.gState && onTile != null && onTile.properties.hasCollision){
             
@@ -273,7 +278,7 @@ var Snake = new Phaser.Class({
 
         // #region Food Collision
         scene.atoms.forEach(_atom => {  
-            if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
+            if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
                 scene.snakeEating();
                 var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
@@ -295,8 +300,6 @@ var Snake = new Phaser.Class({
                 scene.events.emit('addScore', _atom); // Sends to UI Listener 
                 this.grow(scene);
                 // Avoid double _atom getting while in transition
-                _atom.x = 0;
-                _atom.y = 0;
                 _atom.visible = false;
                 //_atom.electrons.visible = false;
                 //_atom.electrons.play("electronIdle");

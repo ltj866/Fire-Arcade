@@ -17,7 +17,7 @@ const DEV_BRANCH = "dev";
 
 
 const GAME_VERSION = 'v0.7.07.13.002';
-export const GRID = 24;        //....................... Size of Sprites and GRID
+export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
@@ -44,6 +44,8 @@ const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
+export const X_OFFSET = 268 / 2;
+export const Y_OFFSET = 72 / 2;
 
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
@@ -259,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_7-3_Final_Exams'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1413,10 +1415,12 @@ class GameScene extends Phaser.Scene {
         
 
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png'
+            
+        ).setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
         this.UIbackground.setVisible(false);
-
+a
        
 
         // #region TileMap
@@ -1425,7 +1429,7 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
-        this.startCoords = { x: spawnTile.x, y: spawnTile.y};
+        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
         spawnTile.index = -1; // Set to empty tile
 
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
@@ -1491,22 +1495,22 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset]).setPipeline('Light2D');
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET).setPipeline('Light2D');
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
 
         if (this.map.getLayer('Food')) {
-            this.foodLayer = this.map.createLayer('Food', [this.tileset]);
+            this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET, Y_OFFSET);
             this.foodLayer.visible = false;
 
             this.foodLayer.forEachTile(_tile => {
                 if(11 === _tile.index) {
                     var food = new Food(this);
-                    food.x = _tile.x*GRID;
+                    food.x = _tile.x*GRID; // Not sure this works anymore.
                     food.y = _tile.y*GRID;
 
                     food.electrons.x = _tile.x*GRID;
@@ -1562,11 +1566,11 @@ class GameScene extends Phaser.Scene {
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
-        this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
-        this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
-        this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
-        this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
-        console.log(this.gState)
+        //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
+        //this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
+        //this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
+        //this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
+        //console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY && !this.winned) {
@@ -1593,48 +1597,50 @@ class GameScene extends Phaser.Scene {
             // Make Portal Spawning List
             if (tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + PORTAL_TILE_DIFF * 2) {
                 if (portalArrayX[tile.index]) {
-                    portalArrayX[tile.index].push([tile.x, tile.y]);
+                    
+                    portalArrayX[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                 }
                 else {
-                    portalArrayX[tile.index] = [[tile.x, tile.y]];
+                    portalArrayX[tile.index] = [[tile.pixelY + X_OFFSET, tile.pixelY + Y_OFFSET]];
                 }
-                tile.index = -1;
+                //tile.index = -1;
                 
             }
+            
 
             // Draw Dream walls
             switch (tile.index) {
                 // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
                 case 550:
-                    var wallShimmerTop = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerTop.play('wrapBlock02');
                     this.dreamWalls.push(wallShimmerTop);
                     tile.index = -1;
                     break;
 
                 case 614:
-                    var wallShimmerBottom = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerBottom.play('wrapBlock07');
                     this.dreamWalls.push(wallShimmerBottom);
                     tile.index = -1;
                     break;
 
                 case 581:
-                    var wallShimmerLeft = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerLeft.play('wrapBlock04');
                     this.dreamWalls.push(wallShimmerLeft);
                     tile.index = -1;
                     break;
 
                 case 583:
-                    var wallShimmerRight = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerRight.play('wrapBlock05');
                     this.dreamWalls.push(wallShimmerRight);
                     tile.index = -1;
                     break;
 
                 case 549:
-                    var wrapBlock01 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock01);
@@ -1642,7 +1648,7 @@ class GameScene extends Phaser.Scene {
                     break;
 
                 case 551:
-                    var wrapBlock03 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock03);
@@ -1650,7 +1656,7 @@ class GameScene extends Phaser.Scene {
                     break;
                 
                 case 613:
-                    var wrapBlock06 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock06);
@@ -1658,7 +1664,7 @@ class GameScene extends Phaser.Scene {
                     break;
 
                 case 615:
-                    var wrapBlock08 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock08);
@@ -1669,6 +1675,7 @@ class GameScene extends Phaser.Scene {
                     break;
             }
         });
+
 
         /*
         for (let index = 2; index < END_Y - 1; index++) {
@@ -2129,13 +2136,13 @@ class GameScene extends Phaser.Scene {
 
         if (this.map.getLayer(coinVarient)) {
 
-            var coinLayer = this.map.createLayer(coinVarient, [this.tileset]);
+            var coinLayer = this.map.createLayer(coinVarient, [this.tileset], X_OFFSET, Y_OFFSET);
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
                     //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
                     //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'coinPickup01Anim', 'coinPickup01Anim.png' 
+                    var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
                     ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
 
                     this.coins.push(_coin);
@@ -2192,6 +2199,7 @@ class GameScene extends Phaser.Scene {
 
         for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 1 + PORTAL_TILE_DIFF; index++) {
 
+            // TODO: rename portalArrayX X doesn't have to do with coordinates and is confusing and not needed.
             if (portalArrayX[index]) {
                 // consider throwing an error if a portal doesn't have a correctly defined _to or _from
                 
@@ -2242,7 +2250,7 @@ class GameScene extends Phaser.Scene {
         while (this.map.getLayer(`${portalVarient}-${layerIndex}`)) {
 
             //console.log(`Portal-${layerIndex} Logic`);
-            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset]);
+            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset], X_OFFSET, Y_OFFSET);
             var portalArrayN = {};
             
             var toN = [];
@@ -2253,10 +2261,10 @@ class GameScene extends Phaser.Scene {
                 if (tile.index > 0) {
     
                     if (portalArrayN[tile.index]) {
-                        portalArrayN[tile.index].push([tile.x, tile.y]);
+                        portalArrayN[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                     }
                     else {
-                        portalArrayN[tile.index] = [[tile.x, tile.y]];
+                        portalArrayN[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
                     }
                 } 
             });
@@ -2279,7 +2287,7 @@ class GameScene extends Phaser.Scene {
                     var count = 0;
                     value.forEach(tile => {
                         this.portals.some( portal => {
-                            if(portal.x === tile[0]*GRID && portal.y === tile[1]*GRID){
+                            if(portal.x === tile[0] && portal.y === tile[1]){
                                 count += 1;
                                 //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
                             }
@@ -3095,37 +3103,41 @@ class GameScene extends Phaser.Scene {
 
     // #region .validSpawnLocation(
     validSpawnLocations() {
-        var testGrid = {};
+        var testGrid = [];
 
         // Start with all safe points as true. This is important because Javascript treats 
         // non initallized values as undefined and so any comparison or look up throws an error.
-        for (var x1 = 0; x1 <= END_X; x1++) {
-            testGrid[x1] = {};
-    
-            for (var y1 = 2; y1 < END_Y; y1++)
-            {
-                testGrid[x1][y1] = true;
+        
+        // 2. Make a viritual GRID space to minimise the size of the array.
+        for (var _x = 0; _x < 29; _x++) {
+            testGrid[_x] = [];
+            for (var _y = 0; _y < 27; _y++) {
+                testGrid[_x][_y] = 1; // Note: In the console the grid looks rotated.
             }
         }
-    
         
+        
+    
+        console.log(testGrid);
         // Set all the unsafe places unsafe
 
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
-            if (wall.index > 0) {
-                
-                testGrid[wall.x][wall.y] = false;
+            if (wall.index > 0) {                
+                testGrid[wall.x][wall.y] = 0; // In TileSpace
             }
         });
+        
+        
+        
         
         if (this.map.getLayer('Ghost-1')) {
             this.ghostWallLayer.forEachTile(wall => {
     
                 if (wall.index > 0) {
                     
-                    testGrid[wall.x][wall.y] = false;
+                    testGrid[wall.x][wall.y] = 0;
                 }
             });
         }
@@ -3135,19 +3147,21 @@ class GameScene extends Phaser.Scene {
     
                 if (foodTile.index > 0) {
                     
-                    testGrid[foodTile.x][foodTile.y] = false;
+                    testGrid[foodTile.x][foodTile.y] = 0;
                 }
             });
 
         }
+        
 
 
         // Don't spawn on Dream Walls
 
 
-        this.dreamWalls.forEach( dreamwall => {
-            testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
-        });
+        // THIS IS BROKE NOW. Also no dream walls now.
+        //this.dreamWalls.forEach( dreamwall => {
+        //    testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
+        //});
         
 
 
@@ -3162,17 +3176,25 @@ class GameScene extends Phaser.Scene {
         //});
 
         this.atoms.forEach(_fruit => {
-            testGrid[Math.floor(_fruit.x/GRID)][Math.floor(_fruit.y/GRID)] = false;
-        });
 
-        this.portals.forEach(_portal => {
-            testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
+            var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
+            var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
+            console.log(this.atoms);
+            testGrid[_x][_y] = "a";
+            
         });
+        
+
+        // TEMP
+        //this.portals.forEach(_portal => {
+        //    testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
+        //});
 
 
-        this.dreamWalls.forEach( _dreamWall => {
-            testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-        });
+        // THIS EXISTS TWICE????
+        //this.dreamWalls.forEach( _dreamWall => {
+        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        //});
 
 
         // Don't let fruit spawn on dreamwall blocks
@@ -3186,26 +3208,26 @@ class GameScene extends Phaser.Scene {
             if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
                 // This goes nan sometimes. Ignore if that happens.
                 // Round maths for the case when adding a fruit while the head interpolates across the screen
-                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+                //testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
             }
             
         });
+
+
         
 
         
         var validLocations = [];
-    
-        for (var x2 = 0; x2 <= END_X; x2++)
-        {
-            for (var y2 = 0; y2 <= END_Y; y2++)
-            {
-                if (testGrid[x2][y2] === true)
-                {
+
+        for (var _x = 0; _x < 29; _x++) {
+            for (var _y = 0; _y < 27; _y++) {
+                if (testGrid[_x][_y] === 1) {
                     // Push only valid positions to an array.
-                    validLocations.push({x: x2, y: y2});
+                    validLocations.push({x: _x * GRID + X_OFFSET, y: _y * GRID + Y_OFFSET});     
                 }
             }
         }
+
 
         return validLocations;
 
@@ -3376,8 +3398,8 @@ class GameScene extends Phaser.Scene {
 
         var vortexTween = this.tweens.add({
             targets: target, 
-            x: x * GRID, //this.pathRegroup.vec.x,
-            y: y * GRID, //this.pathRegroup.vec.y,
+            x: x, //this.pathRegroup.vec.x,
+            y: y, //this.pathRegroup.vec.y,
             yoyo: false,
             duration: 500,
             ease: 'Sine.easeOutIn',
@@ -3637,12 +3659,13 @@ class GameScene extends Phaser.Scene {
              * Checks for Tween complete on each frame.
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
-            if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
-                this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
-                this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
-                this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
-                this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
-            }
+
+            //if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
+            //    this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
+            //    this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
+            //    this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
+            //    this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
+            //}
             
            /* this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
@@ -7475,15 +7498,15 @@ var tempHeightDiff = 16;
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     backgroundColor: '#bbbbbb', //'#4488aa'
-    width: 744, 
-    height: 744,// + tempHeightDiff * GRID,
+    width: 640, 
+    height: 360,// + tempHeightDiff * GRID,
     min: {
-        width: 372,
-        height: 372
+        width: 640,
+        height: 360
     },
     snap: {
-        width: 372,
-        height: 372
+        width: 640,
+        height: 360
     },
     
     //renderer: Phaser.AUTO,
@@ -7517,7 +7540,7 @@ var config = {
 
 // #region Screen Settings
 export const SCREEN_WIDTH = config.width;
-export const SCREEN_HEIGHT = 31 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
+export const SCREEN_HEIGHT = 29 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
 
 // Edge locations for X and Y
 export const END_X = SCREEN_WIDTH/GRID - 1;

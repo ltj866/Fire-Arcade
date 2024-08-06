@@ -10,7 +10,7 @@ var Portal = new Phaser.Class({
     {
         Phaser.GameObjects.Sprite.call(this, scene);
         //this.setTexture('portals', 0);
-        this.setPosition(from[0] * GRID, from[1] * GRID);
+        this.setPosition(from[0], from[1]);
         this.setOrigin(.3125,.3125);
         this.setDepth(47);
         this.play("portalIdle");
@@ -18,7 +18,7 @@ var Portal = new Phaser.Class({
 
         this.target = { x: to[0], y: to[1]};
         this.targetObject = {};
-        this.snakePortalingSprite = scene.add.sprite(from[0] * GRID, from[1] * GRID, 'snakeDefault', 1
+        this.snakePortalingSprite = scene.add.sprite(from[0], from[1], 'snakeDefault', 1
         ).setDepth(52).setOrigin(0,0).setPipeline('Light2D');
         this.snakePortalingSprite.setAlpha(0.66);
 
