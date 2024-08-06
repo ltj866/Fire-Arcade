@@ -1529,7 +1529,6 @@ a
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
-        debugger
         
 
         if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
@@ -3088,38 +3087,41 @@ a
 
     // #region .validSpawnLocation(
     validSpawnLocations() {
-        // TODO make this have its own internal grid so the Array javascript makes isn't 1000s, 1000s wide.
-        var testGrid = {};
+        var testGrid = [];
 
         // Start with all safe points as true. This is important because Javascript treats 
         // non initallized values as undefined and so any comparison or look up throws an error.
-        for (var x1 = 0; x1 <= END_X; x1++) {
-            testGrid[x1] = {};
-    
-            for (var y1 = 2; y1 < END_Y; y1++)
-            {
-                testGrid[x1][y1] = true;
+        
+        // 2. Make a viritual GRID space to minimise the size of the array.
+        for (var _x = 0; _x < 29; _x++) {
+            testGrid[_x] = [];
+            for (var _y = 0; _y < 27; _y++) {
+                testGrid[_x][_y] = 1; // Note: In the console the grid looks rotated.
             }
         }
-    
         
+        
+    
+        console.log(testGrid);
         // Set all the unsafe places unsafe
 
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
     
-            if (wall.index > 0) {
-                
-                testGrid[wall.x][wall.y] = false;
+            if (wall.index > 0) {                
+                testGrid[wall.x][wall.y] = 0; // In TileSpace
             }
         });
+        
+        
+        
         
         if (this.map.getLayer('Ghost-1')) {
             this.ghostWallLayer.forEachTile(wall => {
     
                 if (wall.index > 0) {
                     
-                    testGrid[wall.x][wall.y] = false;
+                    testGrid[wall.x][wall.y] = 0;
                 }
             });
         }
@@ -3129,17 +3131,18 @@ a
     
                 if (foodTile.index > 0) {
                     
-                    testGrid[foodTile.x][foodTile.y] = false;
+                    testGrid[foodTile.x][foodTile.y] = 0;
                 }
             });
 
         }
+        
 
 
         // Don't spawn on Dream Walls
 
 
-        // THIS IS BROKE NOW
+        // THIS IS BROKE NOW. Also no dream walls now.
         //this.dreamWalls.forEach( dreamwall => {
         //    testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
         //});
@@ -3157,8 +3160,14 @@ a
         //});
 
         this.atoms.forEach(_fruit => {
-            testGrid[Math.floor(_fruit.x/GRID)][Math.floor(_fruit.y/GRID)] = false;
+
+            var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
+            var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
+            console.log(this.atoms);
+            testGrid[_x][_y] = "a";
+            
         });
+        
 
         // TEMP
         //this.portals.forEach(_portal => {
@@ -3187,22 +3196,22 @@ a
             }
             
         });
+
+
         
 
         
         var validLocations = [];
-    
-        for (var x2 = 0; x2 <= END_X; x2++)
-        {
-            for (var y2 = 0; y2 <= END_Y; y2++)
-            {
-                if (testGrid[x2][y2] === true)
-                {
+
+        for (var _x = 0; _x < 29; _x++) {
+            for (var _y = 0; _y < 27; _y++) {
+                if (testGrid[_x][_y] === 1) {
                     // Push only valid positions to an array.
-                    validLocations.push({x: x2, y: y2});
+                    validLocations.push({x: _x * GRID + X_OFFSET, y: _y * GRID + Y_OFFSET});     
                 }
             }
         }
+
 
         return validLocations;
 

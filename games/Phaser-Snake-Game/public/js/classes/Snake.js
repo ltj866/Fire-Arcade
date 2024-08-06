@@ -276,7 +276,7 @@ var Snake = new Phaser.Class({
 
         // #region Food Collision
         scene.atoms.forEach(_atom => {  
-            if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
+            if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
                 scene.snakeEating();
                 var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
@@ -298,8 +298,6 @@ var Snake = new Phaser.Class({
                 scene.events.emit('addScore', _atom); // Sends to UI Listener 
                 this.grow(scene);
                 // Avoid double _atom getting while in transition
-                _atom.x = 0;
-                _atom.y = 0;
                 _atom.visible = false;
                 //_atom.electrons.visible = false;
                 //_atom.electrons.play("electronIdle");

@@ -1,4 +1,4 @@
-import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT} from "../SnakeHole.js";
+import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT, X_OFFSET, Y_OFFSET} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
@@ -69,12 +69,14 @@ var Food = new Phaser.Class({
         var validLocations = scene.validSpawnLocations();
         
         var pos = Phaser.Math.RND.pick(validLocations);
+
+        
         
 
-        this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
-        scene.foodHistory.push([pos.x, pos.y, ourInputScene.moveCount]);
+        this.setPosition(pos.x, pos.y ); // This seems to magically reset the fruit timers
+        scene.foodHistory.push([(pos.x - X_OFFSET) / GRID, (pos.y - Y_OFFSET) / GRID, ourInputScene.moveCount]);
         //console.log(this.x,this.y)
-        this.electrons.setPosition(pos.x * GRID, pos.y * GRID);
+        this.electrons.setPosition(pos.x, pos.y);
         //console.log(this.electrons.x,this.electrons.y)
 
         if (DEBUG) { // Reset Fruit Timer Text
