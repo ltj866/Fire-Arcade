@@ -45,6 +45,7 @@ const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
 export const X_OFFSET = 268;
+export const Y_OFFSET = 72;
 
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
@@ -253,7 +254,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_7-3_Final_Exams'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1412,7 +1413,7 @@ a
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
-        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY};
+        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
         spawnTile.index = -1; // Set to empty tile
 
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
@@ -1478,16 +1479,16 @@ a
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET).setPipeline('Light2D');
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET).setPipeline('Light2D');
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
 
         if (this.map.getLayer('Food')) {
-            this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET);
+            this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET, Y_OFFSET);
             this.foodLayer.visible = false;
 
             this.foodLayer.forEachTile(_tile => {
@@ -1582,10 +1583,10 @@ a
             if (tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + PORTAL_TILE_DIFF * 2) {
                 if (portalArrayX[tile.index]) {
                     
-                    portalArrayX[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY]);
+                    portalArrayX[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                 }
                 else {
-                    portalArrayX[tile.index] = [[tile.pixelY + X_OFFSET, tile.pixelY]];
+                    portalArrayX[tile.index] = [[tile.pixelY + X_OFFSET, tile.pixelY + Y_OFFSET]];
                 }
                 //tile.index = -1;
                 
@@ -1596,35 +1597,35 @@ a
             switch (tile.index) {
                 // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
                 case 550:
-                    var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY).setDepth(50).setOrigin(0,0);
+                    var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerTop.play('wrapBlock02');
                     this.dreamWalls.push(wallShimmerTop);
                     tile.index = -1;
                     break;
 
                 case 614:
-                    var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY).setDepth(50).setOrigin(0,0);
+                    var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerBottom.play('wrapBlock07');
                     this.dreamWalls.push(wallShimmerBottom);
                     tile.index = -1;
                     break;
 
                 case 581:
-                    var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY).setDepth(50).setOrigin(0,0);
+                    var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerLeft.play('wrapBlock04');
                     this.dreamWalls.push(wallShimmerLeft);
                     tile.index = -1;
                     break;
 
                 case 583:
-                    var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY).setDepth(50).setOrigin(0,0);
+                    var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerRight.play('wrapBlock05');
                     this.dreamWalls.push(wallShimmerRight);
                     tile.index = -1;
                     break;
 
                 case 549:
-                    var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY
+                    var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock01);
@@ -1632,7 +1633,7 @@ a
                     break;
 
                 case 551:
-                    var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY
+                    var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock03);
@@ -1640,7 +1641,7 @@ a
                     break;
                 
                 case 613:
-                    var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY
+                    var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock06);
@@ -1648,7 +1649,7 @@ a
                     break;
 
                 case 615:
-                    var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY
+                    var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock08);
@@ -2120,13 +2121,13 @@ a
 
         if (this.map.getLayer(coinVarient)) {
 
-            var coinLayer = this.map.createLayer(coinVarient, [this.tileset], X_OFFSET);
+            var coinLayer = this.map.createLayer(coinVarient, [this.tileset], X_OFFSET, Y_OFFSET);
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
                     //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
                     //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-                    var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY, 'coinPickup01Anim', 'coinPickup01Anim.png' 
+                    var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
                     ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
 
                     this.coins.push(_coin);
@@ -2234,7 +2235,7 @@ a
         while (this.map.getLayer(`${portalVarient}-${layerIndex}`)) {
 
             //console.log(`Portal-${layerIndex} Logic`);
-            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset], X_OFFSET);
+            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset], X_OFFSET, Y_OFFSET);
             var portalArrayN = {};
             
             var toN = [];
@@ -2245,10 +2246,10 @@ a
                 if (tile.index > 0) {
     
                     if (portalArrayN[tile.index]) {
-                        portalArrayN[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY]);
+                        portalArrayN[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                     }
                     else {
-                        portalArrayN[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY]];
+                        portalArrayN[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
                     }
                 } 
             });
@@ -3182,7 +3183,7 @@ a
             if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
                 // This goes nan sometimes. Ignore if that happens.
                 // Round maths for the case when adding a fruit while the head interpolates across the screen
-                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+                //testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
             }
             
         });
