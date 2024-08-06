@@ -3373,8 +3373,8 @@ a
 
         var vortexTween = this.tweens.add({
             targets: target, 
-            x: x * GRID, //this.pathRegroup.vec.x,
-            y: y * GRID, //this.pathRegroup.vec.y,
+            x: x, //this.pathRegroup.vec.x,
+            y: y, //this.pathRegroup.vec.y,
             yoyo: false,
             duration: 500,
             ease: 'Sine.easeOutIn',

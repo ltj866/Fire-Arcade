@@ -172,6 +172,7 @@ var Snake = new Phaser.Class({
             }
         }
 
+        
         var onTile = scene.map.getTileAtWorldXY( this.head.x, this.head.y);
         if (GState.PLAY === scene.gState && onTile != null && onTile.properties.hasCollision){
             
