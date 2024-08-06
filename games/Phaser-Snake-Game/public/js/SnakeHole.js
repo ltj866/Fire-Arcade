@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1990,7 +1990,7 @@ a
                 
                 if (this.map.getLayer('Next')) {
 
-                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
+                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
                     var tiledIndex = 641; // First column in the row.
                     //debugger;
                     this.nextStages.forEach( stageName => {
@@ -2016,20 +2016,21 @@ a
                                 if (STAGE_UNLOCKS[propObj.value].call()) {
                                     // Now we know the Stage is unlocked, so make the black hole tile.
                                     
-                                    console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
+                                    console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
+                                    debugger
 
-                                    var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
-                                        stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
+                                    var stageText = this.add.text(tile.pixelX + 6 + X_OFFSET, tile.pixelY - GRID + Y_OFFSET,
+                                        stageName,{ fontFamily: 'Oxanium', fontSize: 8, color: 'white', baselineX: 1.5 }
                                     ).setDepth(50).setOrigin(0,0).setAlpha(0);
                                     
-                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - 26, stageText.width + 8, 24, 0x1a1a1a  
+                                    var r1 = this.add.rectangle(tile.pixelX + 8 + X_OFFSET, tile.pixelY - 14 + Y_OFFSET, stageText.width + 8, 12, 0x1a1a1a  
                                     ).setDepth(49).setOrigin(0,0).setAlpha(0);
                                     //debugger
 
                                     r1.setStrokeStyle(2, 0x4d9be6);
 
                                     
-                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
+                                    var portalImage = this.add.image(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET,
                                         'blackHole' 
                                     ).setDepth(10).setOrigin(0.4125,0.4125).setScale(0);
                                     this.blackholes.push(portalImage)
@@ -3297,17 +3298,14 @@ a
 
         this.wallLayer.culledTiles.forEach( tile => {
 
-            if (tile.y > 1 && tile.y < 30) {
-                
-                var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
-                ).setOrigin(0,0).setDepth(50);
-                
-                if (FADE_OUT_TILES.includes(tile.index)) {
-                    fadeOutSprites.push(_sprite);
-                } else {
-                    wallSprites.push(_sprite);
-                }               
-            }
+            var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+            ).setOrigin(0,0).setDepth(50);
+            
+            if (FADE_OUT_TILES.includes(tile.index)) {
+                fadeOutSprites.push(_sprite);
+            } else {
+                wallSprites.push(_sprite);
+            }               
             
         });
         this.wallLayer.visible = false;
