@@ -1551,21 +1551,21 @@ a
         
 
         if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
-            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
@@ -2529,12 +2529,12 @@ a
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 16,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.scoreFrame = this.add.image(X_OFFSET + GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.fuseFrame = this.add.image(X_OFFSET + GRID * 25.5 + 8,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.scoreFrame = this.add.image(X_OFFSET + GRID * 7 + 6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.fuseFrame = this.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5);
 
        this.boostMask = this.make.image({ // name is unclear.
-           x: SCREEN_WIDTH/2 + 16,
+           x: SCREEN_WIDTH/2,
            y: GRID,
            key: 'megaAtlas',
            frame: 'boostMask.png',
@@ -2542,7 +2542,7 @@ a
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2 + 16, GRID).setOrigin(0.5,0.5);
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID).setOrigin(0.5,0.5);
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
@@ -2677,7 +2677,7 @@ a
 
 
          // Countdown Text
-        this.countDown = this.add.dom(X_OFFSET + GRID*9 + 5, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 4, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -2693,7 +2693,7 @@ a
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon = this.add.sprite(X_OFFSET + GRID *22 -5, 2, 'coinPickup01Anim.png'
+        this.coinsUIIcon = this.add.sprite(X_OFFSET + GRID * 20 + 5, 2, 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
         if (this.scene.get("PersistScene").coins > 0) {
             this.coinsUIIcon.setVisible(true)
@@ -2702,7 +2702,7 @@ a
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(X_OFFSET + GRID*22.5 + 5, 6, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(X_OFFSET + GRID*21 + 9, 6, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -3427,7 +3427,7 @@ a
         return snakeEating
     }
     loseCoin(){
-        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID *22 -5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
         this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
         this.coinsUICopy.setGravity(0,400)
@@ -6052,12 +6052,12 @@ class UIScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 - GRID * 2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
        this.add.image(GRID * 8.4,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({ // name is unclear.
-           x: SCREEN_WIDTH/2,
+           x: SCREEN_WIDTH/2 - GRID * 2,
            y: GRID,
            key: 'megaAtlas',
            frame: 'boostMask.png',
@@ -6065,7 +6065,7 @@ class UIScene extends Phaser.Scene {
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2 -3, GRID).setOrigin(0.5,0.5);
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2 - GRID * 5, GRID).setOrigin(0.5,0.5);
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
