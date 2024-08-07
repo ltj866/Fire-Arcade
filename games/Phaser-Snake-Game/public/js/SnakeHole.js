@@ -7522,7 +7522,7 @@ var config = {
     parent: 'phaser-example',
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     //roundPixels: true,
-    //pixelArt: true,
+    pixelArt: true,
     scale: {
         //zoom: Phaser.Scale.MAX_ZOOM,
         mode: Phaser.Scale.FIT,
