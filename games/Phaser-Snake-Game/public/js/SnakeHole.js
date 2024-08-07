@@ -2526,9 +2526,9 @@ a
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.scoreFrame = this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.fuseFrame = this.add.image(GRID * 25.5 + 8,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5).setScale(2);
+       this.add.image(SCREEN_WIDTH/2 + 4,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.scoreFrame = this.add.image(X_OFFSET + GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.fuseFrame = this.add.image(X_OFFSET + GRID * 25.5 + 8,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5);
 
        this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
@@ -2690,8 +2690,8 @@ a
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5 -6, 4, 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2).setVisible(false);
+        this.coinsUIIcon = this.add.sprite(X_OFFSET + GRID *22 -5, 2, 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
         if (this.scene.get("PersistScene").coins > 0) {
             this.coinsUIIcon.setVisible(true)
         }
@@ -2943,15 +2943,16 @@ a
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.scorePanel = this.add.nineslice(GRID * .125, 0, 
+        this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
             'uiGlassL', 'Glass', 
-            ((96) + (this.scoreDigitLength * 10)), 78, 
-            80, 18, 18, 18);
+            ((48) + (this.scoreDigitLength * 5)), 39, 40, 9, 9, 9);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
-        this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
-        this.progressPanel.setDepth(100).setOrigin(0,0)
+        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
+             'uiGlassR', 'Glass',
+             57, 29, 9, 29, 9, 9);
+        this.progressPanel.setDepth(100).setOrigin(1,0)
         
         
 
@@ -3423,9 +3424,9 @@ a
         return snakeEating
     }
     loseCoin(){
-        this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 6,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID *22 -5, 2,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-200, -400));
+        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
         this.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
         //TODO trigger UI coin loader animation here
@@ -3494,7 +3495,7 @@ a
               });
                 this.tweens.add({
                 targets: this.scorePanel,
-                height: 78,
+                height: 39,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -3522,7 +3523,7 @@ a
               });
             this.tweens.add({
                 targets: this.scorePanel,
-                height: 58,
+                height: 29,
                 ease: 'Sine.InOut',
                 duration: 800,
                 repeat: 0,
@@ -3957,7 +3958,7 @@ a
         */
         var timeTick = this.currentScoreTimer()
         this.scoreDigitLength = this.runningScore.toString().length;
-        this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
+        this.scorePanel.width = ((38) + (this.scoreDigitLength * 5)); //should only run on score+
 
         
         

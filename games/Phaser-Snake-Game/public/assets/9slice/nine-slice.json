@@ -4,8 +4,8 @@
 			"image": "UI_Glass_9SliceLEFT",
 			"format": "RGBA8888",
 			"size": {
-				"w": 144,
-				"h": 144
+				"w": 72,
+				"h": 72
 			},
 			"scale": 1,
 			"frames": [
@@ -14,20 +14,20 @@
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 144,
-						"h": 144
+						"w": 72,
+						"h": 72
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 144,
-						"h": 144
+						"w": 72,
+						"h": 72
 					},
 					"frame": {
 						"x": 0,
 						"y": 0,
-						"w": 144,
-						"h": 144
+						"w": 72,
+						"h": 72
 					}
 				}
 			]
