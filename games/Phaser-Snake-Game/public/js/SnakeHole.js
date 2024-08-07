@@ -320,6 +320,7 @@ class StartScene extends Phaser.Scene {
 
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
+        this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png']);
 
@@ -1343,6 +1344,7 @@ class GameScene extends Phaser.Scene {
 
         this.graphics = this.add.graphics();
         
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
         
         /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
