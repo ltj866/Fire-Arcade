@@ -44,7 +44,7 @@ const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
-export const X_OFFSET = 268 / 2;
+export const X_OFFSET = 292 / 2;
 export const Y_OFFSET = 72 / 2;
 
 
@@ -1024,22 +1024,22 @@ class PersistScene extends Phaser.Scene {
             //this.UIbackground.setScale(32); 
 
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(X_OFFSET, 0, 372, 372,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            this.bg0 = this.add.tileSprite(X_OFFSET, 0, 360, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             this.bg0.tileScaleX = 2;
             this.bg0.tileScaleY = 2;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(X_OFFSET, 0, 372, 372, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            this.bg = this.add.tileSprite(X_OFFSET, 0,  360, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             this.bg.tileScaleX = 2;
             this.bg.tileScaleY = 2;
             
             // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(X_OFFSET, 0, 372, 372, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            this.bg2 = this.add.tileSprite(X_OFFSET, 0,  360, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
             this.bg2.tileScaleX = 2;
             this.bg2.tileScaleY = 2;
             
             // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(X_OFFSET, 0, 372, 372, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            this.bg3 = this.add.tileSprite(X_OFFSET, 0,  360, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
             this.bg3.tileScaleX = 2;
             this.bg3.tileScaleY = 2;
     
@@ -1387,7 +1387,7 @@ class GameScene extends Phaser.Scene {
 
         var _chargeUp = this.sound.add('chargeUp');
 
-        _chargeUp.play();
+        //_chargeUp.play();
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage );
@@ -2526,12 +2526,12 @@ a
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 4,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 + 16,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
        this.scoreFrame = this.add.image(X_OFFSET + GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
        this.fuseFrame = this.add.image(X_OFFSET + GRID * 25.5 + 8,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5);
 
        this.boostMask = this.make.image({ // name is unclear.
-           x: SCREEN_WIDTH/2,
+           x: SCREEN_WIDTH/2 + 16,
            y: GRID,
            key: 'megaAtlas',
            frame: 'boostMask.png',
@@ -2539,7 +2539,7 @@ a
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2 -3, GRID).setOrigin(0.5,0.5);
+       const boostBar = this.add.sprite(SCREEN_WIDTH/2 + 16, GRID).setOrigin(0.5,0.5);
        boostBar.setDepth(50);
        boostBar.play('increasing');
 
@@ -2627,8 +2627,8 @@ a
             "text-align": 'right',
         } 
 
-        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5);
-        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5);
+        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 28.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5);
+        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 25.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -2949,7 +2949,7 @@ a
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
-        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
+        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET + GRID), 0,
              'uiGlassR', 'Glass',
              57, 29, 9, 29, 9, 9);
         this.progressPanel.setDepth(100).setOrigin(1,0)
