@@ -2600,15 +2600,15 @@ a
         
 
         // Score Text
-        this.scoreUI = this.add.dom(5 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Stage`).setOrigin(0,0);
-        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0);
+        this.scoreUI = this.add.dom(X_OFFSET + 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`Stage`).setOrigin(0,0).setScale(.5);
+        this.scoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`0`).setOrigin(0,0).setScale(.5);
 
-        this.bestScoreUI = this.add.dom(12, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Best`).setOrigin(0,0);
-        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.bestBase).setOrigin(0,0);
+        this.bestScoreUI = this.add.dom(X_OFFSET + 8, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(`Best`).setOrigin(0,0).setScale(.5);
+        this.bestScoreLabelUI = this.add.dom(X_OFFSET + GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+            ).setText(this.bestBase).setOrigin(0,0).setScale(.5);
 
 
 
@@ -2627,8 +2627,8 @@ a
             "text-align": 'right',
         } 
 
-        this.lengthGoalUI = this.add.dom((GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        this.lengthGoalUILabel = this.add.dom(GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
+        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5);
+        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -2674,7 +2674,7 @@ a
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 11, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(X_OFFSET + GRID*9 + 5, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -2683,7 +2683,7 @@ a
             'padding': '2px 7px 0px 0px',
             })).setHTML(
                 countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0.5).setAlpha(0);
+        ).setOrigin(1,0.5).setAlpha(0).setScale(.5);
 
         
 
@@ -2699,7 +2699,7 @@ a
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*22.5 + 2, 11, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(X_OFFSET + GRID*22.5 + 5, 6, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -2710,7 +2710,7 @@ a
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
                 `${commaInt(this.scene.get("PersistScene").coins).padStart(2, '0')}`
-        ).setOrigin(0,0).setAlpha(0);
+        ).setOrigin(0,0).setAlpha(0).setScale(.5);
 
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
@@ -2730,12 +2730,12 @@ a
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreUI = this.add.dom(X_OFFSET + GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `Score`
-        ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        ).setOrigin(0,1).setScale(.5);
+        this.runningScoreLabelUI = this.add.dom(X_OFFSET + GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1);
+        ).setOrigin(0,1).setScale(.5);
 
         
         if (DEBUG) {
@@ -2945,7 +2945,7 @@ a
         
         this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
             'uiGlassL', 'Glass', 
-            ((48) + (this.scoreDigitLength * 5)), 39, 40, 9, 9, 9);
+            ((48) + (this.scoreDigitLength * 10)), 39, 40, 9, 9, 9);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
@@ -3515,7 +3515,7 @@ a
         if (this.UIScoreContainer.y === 0) {
             this.tweens.add({
                 targets: this.UIScoreContainer,
-                y: (-20),
+                y: (-12),
                 ease: 'Sine.InOut',
                 duration: 800,
                 repeat: 0,
@@ -3523,7 +3523,7 @@ a
               });
             this.tweens.add({
                 targets: this.scorePanel,
-                height: 29,
+                height: 28,
                 ease: 'Sine.InOut',
                 duration: 800,
                 repeat: 0,
@@ -3958,7 +3958,7 @@ a
         */
         var timeTick = this.currentScoreTimer()
         this.scoreDigitLength = this.runningScore.toString().length;
-        this.scorePanel.width = ((38) + (this.scoreDigitLength * 5)); //should only run on score+
+        this.scorePanel.width = ((38) + (this.scoreDigitLength * 10)); //should only run on score+
 
         
         
