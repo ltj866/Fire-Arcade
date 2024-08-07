@@ -293,9 +293,9 @@ class StartScene extends Phaser.Scene {
         //this.load.atlas('megaAtlas', 'assets/atlas/textureAtlas24_06_27.png', 'assets/atlas/atlasMeta24_06_27.json');
         this.load.atlas({
             key: 'megaAtlas',
-            textureURL: 'assets/atlas/textureAtlas24_06_27.png',
-            normalMap: 'assets/atlas/textureAtlas24_06_27_n.png',
-            atlasURL: 'assets/atlas/atlasMeta24_06_27.json'
+            textureURL: 'assets/textureAtlas24_06_27.png',
+            normalMap: 'assets/textureAtlas24_06_27_n.png',
+            atlasURL: 'assets/atlasMeta24_06_27.json'
         });
 
         
