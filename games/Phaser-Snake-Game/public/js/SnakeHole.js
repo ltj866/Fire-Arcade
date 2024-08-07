@@ -1024,22 +1024,22 @@ class PersistScene extends Phaser.Scene {
             //this.UIbackground.setScale(32); 
 
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(X_OFFSET, 0, 360, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            this.bg0 = this.add.tileSprite(X_OFFSET, 0, 348, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             this.bg0.tileScaleX = 2;
             this.bg0.tileScaleY = 2;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(X_OFFSET, 0,  360, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            this.bg = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             this.bg.tileScaleX = 2;
             this.bg.tileScaleY = 2;
             
             // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(X_OFFSET, 0,  360, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            this.bg2 = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
             this.bg2.tileScaleX = 2;
             this.bg2.tileScaleY = 2;
             
             // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(X_OFFSET, 0,  360, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            this.bg3 = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
             this.bg3.tileScaleX = 2;
             this.bg3.tileScaleY = 2;
     
@@ -2627,8 +2627,8 @@ a
             "text-align": 'right',
         } 
 
-        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 28.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5);
-        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 25.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5);
+        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 27.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5);
+        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 24.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -2949,7 +2949,7 @@ a
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
-        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET + GRID), 0,
+        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
              'uiGlassR', 'Glass',
              57, 29, 9, 29, 9, 9);
         this.progressPanel.setDepth(100).setOrigin(1,0)
