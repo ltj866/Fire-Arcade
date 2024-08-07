@@ -1025,28 +1025,28 @@ class PersistScene extends Phaser.Scene {
             //this.UIbackground.setScale(32); 
 
             // Furthest BG Object
-            this.bg0 = this.add.tileSprite(X_OFFSET, 0, 348, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-            //this.bg0.tileScaleX = 2;
-            //this.bg0.tileScaleY = 2;
+            this.bgFurthest = this.add.tileSprite(X_OFFSET, 0, 348, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            //this.bgFurthest.tileScaleX = 2;
+            //this.bgFurthest.tileScaleY = 2;
     
             // Scrolling BG1
-            this.bg = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-            //this.bg.tileScaleX = 2;
-            //this.bg.tileScaleY = 2;
+            this.bgBack = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            //this.bgBack.tileScaleX = 2;
+            //this.bgBack.tileScaleY = 2;
             
-            // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            //this.bg2.tileScaleX = 2;
-            //this.bg2.tileScaleY = 2;
+            // Scrolling bgFront Planets
+            this.bgFront = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            //this.bgFront.tileScaleX = 2;
+            //this.bgFront.tileScaleY = 2;
             
-            // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-            //this.bg3.tileScaleX = 2;
-            //this.bg3.tileScaleY = 2;
+            // Scrolling bgScrollMid Stars (depth is behind planets)
+            this.bgMid = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            //this.bgMid.tileScaleX = 2;
+            //this.bgMid.tileScaleY = 2;
     
             // Hue Shift
-            this.fx = this.bg.preFX.addColorMatrix();
-            this.fx2 = this.bg0.preFX.addColorMatrix();
+            this.fx = this.bgBack.preFX.addColorMatrix();
+            this.fx2 = this.bgFurthest.preFX.addColorMatrix();
     
     
             //if (this.stage === "Stage-04") {
@@ -1070,10 +1070,10 @@ class PersistScene extends Phaser.Scene {
                 this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
                 var geomask1 = this.shape1.createGeometryMask();
                 
-                this.bg.setMask(geomask1,true)
-                this.bg0.setMask(geomask1,true)
-                this.bg2.setMask(geomask1,true)
-                this.bg3.setMask(geomask1,true)
+                this.bgBack.setMask(geomask1,true)
+                this.bgFurthest.setMask(geomask1,true)
+                this.bgFront.setMask(geomask1,true)
+                this.bgMid.setMask(geomask1,true)
             }
     });
     
@@ -1146,10 +1146,10 @@ class PersistScene extends Phaser.Scene {
                     this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, value);
                     var geomask1 = this.shape1.createGeometryMask();
                     
-                    this.bg.setMask(geomask1,true)
-                    this.bg0.setMask(geomask1,true)
-                    this.bg2.setMask(geomask1,true)
-                    this.bg3.setMask(geomask1,true)
+                    this.bgBack.setMask(geomask1,true)
+                    this.bgFurthest.setMask(geomask1,true)
+                    this.bgFront.setMask(geomask1,true)
+                    this.bgMid.setMask(geomask1,true)
                 }
         });
     }
@@ -1166,10 +1166,10 @@ class PersistScene extends Phaser.Scene {
                     this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
                     var geomask1 = this.shape1.createGeometryMask();
                     
-                    this.bg.setMask(geomask1,true)
-                    this.bg0.setMask(geomask1,true)
-                    this.bg2.setMask(geomask1,true)
-                    this.bg3.setMask(geomask1,true)
+                    this.bgBack.setMask(geomask1,true)
+                    this.bgFurthest.setMask(geomask1,true)
+                    this.bgFront.setMask(geomask1,true)
+                    this.bgMid.setMask(geomask1,true)
                 }
         });
     }
@@ -1193,33 +1193,33 @@ class PersistScene extends Phaser.Scene {
         //this.scrollFactorY += .025;
 
 
-        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+        this.bgFurthest.tilePositionX = (Phaser.Math.Linear(this.bgBack.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
-        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+        this.bgFurthest.tilePositionY = (Phaser.Math.Linear(this.bgBack.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
 
-        this.bg.tilePositionX = (this.bg0.tilePositionX ) * 4;
-        this.bg.tilePositionY = (this.bg0.tilePositionY ) * 4;
+        this.bgBack.tilePositionX = (this.bgFurthest.tilePositionX ) * 4;
+        this.bgBack.tilePositionY = (this.bgFurthest.tilePositionY ) * 4;
             
-        this.bg2.tilePositionX = (this.bg0.tilePositionX ) * 8;
-        this.bg2.tilePositionY = (this.bg0.tilePositionY ) * 8;
+        this.bgFront.tilePositionX = (this.bgFurthest.tilePositionX ) * 8;
+        this.bgFront.tilePositionY = (this.bgFurthest.tilePositionY ) * 8;
 
-        this.bg3.tilePositionX = (this.bg0.tilePositionX ) * 2;
-        this.bg3.tilePositionY = (this.bg0.tilePositionY ) * 2;
+        this.bgMid.tilePositionX = (this.bgFurthest.tilePositionX ) * 2;
+        this.bgMid.tilePositionY = (this.bgFurthest.tilePositionY ) * 2;
 
         this.bgTimer += delta;
 
         if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
             if (this.bgTick === 0) {
-                this.bg3.setTexture('megaAtlas', 'background02_3_2.png'); 
-                this.bg.setTexture('megaAtlas', 'background02_frame2.png'); 
+                this.bgMid.setTexture('megaAtlas', 'background02_3_2.png'); 
+                this.bgBack.setTexture('megaAtlas', 'background02_frame2.png'); 
                 this.bgTick += 1;
             }
 
             if (this.bgTimer >= 2000) {
                 if (this.bgTick === 1) {
-                    this.bg3.setTexture('megaAtlas', 'background02_3.png');
-                    this.bg.setTexture('megaAtlas','background02.png'); 
+                    this.bgMid.setTexture('megaAtlas', 'background02_3.png');
+                    this.bgBack.setTexture('megaAtlas','background02.png'); 
                     this.bgTimer = 0;
                     this.bgTick -=1;
                 }
@@ -7522,7 +7522,7 @@ var config = {
     parent: 'phaser-example',
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     //roundPixels: true,
-    pixelArt: true,
+    //pixelArt: true,
     scale: {
         //zoom: Phaser.Scale.MAX_ZOOM,
         mode: Phaser.Scale.FIT,
