@@ -293,9 +293,9 @@ class StartScene extends Phaser.Scene {
         //this.load.atlas('megaAtlas', 'assets/atlas/textureAtlas24_06_27.png', 'assets/atlas/atlasMeta24_06_27.json');
         this.load.atlas({
             key: 'megaAtlas',
-            textureURL: 'assets/textureAtlas24_06_27.png',
-            normalMap: 'assets/textureAtlas24_06_27_n.png',
-            atlasURL: 'assets/atlasMeta24_06_27.json'
+            textureURL: 'assets/atlasMeta24_08_07.png',
+            normalMap: 'assets/atlasMeta24_08_07_n.png',
+            atlasURL: 'assets/atlasMeta24_08_07.json'
         });
 
         
@@ -1026,23 +1026,23 @@ class PersistScene extends Phaser.Scene {
 
             // Furthest BG Object
             this.bg0 = this.add.tileSprite(X_OFFSET, 0, 348, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-            this.bg0.tileScaleX = 2;
-            this.bg0.tileScaleY = 2;
+            //this.bg0.tileScaleX = 2;
+            //this.bg0.tileScaleY = 2;
     
             // Scrolling BG1
             this.bg = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-            this.bg.tileScaleX = 2;
-            this.bg.tileScaleY = 2;
+            //this.bg.tileScaleX = 2;
+            //this.bg.tileScaleY = 2;
             
             // Scrolling BG2 Planets
             this.bg2 = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            this.bg2.tileScaleX = 2;
-            this.bg2.tileScaleY = 2;
+            //this.bg2.tileScaleX = 2;
+            //this.bg2.tileScaleY = 2;
             
             // Scrolling BG3 Stars (depth is behind planets)
             this.bg3 = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-            this.bg3.tileScaleX = 2;
-            this.bg3.tileScaleY = 2;
+            //this.bg3.tileScaleX = 2;
+            //this.bg3.tileScaleY = 2;
     
             // Hue Shift
             this.fx = this.bg.preFX.addColorMatrix();
@@ -1187,6 +1187,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     update(time, delta) {
+        debugger
         console.log()
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;
@@ -4910,7 +4911,7 @@ class ScoreScene extends Phaser.Scene {
         let rank = this.stageData.stageRank() + 1; // FileNames start at 01.png
         //rank = 4; // Temp override.
         
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank
         ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         this.ScoreContainerL.add(letterRank)
@@ -7178,9 +7179,13 @@ function loadSpriteSheetsAndAnims(scene) {
 
 
     // Sprite Sheets that don't have animations.
-    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 18 ,frameHeight: 24 ,
+    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 18, frameHeight: 24,
         frame: 'comboLetters.png'
     });
+
+    scene.textures.addSpriteSheetFromAtlas('ranksSpriteSheet', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 36,
+        frame: 'ranksSpriteSheet.png'
+    })
 
 
     // Sprite Sheets and add Animations
@@ -7367,6 +7372,8 @@ function loadSpriteSheetsAndAnims(scene) {
       frameRate: 8,
       repeat: -1,
     });
+
+    
   
     //WRAP_BLOCK_ANIMS
     scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 12,frameHeight: 12,
@@ -7419,6 +7426,7 @@ function loadSpriteSheetsAndAnims(scene) {
       frameRate: 8,
       repeat: -1
     })
+
 
 
     
