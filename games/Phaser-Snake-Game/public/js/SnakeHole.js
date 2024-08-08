@@ -4260,8 +4260,8 @@ var StageData = new Phaser.Class({
             default:
                 rank = COPPER;
         }
-
         return rank;
+        
 
     },
 
@@ -4496,7 +4496,7 @@ class ScoreScene extends Phaser.Scene {
 
         // Panels
 
-        this.scorePanelL = this.add.nineslice(GRID * 4.75, GRID * 7.75, 
+        this.scorePanelL = this.add.nineslice(X_OFFSET +GRID * 4.75, GRID * 7.75, 
             'uiPanelL', 'Glass', 
             GRID * 12, GRID * 11.5, 
             8, 8, 8, 8);
@@ -4519,10 +4519,10 @@ class ScoreScene extends Phaser.Scene {
         //megaAtlas code reference
         //this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
         //this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
-        ourGame.continueBanner = ourGame.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
+        ourGame.continueBanner = ourGame.add.image(X_OFFSET,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
 
         // Scene Background Color
-        ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x323353, .75);
+        ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, GRID * 2, GRID * 31, GRID * 28, 0x323353, .75);
         ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
         ourGame.stageBackGround.alpha = 0;
 
@@ -4547,7 +4547,7 @@ class ScoreScene extends Phaser.Scene {
             "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
                 `${this.stageData.stage} CLEAR`
-        ).setOrigin(0.5, 0);
+        ).setOrigin(0.5, 0).setScale(.5);
 
         
         // #region Main Stats
@@ -4564,34 +4564,34 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `BASE SCORE:
                 SPEED BONUS:`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(0)}</span>`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore
                 `
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(0)}</span>
                 `
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore + _speedbonus
                 `
                 
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
         var frameTime = 16.667
 
@@ -4613,7 +4613,7 @@ class ScoreScene extends Phaser.Scene {
                 const value = Math.round(tween.getValue());
                 preAdditiveBaseScoreUI.setHTML(
                     `${commaInt(value)}</span>`
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
 
@@ -4630,7 +4630,7 @@ class ScoreScene extends Phaser.Scene {
                     `
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(value)}</span>
                 `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             },
             onComplete: () => {
                 //SFX
@@ -4667,7 +4667,7 @@ class ScoreScene extends Phaser.Scene {
         });*/
         
 
-        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
@@ -4675,8 +4675,8 @@ class ScoreScene extends Phaser.Scene {
 
 
                 `
-        ).setOrigin(1,0);
-        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1,0).setScale(0.5);
+        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
@@ -4684,8 +4684,8 @@ class ScoreScene extends Phaser.Scene {
                 ZED LVL +${0}%
 
                 `
-        ).setOrigin(1,0);
-        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1,0).setScale(0.5);
+        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
@@ -4693,7 +4693,7 @@ class ScoreScene extends Phaser.Scene {
 
                 MEDAL +${0}%
                 `
-        ).setOrigin(1,0);
+        ).setOrigin(1,0).setScale(0.5);
         
         this.tweens.addCounter({
             from: 0,
@@ -4709,7 +4709,7 @@ class ScoreScene extends Phaser.Scene {
 
                     `
                 
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         this.tweens.addCounter({
@@ -4727,7 +4727,7 @@ class ScoreScene extends Phaser.Scene {
 
                     `
                 
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         this.tweens.addCounter({
@@ -4744,26 +4744,26 @@ class ScoreScene extends Phaser.Scene {
 
                     MEDAL +${value3}%
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
 
-        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `x ${0}%
                 `
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `
                 <hr style="font-size:3px"/><span style="font-size:16px">${0}</span>`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
         this.tweens.addCounter({
             from: 0,
@@ -4777,7 +4777,7 @@ class ScoreScene extends Phaser.Scene {
                 multValuesUI1.setHTML(
                     `x ${value}%
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             },
             onComplete: () => {
                 multValuesUI2.setHTML(
@@ -4810,31 +4810,31 @@ class ScoreScene extends Phaser.Scene {
             },
         });*/
 
-        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `CORNER TIME:
                 BOOST BONUS:
                 NO-BONK BONUS:`
-        ).setOrigin(1,0);
+        ).setOrigin(1,0).setScale(0.5);
 
-        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `${0}
                 
                 `
-        ).setOrigin(1, 0);
-        const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1, 0).setScale(0.5);
+        const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `
                 ${0}
                 `
-        ).setOrigin(1, 0);
-        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1, 0).setScale(0.5);
+        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
@@ -4846,7 +4846,7 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.cornerBonus(),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
@@ -4856,14 +4856,14 @@ class ScoreScene extends Phaser.Scene {
                     `+${value}
                     
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.boostBonus(),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
@@ -4873,14 +4873,14 @@ class ScoreScene extends Phaser.Scene {
                     `
                     +${value}
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.bonkBonus(),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
             onComplete: () =>
@@ -4899,12 +4899,12 @@ class ScoreScene extends Phaser.Scene {
                     
                     +${value}`
                     
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
             
         });
 
-        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -4914,7 +4914,7 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
-        ).setOrigin(1, 0.5).setDepth(20);
+        ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
 
         
         this.ScoreContainerL.add(
@@ -4942,7 +4942,7 @@ class ScoreScene extends Phaser.Scene {
         let rank = this.stageData.stageRank() + 1; // FileNames start at 01.png
         //rank = 4; // Temp override.
         
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank
+        var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank -1
         ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         this.ScoreContainerL.add(letterRank)
@@ -4989,7 +4989,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 14.0, "twinkle01Anim", { 
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -5001,7 +5001,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = goldLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 14.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -5014,7 +5014,7 @@ class ScoreScene extends Phaser.Scene {
             lightColor = platLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle0Anim", {
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 14.0, "twinkle0Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -5044,11 +5044,11 @@ class ScoreScene extends Phaser.Scene {
             let anim;
 
             if (i < 14) {
-                _x = (GRID * (7.2667 - .25)) + (i * 16);
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 16);
                 _y = GRID * 8.75
             }
             else {
-                _x = (-GRID * (2.0667 + .25)) + (i * 16);
+                _x = X_OFFSET + (GRID * (7.2667 - .25) - (GRID * (7.2667 - .25) * 2.667)) + (i * 16);
                 _y = (GRID * 8.75) + 16;
             }
 
@@ -5077,7 +5077,7 @@ class ScoreScene extends Phaser.Scene {
             }
 
             this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
-            ).play(anim).setDepth(21).setScale(.5).setAlpha(0);
+            ).play(anim).setDepth(21).setScale(1).setAlpha(0);
             this.ScoreContainerL.add(this.atomScoreIcon)  
             scoreAtoms.push(this.atomScoreIcon)
         }
@@ -5123,7 +5123,7 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL.x -= SCREEN_WIDTH
         this.tweens.add({ //brings left score container into camera frame
             targets: this.ScoreContainerL,
-            x: -GRID * 1,
+            x: -GRID * 2,
             ease: 'Sine.InOut',
             duration: 500,
         });
@@ -5136,7 +5136,7 @@ class ScoreScene extends Phaser.Scene {
         });
         this.tweens.add({
             targets: letterRank,
-            x: GRID * 3.5,
+            x: X_OFFSET + GRID * 3.5,
             ease: 'Sine.InOut',
             duration: 500,
             delay:2500,
@@ -5149,7 +5149,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.tweens.add({
             targets: this.scorePanelLRank,
-            x: GRID * 4.5,
+            x: X_OFFSET + GRID * 4.5,
             ease: 'Sine.InOut',
             duration: 500,
             delay:2500,
@@ -5187,7 +5187,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
 
-        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 - X_OFFSET + GRID * 3, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
                 //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
@@ -5226,7 +5226,7 @@ class ScoreScene extends Phaser.Scene {
                 [${ourGame.scoreHistory.slice().sort().reverse()}]
                 </br>`
                     
-        ).setOrigin(0,0).setVisible(true);
+        ).setOrigin(0,0).setScale(0.5).setVisible(true);
 
 
         
@@ -5259,7 +5259,7 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerR.x += SCREEN_WIDTH//GRID * 1;
         this.tweens.add({
             targets: this.ScoreContainerR,
-            x: -GRID * 1,
+            x: X_OFFSET - GRID * 2,
             ease: 'Sine.InOut',
             duration: 500,
         });
@@ -5279,7 +5279,7 @@ class ScoreScene extends Phaser.Scene {
         this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div',  Object.assign({}, STYLE_DEFAULT, {
             width:'335px',
             "fontSize":'18px',
-        })).setOrigin(.5, 0).setAlpha(0);
+        })).setOrigin(.5, 0).setScale(0.5).setAlpha(0);
 
 
     
@@ -5287,7 +5287,7 @@ class ScoreScene extends Phaser.Scene {
         var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
 
-        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
             "font-weight": '400',
             "text-shadow": '#000000 1px 0 6px',
@@ -5295,9 +5295,9 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setText(
                 `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
-        ).setOrigin(0,0).setAlpha(0);
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
         
-        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
             "font-weight": '400',
             "text-shadow": '#000000 1px 0 6px',
@@ -5305,7 +5305,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
-        ).setOrigin(0,0).setAlpha(0);
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         // #region Help Card
         /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
@@ -5390,7 +5390,7 @@ class ScoreScene extends Phaser.Scene {
                 //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
                 //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
                 }
-            )).setText(continue_text).setOrigin(0.5,0).setDepth(25).setInteractive();
+            )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
 
             this.tweens.add({
