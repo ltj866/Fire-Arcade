@@ -3142,6 +3142,7 @@ a
             }
         }
 
+        // No Spawning on the edges under the bezel.
         for (let row = 0; row < 27; row++) {
             testGrid[0][row] = 0;
             testGrid[28][row] = 0; 
