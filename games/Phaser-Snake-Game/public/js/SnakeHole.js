@@ -1098,7 +1098,7 @@ class PersistScene extends Phaser.Scene {
         "text-align": 'right',
     }   
 
-    this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT + 1 * GRID, 'div', Object.assign({}, STYLE_DEFAULT, 
+    this.zedsUI = this.add.dom(2, SCREEN_HEIGHT - 2, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
             `<span style ="color: limegreen;
@@ -1121,9 +1121,10 @@ class PersistScene extends Phaser.Scene {
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
     ).setOrigin(0,0.5);*/
 
-    this.gameVersionUI = this.add.dom(SCREEN_WIDTH + GRID * 8, SCREEN_HEIGHT + 1 * GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+    this.gameVersionUI = this.add.dom(SCREEN_WIDTH, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
         'font-size': '12px',
-        'letter-spacing': '3px',
+        'letter-spacing': '2px',
+        'text-align': 'right',
         })).setText(
             `portalsnake.${GAME_VERSION}`
     ).setOrigin(1,1).setScale(.5);
@@ -1473,7 +1474,7 @@ a
         this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
-        ourPersist.gameVersionUI.setText(`portalsnake.${GAME_VERSION} -- ${this.stage}`);
+        ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
         this.tileset = this.map.addTilesetImage('tileSheetx12');
@@ -7549,7 +7550,7 @@ var config = {
 
 // #region Screen Settings
 export const SCREEN_WIDTH = config.width;
-export const SCREEN_HEIGHT = 29 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
+export const SCREEN_HEIGHT = config.height;   // Probably should be named to GAME_SCREEN Height. 29 * GRID
 
 // Edge locations for X and Y
 export const END_X = SCREEN_WIDTH/GRID - 1;
