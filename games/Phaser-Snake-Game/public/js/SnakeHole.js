@@ -373,7 +373,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
-        this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 24, frameHeight: 48 });
+        this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 12, frameHeight: 24 });
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
         this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
@@ -1093,20 +1093,20 @@ class PersistScene extends Phaser.Scene {
     updateSumOfBest(this);
 
     const styleBottomText = {
-        "font-size": '8px',
+        "font-size": '12px',
         "font-weight": 400,
         "text-align": 'right',
     }   
 
-    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 1, 'div', Object.assign({}, STYLE_DEFAULT, 
+    this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT + 1 * GRID, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
             `<span style ="color: limegreen;
-            font-size: 9px;
+            font-size: 14px;
             border: limegreen solid 1px;
             border-radius: 5px;
             padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
-    ).setOrigin(0, 1);
+    ).setOrigin(0, 1).setScale(.5);
 
 
     /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -1121,12 +1121,12 @@ class PersistScene extends Phaser.Scene {
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
     ).setOrigin(0,0.5);*/
 
-    this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '8px',
+    this.gameVersionUI = this.add.dom(SCREEN_WIDTH + GRID * 8, SCREEN_HEIGHT + 1 * GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        'font-size': '12px',
         'letter-spacing': '3px',
         })).setText(
             `portalsnake.${GAME_VERSION}`
-    ).setOrigin(1,1);
+    ).setOrigin(1,1).setScale(.5);
 
     this.scene.moveBelow("StartScene", "PersistScene");
 
@@ -1706,7 +1706,7 @@ a
         }
         */
 
-        this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        this.CapSpark = this.add.sprite(X_OFFSET + GRID * 9, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
@@ -2529,7 +2529,7 @@ a
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
        this.scoreFrame = this.add.image(X_OFFSET + GRID * 7 + 6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
        this.fuseFrame = this.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5);
 
@@ -2543,7 +2543,7 @@ a
 
        const keys = ['increasing'];
        const boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID).setOrigin(0.5,0.5);
-       boostBar.setDepth(50);
+       boostBar.setDepth(52);
        boostBar.play('increasing');
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
@@ -2791,23 +2791,23 @@ a
      
 
                 var electronToCapacitor = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
-                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                .setOrigin(0.5,0.5).setDepth(80).setScale(1);
                 var electronToCapacitor2 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
-                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                .setOrigin(0.5,0.5).setDepth(80).setScale(1);
                 var electronToCapacitor3 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
-                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                .setOrigin(0.5,0.5).setDepth(80).setScale(1);
                 //electronToCapacitor.play("electronIdle");
                 //electronToCapacitor.anims.msPerFrame = 66;
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: this.scoreFrame.getCenter().x -7,
+                    x: this.scoreFrame.getCenter().x -3,
                     y: this.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 0,
                     ease: 'Sine.in',
                     onComplete: () => {
-                        electronToCapacitor.playAfterRepeat({ key: 'CapElectronDispersion' }, 0).setScale(2);
+                        electronToCapacitor.playAfterRepeat({ key: 'CapElectronDispersion' }, 0).setScale(1);
                         //electronToCapacitor.play({ key: 'electronDispersion01' })
                     }
                 });
@@ -6052,7 +6052,7 @@ class UIScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 - GRID * 2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(SCREEN_WIDTH/2 - GRID * 2,GRID,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
        this.add.image(GRID * 8.4,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
