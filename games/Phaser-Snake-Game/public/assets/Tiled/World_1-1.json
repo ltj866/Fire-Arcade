@@ -147,14 +147,14 @@
         {
          "columns":32,
          "firstgid":1,
-         "image":"tileSheetx24.png",
-         "imageheight":768,
-         "imagewidth":768,
+         "image":"tileSheetx12.png",
+         "imageheight":384,
+         "imagewidth":384,
          "margin":0,
-         "name":"tileSheetx24",
+         "name":"tileSheetx12",
          "spacing":0,
          "tilecount":1024,
-         "tileheight":24,
+         "tileheight":12,
          "tiles":[
                 {
                  "id":0,
@@ -733,89 +733,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
-                {
-                 "id":548,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":549,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":550,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":580,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":581,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":582,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":612,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":613,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
-                }, 
-                {
-                 "id":614,
-                 "properties":[
-                        {
-                         "name":"noCollision",
-                         "type":"bool",
-                         "value":true
-                        }]
                 }],
-         "tilewidth":24
+         "tilewidth":12
         }],
  "tilewidth":12,
  "type":"map",
