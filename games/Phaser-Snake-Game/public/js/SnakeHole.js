@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 6; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -2165,7 +2165,7 @@ a
                     //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
                     //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
                     var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
+                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
 
                     this.coins.push(_coin);
                 }
@@ -2596,13 +2596,13 @@ a
 
        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(51).setAlpha(0);
-       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(51).setAlpha(0);
-       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(51).setAlpha(0);
-       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(51).setAlpha(0);
-       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(51).setAlpha(0);
+       this.letterC = this.add.sprite(X_OFFSET + GRID * 22,GRID * 4,"comboLetters", 0).setDepth(51).setAlpha(0);
+       this.letterO = this.add.sprite(X_OFFSET + GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterM = this.add.sprite(X_OFFSET + GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(51).setAlpha(0);
+       this.letterB = this.add.sprite(X_OFFSET + GRID * 26,GRID * 4,"comboLetters", 3).setDepth(51).setAlpha(0);
+       this.letterO2 = this.add.sprite(X_OFFSET + GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(X_OFFSET + GRID * 28,GRID * 4,"comboLetters", 4).setDepth(51).setAlpha(0);
+       this.letterX = this.add.sprite(X_OFFSET + GRID * 29,GRID * 4,"comboLetters", 5).setDepth(51).setAlpha(0);
        
        // #endregion
 
@@ -2781,7 +2781,7 @@ a
                 'font-size': '22px',
                 'font-family': 'Oxanium',
                 'padding': '3px 8px 0px 0px',
-            })).setOrigin(0,0);
+            })).setOrigin(0,0).setScale(.5);
             
             // Remove score text after a time period.
             this.time.delayedCall(1000, event => {
@@ -4022,7 +4022,7 @@ a
 
                     debugger
                     var _coin = this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
+                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
 
                     this.tweens.add( {
                         targets: _coin,
