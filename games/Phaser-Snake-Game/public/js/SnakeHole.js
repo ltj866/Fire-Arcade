@@ -3141,6 +3141,16 @@ a
                 testGrid[_x][_y] = 1; // Note: In the console the grid looks rotated.
             }
         }
+
+        for (let row = 0; row < 27; row++) {
+            testGrid[0][row] = 0;
+            testGrid[28][row] = 0; 
+        }
+
+        for (let column = 0; column < 29; column++) {
+            testGrid[column][0] = 0;
+            testGrid[column][26] = 0;
+        }
         
         
     
