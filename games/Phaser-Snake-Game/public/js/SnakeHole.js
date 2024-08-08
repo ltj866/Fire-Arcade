@@ -2091,7 +2091,7 @@ a
                                 }
                                 this.tweens.add({
                                     targets: this.blackholes,
-                                    scale: {from: 0, to: 2},
+                                    scale: {from: 0, to: 1},
                                     ease: 'Sine.easeOutIn',
                                     duration: 500,
                                     delay: this.tweens.stagger(360)
