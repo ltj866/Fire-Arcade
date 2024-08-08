@@ -695,11 +695,11 @@ class StartScene extends Phaser.Scene {
             yoyo: true
         });
         
-        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 +300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
         this.panelArrowR.play('startArrowIdle').setAlpha(0);
         this.panelArrowR.angle = 90;
         
-        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 -300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
         this.panelArrowL.play('startArrowIdle');
         this.panelArrowL.angle = 270;
         this.panelArrowL.setVisible(false).setAlpha(0);
