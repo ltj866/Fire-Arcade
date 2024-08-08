@@ -495,7 +495,8 @@ class StartScene extends Phaser.Scene {
 
 
 
-        this.add.text(SCREEN_WIDTH/2, GRID * 5.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+        this.add.text(SCREEN_WIDTH/2, GRID * 5.5, 'PORTAL SNAKE',
+            {font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
         
         //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
@@ -529,25 +530,25 @@ class StartScene extends Phaser.Scene {
 
         this.selectedPanel = 1;
 
-        this.tutText1 = this.add.text(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 20,
+        this.tutText1 = this.add.text(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19,
              'Press arrow keys to move.',
-             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0);
-        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 11,
+             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0).setScale(.5);
+        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 9.5,
             'Collect atoms to grow longer.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
-        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 20,
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5);
+        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 19,
             'Use portals to bend spacetime.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
-        this.tutText4 = this.add.text((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 20,
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5);
+        this.tutText4 = this.add.text((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19,
             'Boost with spacebar.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
+            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5);
         
         this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
              SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutAll').setScale(2).setAlpha(0);
+        this.tutWASD.play('tutAll').setScale(1).setAlpha(0);
 
-        this.tutSnake = this.add.sprite(SCREEN_HEIGHT/2,
-             SCREEN_WIDTH/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(2).setAlpha(0);
+        this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
+             SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
 
         this.time.delayedCall(600, event => {
             this.tweens.add({
@@ -560,15 +561,15 @@ class StartScene extends Phaser.Scene {
             });
         });
 
-        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
+        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
         panel1.setDepth(100)
         panel1.setScale(0)
         this.time.delayedCall(500, event => {
             this.tweens.add({
                 targets: panel1,
                 scale: 1,
-                width: 480,
-                height: 320,
+                width: 240,
+                height: 160,
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
@@ -576,15 +577,15 @@ class StartScene extends Phaser.Scene {
             });
         });
 
-        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
+        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
         panel2.setDepth(100)
         panel2.setScale(0)
         this.time.delayedCall(500, event => {
             this.tweens.add({
                 targets: panel2,
                 scale: 1,
-                width: 400,
-                height: 280,
+                width: 200,
+                height: 140,
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
@@ -593,22 +594,22 @@ class StartScene extends Phaser.Scene {
         });
 
         this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         this.tutAtomSmall.play('atom04idle')
         this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         this.tutAtomMedium.play('atom03idle')
         this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         this.tutAtomLarge.play('atom02idle')
         this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         this.tutAtomCharged.play('atom01idle')
         this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         this.tutAtomElectrons.play('electronIdle')
 
-        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
+        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
         panel3.setDepth(100)
 
         this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
@@ -619,19 +620,19 @@ class StartScene extends Phaser.Scene {
         this.tutPortal2.play('portalIdle')
 
         this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
-        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(2);
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
         this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
-        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(2);
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
 
-        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
+        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
         panel4.setDepth(100)
 
         this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
-            SCREEN_HEIGHT/2 + GRID  * 4.75).setDepth(103).setOrigin(0.5,0.5);
-       this.tutSPACE.play('tutSpace').setScale(2);
+            SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
+       this.tutSPACE.play('tutSpace').setScale(1);
 
        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
-        SCREEN_WIDTH/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(2);
+        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
 
         this.panels = []
         this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
@@ -655,7 +656,7 @@ class StartScene extends Phaser.Scene {
             console.log("Testing LOCAL STORAGE Has played.", );
         }
 
-        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive();
+        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
         this.continueText.setVisible(false)
         if (!this.hasPlayedBefore) {
             //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
@@ -701,17 +702,17 @@ class StartScene extends Phaser.Scene {
                     break;
                 case 2:
                     ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -625;
+                    this.panelContainerX = -570;
                     ourStartScene.panelArrowL.setVisible(true)
                     break;
                 case 3:
                     ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -1250;
+                    this.panelContainerX = -1195;
                     ourStartScene.panelArrowL.setVisible(true)
                     break;
                 case 4:
                     ourPersist.bgCoords.x = 60;
-                    this.panelContainerX = -1870;
+                    this.panelContainerX = -1820;
                     ourStartScene.panelArrowL.setVisible(true)
                     ourStartScene.panelArrowR.setVisible(false)
                     this.continueText.setVisible(true)
@@ -742,17 +743,17 @@ class StartScene extends Phaser.Scene {
                     break;
                 case 2:
                     ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -625;
+                    this.panelContainerX = -570;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 3:
                     ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1250;
+                    this.panelContainerX = -1195;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
                 case 4:
                     ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1870;
+                    this.panelContainerX = -1820;
                     ourStartScene.panelArrowR.setVisible(true)
                     break;
             }
@@ -775,7 +776,7 @@ class StartScene extends Phaser.Scene {
             });   
         })
 
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
+        /*var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(50);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(50);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(50);
@@ -805,10 +806,10 @@ class StartScene extends Phaser.Scene {
             wallShimmerBottom.play('wrapBlock07');
             this.dreamWalls.push(wallShimmerBottom);
         
-        }
+        }*/
 
-        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-        this.UIbackground.setScale(32); 
+        //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+        //this.UIbackground.setScale(32); 
 
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
@@ -2532,7 +2533,7 @@ a
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
        this.scoreFrame = this.add.image(X_OFFSET + GRID * 7 + 6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.fuseFrame = this.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.fuseFrame = this.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
 
        this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
