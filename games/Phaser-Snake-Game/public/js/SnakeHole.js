@@ -495,8 +495,12 @@ class StartScene extends Phaser.Scene {
 
 
 
-        this.add.text(SCREEN_WIDTH/2, GRID * 5.5, 'PORTAL SNAKE',
-            {font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'48px',
+            "color": 'white' 
+            }), 
+                'PORTAL SNAKE',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
         
         //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
@@ -528,20 +532,25 @@ class StartScene extends Phaser.Scene {
 
         // Tutorial Panels
 
+        var tutStyle = {
+            "fontSize":'24px',
+        }
+
         this.selectedPanel = 1;
 
-        this.tutText1 = this.add.text(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19,
+
+        this.tutText1 = this.add.dom(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
              'Press arrow keys to move.',
-             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0).setScale(.5);
-        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 9.5,
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0); // Sets the origin to the middle top.
+        this.tutText2 = this.add.dom(SCREEN_WIDTH + 250, GRID * 9.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
             'Collect atoms to grow longer.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5);
-        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 19,
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.tutText3 = this.add.dom(SCREEN_WIDTH + 250 * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
             'Use portals to bend spacetime.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5);
-        this.tutText4 = this.add.text((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19,
-            'Boost with spacebar.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.tutText4 = this.add.dom((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+                'Hold space to sprint.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
         
         this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
              SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
@@ -656,7 +665,16 @@ class StartScene extends Phaser.Scene {
             console.log("Testing LOCAL STORAGE Has played.", );
         }
 
-        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
+        //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
+        
+        this.continueText = this.add.dom(SCREEN_WIDTH/2, GRID*24.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'32px',
+            }), 
+                '[PRESS SPACE TO CONTINUE]',
+        ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
+        
+        
+        
         this.continueText.setVisible(false)
         if (!this.hasPlayedBefore) {
             //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
