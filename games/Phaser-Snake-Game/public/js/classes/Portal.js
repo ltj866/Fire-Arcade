@@ -9,7 +9,6 @@ var Portal = new Phaser.Class({
     function Portal(scene, color, from, to)
     {
         Phaser.GameObjects.Sprite.call(this, scene);
-        //this.setTexture('portals', 0);
         this.setPosition(from[0], from[1]);
         this.setOrigin(.3125,.3125);
         this.setDepth(47);

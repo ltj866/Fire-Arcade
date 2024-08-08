@@ -497,7 +497,6 @@ class StartScene extends Phaser.Scene {
 
         this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
             "fontSize":'48px',
-            "color": 'white' 
             }), 
                 'PORTAL SNAKE',
         ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
@@ -1623,7 +1622,7 @@ a
                     portalArrayX[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                 }
                 else {
-                    portalArrayX[tile.index] = [[tile.pixelY + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                    portalArrayX[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
                 }
                 //tile.index = -1;
                 
@@ -2218,18 +2217,15 @@ a
             //} 
         //});
 
-        let toIndex;
-
         for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 1 + PORTAL_TILE_DIFF; index++) {
 
             // TODO: rename portalArrayX X doesn't have to do with coordinates and is confusing and not needed.
             if (portalArrayX[index]) {
                 // consider throwing an error if a portal doesn't have a correctly defined _to or _from
                 
-                toIndex = index + PORTAL_TILE_DIFF
                 let _from = Phaser.Math.RND.pick(portalArrayX[index]);
-                let _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
-                //console.log("Portal X Logic: FROM TO",_from, _to);
+                let _to = Phaser.Math.RND.pick(portalArrayX[index + PORTAL_TILE_DIFF]);
+                console.log("Portal Base Logic: FROM TO",_from, _to, index);
                 makePair(this, _to, _from);
             }
         }
@@ -2386,16 +2382,17 @@ a
             
             this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
 
+            debugger
             this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
-                x:{steps: 2, min: -18, max: 48},
-                y:{steps: 2, min: -18, max: 48},
+                x:{steps: 2, min: -9, max: 24},
+                y:{steps: 2, min: -9, max: 24},
                 scale: {start: 1, end: .5},
                 speed: 5,
-                moveToX: 14,
-                moveToY: 14,
+                moveToX: 7,
+                moveToY: 7,
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
             
@@ -3142,7 +3139,6 @@ a
         
         
     
-        console.log(testGrid);
         // Set all the unsafe places unsafe
 
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
@@ -3203,7 +3199,6 @@ a
 
             var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
             var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
-            console.log(this.atoms);
             testGrid[_x][_y] = "a";
             
         });
@@ -5086,7 +5081,6 @@ class ScoreScene extends Phaser.Scene {
                 if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
                     _frame += 1
                     var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
-                    console.log(__frame)
                     
                     scoreAtoms[_frame-1].setAlpha(1);
                     ourGame.atomSounds[_index].play()
