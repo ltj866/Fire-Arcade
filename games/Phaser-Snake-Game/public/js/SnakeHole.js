@@ -368,6 +368,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
@@ -553,7 +554,7 @@ class StartScene extends Phaser.Scene {
         
         this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
              SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutAll').setScale(1).setAlpha(0);
+        this.tutWASD.play('tutAll').setAlpha(0);
 
         this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
              SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
@@ -636,10 +637,10 @@ class StartScene extends Phaser.Scene {
         panel4.setDepth(100)
 
         this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
-            SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-       this.tutSPACE.play('tutSpace').setScale(1);
+             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutSPACE.play('tutSpace');
 
-       this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
+        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
         SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
 
         this.panels = []
@@ -2386,7 +2387,7 @@ a
                     break;
             }
             
-            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
+            this.lights.addLight(portal.x +8, portal.y + 8, 128,  portalLightColor).setIntensity(1);
 
             this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
@@ -4947,7 +4948,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.ScoreContainerL.add(letterRank)
         
-        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 12, letterRank.y + 16, 48);
+        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x - 12, letterRank.y + 16, 36);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
         this.letterRankPath2 = { t: .5, vec: new Phaser.Math.Vector2() };
 
@@ -5027,8 +5028,8 @@ class ScoreScene extends Phaser.Scene {
             this.ScoreContainerL.add(rankParticles)
         }
 
-        this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
-        this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
+        this.spotlight = this.lights.addLight(0, 0, 66, lightColor).setIntensity(1.5); //
+        this.spotlight2 = this.lights.addLight(0, 0, 66, lightColor2).setIntensity(1.5); //
         
 
         // #region Atomic Food List
@@ -5044,17 +5045,17 @@ class ScoreScene extends Phaser.Scene {
             let anim;
 
             if (i < 14) {
-                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 16);
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 8);
                 _y = GRID * 8.75
             }
             else {
-                _x = X_OFFSET + (GRID * (7.2667 - .25) - (GRID * (7.2667 - .25) * 2.667)) + (i * 16);
-                _y = (GRID * 8.75) + 16;
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
+                _y = (GRID * 8.75) + 8;
             }
 
             switch (true) {
                 case logTime > COMBO_ADD_FLOOR:
-                    anim = "atom01idle";
+                    anim = "atomScore01";
                     if (i != 0) { // First Can't Connect
                         var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
                         ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
@@ -5064,19 +5065,19 @@ class ScoreScene extends Phaser.Scene {
                     break
                 case logTime > BOOST_ADD_FLOOR:
                     console.log(logTime, "Boost", i);
-                    anim = "atom02idle";
+                    anim = "atomScore02";
                     break
                 case logTime > SCORE_FLOOR:
                     console.log(logTime, "Boost", i);
-                    anim = "atom03idle";
+                    anim = "atomScore03";
                     break
                 default:
                     console.log(logTime, "dud", i);
-                    anim = "atom04idle";
+                    anim = "atomScore04";
                     break
             }
 
-            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
+            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
             ).play(anim).setDepth(21).setScale(1).setAlpha(0);
             this.ScoreContainerL.add(this.atomScoreIcon)  
             scoreAtoms.push(this.atomScoreIcon)
@@ -5501,14 +5502,14 @@ class ScoreScene extends Phaser.Scene {
         this.spotlight2.x = this.letterRankPath2.vec.x;
         this.spotlight2.y = this.letterRankPath2.vec.y;
 
-
-        /*this.graphics.clear(); //Used to debug where light is
+        /*this.graphics = this.add.graphics();
+        this.graphics.clear(); //Used to debug where light is
         this.graphics.lineStyle(2, 0xffffff, 1);
         this.letterRankCurve.draw(this.graphics, 64);
         this.graphics.fillStyle(0xff0000, 1);
         this.graphics.fillCircle(this.letterRankPath.vec.x, this.letterRankPath.vec.y, 8).setDepth(30);
-        this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);*/
-
+        this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);
+        */
 
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -6602,7 +6603,34 @@ function loadSpriteSheetsAndAnims(scene) {
       frameRate: 12,
       delay: 200,
       repeat: 0, // How long is the duration of this animation in milliseconds @ hodlen?
-    })
+    });
+
+    // score scene atoms
+    scene.anims.create({
+      key: 'atomScore01',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
+      frameRate: 12,
+      randomFrame: true,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atomScore02',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
+      frameRate: 8,
+      randomFrame: true,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atomScore03',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
+      frameRate: 6,
+      randomFrame: true,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atomScore04',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
+      frameRate: 4,
+      randomFrame: true,
+      repeat: -1
+    });
 
 
 
