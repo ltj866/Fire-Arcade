@@ -38,10 +38,10 @@ var Snake = new Phaser.Class({
         }
 
         this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y + SCREEN_HEIGHT/2, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightE = scene.lights.addLight(this.head.x + SCREEN_WIDTH/2, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y - SCREEN_HEIGHT/2, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightW = scene.lights.addLight(this.head.x - SCREEN_WIDTH/2, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y + GRID * 27, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightE = scene.lights.addLight(this.head.x + GRID * 29, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y - GRID * 27, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightW = scene.lights.addLight(this.head.x - GRID * 29, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
     },
     
     // #region Grow
@@ -114,15 +114,15 @@ var Snake = new Phaser.Class({
         this.snakeLight.y = y + GRID/2;
 
         this.snakeLightN.x = x
-        this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3) // TODO IS WRONG
+        this.snakeLightN.y = y + GRID * 27
 
-        this.snakeLightE.x = x + SCREEN_WIDTH  // TODO IS WRONG
+        this.snakeLightE.x = x + GRID * 29
         this.snakeLightE.y = y
 
         this.snakeLightS.x = x
-        this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)  // TODO IS WRONG
+        this.snakeLightS.y = y - GRID * 27
 
-        this.snakeLightW.x = x - SCREEN_WIDTH  // TODO IS WRONG
+        this.snakeLightW.x = x - GRID * 29
         this.snakeLightW.y = y
 
         // wrapping tiles
