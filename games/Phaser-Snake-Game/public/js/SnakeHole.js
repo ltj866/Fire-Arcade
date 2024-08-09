@@ -2624,14 +2624,14 @@ a
         
 
         // Score Text
-        this.scoreUI = this.add.dom(X_OFFSET + 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        this.scoreUI = this.add.dom(X_OFFSET + 1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(`Stage`).setOrigin(0,0).setScale(.5);
-        this.scoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        this.scoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 -4 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(`0`).setOrigin(0,0).setScale(.5);
 
-        this.bestScoreUI = this.add.dom(X_OFFSET + 8, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        this.bestScoreUI = this.add.dom(X_OFFSET + 6, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(`Best`).setOrigin(0,0).setScale(.5);
-        this.bestScoreLabelUI = this.add.dom(X_OFFSET + GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        this.bestScoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 -4, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(this.bestBase).setOrigin(0,0).setScale(.5);
 
 
@@ -2754,10 +2754,10 @@ a
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(X_OFFSET + GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreUI = this.add.dom(X_OFFSET + 1, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `Score`
         ).setOrigin(0,1).setScale(.5);
-        this.runningScoreLabelUI = this.add.dom(X_OFFSET + GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreLabelUI = this.add.dom(X_OFFSET + GRID*3 -4, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
         ).setOrigin(0,1).setScale(.5);
 
@@ -2797,7 +2797,7 @@ a
             this.tweens.add({
                 targets: scoreText,
                 alpha: { from: 1, to: 0.0 },
-                y: scoreText.y - 10,
+                y: scoreText.y - 6,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -2969,7 +2969,7 @@ a
         
         this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
             'uiGlassL', 'Glass', 
-            ((48) + (this.scoreDigitLength * 10)), 39, 40, 9, 9, 9);
+            ((42) + (this.scoreDigitLength * 6)), 39, 40, 9, 9, 9);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
@@ -3991,7 +3991,7 @@ a
         */
         var timeTick = this.currentScoreTimer()
         this.scoreDigitLength = this.runningScore.toString().length;
-        this.scorePanel.width = ((38) + (this.scoreDigitLength * 10)); //should only run on score+
+        this.scorePanel.width = ((42) + (this.scoreDigitLength * 6)); //should only run on score+
 
         
         
