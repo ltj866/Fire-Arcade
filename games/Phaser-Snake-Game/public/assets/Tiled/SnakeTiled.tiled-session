@@ -1,5 +1,5 @@
 {
-    "activeFile": "r-07-10-2.json",
+    "activeFile": "World_1-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -712,8 +712,8 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 162
+                "x": 304.3333333333333,
+                "y": -13.5
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -1906,23 +1906,24 @@
         "r-07-10-5.json",
         "r-07-10-4.json",
         "r-07-10.json",
-        "r-07-10-2.json"
+        "r-07-10-2.json",
+        "World_1-1.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "World_1-2.json",
-        "World_1-3.json",
-        "World_7-4_Final_Exams.json",
-        "World_8-3_Final_Exams.json",
-        "World_7-3_Final_Exams.json",
-        "World_1-1.json",
-        "World_8-4_Final_Exams.json",
-        "Stage-06.json",
-        "Stage-08.json",
-        "testing10-3.json",
+        "testing07.json",
+        "testing04.json",
+        "Stage-13.json",
+        "Stage-02e.json",
+        "Stage-05.json",
+        "testing05.json",
+        "testing03.json",
+        "testing09.json",
         "testing10.json",
-        "testing09.json"
+        "testing10-3.json",
+        "Stage-08.json",
+        "Stage-06.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

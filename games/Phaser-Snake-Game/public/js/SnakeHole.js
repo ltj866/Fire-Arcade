@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -2051,11 +2051,11 @@ a
                                             stageName
                                     ).setDepth(50).setOrigin(0,0).setAlpha(0);
                                     
-                                    var r1 = this.add.rectangle(tile.pixelX + 2 + X_OFFSET, tile.pixelY - 14 + Y_OFFSET, stageText.width + 8, 12, 0x1a1a1a  
+                                    var r1 = this.add.rectangle(tile.pixelX + 2 + X_OFFSET, tile.pixelY - 14 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
                                     ).setDepth(49).setOrigin(0,0).setAlpha(0);
                                     //debugger
 
-                                    r1.setStrokeStyle(1, 0x4d9be6);
+                                    r1.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                                     
                                     var portalImage = this.add.image(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET,
@@ -4990,9 +4990,9 @@ class ScoreScene extends Phaser.Scene {
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 14.0, "twinkle01Anim", { 
-                x:{min: 0, max: 32},
-                y:{min: 0, max: 68},
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
+                x:{min: 0, max: 16},
+                y:{min: 0, max: 34},
                 anim: 'twinkle01',
                 lifespan: 1000,
             }).setFrequency(500,[1]).setDepth(51);
@@ -5002,9 +5002,9 @@ class ScoreScene extends Phaser.Scene {
             lightColor = goldLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 14.0, "twinkle02Anim", {
-                x:{min: 0, max: 32},
-                y:{min: 0, max: 68},
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+                x:{min: 0, max: 16},
+                y:{min: 0, max: 34},
                 anim: 'twinkle02',
                 lifespan: 1000,
             }).setFrequency(1332,[1]).setDepth(51);
@@ -5015,9 +5015,9 @@ class ScoreScene extends Phaser.Scene {
             lightColor = platLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 14.0, "twinkle0Anim", {
-                x:{steps: 8, min: -8, max: 40},
-                y:{steps: 8, min: 8, max: 74},
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5,GRID * 14.5, "twinkle0Anim", {
+                x:{steps: 8, min: 0, max: 24},
+                y:{steps: 8, min: 24.5, max: 65.5},
                 anim: 'twinkle03',
                 color: [0x8fd3ff,0xffffff,0x8ff8e2,0xeaaded], 
                 colorEase: 'quad.out',
