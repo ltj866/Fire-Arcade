@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -437,6 +437,7 @@ class StartScene extends Phaser.Scene {
 
     create() {
         const ourPersist = this.scene.get("PersistScene");
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GamesScene");
         const ourStartScene = this.scene.get("StartScene");
         
@@ -490,7 +491,9 @@ class StartScene extends Phaser.Scene {
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
+        this.scene.launch('SpaceBoyScene');
         this.scene.launch('PersistScene');
+        
 
  
 
@@ -505,6 +508,8 @@ class StartScene extends Phaser.Scene {
         //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
         //card.setScale(1)
+
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
 
         // Masks
 
@@ -1008,6 +1013,14 @@ class StartScene extends Phaser.Scene {
 
     }
 }
+class SpaceBoyScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'SpaceBoyScene', active: true});
+    }
+    create() {
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+    }
+}
 
 class PersistScene extends Phaser.Scene {
     constructor () {
@@ -1360,11 +1373,13 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
+        this.scene.moveBelow("SpaceBoyScene", "GameScene");
+
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
         
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        
         
         /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
@@ -1563,6 +1578,17 @@ a
                 fx2.hue(tween.getValue());
             }
         });*/
+
+        //camera
+
+        this.cameras.main.setZoom(.01, .01)
+        this.tweens.add({
+            targets: this.cameras.main,
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'Sine.Out',
+            zoom: 1
+            });
 
 
         let _x = this.snake.head.x;
@@ -3324,6 +3350,7 @@ a
 
     warpToNext(nextStageIndex) {
 
+
         this.gState = GState.TRANSITION;
 
         this.snake.head.setTexture('snakeDefault', 0);
@@ -3385,9 +3412,21 @@ a
             ease: 'linear'
             }, this);
 
+        
+
 
         snakeholeTween.on('complete', () => {
-            this.nextStage(this.nextStages[nextStageIndex]);
+            var cameraZoomTween = this.tweens.add({
+                targets: this.cameras.main,
+                alpha: {from: 1, to: 0},
+                duration: 500,
+                ease: 'Sine.InOut',
+                zoom: 10
+                });
+            cameraZoomTween.on('complete', ()=>{
+                this.nextStage(this.nextStages[nextStageIndex]);
+            })
+            
         });
         /*var tween = this.tweens.addCounter({
             from: 600,
@@ -3711,6 +3750,7 @@ a
             this.startingArrowsAnimW.play('startArrowIdle')*/
             
             this.tweenRespawn.on('complete', () => {
+
                 
                 if (this.scene.get("PersistScene").coins > 0) {
                     this.coinsUIIcon.setVisible(true)
@@ -6862,7 +6902,7 @@ var config = {
         createContainer: true,
     },
     
-    scene: [ StartScene, PersistScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
 };
 
 // #region Screen Settings
