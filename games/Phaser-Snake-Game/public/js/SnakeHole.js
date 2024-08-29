@@ -329,7 +329,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-        this.load.image('blackHole', '/assets/sprites/blackHole.png');
+        this.load.spritesheet('blackholeAnim', '/assets/sprites/blackholeAnim.png',{ frameWidth: 64, frameHeight: 64 });
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -2084,51 +2084,55 @@ a
                                     r1.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                                     
-                                    var portalImage = this.add.image(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET,
-                                        'blackHole' 
-                                    ).setDepth(10).setOrigin(0.4125,0.4125).setScale(0);
-                                    this.blackholes.push(portalImage)
+                                    
+                                    var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                    ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+                                    this.blackholes.push(blackholeImage)
                                     this.blackholeLabels.push(stageText,r1)
+                                    if (blackholeImage.anims.getName() === 'blackholeForm')
+                                        {
+                                            blackholeImage.playAfterRepeat('blackholeIdle');
+                                        }
 
                                     //line code doesn't work yet
                                     //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
-                                    //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, portalImage.x,portalImage.y, r1.x,r1.y[0x000000],1)
+                                    //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
                                     
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
                                         switch (ourPersist.bestOfStageData[stageName].stageRank()) {
                                             case COPPER:
-                                                portalImage.setTint(0xB87333);
+                                                blackholeImage.setTint(0xB87333);
                                                 break;
                                             case BRONZE:
-                                                portalImage.setTint(0xCD7F32);
+                                                blackholeImage.setTint(0xCD7F32);
                                                 break;
                                             case SILVER:
-                                                portalImage.setTint(0xC0C0C0);
+                                                blackholeImage.setTint(0xC0C0C0);
                                                 break;
                                             case GOLD:
-                                                portalImage.setTint(0xDAA520);
+                                                blackholeImage.setTint(0xDAA520);
                                                 break;
                                             case PLATINUM:
-                                                portalImage.setTint(0xE5E4E2);
+                                                blackholeImage.setTint(0xE5E4E2);
                                                 break;
                                             default:
                                                 // here is if you have never played a level before
-                                                portalImage.setTint(0xFFFFFF);    
+                                                blackholeImage.setTint(0xFFFFFF);    
                                                 break;
                                         }
                                     } else {
-                                        portalImage.setTint(0xFFFFFF);
+                                        blackholeImage.setTint(0xFFFFFF);
                                     }
                                     
-                                    this.nextStagePortals.push(portalImage);
+                                    this.nextStagePortals.push(blackholeImage);
                                 }
-                                this.tweens.add({
+                                /*this.tweens.add({
                                     targets: this.blackholes,
                                     scale: {from: 0, to: 1},
                                     ease: 'Sine.easeOutIn',
                                     duration: 500,
                                     delay: this.tweens.stagger(360)
-                                });
+                                });*/
                                 this.tweens.add({
                                     targets: this.blackholeLabels,
                                     alpha: {from: 0, to: 1},
@@ -6714,6 +6718,21 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: 0,
       }); */
+
+    scene.anims.create({
+    key: 'blackholeForm',
+    frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 0,1,2,3,4,5]}),
+    frameRate: 8,
+    repeat: 0,
+    });
+
+    scene.anims.create({
+    key: 'blackholeIdle',
+    frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 6,7,8,9,10,11]}),
+    frameRate: 12,
+    repeat: -1,
+    });
+
     scene.anims.create({
     key: 'CapElectronDispersion',
     frames: scene.anims.generateFrameNumbers('CapElectronDispersion',{ frames: [ 0,1,2,3,4,5,6,7,8,9]}),
