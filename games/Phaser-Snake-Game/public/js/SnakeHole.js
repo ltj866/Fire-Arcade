@@ -2125,14 +2125,22 @@ a
                                     }
                                     
                                     this.nextStagePortals.push(blackholeImage);
+                                    
+                                    this.add.particles(blackholeImage.x, blackholeImage.y, 'megaAtlas', {
+                                        frame: ['portalParticle01.png'],
+                                        color: [ 0xFFFFFF,0x000000],
+                                        colorEase: 'quad.out',
+                                        x:{min: -9 - 12, max: 24 + 12},
+                                        y:{min: -9 - 12, max: 24 + 12},
+                                        scale: {start: 1, end: .25},
+                                        speed: 1,
+                                        moveToX: 7,
+                                        moveToY: 7,
+                                        alpha:{start: 1, end: 0 },
+                                        ease: 'Sine.easeOutIn',
+                                    }).setFrequency(667,[1]).setDepth(0);
+
                                 }
-                                /*this.tweens.add({
-                                    targets: this.blackholes,
-                                    scale: {from: 0, to: 1},
-                                    ease: 'Sine.easeOutIn',
-                                    duration: 500,
-                                    delay: this.tweens.stagger(360)
-                                });*/
                                 this.tweens.add({
                                     targets: this.blackholeLabels,
                                     alpha: {from: 0, to: 1},
