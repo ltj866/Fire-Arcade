@@ -2632,8 +2632,8 @@ a
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID).setOrigin(0.5,0.5);
-       ourSpaceBoy.boostBar.setDepth(52);
+       ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID)
+            .setOrigin(0.5,0.5).setDepth(52);
        ourSpaceBoy.boostBar.play('increasing');
 
        ourSpaceBoy.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, ourSpaceBoy.boostMask);
