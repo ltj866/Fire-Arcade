@@ -1614,6 +1614,28 @@ a
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
+
+
+
+        //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
+        
+        this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText('GOAL : Collect 28 Atoms').setOrigin(0,0).setOrigin(0.5,0);
+        
+        this.scorePanelL = this.add.nineslice(-SCREEN_WIDTH, GRID * 9.25, 
+            'uiPanelL', 'Glass', 
+            GRID * 18, GRID * 3, 
+            8, 8, 8, 8);
+        this.scorePanelL.setDepth(100).setOrigin(0.475,0);
+
+        this.tweens.add({
+            targets: [this.openingGoalText, this.scorePanelL],
+            x: SCREEN_WIDTH/2,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 125,
+        });
+
         //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
         //this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
         //this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
@@ -1827,6 +1849,13 @@ a
                 ourInputScene.moveDirection(this, e);
                 //this.panelTweenCollapse.resume();
                 
+                this.tweens.add({
+                    targets: [this.openingGoalText, this.scorePanelL],
+                    x: SCREEN_WIDTH * 2,
+                    ease: 'Sine.easeOutIn',
+                    duration: 300,
+                    delay: 125
+                });
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
                     
@@ -6474,6 +6503,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.startingArrowsAnimW != undefined){
             gameScene.startingArrowsAnimW.setAlpha(0);
         }
+        
 
 
             //ourInputScene.moveDirection(this, e);
