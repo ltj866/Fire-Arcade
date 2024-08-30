@@ -1622,14 +1622,14 @@ a
         this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
         ).setText('GOAL : Collect 28 Atoms').setOrigin(0,0).setOrigin(0.5,0);
         
-        this.scorePanelL = this.add.nineslice(-SCREEN_WIDTH, GRID * 9.25, 
+        this.openingGoalPanel = this.add.nineslice(-SCREEN_WIDTH, GRID * 9.25, 
             'uiPanelL', 'Glass', 
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
-        this.scorePanelL.setDepth(100).setOrigin(0.475,0);
+        this.openingGoalPanel.setDepth(100).setOrigin(0.475,0);
 
         this.tweens.add({
-            targets: [this.openingGoalText, this.scorePanelL],
+            targets: [this.openingGoalText, this.openingGoalPanel],
             x: SCREEN_WIDTH/2,
             ease: 'Sine.easeOutIn',
             duration: 300,
@@ -1850,7 +1850,7 @@ a
                 //this.panelTweenCollapse.resume();
                 
                 this.tweens.add({
-                    targets: [this.openingGoalText, this.scorePanelL],
+                    targets: [this.openingGoalText, this.openingGoalPanel],
                     x: SCREEN_WIDTH * 2,
                     ease: 'Sine.easeOutIn',
                     duration: 300,
@@ -2618,11 +2618,12 @@ a
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
-       this.scoreFrame = this.add.image(X_OFFSET + GRID * 7 + 6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.fuseFrame = this.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
+       const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+       ourSpaceBoy.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
+       ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       ourSpaceBoy.fuseFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
 
-       this.boostMask = this.make.image({ // name is unclear.
+       ourSpaceBoy.boostMask = ourSpaceBoy.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
            y: GRID,
            key: 'megaAtlas',
@@ -2631,17 +2632,17 @@ a
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID).setOrigin(0.5,0.5);
-       boostBar.setDepth(52);
-       boostBar.play('increasing');
+       ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID).setOrigin(0.5,0.5);
+       ourSpaceBoy.boostBar.setDepth(52);
+       ourSpaceBoy.boostBar.play('increasing');
 
-       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
-       this.boostMask.scaleX = 0;
+       ourSpaceBoy.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, ourSpaceBoy.boostMask);
+       ourSpaceBoy.boostMask.scaleX = 0;
 
        const ourGame = this.scene.get("GameScene");
 
        this.boostBarTween = this.tweens.add( {
-        targets: this.boostMask,
+        targets: ourSpaceBoy.boostMask,
         scaleX: this.boostEnergy/1000,
         ease: 'linear',
         duration: 2250, // Mariocart countdown timer is 750 milliseconds between beats.
@@ -2782,7 +2783,7 @@ a
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon = this.add.sprite(X_OFFSET + GRID * 20 + 5, 2, 'coinPickup01Anim.png'
+        this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2, 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
         if (this.scene.get("PersistScene").coins > 0) {
             this.coinsUIIcon.setVisible(true)
@@ -2879,19 +2880,19 @@ a
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
      
 
-                var electronToCapacitor = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                var electronToCapacitor = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
                 .setOrigin(0.5,0.5).setDepth(80).setScale(1);
-                var electronToCapacitor2 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                var electronToCapacitor2 = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
                 .setOrigin(0.5,0.5).setDepth(80).setScale(1);
-                var electronToCapacitor3 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                var electronToCapacitor3 = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
                 .setOrigin(0.5,0.5).setDepth(80).setScale(1);
                 //electronToCapacitor.play("electronIdle");
                 //electronToCapacitor.anims.msPerFrame = 66;
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: this.scoreFrame.getCenter().x -3,
-                    y: this.scoreFrame.getCenter().y,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                    y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 0,
                     ease: 'Sine.in',
@@ -2902,8 +2903,8 @@ a
                 });
                 var movingElectronTween2 = this.tweens.add( {
                     targets: electronToCapacitor2,
-                    x: this.scoreFrame.getCenter().x -7,
-                    y: this.scoreFrame.getCenter().y,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 33.3,
                     ease: 'Sine.in',
@@ -2914,8 +2915,8 @@ a
                 });
                 var movingElectronTween3 = this.tweens.add( {
                     targets: electronToCapacitor3,
-                    x: this.scoreFrame.getCenter().x -7,
-                    y: this.scoreFrame.getCenter().y,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 66.7,
                     ease: 'Sine.in',
@@ -3035,7 +3036,7 @@ a
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
+        /*this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
             'uiGlassL', 'Glass', 
             ((42) + (this.scoreDigitLength * 6)), 39, 40, 9, 9, 9);
         this.scorePanel.setDepth(100).setOrigin(0,0)
@@ -3044,7 +3045,7 @@ a
         this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
              'uiGlassR', 'Glass',
              57, 29, 9, 29, 9, 9);
-        this.progressPanel.setDepth(100).setOrigin(1,0)
+        this.progressPanel.setDepth(100).setOrigin(1,0)*/
         
         
 
@@ -3052,10 +3053,10 @@ a
             this.bestScoreUI,this.bestScoreLabelUI,
             this.runningScoreUI, this.runningScoreLabelUI])
 
-        if (this.startupAnim) {
+        /*if (this.startupAnim) {
             this.progressPanel.setAlpha(0)
             this.scorePanel.setAlpha(0)
-        }
+        }*/
 
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
@@ -3538,10 +3539,11 @@ a
         return snakeEating
     }
     loseCoin(){
-        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+        ourSpaceBoy.coinsUICopy = ourSpaceBoy.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        this.coinsUICopy.setGravity(0,400)
+        ourSpaceBoy.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        ourSpaceBoy.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
         //TODO trigger UI coin loader animation here
     }
@@ -4072,8 +4074,8 @@ a
         }
         */
         var timeTick = this.currentScoreTimer()
-        this.scoreDigitLength = this.runningScore.toString().length;
-        this.scorePanel.width = ((42) + (this.scoreDigitLength * 6)); //should only run on score+
+        //this.scoreDigitLength = this.runningScore.toString().length;
+        //this.scorePanel.width = ((42) + (this.scoreDigitLength * 6)); //should only run on score+
 
         
         
@@ -4201,6 +4203,7 @@ a
             
         }
         
+        
 
 
         
@@ -4220,9 +4223,10 @@ a
                         this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
                     } 
                 } else{
+                    const ourSpaceBoy = this.scene.get("SpaceBoyScene");
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
-                    this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
+                    ourSpaceBoy.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
                     this.moveInterval = SPEED_WALK;
                 }
         
