@@ -2632,12 +2632,16 @@ a
        }).setOrigin(0.5,0.5);
 
        const keys = ['increasing'];
-       ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID)
+
+       if (ourSpaceBoy.boostBar == undefined) { //checking for undefined here prevents it from being made in the space boy scene multiple times each level transition
+        ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID)
             .setOrigin(0.5,0.5).setDepth(52);
+        ourSpaceBoy.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, ourSpaceBoy.boostMask);
+        ourSpaceBoy.boostMask.scaleX = 0;
+       }
+       
        ourSpaceBoy.boostBar.play('increasing');
 
-       ourSpaceBoy.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, ourSpaceBoy.boostMask);
-       ourSpaceBoy.boostMask.scaleX = 0;
 
        const ourGame = this.scene.get("GameScene");
 
