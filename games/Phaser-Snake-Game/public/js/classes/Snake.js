@@ -88,6 +88,8 @@ var Snake = new Phaser.Class({
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.sprite(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(47).setPipeline('Light2D');
+        newPart.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+        
         
 
         if (this.body.length > 1){

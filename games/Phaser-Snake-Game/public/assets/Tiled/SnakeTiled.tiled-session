@@ -1,5 +1,5 @@
 {
-    "activeFile": "snakeMap.json",
+    "activeFile": "testingAztec.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1825,7 +1825,7 @@
         },
         "testingAztec.json": {
             "scale": 1.5,
-            "selectedLayer": -1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 189.66666666666666,
                 "y": 143.66666666666663
@@ -1935,20 +1935,27 @@
         "r-07-10-4.json",
         "r-07-10.json",
         "r-07-10-2.json",
-        "World_1-1.json",
+        "testingAztec.json",
         "Racing_Stage-02.json",
         "Racing_Stage-03.json",
         "Ghost_Stage-03.json",
         "rough-02.json",
         "rough-05.json",
-        "snakeMap.json"
+        "World_1-2.json",
+        "World_2-2.json",
+        "World_2-3.json",
+        "World_4-2.json",
+        "World_4-3.json",
+        "World_4-3-ii.json",
+        "World_4-4.json",
+        "World_4-4-iii.json",
+        "World_1-1.json",
+        "testingx01.json",
+        "snakeMap.tmx"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "testingAztec..tmx",
-        "World_4-3-iii.json",
-        "snakeMap.json",
         "testing07.json",
         "testing04.json",
         "Stage-13.json",
@@ -1957,7 +1964,10 @@
         "testing05.json",
         "testing03.json",
         "testing09.json",
-        "testing10.json"
+        "testing10.json",
+        "testing10-3.json",
+        "Stage-08.json",
+        "Stage-06.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

@@ -563,7 +563,6 @@ class StartScene extends Phaser.Scene {
 
         this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
              SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
-
         this.time.delayedCall(600, event => {
             this.tweens.add({
                 targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
@@ -1471,7 +1470,11 @@ a
 
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
         this.snake.direction = DIRS.STOP;
-        
+
+        //const shadowFX = this.snake.head.postFX.addShadow(0, 0, 0.006, 2, 0x111111, 10, .8);
+
+
+        this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
 
         this.tiledProperties = {};
 
@@ -1557,8 +1560,10 @@ a
             this.foodLayer.destroy();
         }
 
+
         // end on the wall map
         this.map.getLayer(this.wallVarient);
+        
 
 
 
