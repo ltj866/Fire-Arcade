@@ -2624,11 +2624,12 @@ a
 
        // #region Boost Meter UI
        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-       ourSpaceBoy.add.image(SCREEN_WIDTH/2 + 3,GRID * 1.5,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
-       ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       ourSpaceBoy.fuseFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 25,GRID * 1.5,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
+       //ourSpaceBoy.add.image(SCREEN_WIDTH/2 + 3,GRID * 1.5,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
+       //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
+       ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5).setAlpha(0);
+       //ourSpaceBoy.fuseFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 25,GRID * 1.5,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
 
-       ourSpaceBoy.boostMask = ourSpaceBoy.make.image({ // name is unclear.
+       this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
            y: GRID * 1.5,
            key: 'megaAtlas',
@@ -2638,20 +2639,20 @@ a
 
        const keys = ['increasing'];
 
-       if (ourSpaceBoy.boostBar == undefined) { //checking for undefined here prevents it from being made in the space boy scene multiple times each level transition
-        ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID * 1.5)
-            .setOrigin(0.5,0.5).setDepth(52);
-        ourSpaceBoy.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, ourSpaceBoy.boostMask);
-        ourSpaceBoy.boostMask.scaleX = 0;
-       }
        
-       ourSpaceBoy.boostBar.play('increasing');
+        this.boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID * 1.5)
+            .setOrigin(0.5,0.5).setDepth(52);
+        this.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
+        this.boostMask.scaleX = 0;
+       
+       
+        this.boostBar.play('increasing');
 
 
        const ourGame = this.scene.get("GameScene");
 
        this.boostBarTween = this.tweens.add( {
-        targets: ourSpaceBoy.boostMask,
+        targets: this.boostMask,
         scaleX: this.boostEnergy/1000,
         ease: 'linear',
         duration: 2250, // Mariocart countdown timer is 750 milliseconds between beats.
@@ -4235,10 +4236,9 @@ a
                         this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
                     } 
                 } else{
-                    const ourSpaceBoy = this.scene.get("SpaceBoyScene");
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
-                    ourSpaceBoy.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
+                    this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
                     this.moveInterval = SPEED_WALK;
                 }
         
