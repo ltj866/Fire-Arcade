@@ -354,7 +354,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
-        //this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
+        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
 
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
@@ -2693,13 +2693,13 @@ a
 
        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(X_OFFSET + GRID * 22,GRID * 4,"comboLetters", 0).setDepth(51).setAlpha(0);
-       this.letterO = this.add.sprite(X_OFFSET + GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterM = this.add.sprite(X_OFFSET + GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(51).setAlpha(0);
-       this.letterB = this.add.sprite(X_OFFSET + GRID * 26,GRID * 4,"comboLetters", 3).setDepth(51).setAlpha(0);
-       this.letterO2 = this.add.sprite(X_OFFSET + GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(X_OFFSET + GRID * 28,GRID * 4,"comboLetters", 4).setDepth(51).setAlpha(0);
-       this.letterX = this.add.sprite(X_OFFSET + GRID * 29,GRID * 4,"comboLetters", 5).setDepth(51).setAlpha(0);
+       this.letterC = this.add.sprite(X_OFFSET + GRID * 0 - GRID * 4,GRID * 1.25,"comboLetters", 0).setDepth(51).setAlpha(0);
+       this.letterO = this.add.sprite(X_OFFSET + GRID * 1.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterM = this.add.sprite(X_OFFSET + GRID * 2.75 - GRID * 4,GRID * 1.25,"comboLetters", 2).setDepth(51).setAlpha(0);
+       this.letterB = this.add.sprite(X_OFFSET + GRID * 4 - GRID * 4,GRID * 1.25,"comboLetters", 3).setDepth(51).setAlpha(0);
+       this.letterO2 = this.add.sprite(X_OFFSET + GRID * 5.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51).setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(X_OFFSET + GRID * 6 - GRID * 4,GRID * 1.25,"comboLetters", 4).setDepth(51).setAlpha(0);
+       this.letterX = this.add.sprite(X_OFFSET + GRID * 7 - GRID * 4,GRID * 1.25,"comboLetters", 5).setDepth(51).setAlpha(0);
        
        // #endregion
 
@@ -3690,7 +3690,7 @@ a
         this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
                 this.letterO2, this.letterExplanationPoint], 
-            y: { from: GRID * 4, to: GRID * 3 },
+            y: { from: GRID * 1.25, to: GRID * 0 },
             ease: 'Sine.InOut',
             duration: 200,
             repeat: 0,
@@ -6583,9 +6583,9 @@ function loadSpriteSheetsAndAnims(scene) {
 
 
     // Sprite Sheets that don't have animations.
-    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 18, frameHeight: 24,
+    /*scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 18, frameHeight: 24,
         frame: 'comboLetters.png'
-    });
+    });*/
 
     scene.textures.addSpriteSheetFromAtlas('ranksSpriteSheet', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 36,
         frame: 'ranksSpriteSheet.png'
