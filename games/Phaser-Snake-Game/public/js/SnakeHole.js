@@ -321,6 +321,7 @@ class StartScene extends Phaser.Scene {
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
+        this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png']);
 
@@ -1018,6 +1019,17 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
+        setOrigin(0,0).setDepth(51).setAlpha(0);
+
+        this.tweens.add({
+            targets: this.spaceBoyLight,
+            alpha: {from: 0, to: 1},
+            duration: 600,
+            ease: 'Sine.Out',
+            delay: 500,
+            });
+
     }
 }
 
@@ -3150,11 +3162,14 @@ a
     }
     // #region .screenShake(
     screenShake(){
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         if (this.moveInterval === SPEED_SPRINT) {
             this.cameras.main.shake(400, .01);
+            ourSpaceBoy.cameras.main.shake(400, .01); //shakes differently than main when referencing different cameras
         }
         else if (this.moveInterval === SPEED_WALK){
             this.cameras.main.shake(300, .00625);
+            ourSpaceBoy.cameras.main.shake(300, .00625); //above note
         }    
     }
 
