@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingAztec'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -1056,22 +1056,22 @@ class PersistScene extends Phaser.Scene {
             //this.UIbackground.setScale(32); 
 
             // Furthest BG Object
-            this.bgFurthest = this.add.tileSprite(X_OFFSET, 0, 348, 360,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+            this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             //this.bgFurthest.tileScaleX = 2;
             //this.bgFurthest.tileScaleY = 2;
     
             // Scrolling BG1
-            this.bgBack = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+            this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             //this.bgBack.tileScaleX = 2;
             //this.bgBack.tileScaleY = 2;
             
             // Scrolling bgFront Planets
-            this.bgFront = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+            this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
             //this.bgFront.tileScaleX = 2;
             //this.bgFront.tileScaleY = 2;
             
             // Scrolling bgScrollMid Stars (depth is behind planets)
-            this.bgMid = this.add.tileSprite(X_OFFSET, 0, 348, 360, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+            this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
             //this.bgMid.tileScaleX = 2;
             //this.bgMid.tileScaleY = 2;
     
@@ -2624,13 +2624,13 @@ a
 
        // #region Boost Meter UI
        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-       ourSpaceBoy.add.image(SCREEN_WIDTH/2 + 3,GRID,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
-       ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       ourSpaceBoy.fuseFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 25,GRID,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
+       ourSpaceBoy.add.image(SCREEN_WIDTH/2 + 3,GRID * 1.5,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
+       ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       ourSpaceBoy.fuseFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 25,GRID * 1.5,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
 
        ourSpaceBoy.boostMask = ourSpaceBoy.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
-           y: GRID,
+           y: GRID * 1.5,
            key: 'megaAtlas',
            frame: 'boostMask.png',
            add: false
@@ -2639,7 +2639,7 @@ a
        const keys = ['increasing'];
 
        if (ourSpaceBoy.boostBar == undefined) { //checking for undefined here prevents it from being made in the space boy scene multiple times each level transition
-        ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID)
+        ourSpaceBoy.boostBar = ourSpaceBoy.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID * 1.5)
             .setOrigin(0.5,0.5).setDepth(52);
         ourSpaceBoy.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, ourSpaceBoy.boostMask);
         ourSpaceBoy.boostMask.scaleX = 0;
@@ -2701,16 +2701,16 @@ a
         
         
 
-        // Score Text
+        // Score Text SET INVISIBLE
         this.scoreUI = this.add.dom(X_OFFSET + 1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Stage`).setOrigin(0,0).setScale(.5);
+            ).setText(`Stage`).setOrigin(0,0).setScale(.5).setAlpha(0);
         this.scoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 -4 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0).setScale(.5);
+            ).setText(`0`).setOrigin(0,0).setScale(.5).setAlpha(0);
 
         this.bestScoreUI = this.add.dom(X_OFFSET + 6, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Best`).setOrigin(0,0).setScale(.5);
+            ).setText(`Best`).setOrigin(0,0).setScale(.5).setAlpha(0);
         this.bestScoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 -4, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.bestBase).setOrigin(0,0).setScale(.5);
+            ).setText(this.bestBase).setOrigin(0,0).setScale(.5).setAlpha(0);
 
 
 
@@ -2729,8 +2729,10 @@ a
             "text-align": 'right',
         } 
 
-        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 27.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5);
-        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 24.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5);
+        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 27.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5)
+        .setAlpha(0);
+        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 24.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5)
+        .setAlpha(0);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -2744,16 +2746,17 @@ a
                 `${length.padStart(2, "0")}<br/>
                 <hr style="font-size:3px"/>
                 ${LENGTH_GOAL.toString().padStart(2, "0")}`
-            ).setOrigin(0,0.5)//.setAlpha(0);
+            ).setOrigin(0,0.5).setAlpha(0);
             this.lengthGoalUILabel.setHTML(
                 `Length
                 <br/>
                 Goal`
-            ).setOrigin(0,0.5)//.setAlpha(0);
+            ).setOrigin(0,0.5).setAlpha(0);
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
+            .setAlpha(0);
             this.lengthGoalUI.x = GRID * 27
         }
 
@@ -2776,7 +2779,7 @@ a
 
 
          // Countdown Text
-        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 4, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 4, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -2792,7 +2795,7 @@ a
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2, 'coinPickup01Anim.png'
+        this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2 + GRID * .5, 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
         if (this.scene.get("PersistScene").coins > 0) {
             this.coinsUIIcon.setVisible(true)
@@ -2801,7 +2804,7 @@ a
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(X_OFFSET + GRID*21 + 9, 6, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(X_OFFSET + GRID*21 + 9, 6 + GRID * .5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -2834,10 +2837,10 @@ a
         
         this.runningScoreUI = this.add.dom(X_OFFSET + 1, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `Score`
-        ).setOrigin(0,1).setScale(.5);
+        ).setOrigin(0,1).setScale(.5).setAlpha(0);
         this.runningScoreLabelUI = this.add.dom(X_OFFSET + GRID*3 -4, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1).setScale(.5);
+        ).setOrigin(0,1).setScale(.5).setAlpha(0);
 
         
         if (DEBUG) {
@@ -2989,8 +2992,8 @@ a
             
 
 
-            this.bestScoreUI.setText(`Best`);
-            this.bestScoreLabelUI.setText(this.bestBase);
+            this.bestScoreUI.setText(`Best`).setAlpha(0);
+            this.bestScoreLabelUI.setText(this.bestBase).setAlpha(0);
 
             
              // Restart Score Timer
@@ -3080,7 +3083,7 @@ a
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
                     targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
-                    alpha: 1,
+                    alpha: 0,
                     duration: 300,
                     ease: 'sine.inout',
                     yoyo: false,
