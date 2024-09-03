@@ -1069,12 +1069,10 @@ class MainMenuScene extends Phaser.Scene {
         }
 
         var menuList = Object.keys(menuOptions);
-        var cursorIndex = 0;
+        var cursorIndex = 1;
         var textStart = 160;
         var spacing = 30;
 
-        const menuStyle = {  
-        }
         
         this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
             "fontSize":'48px',
@@ -1085,9 +1083,9 @@ class MainMenuScene extends Phaser.Scene {
         
         var menuElements = []
         for (let index = 0; index < menuList.length; index++) {
-            var textElement = this.add.dom(SCREEN_WIDTH/2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, 
-                menuStyle, {  
+            var textElement = this.add.dom(SCREEN_WIDTH/2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {  
                 "fontSize":'48px',
+                "font-weight": 400,
                 }),
                     `${menuList[index].toUpperCase()}`
             ).setOrigin(0.5,0).setScale(0.5);
