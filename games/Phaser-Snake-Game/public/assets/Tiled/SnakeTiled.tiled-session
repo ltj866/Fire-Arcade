@@ -491,8 +491,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.71406610299766,
-                "y": 371.7140661029977
+                "x": 370.51013390509326,
+                "y": 370.5101339050932
             }
         },
         "Stage-05.json#tileSheetx24": {
@@ -514,8 +514,8 @@
             "scale": 0.7482526881720429,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.20046703790194,
-                "y": 372.2004670379019
+                "x": 370.86402011855574,
+                "y": 370.86402011855574
             }
         },
         "Stage-06.json#tileSheetx24": {
@@ -536,8 +536,8 @@
             "scale": 1.5858870967741936,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.71624713958806,
-                "y": 371.71624713958806
+                "x": 371.0856852275616,
+                "y": 370.45512331553516
             }
         },
         "Stage-07.json#tileSheetx24": {
@@ -547,8 +547,8 @@
             "scale": 1.5858870967741936,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 371.71624713958806,
-                "y": 371.71624713958806
+                "x": 371.0856852275616,
+                "y": 370.45512331553516
             }
         },
         "Stage-08.json#tileSheetx24": {
@@ -739,11 +739,11 @@
             "scaleInEditor": 1
         },
         "World_1-3.json": {
-            "scale": 3.0492816091954023,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.13937709089194,
-                "y": 162.16934457899447
+                "x": 148.33333333333334,
+                "y": 192.33333333333337
             }
         },
         "World_1-3.json#tileSheetx12": {
@@ -767,7 +767,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 141,
+                "x": 180.33333333333334,
                 "y": 211.66666666666663
             }
         },
@@ -1821,6 +1821,17 @@
         },
         "testingAztec.json#tileSheetx12": {
             "scaleInDock": 1
+        },
+        "testingFuturistic.json": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 198.25,
+                "y": 122.25
+            }
+        },
+        "testingFuturistic.json#tileSheetx12": {
+            "scaleInDock": 3
         },
         "testingx01.json": {
             "scale": 1,

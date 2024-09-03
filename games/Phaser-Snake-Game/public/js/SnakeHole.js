@@ -341,11 +341,11 @@ class StartScene extends Phaser.Scene {
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         this.load.image('comboBG','assets/sprites/UI_comboBG.png')
         // Tilemap
-        this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png']);
+        this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png']);
 
         // Load Tilemap as Sprite sheet to allow conversion to Sprites later.
         // Doesn't need to be GPU optimized unless we use it more regularly.
-        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
         this.load.spritesheet('blackholeAnim', '/assets/sprites/blackholeAnim.png',{ frameWidth: 64, frameHeight: 64 });
@@ -1157,6 +1157,8 @@ class PersistScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(0x111111);
     this.add.image(SCREEN_WIDTH/2 - 1,GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
+    this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+        .setOrigin(0.0,0.0).setDepth(11);
     this.add.image(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
 
 
@@ -1699,14 +1701,15 @@ class GameScene extends Phaser.Scene {
 
         //camera
 
-        this.cameras.main.setZoom(.01, .01)
-        this.tweens.add({
+        //this.cameras.main.setZoom(.01, .01)
+        /*this.tweens.add({
             targets: this.cameras.main,
             alpha: {from: 0, to: 1},
             duration: 500,
             ease: 'Sine.Out',
-            zoom: 1
-            });
+            delay: 500,
+            //zoom: 1
+            });*/
 
 
         let _x = this.snake.head.x;
@@ -2804,7 +2807,7 @@ class GameScene extends Phaser.Scene {
        */
 
        this.letterC = this.make.image({
-        x: X_OFFSET + GRID * 0 - GRID * 4,
+        x: X_OFFSET + GRID * 0 - GRID * 4 -6,
         y:  GRID * 1.25,
         key: 'comboLetters',
         frame: 0,
@@ -2812,7 +2815,7 @@ class GameScene extends Phaser.Scene {
         alpha: 0,
         });
         this.letterO = this.make.image({
-            x: X_OFFSET + GRID * 1.25 - GRID * 4,
+            x: X_OFFSET + GRID * 1.25 - GRID * 4 -5,
             y:  GRID * 1.25,
             key: 'comboLetters',
             frame: 1,
@@ -2820,7 +2823,7 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
         this.letterM = this.make.image({
-            x: X_OFFSET + GRID * 2.75 - GRID * 4,
+            x: X_OFFSET + GRID * 2.75 - GRID * 4 -4,
             y:  GRID * 1.25,
             key: 'comboLetters',
             frame: 2,
@@ -2828,7 +2831,7 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
         this.letterB = this.make.image({
-            x: X_OFFSET + GRID * 4 - GRID * 4,
+            x: X_OFFSET + GRID * 4 - GRID * 4 -3,
             y:  GRID * 1.25,
             key: 'comboLetters',
             frame: 3,
@@ -2836,7 +2839,7 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
         this.letterO2 = this.make.image({
-            x: X_OFFSET + GRID * 5.25 - GRID * 4,
+            x: X_OFFSET + GRID * 5.25 - GRID * 4 -2,
             y:  GRID * 1.25,
             key: 'comboLetters',
             frame: 1,
@@ -2844,7 +2847,7 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
         this.letterExplanationPoint = this.make.image({
-            x: X_OFFSET + GRID * 6 - GRID * 4,
+            x: X_OFFSET + GRID * 6 - GRID * 4 -1,
             y:  GRID * 1.25,
             key: 'comboLetters',
             frame: 4,
@@ -2852,8 +2855,10 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
         
+        
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
             .setOrigin(0.0,0.0).setDepth(52);
+        ourPersist.comboCover.setVisible(false) //this is set to invisible so the game scene can render one that's interacted in this scene
 
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,this.letterO2,this.letterExplanationPoint)
@@ -2865,7 +2870,6 @@ class GameScene extends Phaser.Scene {
 
 
         this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
-        //cloud2.mask = new Phaser.Display.Masks.BitmapMask(this, mask);
 
         this.comboCover.mask.invertAlpha = true;
        // #endregion
@@ -3654,11 +3658,11 @@ class GameScene extends Phaser.Scene {
 
         snakeholeTween.on('complete', () => {
             var cameraZoomTween = this.tweens.add({
-                targets: this.cameras.main,
+                targets: this.map,
                 alpha: {from: 1, to: 0},
                 duration: 500,
                 ease: 'Sine.InOut',
-                zoom: 10
+                zoom: 1 //switched to 1 from 10 to quickly remove it. nextStage() needs to run from somewhere else once removed.
                 });
             cameraZoomTween.on('complete', ()=>{
                 this.nextStage(this.nextStages[nextStageIndex]);
