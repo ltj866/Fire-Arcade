@@ -339,6 +339,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
+        this.load.image('comboBG','assets/sprites/UI_comboBG.png')
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png']);
 
@@ -357,6 +358,7 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
+        this.load.image('boostMeterBG', 'assets/sprites/UI_boostMeterBG.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image('fuseFrame', 'assets/sprites/UI_fuseHolder.png');
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
@@ -372,7 +374,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
-
+        this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
             /**
@@ -527,7 +529,7 @@ class StartScene extends Phaser.Scene {
         //card.setOrigin(0,0);
         //card.setScale(1)
 
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        //this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
 
         // Masks
 
@@ -1156,6 +1158,8 @@ class PersistScene extends Phaser.Scene {
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
+    this.add.image(SCREEN_WIDTH/2 - 1,GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
+    this.add.image(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
 
 
     // # Backgrounds
@@ -2794,14 +2798,80 @@ a
 
        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(X_OFFSET + GRID * 0 - GRID * 4,GRID * 1.25,"comboLetters", 0).setDepth(51).setAlpha(0);
-       this.letterO = this.add.sprite(X_OFFSET + GRID * 1.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterM = this.add.sprite(X_OFFSET + GRID * 2.75 - GRID * 4,GRID * 1.25,"comboLetters", 2).setDepth(51).setAlpha(0);
-       this.letterB = this.add.sprite(X_OFFSET + GRID * 4 - GRID * 4,GRID * 1.25,"comboLetters", 3).setDepth(51).setAlpha(0);
-       this.letterO2 = this.add.sprite(X_OFFSET + GRID * 5.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(X_OFFSET + GRID * 6 - GRID * 4,GRID * 1.25,"comboLetters", 4).setDepth(51).setAlpha(0);
+       /*this.letterC = this.add.sprite(X_OFFSET + GRID * 0 - GRID * 4,GRID * 1.25,"comboLetters", 0).setDepth(51)//.setAlpha(0);
+       this.letterO = this.add.sprite(X_OFFSET + GRID * 1.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51)//.setAlpha(0);
+       this.letterM = this.add.sprite(X_OFFSET + GRID * 2.75 - GRID * 4,GRID * 1.25,"comboLetters", 2).setDepth(51)//.setAlpha(0);
+       this.letterB = this.add.sprite(X_OFFSET + GRID * 4 - GRID * 4,GRID * 1.25,"comboLetters", 3).setDepth(51)//.setAlpha(0);
+       this.letterO2 = this.add.sprite(X_OFFSET + GRID * 5.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51)//.setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(X_OFFSET + GRID * 6 - GRID * 4,GRID * 1.25,"comboLetters", 4).setDepth(51)//.setAlpha(0);
        this.letterX = this.add.sprite(X_OFFSET + GRID * 7 - GRID * 4,GRID * 1.25,"comboLetters", 5).setDepth(51).setAlpha(0);
-       
+       */
+
+       this.letterC = this.make.image({
+        x: X_OFFSET + GRID * 0 - GRID * 4,
+        y:  GRID * 1.25,
+        key: 'comboLetters',
+        frame: 0,
+        add: false,
+        alpha: 0,
+        });
+        this.letterO = this.make.image({
+            x: X_OFFSET + GRID * 1.25 - GRID * 4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 1,
+            add: false,
+            alpha: 0,
+        });
+        this.letterM = this.make.image({
+            x: X_OFFSET + GRID * 2.75 - GRID * 4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 2,
+            add: false,
+            alpha: 0,
+        });
+        this.letterB = this.make.image({
+            x: X_OFFSET + GRID * 4 - GRID * 4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 3,
+            add: false,
+            alpha: 0,
+        });
+        this.letterO2 = this.make.image({
+            x: X_OFFSET + GRID * 5.25 - GRID * 4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 1,
+            add: false,
+            alpha: 0,
+        });
+        this.letterExplanationPoint = this.make.image({
+            x: X_OFFSET + GRID * 6 - GRID * 4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 4,
+            add: false,
+            alpha: 0,
+        });
+        
+        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+            .setOrigin(0.0,0.0).setDepth(52);
+
+        this.comboMasks = []
+        this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,this.letterO2,this.letterExplanationPoint)
+
+        this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
+        this.comboMasksContainer.add(this.comboMasks);
+
+        this.comboMasksContainer.setVisible(false);
+
+
+        this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
+        //cloud2.mask = new Phaser.Display.Masks.BitmapMask(this, mask);
+
+        this.comboCover.mask.invertAlpha = true;
        // #endregion
 
         
@@ -4736,7 +4806,7 @@ class ScoreScene extends Phaser.Scene {
         ourGame.continueBanner = ourGame.add.image(X_OFFSET,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
 
         // Scene Background Color
-        ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, GRID * 2, GRID * 31, GRID * 28, 0x323353, .75);
+        ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, GRID * 3, GRID * 31, GRID * 28, 0x323353, .75);
         ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
         ourGame.stageBackGround.alpha = 0;
 
