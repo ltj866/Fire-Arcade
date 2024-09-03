@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1571,8 +1571,6 @@ class GameScene extends Phaser.Scene {
         ).setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
         this.UIbackground.setVisible(false);
-a
-       
 
         // #region TileMap
 
@@ -1589,7 +1587,7 @@ a
         //const shadowFX = this.snake.head.postFX.addShadow(0, 0, 0.006, 2, 0x111111, 10, .8);
 
 
-        this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+        //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
 
         this.tiledProperties = {};
 
