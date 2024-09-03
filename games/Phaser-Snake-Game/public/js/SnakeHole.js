@@ -264,11 +264,28 @@ const DREAMWALLSKIP = [0,1,2];
 const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
+// #region SpaceBoyScene
+class SpaceBoyScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'SpaceBoyScene', active: true});
+    }
+    create() {
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
+        setOrigin(0,0).setDepth(51).setAlpha(0);
 
+        this.tweens.add({
+            targets: this.spaceBoyLight,
+            alpha: {from: 0, to: 1},
+            duration: 600,
+            ease: 'Sine.Out',
+            delay: 500,
+            });
 
+    }
+}
 
-
-
+// #region StartScene
 class StartScene extends Phaser.Scene {
     constructor () {
         super({key: 'StartScene', active: true});
@@ -897,7 +914,8 @@ class StartScene extends Phaser.Scene {
                     //this.scene.get("UIScene").setVisible(false);
                     
                     //this.scene.launch('UIScene');
-                    scene.scene.launch('GameScene');
+                    //scene.scene.launch('GameScene');
+                    scene.scene.launch('MainMenuScene');
                     ourPersist.starterTween.stop();
                     ourPersist.openingTween(scene.tweenValue);
                     scene.openingTweenStart.stop();
@@ -909,6 +927,8 @@ class StartScene extends Phaser.Scene {
             });
 
         }
+        
+        // Shows Local Storage Sizes for Debugging.
         var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");
 
         this.continueText.on('pointerdown', e => {
@@ -1013,23 +1033,104 @@ class StartScene extends Phaser.Scene {
 
     }
 }
-class SpaceBoyScene extends Phaser.Scene {
+
+// #region MainMenuScene
+class MainMenuScene extends Phaser.Scene {
     constructor () {
-        super({key: 'SpaceBoyScene', active: true});
+        super({key: 'MainMenuScene', active: false});
     }
     create() {
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
-        setOrigin(0,0).setDepth(51).setAlpha(0);
 
-        this.tweens.add({
-            targets: this.spaceBoyLight,
-            alpha: {from: 0, to: 1},
-            duration: 600,
-            ease: 'Sine.Out',
-            delay: 500,
-            });
+        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+        const thisScene = this.scene.get('MainMenuScene');
 
+        var menuOptions = {
+            'practice': function () {
+                console.log("Practice");
+                return true;
+            },
+            'arcade': function () {
+                console.log("Arcade");
+                thisScene.scene.launch('GameScene');
+                thisScene.scene.stop();
+                return true;
+            },
+            'extraction': function () {
+                return true;
+            },
+            'world-championship': function () {
+                return true;
+            },
+            'options': function () {
+                return true;
+            },
+        }
+
+        var menuList = Object.keys(menuOptions);
+        var cursorIndex = 0;
+        var textStart = 160;
+        var spacing = 30;
+
+        const menuStyle = {  
+        }
+        
+        this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'48px',
+            }), 
+                'PORTAL SNAKE',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+
+        
+        var menuElements = []
+        for (let index = 0; index < menuList.length; index++) {
+            var textElement = this.add.dom(SCREEN_WIDTH/2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, 
+                menuStyle, {  
+                "fontSize":'48px',
+                }),
+                    `${menuList[index].toUpperCase()}`
+            ).setOrigin(0.5,0).setScale(0.5);
+
+            menuElements.push(textElement);
+            
+        }
+
+        var selected = menuElements[cursorIndex];
+        selected.node.style.color = COLOR_FOCUS;
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            selected.node.style.color = "white";
+            cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+            selected = menuElements[cursorIndex];
+            selected.node.style.color = COLOR_FOCUS;
+            //selector.y = selected.y + 6;
+            
+            //upArrow.y = selected.y - 42;
+            //downArrow.y = selected.y + 32;
+
+            //continueTextUI.setText(`[GOTO ${selected[1]}]`);
+            
+        }, [], this);
+
+        this.input.keyboard.on('keydown-UP', function() {
+            selected.node.style.color = "white";
+            cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
+            
+            selected = menuElements[cursorIndex];
+            selected.node.style.color = COLOR_FOCUS;
+            //selector.y = selected[0].y + 6;
+            
+            //upArrow.y = selected[0].y - 42;
+            //downArrow.y = selected[0].y + 32;
+
+            //continueTextUI.setText(`[GOTO ${selected[1]}]`);
+        }, [], this);
+
+        this.input.keyboard.on('keydown-SPACE', function() {
+            console.log(menuOptions[menuList[cursorIndex]].call());
+        });
+        
+        
     }
 }
 
@@ -6990,7 +7091,7 @@ var config = {
         createContainer: true,
     },
     
-    scene: [ StartScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, MainMenuScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
 };
 
 // #region Screen Settings
