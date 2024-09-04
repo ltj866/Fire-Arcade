@@ -1812,22 +1812,22 @@
             "scaleInDock": 1
         },
         "testingAztec.json": {
-            "scale": 1.5,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 185.66666666666666,
-                "y": 168.33333333333337
+                "x": 181.25,
+                "y": 156.25
             }
         },
         "testingAztec.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 3
         },
         "testingFuturistic.json": {
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 198.25,
-                "y": 122.25
+                "x": 166.25,
+                "y": 207.75
             }
         },
         "testingFuturistic.json#tileSheetx12": {
