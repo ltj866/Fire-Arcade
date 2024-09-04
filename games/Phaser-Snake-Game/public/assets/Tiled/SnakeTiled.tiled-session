@@ -1823,15 +1823,15 @@
             "scaleInDock": 3
         },
         "testingFuturistic.json": {
-            "scale": 2,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 166.25,
-                "y": 207.75
+                "x": 153,
+                "y": 262.99999999999994
             }
         },
         "testingFuturistic.json#tileSheetx12": {
-            "scaleInDock": 3
+            "scaleInDock": 2
         },
         "testingx01.json": {
             "scale": 1,
