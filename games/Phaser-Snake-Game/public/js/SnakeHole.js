@@ -1591,6 +1591,10 @@ class GameScene extends Phaser.Scene {
 
         //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
 
+        //this.map.tilemap.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+
+        
+
         this.tiledProperties = {};
 
         this.map.properties.forEach(prop => {
@@ -3427,6 +3431,7 @@ class GameScene extends Phaser.Scene {
 
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
+        
     
             if (wall.index > 0) {                
                 testGrid[wall.x][wall.y] = 0; // In TileSpace
