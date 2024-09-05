@@ -3674,6 +3674,10 @@ class GameScene extends Phaser.Scene {
                 zoom: 1 //switched to 1 from 10 to quickly remove it. nextStage() needs to run from somewhere else once removed.
                 });
             cameraZoomTween.on('complete', ()=>{
+                
+                this.blackholes.forEach( blackholeImage=> {
+                    blackholeImage.play('blackholeClose')
+                });
                 this.nextStage(this.nextStages[nextStageIndex]);
             })
             
@@ -6982,6 +6986,13 @@ function loadSpriteSheetsAndAnims(scene) {
     frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 6,7,8,9,10,11]}),
     frameRate: 12,
     repeat: -1,
+    });
+
+    scene.anims.create({
+        key: 'blackholeClose',
+        frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 5,4,3,2,1]}),
+        frameRate: 8,
+        repeat: 0,
     });
 
     scene.anims.create({
