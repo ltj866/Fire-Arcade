@@ -390,7 +390,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
-        //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
@@ -2744,10 +2744,11 @@ class GameScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-       //ourSpaceBoy.add.image(SCREEN_WIDTH/2 + 3,GRID * 1.5,'boostMeterFrame').setDepth(53).setOrigin(0.5,0.5);
        //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
-       ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5).setAlpha(0);
-       //ourSpaceBoy.fuseFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 25,GRID * 1.5,'fuseFrame').setDepth(54).setOrigin(0.5,0.5);
+        if (ourSpaceBoy.scoreFrame == undefined) {
+            ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5).setAlpha(0);
+        }
+       
 
        this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
@@ -2983,8 +2984,11 @@ class GameScene extends Phaser.Scene {
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2 + GRID * .5, 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
+        if (this.coinsUIIcon == undefined) {
+            this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2 + GRID * .5, 'coinPickup01Anim.png'
+            ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
+        }
+
         if (this.scene.get("PersistScene").coins > 0) {
             this.coinsUIIcon.setVisible(true)
         }
@@ -6769,14 +6773,16 @@ function loadSpriteSheetsAndAnims(scene) {
 
 
     // Sprite Sheets and add Animations
-    scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
-        frame: 'startingArrowsAnim.png'
-    }); scene.anims.create({
+    // Mega Atlas code commented out
+    //scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
+    //    frame: 'startingArrowsAnim.png'});
+    scene.anims.create({
         key: 'startArrowIdle',
-        frames: scene.anims.generateFrameNumbers('startArrow', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+        frames: scene.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
         frameRate: 16,
         repeat: -1
     });
+
 
     scene.anims.create({
         key: 'tutIdle',
