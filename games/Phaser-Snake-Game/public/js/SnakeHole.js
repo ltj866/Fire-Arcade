@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingRacetrack'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -2092,6 +2092,7 @@ class GameScene extends Phaser.Scene {
         
         this.blackholes = [];
         this.blackholeLabels = [];
+        this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
 
@@ -2241,7 +2242,16 @@ class GameScene extends Phaser.Scene {
                                     
                                     var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
                                     ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+                                    
+                                    
                                     this.blackholes.push(blackholeImage)
+                                    
+                                    
+                                    
+                                    
+                                    this.blackholesContainer.add(this.blackholes)
+                                    //this.blackholes.postFX.addBarrel(this.main.cameras,[.5])
+
                                     this.blackholeLabels.push(stageText,r1)
                                     if (blackholeImage.anims.getName() === 'blackholeForm')
                                         {
@@ -2310,13 +2320,13 @@ class GameScene extends Phaser.Scene {
         
                 }
 
-    
+                
             }
                 
-     
-        
+            
+            
         }, this);
-
+       
 
         // #region Transition Visual /*
 
@@ -3608,6 +3618,8 @@ class GameScene extends Phaser.Scene {
         var wallSprites = [];
         var fadeOutSprites = []; 
 
+        
+
         this.wallLayer.culledTiles.forEach( tile => {
 
             var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
@@ -3642,7 +3654,7 @@ class GameScene extends Phaser.Scene {
             delay: this.tweens.stagger(30)
         });
 
-        
+        //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
@@ -3652,7 +3664,7 @@ class GameScene extends Phaser.Scene {
             duration: 500,
             ease: 'Sine.easeOutIn',
             repeat: 0,
-            delay: this.tweens.stagger(30)
+            delay: this.tweens.stagger(30),
         });
 
         var fadeoutTween = this.tweens.add({
