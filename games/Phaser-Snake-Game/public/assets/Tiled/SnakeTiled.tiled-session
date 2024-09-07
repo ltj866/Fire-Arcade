@@ -1,5 +1,5 @@
 {
-    "activeFile": "testingFuturistic.json",
+    "activeFile": "World_1-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -191,8 +191,8 @@
             "scale": 1.6650537634408602,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 370.2583144979012,
-                "y": 370.25831449790115
+                "x": 371.4594769131417,
+                "y": 371.4594769131417
             }
         },
         "Racing_Stage-02.json#tileSheetx24": {
@@ -709,11 +709,11 @@
             "scaleInDock": 1
         },
         "World_1-1.json": {
-            "scale": 3,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.83333333333331,
-                "y": 161.83333333333331
+                "x": 157.25,
+                "y": 164.25
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -1815,8 +1815,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.33333333333334,
-                "y": 162.33333333333331
+                "x": 173.66666666666663,
+                "y": 161.66666666666663
             }
         },
         "testingAztec.json#tileSheetx12": {
@@ -1826,8 +1826,8 @@
             "scale": 4,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.375,
-                "y": 162.375
+                "x": 174.125,
+                "y": 162.125
             }
         },
         "testingFuturistic.json#tileSheetx12": {
@@ -1837,8 +1837,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 135,
-                "y": 204.99999999999997
+                "x": 175,
+                "y": 162.99999999999997
             }
         },
         "testingRacetrack.json#tileSheetx12": {
@@ -1956,7 +1956,6 @@
         "r-07-10-4.json",
         "r-07-10.json",
         "r-07-10-2.json",
-        "testingFuturistic.json",
         "Racing_Stage-02.json",
         "Racing_Stage-03.json",
         "Ghost_Stage-03.json",
@@ -1980,12 +1979,12 @@
         "World_6-2_Adv_Portaling.json",
         "World_6-3_Adv_Portaling.json",
         "World_1-3.json",
-        "testingAztec.json"
+        "testingAztec.json",
+        "testingRacetrack.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "testingRactrack.json",
         "testing07.json",
         "testing04.json",
         "Stage-13.json",
@@ -1996,7 +1995,8 @@
         "testing09.json",
         "testing10.json",
         "testing10-3.json",
-        "Stage-08.json"
+        "Stage-08.json",
+        "Stage-06.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

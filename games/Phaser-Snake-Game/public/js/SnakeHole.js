@@ -332,7 +332,7 @@ class StartScene extends Phaser.Scene {
         //scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim.png', frameWidth: 64, frameHeight: 64 }); 
         //debugger
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-
+        this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         
@@ -1494,8 +1494,44 @@ class GameScene extends Phaser.Scene {
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
-        
-        
+
+        //test portal walls
+        var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
+        var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
+        var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
+        portalWall.play('pWallFlatMiddle')
+        portalWallL.play('pWallFlatLeft')
+        portalWallR.play('pWallFlatRight')
+        portalWall.setTint(0xFF0000)
+        portalWallL.setTint(0xFF0000)
+        portalWallR.setTint(0xFF0000)
+        var portalWall2 = this.add.sprite(X_OFFSET + GRID * 19, GRID * 23).setOrigin(0,0);
+        var portalWallL2 = this.add.sprite(X_OFFSET + GRID * 18, GRID * 23).setOrigin(0,0);
+        var portalWallR2 = this.add.sprite(X_OFFSET + GRID * 20, GRID * 23).setOrigin(0,0);
+        //this.wallLight = this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 66, 'lightColor').setIntensity(1.5);
+
+        portalWall2.play('pWallFlatMiddle')
+        portalWallL2.play('pWallFlatLeft')
+        portalWallR2.play('pWallFlatRight')
+        portalWall2.setTint(0xFF0000)
+        portalWallL2.setTint(0xFF0000)
+        portalWallR2.setTint(0xFF0000)
+        this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2);
+        this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2);
+        var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
+        var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
+        portalWallL3.play('pWallFlatLeft')
+        portalWallR3.play('pWallFlatRight')
+        portalWallR3.setTint(0x9900FF)
+        portalWallL3.setTint(0x9900FF)
+        var portalWallL4 = this.add.sprite(X_OFFSET + GRID * 15, GRID * 28).setOrigin(0,0);
+        var portalWallR4 = this.add.sprite(X_OFFSET + GRID * 16, GRID * 28).setOrigin(0,0);
+        portalWallL4.play('pWallFlatLeft')
+        portalWallR4.play('pWallFlatRight')
+        portalWallL4.setTint(0x9900FF)
+        portalWallR4.setTint(0x9900FF)
+        this.lights.addLight(X_OFFSET + GRID * 15, GRID * 28, 128,  0x9900FF).setIntensity(2);
+        this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2);
         
         /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
@@ -6829,6 +6865,25 @@ function loadSpriteSheetsAndAnims(scene) {
     }); scene.anims.create({
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'pWallFlatMiddle',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [6,7,8,9,10,11]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallFlatLeft',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [0,1,2,3,4,5]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallFlatRight',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [12,13,14,15,16,17]}),
         frameRate: 8,
         repeat: -1
     });
