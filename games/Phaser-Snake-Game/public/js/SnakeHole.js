@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingRacetrack'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1587,11 +1587,9 @@ class GameScene extends Phaser.Scene {
         this.snake.direction = DIRS.STOP;
 
         //const shadowFX = this.snake.head.postFX.addShadow(0, 0, 0.006, 2, 0x111111, 10, .8);
-
-
+        //const shadowFX = this.cameras.main.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+        
         //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
-
-        //this.map.tilemap.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
 
         
 
@@ -1654,7 +1652,10 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET).setPipeline('Light2D');
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
+        this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
+        //this.wallLayer.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+        
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
@@ -2738,6 +2739,10 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
         }
+
+
+        
+
         
         // #endregion
 
@@ -7027,7 +7032,7 @@ function loadSpriteSheetsAndAnims(scene) {
     
   
     //WRAP_BLOCK_ANIMS
-    scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 12,frameHeight: 12,
+    /*scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 12,frameHeight: 12,
         frame: 'wrapBlockAnim.png'
     }); scene.anims.create({
       key: 'wrapBlock01',
@@ -7076,7 +7081,7 @@ function loadSpriteSheetsAndAnims(scene) {
       frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
       frameRate: 8,
       repeat: -1
-    })
+    })*/
 
 
 
@@ -7194,6 +7199,7 @@ var config = {
     dom: {
         createContainer: true,
     },
+    maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
     scene: [ StartScene, MainMenuScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
 };

@@ -1833,6 +1833,17 @@
         "testingFuturistic.json#tileSheetx12": {
             "scaleInDock": 2
         },
+        "testingRacetrack.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 135,
+                "y": 204.99999999999997
+            }
+        },
+        "testingRacetrack.json#tileSheetx12": {
+            "scaleInDock": 2
+        },
         "testingRactrack.json": {
             "scale": 2,
             "selectedLayer": 0,
