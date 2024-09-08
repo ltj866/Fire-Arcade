@@ -1,5 +1,5 @@
 {
-    "activeFile": "World_1-1.json",
+    "activeFile": "testingFuturistic.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1823,11 +1823,11 @@
             "scaleInDock": 3
         },
         "testingFuturistic.json": {
-            "scale": 4,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.125,
-                "y": 162.125
+                "x": 141.75,
+                "y": 143.75
             }
         },
         "testingFuturistic.json#tileSheetx12": {
@@ -1980,7 +1980,8 @@
         "World_6-3_Adv_Portaling.json",
         "World_1-3.json",
         "testingAztec.json",
-        "testingRacetrack.json"
+        "testingRacetrack.json",
+        "testingFuturistic.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",

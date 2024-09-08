@@ -1516,8 +1516,8 @@ class GameScene extends Phaser.Scene {
         portalWall2.setTint(0xFF0000)
         portalWallL2.setTint(0xFF0000)
         portalWallR2.setTint(0xFF0000)
-        this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2);
-        this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2);
+        this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
+        this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
         var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
         var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
         portalWallL3.play('pWallFlatLeft')
@@ -1530,8 +1530,8 @@ class GameScene extends Phaser.Scene {
         portalWallR4.play('pWallFlatRight')
         portalWallL4.setTint(0x9900FF)
         portalWallR4.setTint(0x9900FF)
-        this.lights.addLight(X_OFFSET + GRID * 15, GRID * 28, 128,  0x9900FF).setIntensity(2);
-        this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2);
+        this.lights.addLight(X_OFFSET + GRID * 16, GRID * 28, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
+        this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
         
         /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
@@ -1614,6 +1614,7 @@ class GameScene extends Phaser.Scene {
 
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
+        this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
         this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
@@ -1688,9 +1689,13 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
+        this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
+        
+
+        
+        this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
         this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
-        //this.wallLayer.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
         
 
         if (this.map.getLayer('Ghost-1')) {
