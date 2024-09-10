@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingRacetrack'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1496,43 +1496,45 @@ class GameScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
 
         //test portal walls
-        var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
-        var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
-        var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
-        portalWall.play('pWallFlatMiddle')
-        portalWallL.play('pWallFlatLeft')
-        portalWallR.play('pWallFlatRight')
-        portalWall.setTint(0xFF0000)
-        portalWallL.setTint(0xFF0000)
-        portalWallR.setTint(0xFF0000)
-        var portalWall2 = this.add.sprite(X_OFFSET + GRID * 19, GRID * 23).setOrigin(0,0);
-        var portalWallL2 = this.add.sprite(X_OFFSET + GRID * 18, GRID * 23).setOrigin(0,0);
-        var portalWallR2 = this.add.sprite(X_OFFSET + GRID * 20, GRID * 23).setOrigin(0,0);
-        //this.wallLight = this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 66, 'lightColor').setIntensity(1.5);
+        if (this.stage == 'testingFuturistic' ) {
+            var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
+            var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
+            var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
+            portalWall.play('pWallFlatMiddle')
+            portalWallL.play('pWallFlatLeft')
+            portalWallR.play('pWallFlatRight')
+            portalWall.setTint(0xFF0000)
+            portalWallL.setTint(0xFF0000)
+            portalWallR.setTint(0xFF0000)
+            var portalWall2 = this.add.sprite(X_OFFSET + GRID * 19, GRID * 23).setOrigin(0,0);
+            var portalWallL2 = this.add.sprite(X_OFFSET + GRID * 18, GRID * 23).setOrigin(0,0);
+            var portalWallR2 = this.add.sprite(X_OFFSET + GRID * 20, GRID * 23).setOrigin(0,0);
+            //this.wallLight = this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 66, 'lightColor').setIntensity(1.5);
 
-        portalWall2.play('pWallFlatMiddle')
-        portalWallL2.play('pWallFlatLeft')
-        portalWallR2.play('pWallFlatRight')
-        portalWall2.setTint(0xFF0000)
-        portalWallL2.setTint(0xFF0000)
-        portalWallR2.setTint(0xFF0000)
-        this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
-        this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
-        var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
-        var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
-        portalWallL3.play('pWallFlatLeft')
-        portalWallR3.play('pWallFlatRight')
-        portalWallR3.setTint(0x9900FF)
-        portalWallL3.setTint(0x9900FF)
-        var portalWallL4 = this.add.sprite(X_OFFSET + GRID * 15, GRID * 28).setOrigin(0,0);
-        var portalWallR4 = this.add.sprite(X_OFFSET + GRID * 16, GRID * 28).setOrigin(0,0);
-        portalWallL4.play('pWallFlatLeft')
-        portalWallR4.play('pWallFlatRight')
-        portalWallL4.setTint(0x9900FF)
-        portalWallR4.setTint(0x9900FF)
-        this.lights.addLight(X_OFFSET + GRID * 16, GRID * 28, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
-        this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
-        
+            portalWall2.play('pWallFlatMiddle')
+            portalWallL2.play('pWallFlatLeft')
+            portalWallR2.play('pWallFlatRight')
+            portalWall2.setTint(0xFF0000)
+            portalWallL2.setTint(0xFF0000)
+            portalWallR2.setTint(0xFF0000)
+            this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
+            this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
+            var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
+            var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
+            portalWallL3.play('pWallFlatLeft')
+            portalWallR3.play('pWallFlatRight')
+            portalWallR3.setTint(0x9900FF)
+            portalWallL3.setTint(0x9900FF)
+            var portalWallL4 = this.add.sprite(X_OFFSET + GRID * 15, GRID * 28).setOrigin(0,0);
+            var portalWallR4 = this.add.sprite(X_OFFSET + GRID * 16, GRID * 28).setOrigin(0,0);
+            portalWallL4.play('pWallFlatLeft')
+            portalWallR4.play('pWallFlatRight')
+            portalWallL4.setTint(0x9900FF)
+            portalWallR4.setTint(0x9900FF)
+            this.lights.addLight(X_OFFSET + GRID * 16, GRID * 28, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
+            this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
+        }
+
         /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
                 from: 0,
@@ -1616,17 +1618,42 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
+
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
+        //var spawnTile2 = this.mapShadow.findByIndex(9); // Snake Head Index
         this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
         spawnTile.index = -1; // Set to empty tile
-
+        //spawnTile2.index = -1; // Set to empty tile
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
         this.snake.direction = DIRS.STOP;
+        
+        
+        var noRenderTiles = [9,10,11,12,
+            257,258,258,259,260,261,262,263,264,
+            289,290,291,292,293,294,295,296] //need to populate with full list and move elsewhere;
+        //var noRenderTilesList = [];
+        
+        for (let i = 0; i < noRenderTiles.length; i++) {
+            this.mapShadow.forEachTile(tile =>{
+                //console.log(tile.index)
+                if (tile.index == noRenderTiles[i]) {
+                    tile.index = -1;
+                }
+            })
+            
+        }
+        //moved below to only reference spawn tile from wall layer
+        /*var spawnTile = this.map.findByIndex(9); // Snake Head Index
+        console.log(spawnTile)
+        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+        spawnTile.index = -1; // Set to empty tile*/
+
+       
 
         //const shadowFX = this.snake.head.postFX.addShadow(0, 0, 0.006, 2, 0x111111, 10, .8);
         //const shadowFX = this.cameras.main.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
         
-        //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+        //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
         
 
@@ -1635,6 +1662,9 @@ class GameScene extends Phaser.Scene {
         this.map.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
         });
+        /*this.mapShadow.properties.forEach(prop => {
+            this.tiledProperties[prop.name] = prop.value;
+        });*/
 
 
         // Loading all Next Stage name to slug to grab from the cache later.
@@ -1689,14 +1719,29 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
+        if (this.map.getLayer('Ground')) {
+            this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET)
+            this.groundLayer.setPipeline('Light2D')
+        }
+
         this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
+        //var renderIndex = 9
+        //this.noRenderTiles = [8,9,10,11];
+        /*for (let index = 0; index < 256; index++) {
+            //renderIndex = noRenderTiles[index];
+            var noRenderTile = this.wallLayerShadow.findByIndex(renderIndex)
+            noRenderTile.index = -1
+            //noRenderTiles.push(noRenderTile)
+        }*/
 
+        //var noRenderTile = this.wallLayerShadow.findByIndex(9)
+        //noRenderTile.index = -1
         
-        this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
+        this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
         this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
-        
+
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
@@ -1724,8 +1769,10 @@ class GameScene extends Phaser.Scene {
 
         // end on the wall map
         this.map.getLayer(this.wallVarient);
-        
+    
 
+        //this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+        //this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
 
 
         
@@ -3678,6 +3725,7 @@ class GameScene extends Phaser.Scene {
             }               
             
         });
+
         this.wallLayer.visible = false;
 
         Phaser.Utils.Array.Shuffle(wallSprites);
