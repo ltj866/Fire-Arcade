@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingRacetrack'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -408,6 +408,7 @@ class StartScene extends Phaser.Scene {
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
         this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
+        this.load.audio('pop03', [ 'pop03.ogg', 'pop03.mp3']);
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
@@ -506,6 +507,7 @@ class StartScene extends Phaser.Scene {
         ///
         // AUDIO
         this.pop02 = this.sound.add('pop02')
+
         
         
 
@@ -1577,6 +1579,7 @@ class GameScene extends Phaser.Scene {
         this.coinSound = this.sound.add('coinCollect');
 
         var _chargeUp = this.sound.add('chargeUp');
+        this.pop03 = this.sound.add('pop03')
 
         //_chargeUp.play();
 
@@ -2412,7 +2415,6 @@ class GameScene extends Phaser.Scene {
                 
             }
                 
-            
             
         }, this);
        
@@ -3717,6 +3719,7 @@ class GameScene extends Phaser.Scene {
 
             var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
             ).setOrigin(0,0).setDepth(50);
+            _sprite.setPipeline('Light2D').setDepth(50);
             
             if (FADE_OUT_TILES.includes(tile.index)) {
                 fadeOutSprites.push(_sprite);
@@ -3725,8 +3728,19 @@ class GameScene extends Phaser.Scene {
             }               
             
         });
+        this.groundLayer.culledTiles.forEach( tile => {
+
+            var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+            ).setOrigin(0,0).setDepth(50);
+            _sprite.setPipeline('Light2D').setDepth(20);
+            
+            wallSprites.push(_sprite);            
+            
+        });
 
         this.wallLayer.visible = false;
+        this.wallLayerShadow.visible = false;
+        this.groundLayer.visible = false;
 
         Phaser.Utils.Array.Shuffle(wallSprites);
         
@@ -3734,9 +3748,9 @@ class GameScene extends Phaser.Scene {
             ...this.coins,
             ...this.portals,
             ...this.atoms,
-            ...wallSprites
+            ...wallSprites,
         ];
-
+        
         var snakeholeTween = this.tweens.add({
             targets: this.snake.body, 
             x: this.snake.head.x,
@@ -3745,21 +3759,46 @@ class GameScene extends Phaser.Scene {
             duration: 500,
             ease: 'Sine.easeOutIn',
             repeat: 0,
-            delay: this.tweens.stagger(30)
+            delay: this.tweens.stagger(30),
         });
 
         //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+        var popVolume = 1.0
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
             x: this.snake.head.x,
             y: this.snake.head.y,
+            //x: {from: this.snake.head.x + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.x},
+            //y: {from: this.snake.head.y + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.y},
             yoyo: false,
-            duration: 500,
-            ease: 'Sine.easeOutIn',
+            duration: 600,
+            ease: 'Sine.in',
             repeat: 0,
-            delay: this.tweens.stagger(30),
+            delay: this.tweens.stagger(60),
+            alpha: {from: 5, to: 0},
+            rotation: 5,
+            onDelay: () =>{
+                if (allTheThings.length > 150) {
+                    blackholeTween.timeScale += .04;
+                }
+                else{
+                    blackholeTween.timeScale += .02;
+                }
+                this.sound.play('pop03', { volume: popVolume });
+                if (popVolume >= 0.00) {
+                    popVolume -= .005
+                }
+            },
+            onComplete: () =>{
+                //console.log(this.blackholesc)
+                this.nextStagePortals.forEach( blackholeImage=> {
+                    blackholeImage.play('blackholeClose')
+                    this.stageAdvance(nextStageIndex)
+                });
+            }
         });
+
 
         var fadeoutTween = this.tweens.add({
             targets: fadeOutSprites,
@@ -3781,10 +3820,8 @@ class GameScene extends Phaser.Scene {
                 });
             cameraZoomTween.on('complete', ()=>{
                 
-                this.blackholes.forEach( blackholeImage=> {
-                    blackholeImage.play('blackholeClose')
-                });
-                this.nextStage(this.nextStages[nextStageIndex]);
+                
+                //this.nextStage(this.nextStages[nextStageIndex]);
             })
             
         });
@@ -3810,6 +3847,22 @@ class GameScene extends Phaser.Scene {
             this.nextStage(this.nextStages[nextStageIndex]);
         });*/
                     
+    }
+    stageAdvance(nextStageIndex){
+        //take location of blackhole on the screen and create motion of 
+        //camera moving to new spot in the galaxy.
+        //placeholder tween below
+        this.tweens.add({
+            targets: this.snake,
+            alpha: 0,
+            yoyo: false,
+            duration: 500,
+            ease: 'Sine.easeOutIn',
+            repeat: 0,
+            onComplete: () =>{
+                this.nextStage(this.nextStages[nextStageIndex]);
+            }
+        });
     }
 
     currentScoreTimer() {
@@ -5500,10 +5553,11 @@ class ScoreScene extends Phaser.Scene {
                 __frame += 1
                 if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
                     _frame += 1
-                    var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
+                    //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
                     
                     scoreAtoms[_frame-1].setAlpha(1);
-                    ourGame.atomSounds[_index].play()
+                    //ourGame.atomSounds[_index].play()
+                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
                 }
                 
                 //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
@@ -7118,6 +7172,7 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 5,4,3,2,1]}),
         frameRate: 8,
         repeat: 0,
+        hideOnComplete: true
     });
 
     scene.anims.create({
