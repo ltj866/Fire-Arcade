@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingRacetrack'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -3719,6 +3719,7 @@ class GameScene extends Phaser.Scene {
 
         var wallSprites = [];
         var fadeOutSprites = []; 
+        var groundSprites = [];
 
         
 
@@ -3727,6 +3728,7 @@ class GameScene extends Phaser.Scene {
             var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
             ).setOrigin(0,0).setDepth(50);
             _sprite.setPipeline('Light2D').setDepth(50);
+
             
             if (FADE_OUT_TILES.includes(tile.index)) {
                 fadeOutSprites.push(_sprite);
@@ -3737,11 +3739,12 @@ class GameScene extends Phaser.Scene {
         });
         this.groundLayer.culledTiles.forEach( tile => {
 
-            var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
-            ).setOrigin(0,0).setDepth(50);
-            _sprite.setPipeline('Light2D').setDepth(20);
+            var _spriteGround = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+            ).setOrigin(0,0).setDepth(20);
+            _spriteGround.setTint(0xaba2d8);
+            _spriteGround.setPipeline('Light2D').setDepth(20);
             
-            wallSprites.push(_sprite);            
+            groundSprites.push(_spriteGround);            
             
         });
 
@@ -3803,6 +3806,22 @@ class GameScene extends Phaser.Scene {
                     blackholeImage.play('blackholeClose')
                     this.stageAdvance(nextStageIndex)
                 });
+            }
+        });
+
+        var blackholeTweenGround = this.tweens.add({
+            targets: groundSprites, 
+            x: this.snake.head.x,
+            y: this.snake.head.y,
+            yoyo: false,
+            duration: 600,
+            ease: 'Sine.in',
+            repeat: 0,
+            delay: this.tweens.stagger(30),
+            alpha: {from: 5, to: 0},
+            rotation: 5,
+            onDelay: () =>{
+                blackholeTweenGround.timeScale += .03;
             }
         });
 
