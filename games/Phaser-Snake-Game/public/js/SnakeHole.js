@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingRacetrack'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1198,10 +1198,6 @@ class PersistScene extends Phaser.Scene {
             this.fx = this.bgBack.preFX.addColorMatrix();
             this.fx2 = this.bgFurthest.preFX.addColorMatrix();
     
-    
-            //if (this.stage === "Stage-04") {
-            //    this.fx.hue(330);
-            //}
             this.scrollFactorX = 0;
             this.scrollFactorY = 0;
             this.bgCoords = new Phaser.Math.Vector2(0,0);
@@ -1537,6 +1533,16 @@ class GameScene extends Phaser.Scene {
             this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
         }
 
+        if (this.stage === "testingFuturistic") {
+            ourPersist.fx.hue(330);
+        }
+        if (this.stage === "testingRacetrack") {
+            ourPersist.fx.hue(300);
+        }
+        else{
+            ourPersist.fx.hue(0)
+        }
+
         /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
                 from: 0,
@@ -1725,6 +1731,7 @@ class GameScene extends Phaser.Scene {
         if (this.map.getLayer('Ground')) {
             this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET)
             this.groundLayer.setPipeline('Light2D')
+            this.groundLayer.setTint(0xaba2d8)
         }
 
         this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
