@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1455,7 +1455,8 @@ class GameScene extends Phaser.Scene {
 
         var {startupAnim = true } = props;
         this.startupAnim = startupAnim
-
+        var {camDirection = new Phaser.Math.Vector2(0,0)} = props
+        this.camDirection = camDirection
         this.scoreHistory = [];
 
         // BOOST METER
@@ -1492,6 +1493,21 @@ class GameScene extends Phaser.Scene {
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
+
+
+        this.cameras.main.x = this.camDirection.y * 10
+        this.cameras.main.y = this.camDirection.x * 10
+        
+        //ourPersist.bgCoords.x += this.camDirection.y/4;
+        //ourPersist.bgCoords.y += this.camDirection.x/4;
+        
+        var cameraOpeningTween = this.tweens.add({
+            targets: this.cameras.main,
+            x: 0,
+            y: 0,
+            duration: 1000,
+            ease: 'Sine.Out',
+        });
 
         //test portal walls
         if (this.stage == 'testingFuturistic' ) {
@@ -3712,7 +3728,7 @@ class GameScene extends Phaser.Scene {
 
     warpToNext(nextStageIndex) {
 
-
+        const ourPersist = this.scene.get('PersistScene');
         this.gState = GState.TRANSITION;
 
         this.snake.head.setTexture('snakeDefault', 0);
@@ -3721,7 +3737,17 @@ class GameScene extends Phaser.Scene {
         var fadeOutSprites = []; 
         var groundSprites = [];
 
+                // Camera Pan Logic
+
+                var centerLocation = new Phaser.Math.Vector2(X_OFFSET + GRID * 14,Y_OFFSET + GRID * 13)
+                //this.add.sprite(centerLocation.x,centerLocation.y,'snakeDefault', 5)
+                var blackholeLocation = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
+                //this.add.sprite(centerLocation.x,centerLocation.y,'snakeDefault', 5)
         
+                var camDirection = new Phaser.Math.Vector2((blackholeLocation.y - centerLocation.y),(blackholeLocation.x - centerLocation.x));
+                //console.log('centerLocation',centerLocation)
+                //console.log('blackholeLocation',blackholeLocation)
+                //console.log('CAMDIRECTION',camDirection)
 
         this.wallLayer.culledTiles.forEach( tile => {
 
@@ -3789,6 +3815,7 @@ class GameScene extends Phaser.Scene {
             alpha: {from: 5, to: 0},
             rotation: 5,
             onDelay: () =>{
+
                 if (allTheThings.length > 150) {
                     blackholeTween.timeScale += .04;
                 }
@@ -3801,10 +3828,25 @@ class GameScene extends Phaser.Scene {
                 }
             },
             onComplete: () =>{
-                //console.log(this.blackholesc)
                 this.nextStagePortals.forEach( blackholeImage=> {
                     blackholeImage.play('blackholeClose')
-                    this.stageAdvance(nextStageIndex)
+                    ourPersist.bgCoords.x += camDirection.y/2;
+                    ourPersist.bgCoords.y += camDirection.x/2;
+                    var cameraPanTween = this.tweens.add({
+                        targets: this.cameras.main,
+                        x: -camDirection.y * 10,
+                        y: -camDirection.x * 10,
+                        duration: 1000,
+                        ease: 'Sine.In',
+                        delay: 500,
+                        onComplete: () =>{
+                            this.snake.head.visible = false;
+                            this.snake.body.forEach(_part => {
+                                _part.visible = false;
+                            });
+                            this.nextStage(this.nextStages[nextStageIndex],camDirection);
+                        }
+                    });
                 });
             }
         });
@@ -3851,44 +3893,11 @@ class GameScene extends Phaser.Scene {
             })
             
         });
-        /*var tween = this.tweens.addCounter({
-            from: 600,
-            to: 0,
-            ease: 'Sine.InOut',
-            duration: 2000,
-            onUpdate: tween =>
-                {   
-                    this.graphics.clear();
-                    var value = (tween.getValue());
-                    this.tweenValue = value
-                    this.shape1 = this.make.graphics().fillCircle(this.snake.head.x, this.snake.head.y, value);
-                    var geomask1 = this.shape1.createGeometryMask();
+
+
+
+       
                     
-                    this.cameras.main.setMask(geomask1,true)
-                    //this.cameras.main.ignore(this.scorePanel)
-                }
-        });
-        tween.on('complete', ()=>{
-            this.cameras.main.setMask(false)
-            this.nextStage(this.nextStages[nextStageIndex]);
-        });*/
-                    
-    }
-    stageAdvance(nextStageIndex){
-        //take location of blackhole on the screen and create motion of 
-        //camera moving to new spot in the galaxy.
-        //placeholder tween below
-        this.tweens.add({
-            targets: this.snake,
-            alpha: 0,
-            yoyo: false,
-            duration: 500,
-            ease: 'Sine.easeOutIn',
-            repeat: 0,
-            onComplete: () =>{
-                this.nextStage(this.nextStages[nextStageIndex]);
-            }
-        });
     }
 
     currentScoreTimer() {
@@ -3954,8 +3963,9 @@ class GameScene extends Phaser.Scene {
         return ourPersist.coins < 0;
     }
 
-    nextStage(stageName) {
+    nextStage(stageName,camDirection) {
         const ourInputScene = this.scene.get("InputScene");
+        this.camDirection = camDirection
 
         
         //console.log(STAGE_UNLOCKS['start'].call());
@@ -3985,7 +3995,8 @@ class GameScene extends Phaser.Scene {
             stage: stageName, 
             score: this.nextScore, 
             lives: this.lives, 
-            startupAnim: false 
+            startupAnim: false,
+            camDirection: this.camDirection
         });
         ourInputScene.scene.restart();
 
