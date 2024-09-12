@@ -261,7 +261,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1651,6 +1651,27 @@ class GameScene extends Phaser.Scene {
         //spawnTile2.index = -1; // Set to empty tile
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
         this.snake.direction = DIRS.STOP;
+
+        //set snake spawn-in
+        this.snake.head.setAlpha(0);
+
+        var startingBlackhole = this.add.sprite(this.snake.head.x + GRID * 0.5,this.snake.head.y + GRID * 0.5);
+        startingBlackhole.play('blackholeForm');
+        if (startingBlackhole.anims.getName() === 'blackholeForm')
+            {
+                startingBlackhole.playAfterRepeat('blackholeIdle');
+            }
+        
+        this.tweens.add({
+            targets: this.snake.head,
+            alpha: 1,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 125
+        });
+        this.time.delayedCall(1500, event => {
+            startingBlackhole.play('blackholeClose');
+        });
         
         
         var noRenderTiles = [9,10,11,12,
@@ -1873,7 +1894,7 @@ class GameScene extends Phaser.Scene {
             x: SCREEN_WIDTH/2,
             ease: 'Sine.easeOutIn',
             duration: 300,
-            delay: 125,
+            delay: 500,
         });
 
         //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
@@ -2424,8 +2445,8 @@ class GameScene extends Phaser.Scene {
                                     targets: this.blackholeLabels,
                                     alpha: {from: 0, to: 1},
                                     ease: 'Sine.easeOutIn',
-                                    duration: 300,
-                                    delay: this.tweens.stagger(360)
+                                    duration: 50,
+                                    delay: this.tweens.stagger(150)
                                 });
                             }
                         });
@@ -3763,20 +3784,24 @@ class GameScene extends Phaser.Scene {
             }               
             
         });
-        this.groundLayer.culledTiles.forEach( tile => {
+        if (this.groundLayer != undefined) {
+            this.groundLayer.culledTiles.forEach( tile => {
 
-            var _spriteGround = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
-            ).setOrigin(0,0).setDepth(20);
-            _spriteGround.setTint(0xaba2d8);
-            _spriteGround.setPipeline('Light2D').setDepth(20);
-            
-            groundSprites.push(_spriteGround);            
-            
-        });
+                var _spriteGround = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+                ).setOrigin(0,0).setDepth(20);
+                _spriteGround.setTint(0xaba2d8);
+                _spriteGround.setPipeline('Light2D').setDepth(20);
+                
+                groundSprites.push(_spriteGround);            
+                
+            });
+            this.groundLayer.visible = false;
+        }
+        
 
         this.wallLayer.visible = false;
         this.wallLayerShadow.visible = false;
-        this.groundLayer.visible = false;
+        
 
         Phaser.Utils.Array.Shuffle(wallSprites);
         
@@ -3796,6 +3821,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.easeOutIn',
             repeat: 0,
             delay: this.tweens.stagger(30),
+            alpha: 0
         });
 
         //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
@@ -3840,10 +3866,6 @@ class GameScene extends Phaser.Scene {
                         ease: 'Sine.In',
                         delay: 500,
                         onComplete: () =>{
-                            this.snake.head.visible = false;
-                            this.snake.body.forEach(_part => {
-                                _part.visible = false;
-                            });
                             this.nextStage(this.nextStages[nextStageIndex],camDirection);
                         }
                     });
@@ -3865,6 +3887,16 @@ class GameScene extends Phaser.Scene {
             onDelay: () =>{
                 blackholeTweenGround.timeScale += .03;
             }
+        });
+
+        var blackholeTweenGround = this.tweens.add({
+            targets: this.blackholeLabels,
+            alpha: 0,
+            yoyo: false,
+            duration: 50,
+            ease: 'linear',
+            repeat: 0,
+            delay: this.tweens.stagger(150),
         });
 
 
