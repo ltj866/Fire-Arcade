@@ -1836,11 +1836,11 @@
             "scaleInEditor": 1
         },
         "testingRacetrack.json": {
-            "scale": 2,
+            "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 140.5,
-                "y": 178.25
+                "x": 135.66666666666666,
+                "y": 207.66666666666663
             }
         },
         "testingRacetrack.json#tileSheetx12": {

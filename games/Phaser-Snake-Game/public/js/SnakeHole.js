@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -164,7 +164,8 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 var map;  // Phaser.Tilemaps.Tilemap 
 var tileset;
 var tileset2;
-const FADE_OUT_TILES = [104];
+const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
+    113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,241,242,243];
 
 //  Direction consts
 //export const LEFT = 3;
@@ -261,7 +262,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1652,7 +1653,7 @@ class GameScene extends Phaser.Scene {
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
         this.snake.direction = DIRS.STOP;
 
-        //set snake spawn-in
+        //set snake invisible so it can appear from blackhole
         this.snake.head.setAlpha(0);
 
         var startingBlackhole = this.add.sprite(this.snake.head.x + GRID * 0.5,this.snake.head.y + GRID * 0.5);
@@ -1674,20 +1675,7 @@ class GameScene extends Phaser.Scene {
         });
         
         
-        var noRenderTiles = [9,10,11,12,
-            257,258,258,259,260,261,262,263,264,
-            289,290,291,292,293,294,295,296] //need to populate with full list and move elsewhere;
-        //var noRenderTilesList = [];
-        
-        for (let i = 0; i < noRenderTiles.length; i++) {
-            this.mapShadow.forEachTile(tile =>{
-                //console.log(tile.index)
-                if (tile.index == noRenderTiles[i]) {
-                    tile.index = -1;
-                }
-            })
-            
-        }
+
         //moved below to only reference spawn tile from wall layer
         /*var spawnTile = this.map.findByIndex(9); // Snake Head Index
         console.log(spawnTile)
@@ -1768,11 +1756,12 @@ class GameScene extends Phaser.Scene {
         if (this.map.getLayer('Ground')) {
             this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET)
             this.groundLayer.setPipeline('Light2D')
-            this.groundLayer.setTint(0xaba2d8)
+            //this.groundLayer.setTint(0xaba2d8)
         }
 
         this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
+        
         
         //var renderIndex = 9
         //this.noRenderTiles = [8,9,10,11];
@@ -1817,7 +1806,19 @@ class GameScene extends Phaser.Scene {
         // end on the wall map
         this.map.getLayer(this.wallVarient);
     
-
+        var noRenderTiles = [9,10,11,12,
+            257,258,258,259,260,261,262,263,264,
+            289,290,291,292,293,294,295,296] //need to populate with full list and move elsewhere;
+        //var noRenderTilesList = [];
+        
+        for (let i = 0; i < noRenderTiles.length; i++) {
+            this.mapShadow.forEachTile(tile =>{
+                if (tile.index == noRenderTiles[i]) {
+                    tile.index = -1;
+                }
+            })
+            
+        }
         //this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
         //this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
 
@@ -3758,23 +3759,18 @@ class GameScene extends Phaser.Scene {
         var fadeOutSprites = []; 
         var groundSprites = [];
 
-                // Camera Pan Logic
+        // Camera Pan Logic
 
-                var centerLocation = new Phaser.Math.Vector2(X_OFFSET + GRID * 14,Y_OFFSET + GRID * 13)
-                //this.add.sprite(centerLocation.x,centerLocation.y,'snakeDefault', 5)
-                var blackholeLocation = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
-                //this.add.sprite(centerLocation.x,centerLocation.y,'snakeDefault', 5)
-        
-                var camDirection = new Phaser.Math.Vector2((blackholeLocation.y - centerLocation.y),(blackholeLocation.x - centerLocation.x));
-                //console.log('centerLocation',centerLocation)
-                //console.log('blackholeLocation',blackholeLocation)
-                //console.log('CAMDIRECTION',camDirection)
+        var centerLocation = new Phaser.Math.Vector2(X_OFFSET + GRID * 14,Y_OFFSET + GRID * 13)
+        var blackholeLocation = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
+
+        var camDirection = new Phaser.Math.Vector2((blackholeLocation.y - centerLocation.y),(blackholeLocation.x - centerLocation.x));
 
         this.wallLayer.culledTiles.forEach( tile => {
 
             var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
             ).setOrigin(0,0).setDepth(50);
-            _sprite.setPipeline('Light2D').setDepth(50);
+            _sprite.setPipeline('Light2D')
 
             
             if (FADE_OUT_TILES.includes(tile.index)) {
@@ -3789,11 +3785,15 @@ class GameScene extends Phaser.Scene {
 
                 var _spriteGround = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
                 ).setOrigin(0,0).setDepth(20);
-                _spriteGround.setTint(0xaba2d8);
+                //_spriteGround.setTint(0xaba2d8);
                 _spriteGround.setPipeline('Light2D').setDepth(20);
                 
-                groundSprites.push(_spriteGround);            
-                
+                if (FADE_OUT_TILES.includes(tile.index)) {
+                    fadeOutSprites.push(_spriteGround);
+                } else {
+                    groundSprites.push(_spriteGround);
+                }    
+                Phaser.Actions.Shuffle(groundSprites)
             });
             this.groundLayer.visible = false;
         }
@@ -3827,6 +3827,13 @@ class GameScene extends Phaser.Scene {
         //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
         var popVolume = 1.0
 
+        var fadeoutTween = this.tweens.add({
+            targets: fadeOutSprites,
+            alpha: 0,
+            duration: 1000,
+            ease: 'linear'
+            }, this);
+
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
             x: this.snake.head.x,
@@ -3841,7 +3848,6 @@ class GameScene extends Phaser.Scene {
             alpha: {from: 5, to: 0},
             rotation: 5,
             onDelay: () =>{
-
                 if (allTheThings.length > 150) {
                     blackholeTween.timeScale += .04;
                 }
@@ -3881,11 +3887,19 @@ class GameScene extends Phaser.Scene {
             duration: 600,
             ease: 'Sine.in',
             repeat: 0,
-            delay: this.tweens.stagger(30),
+            delay: this.tweens.stagger(20),
             alpha: {from: 5, to: 0},
             rotation: 5,
             onDelay: () =>{
-                blackholeTweenGround.timeScale += .03;
+                if (groundSprites.length > 250) {
+                    blackholeTweenGround.timeScale += .06;
+                }
+                if (groundSprites.length > 150) {
+                    blackholeTweenGround.timeScale += .05;
+                }
+                else{
+                    blackholeTweenGround.timeScale += .03;
+                }
             }
         });
 
@@ -3900,12 +3914,7 @@ class GameScene extends Phaser.Scene {
         });
 
 
-        var fadeoutTween = this.tweens.add({
-            targets: fadeOutSprites,
-            alpha: 0,
-            duration: 1000,
-            ease: 'linear'
-            }, this);
+
 
         
 
