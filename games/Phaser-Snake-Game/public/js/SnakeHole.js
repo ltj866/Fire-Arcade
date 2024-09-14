@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -262,7 +262,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1417,6 +1417,7 @@ class GameScene extends Phaser.Scene {
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
         this.portalParticles = [];
+        this.snakePortalingSprites = [];
 
         this.stageOver = false; // deprecated to be removed
 
@@ -1899,6 +1900,14 @@ class GameScene extends Phaser.Scene {
             duration: 300,
             delay: 500,
             alpha: {from: 0, to: 1}
+        });
+
+        this.tweens.add({
+            targets: [this.openingGoalText, this.openingGoalPanel],
+            alpha: 0,
+            ease: 'linear',
+            duration: 500,
+            delay: 5000,
         });
 
         //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
@@ -3835,11 +3844,15 @@ class GameScene extends Phaser.Scene {
             ...wallSprites,
         ];
 
-        //turn off portal particles
+        //turn off portal particles and any portal sprites
         if (this.portalParticles != undefined) {
             this.portalParticles.forEach(portalParticles => { 
                 portalParticles.stop();
             });
+            this.snakePortalingSprites.forEach(snakePortalingSprite => { 
+                snakePortalingSprite.visible = false;
+            });
+            
         }
         
         var snakeholeTween = this.tweens.add({
