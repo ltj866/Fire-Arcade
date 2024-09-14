@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1162,6 +1162,7 @@ class PersistScene extends Phaser.Scene {
     this.add.image(SCREEN_WIDTH/2 - 1,GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
     this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
         .setOrigin(0.0,0.0).setDepth(11);
+    this.comboCover.setScrollFactor(0);
     this.add.image(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
 
 
@@ -1415,6 +1416,7 @@ class GameScene extends Phaser.Scene {
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
+        this.portalParticles = [];
 
         this.stageOver = false; // deprecated to be removed
 
@@ -1496,16 +1498,16 @@ class GameScene extends Phaser.Scene {
         this.graphics = this.add.graphics();
 
 
-        this.cameras.main.x = this.camDirection.y * 10
-        this.cameras.main.y = this.camDirection.x * 10
+        this.cameras.main.scrollX = -this.camDirection.y * 10
+        this.cameras.main.scrollY = -this.camDirection.x * 10
         
         //ourPersist.bgCoords.x += this.camDirection.y/4;
         //ourPersist.bgCoords.y += this.camDirection.x/4;
         
         var cameraOpeningTween = this.tweens.add({
             targets: this.cameras.main,
-            x: 0,
-            y: 0,
+            scrollX: 0,
+            scrollY: 0,
             duration: 1000,
             ease: 'Sine.Out',
         });
@@ -1896,6 +1898,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.easeOutIn',
             duration: 300,
             delay: 500,
+            alpha: {from: 0, to: 1}
         });
 
         //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
@@ -2116,7 +2119,8 @@ class GameScene extends Phaser.Scene {
                     x: SCREEN_WIDTH * 2,
                     ease: 'Sine.easeOutIn',
                     duration: 300,
-                    delay: 125
+                    delay: 125,
+                    alpha: 0,
                 });
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -2362,17 +2366,17 @@ class GameScene extends Phaser.Scene {
                                     //    stageName,{ fontFamily: 'Oxanium', fontSize: 8, color: 'white', baselineX: 1.5 }
                                     //).setDepth(50).setOrigin(0,0).setAlpha(0);
 
-                                    var stageText = this.add.dom(tile.pixelX + 6 + X_OFFSET, tile.pixelY - GRID + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                                    var stageText = this.add.dom(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
                                         "font-size": '8px',
                                         "baselineX": 1.5,
                                         })).setHTML(
                                             stageName
-                                    ).setDepth(50).setOrigin(0,0).setAlpha(0);
+                                    ).setDepth(50).setAlpha(0);
                                     
-                                    var r1 = this.add.rectangle(tile.pixelX + 2 + X_OFFSET, tile.pixelY - 14 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
-                                    ).setDepth(49).setOrigin(0,0).setAlpha(0);
+                                    var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 12 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
+                                    ).setDepth(49).setAlpha(0);
                                     //debugger
-
+                                    r1.postFX.addShine(1, .5, 5)
                                     r1.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                                     
@@ -2381,13 +2385,20 @@ class GameScene extends Phaser.Scene {
                                     ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
                                     
                                     
+                                    //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+                                    //this.cameras.main.postFX.addBarrel(this,-0.5);
+                                    //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
+                                    /*this.blackholes.forEach(blackholeImage =>{
+                                        this.cameras.main.postFX.addBarrel([.125]) 
+                                    })*/
+                                    
                                     this.blackholes.push(blackholeImage)
                                     
                                     
                                     
                                     
                                     this.blackholesContainer.add(this.blackholes)
-                                    //this.blackholes.postFX.addBarrel(this.main.cameras,[.5])
+                                
 
                                     this.blackholeLabels.push(stageText,r1)
                                     if (blackholeImage.anims.getName() === 'blackholeForm')
@@ -2459,10 +2470,9 @@ class GameScene extends Phaser.Scene {
 
                 
             }
-                
-            
+
         }, this);
-       
+
 
         // #region Transition Visual /*
 
@@ -2692,6 +2702,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
+        
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -2727,7 +2738,7 @@ class GameScene extends Phaser.Scene {
             
             this.lights.addLight(portal.x +8, portal.y + 8, 128,  portalLightColor).setIntensity(1);
 
-            this.add.particles(portal.x, portal.y, 'megaAtlas', {
+            var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
@@ -2739,6 +2750,8 @@ class GameScene extends Phaser.Scene {
                 moveToY: 7,
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
+
+            this.portalParticles.push(portalParticles)
             
             if (!this.hasGhostTiles) {
                 this.portalMask = this.make.image({
@@ -2810,7 +2823,7 @@ class GameScene extends Phaser.Scene {
             this.bestBase = 0;
         }
 
-
+        
 
 
         
@@ -2884,7 +2897,7 @@ class GameScene extends Phaser.Scene {
         // #region UI HUD
         this.UIScoreContainer = this.make.container(0,0)
        if (this.startupAnim) {
-        this.UIScoreContainer.setAlpha(0);
+        this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
         }
 
 
@@ -2907,12 +2920,14 @@ class GameScene extends Phaser.Scene {
            frame: 'boostMask.png',
            add: false
        }).setOrigin(0.5,0.5);
+       this.boostMask.setScrollFactor(0);
 
        const keys = ['increasing'];
 
        
         this.boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID * 1.5)
             .setOrigin(0.5,0.5).setDepth(52);
+        this.boostBar.setScrollFactor(0);
         this.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
         this.boostMask.scaleX = 0;
        
@@ -3012,7 +3027,7 @@ class GameScene extends Phaser.Scene {
         
         
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
-            .setOrigin(0.0,0.0).setDepth(52);
+            .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
         ourPersist.comboCover.setVisible(false) //this is set to invisible so the game scene can render one that's interacted in this scene
 
         this.comboMasks = []
@@ -3027,6 +3042,10 @@ class GameScene extends Phaser.Scene {
         this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
         this.comboCover.mask.invertAlpha = true;
+        
+
+        //this.comboMasksContainer.setScrollFactor(0);
+        
        // #endregion
 
         
@@ -3115,6 +3134,7 @@ class GameScene extends Phaser.Scene {
          });
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        
 
 
          // Countdown Text
@@ -3128,6 +3148,7 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5).setAlpha(0).setScale(.5);
+        this.countDown.setScrollFactor(0);
 
         
 
@@ -3158,6 +3179,7 @@ class GameScene extends Phaser.Scene {
         })).setHTML(
                 `${commaInt(this.scene.get("PersistScene").coins).padStart(2, '0')}`
         ).setOrigin(0,0).setAlpha(0).setScale(.5);
+        this.coinUIText.setScrollFactor(0);
 
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
@@ -3487,7 +3509,7 @@ class GameScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1,
            })
-
+        
     }
     // #region .screenShake(
     screenShake(){
@@ -3747,6 +3769,7 @@ class GameScene extends Phaser.Scene {
             }
         });
     }
+    
 
     warpToNext(nextStageIndex) {
 
@@ -3811,6 +3834,13 @@ class GameScene extends Phaser.Scene {
             ...this.atoms,
             ...wallSprites,
         ];
+
+        //turn off portal particles
+        if (this.portalParticles != undefined) {
+            this.portalParticles.forEach(portalParticles => { 
+                portalParticles.stop();
+            });
+        }
         
         var snakeholeTween = this.tweens.add({
             targets: this.snake.body, 
@@ -3836,8 +3866,8 @@ class GameScene extends Phaser.Scene {
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
-            x: this.snake.head.x,
-            y: this.snake.head.y,
+            x: this.snake.head.x - GRID * 1,
+            y: this.snake.head.y + GRID * 1,
             //x: {from: this.snake.head.x + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.x},
             //y: {from: this.snake.head.y + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.y},
             yoyo: false,
@@ -3866,8 +3896,8 @@ class GameScene extends Phaser.Scene {
                     ourPersist.bgCoords.y += camDirection.x/2;
                     var cameraPanTween = this.tweens.add({
                         targets: this.cameras.main,
-                        x: -camDirection.y * 10,
-                        y: -camDirection.x * 10,
+                        scrollX: camDirection.y * 10,
+                        scrollY: camDirection.x * 10,
                         duration: 1000,
                         ease: 'Sine.In',
                         delay: 500,
@@ -3881,8 +3911,8 @@ class GameScene extends Phaser.Scene {
 
         var blackholeTweenGround = this.tweens.add({
             targets: groundSprites, 
-            x: this.snake.head.x,
-            y: this.snake.head.y,
+            x: this.snake.head.x - GRID * 1,
+            y: this.snake.head.y + GRID * 1,
             yoyo: false,
             duration: 600,
             ease: 'Sine.in',
