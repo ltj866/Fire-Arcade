@@ -12,7 +12,7 @@ var Portal = new Phaser.Class({
         this.setPosition(from[0], from[1]);
         this.setOrigin(.3125,.3125);
         this.setDepth(47);
-        this.play("portalIdle");
+        //this.play("portalIdle");
 
 
         this.target = { x: to[0], y: to[1]};

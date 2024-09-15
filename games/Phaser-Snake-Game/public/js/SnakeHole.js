@@ -332,7 +332,7 @@ class StartScene extends Phaser.Scene {
         //this.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim', frameWidth: 64, frameHeight: 64 });
         //scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim.png', frameWidth: 64, frameHeight: 64 }); 
         //debugger
-        //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
@@ -410,6 +410,7 @@ class StartScene extends Phaser.Scene {
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
         this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
         this.load.audio('pop03', [ 'pop03.ogg', 'pop03.mp3']);
+        this.load.audio('chime01',[ 'chime01.ogg', 'chime01.mp3'])
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
@@ -1606,6 +1607,7 @@ class GameScene extends Phaser.Scene {
 
         var _chargeUp = this.sound.add('chargeUp');
         this.pop03 = this.sound.add('pop03')
+        this.chime01 = this.sound.add('chime01')
 
         //_chargeUp.play();
 
@@ -1884,10 +1886,22 @@ class GameScene extends Phaser.Scene {
 
         //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
         
-        this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText('GOAL : Collect 28 Atoms').setOrigin(0,0).setOrigin(0.5,0);
+        this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText('GOAL : Collect 28 Atoms').setOrigin(0.5,0);
+
+        this.stageText = this.add.dom(-SCREEN_WIDTH, GRID * 7.5, 'div', Object.assign({},STYLE_DEFAULT,{
+            'color': '#272727',
+            'font-size': '12px',
+            'font-weight': '400',
+            'padding': '0px 0px 0px 12px'
+        })
+        ).setText(`${this.stage}`).setOrigin(0,0);
+
+        this.r2 = this.add.rectangle(this.stageText.x, this.stageText.y, this.stageText.width - 8, 16, 0xffffff
+        ).setDepth(101).setOrigin(0,0);
         
-        this.openingGoalPanel = this.add.nineslice(-SCREEN_WIDTH, GRID * 9.25, 
+        
+        this.openingGoalPanel = this.add.nineslice(-SCREEN_WIDTH, GRID * 8.25, 
             'uiPanelL', 'Glass', 
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
@@ -1901,9 +1915,26 @@ class GameScene extends Phaser.Scene {
             delay: 500,
             alpha: {from: 0, to: 1}
         });
+        this.tweens.add({
+            targets: this.stageText,
+            x: X_OFFSET + GRID * 6,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 500,
+            alpha: {from: 0, to: 1}
+        });
+        this.tweens.add({
+            targets: this.r2,
+            x: X_OFFSET + GRID * 6.75,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 500,
+            alpha: {from: 0, to: 1}
+        });
+        
 
         this.tweens.add({
-            targets: [this.openingGoalText, this.openingGoalPanel],
+            targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
             alpha: 0,
             ease: 'linear',
             duration: 500,
@@ -2124,8 +2155,8 @@ class GameScene extends Phaser.Scene {
                 //this.panelTweenCollapse.resume();
                 
                 this.tweens.add({
-                    targets: [this.openingGoalText, this.openingGoalPanel],
-                    x: SCREEN_WIDTH * 2,
+                    targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
+                    x: + SCREEN_WIDTH * 2,
                     ease: 'Sine.easeOutIn',
                     duration: 300,
                     delay: 125,
@@ -2775,6 +2806,26 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+
+        //stagger portal spawns
+        this.time.delayedCall(600, event => {
+            var interval = 225
+            this.portals.forEach(function (portal, index) { 
+                setTimeout(function () {
+                    
+                    portal.playAfterRepeat('portalForm');
+                    portal.chain(['portalIdle'])
+                    portal.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+                        ourGameScene.chime01.play({volume: 0.5});
+                    })
+                        
+                    //}
+                },index * interval)
+            })
+            
+        });
+
+
 
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
@@ -3446,6 +3497,7 @@ class GameScene extends Phaser.Scene {
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
+
         /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
         text.setOrigin(0.5, 0.5);
         text.setScale(0)
@@ -7086,15 +7138,28 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [ 0,0,0,0,1,2,2,2,2,1]}),
         frameRate: 12,
         repeat: -1
-        });
+    });
     
-    scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
+    /*scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
         frame: 'portalAnim.png'
     }); scene.anims.create({
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
         frameRate: 8,
         repeat: -1
+    });*/
+
+    scene.anims.create({
+        key: 'portalIdle',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'portalForm',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
+        frameRate: 8,
+        repeat: 0
     });
 
     scene.anims.create({
