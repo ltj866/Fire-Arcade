@@ -19,7 +19,7 @@ const DEV_BRANCH = "dev";
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -334,6 +334,7 @@ class StartScene extends Phaser.Scene {
         //debugger
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         
@@ -2369,6 +2370,34 @@ class GameScene extends Phaser.Scene {
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
+
+                //victory stars
+                /*this.add.particles(X_OFFSET + Phaser.Math.RND.integerInRange(0, SCREEN_WIDTH), 
+                    Y_OFFSET + Phaser.Math.RND.integerInRange(0, SCREEN_HEIGHT), 'starIdle', {
+                    //frame: ['portalParticle01.png'],
+                    //color: [ 0xFFFFFF,0x000000],
+                    //colorEase: 'quad.out',
+                    x:SCREEN_WIDTH,
+                    y:SCREEN_HEIGHT,
+                    //scale: {start: 1, end: .25},
+                    speed: 5,
+                    moveToX:-SCREEN_WIDTH,
+                    moveToY: -SCREEN_WIDTH,
+                    alpha:{start: 1, end: 0 },
+                    ease: 'Sine.easeOutIn',
+                }).setFrequency(667,[1]).setDepth(0);*/
+
+                this.add.particles(0, 0, "starIdle", { 
+                    x:{min: 0, max: SCREEN_WIDTH},
+                    y:{min: 0, max: SCREEN_HEIGHT},
+                    moveToX: -SCREEN_WIDTH,
+                    moveToY: SCREEN_HEIGHT,
+                    anim: 'starIdle',
+                    lifespan: 1000,
+                    rotation: 5
+                }).setFrequency(150,[1]).setDepth(51);
+            
+
                 
                 
                 
@@ -7164,6 +7193,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
         frameRate: 8,
         repeat: 0
+    });
+    scene.anims.create({
+        key: 'starIdle',
+        frames: scene.anims.generateFrameNumbers('stars',{ frames: [ 0,1,2,3,4,5,6,7,8]}),
+        frameRate: 4,
+        repeat: -1
     });
 
     scene.anims.create({
