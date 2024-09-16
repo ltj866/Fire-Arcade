@@ -1067,6 +1067,9 @@ class MainMenuScene extends Phaser.Scene {
             'world-championship': function () {
                 return true;
             },
+            'extras': function () {
+                return true;
+            },
             'options': function () {
                 return true;
             },
@@ -1689,9 +1692,7 @@ class GameScene extends Phaser.Scene {
 
        
 
-        //const shadowFX = this.snake.head.postFX.addShadow(0, 0, 0.006, 2, 0x111111, 10, .8);
-        //const shadowFX = this.cameras.main.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, .8);
-        
+       
         //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
         
@@ -1906,7 +1907,6 @@ class GameScene extends Phaser.Scene {
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
         this.openingGoalPanel.setDepth(100).setOrigin(0.475,0);
-
         this.tweens.add({
             targets: [this.openingGoalText, this.openingGoalPanel],
             x: SCREEN_WIDTH/2,
@@ -2560,13 +2560,16 @@ class GameScene extends Phaser.Scene {
                     //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
                     //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
                     var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
-
+                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875);
+                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
                     this.coins.push(_coin);
                 }
             });
             coinLayer.destroy();
         }
+
+        
+        
         
         
         
@@ -4668,6 +4671,7 @@ class GameScene extends Phaser.Scene {
                     debugger
                     var _coin = this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
                     ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
+                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
 
                     this.tweens.add( {
                         targets: _coin,
