@@ -1524,7 +1524,7 @@ class GameScene extends Phaser.Scene {
         });
 
         //test portal walls
-        if (this.stage == 'testingFuturistic' ) {
+        if (this.stage == 'testingFuturistic_x' ) {
             var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
             var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
             var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
@@ -1969,14 +1969,44 @@ class GameScene extends Phaser.Scene {
         // TODO Move out of here
         // Reserves two rows in the tilesheet for making portal areas.
         const PORTAL_TILE_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
-        const PORTAL_TILE_DIFF = 32;
+        const PORTAL_WALL_START = 672;
+        const ROW_DELTA = 32;
+
+        
+        
         var basePortalSpawnPools = {};
+        var wallPortalData = {};
+
+        
         
         this.map.getLayer(this.wallVarient);
         this.map.forEachTile( tile => {
 
-            // Make Portal Spawning List
-            if (tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + PORTAL_TILE_DIFF * 2) {
+            // Make Portal Walls
+
+            if ((tile.index > PORTAL_WALL_START && tile.index < PORTAL_WALL_START + 9) ||
+                (tile.index > PORTAL_WALL_START + ROW_DELTA && tile.index < PORTAL_WALL_START + ROW_DELTA + 9)
+            ) {
+                if (wallPortalData[tile.index]) {
+                    
+                    wallPortalData[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                }
+                else {
+                    wallPortalData[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                }
+                tile.index = -1;
+            }
+
+            
+
+
+
+
+            // Make Portal Spawning List based on the wall layer
+            if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
+                (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
+            ) {
+
                 if (basePortalSpawnPools[tile.index]) {
                     
                     basePortalSpawnPools[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
@@ -1987,6 +2017,10 @@ class GameScene extends Phaser.Scene {
                 tile.index = -1;
                 
             }
+            
+
+            
+            
             
 
             // Draw Dream walls
@@ -2056,6 +2090,7 @@ class GameScene extends Phaser.Scene {
                     break;
             }
         });
+
 
 
         /*
@@ -2609,9 +2644,8 @@ class GameScene extends Phaser.Scene {
         
         // #region Stage Logic
         
-        var makePair = function (scene, to, from) {
-            
-            var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
+        var makePair = function (scene, to, from, colorHex) {
+
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
             var p1 = new Portal(scene, color, to, from);
@@ -2648,19 +2682,49 @@ class GameScene extends Phaser.Scene {
                 
             //} 
         //});
+        console.log(wallPortalData);
+        for (let index = PORTAL_WALL_START + 1; index < PORTAL_WALL_START + 9; index++) {
+            
+            if (wallPortalData[index]) {
 
-        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 1 + PORTAL_TILE_DIFF; index++) {
+                // Check for if vertical or horizontal
+            
+            var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
+            
+            var startFrom = wallPortalData[index].shift();
+            var startTo = wallPortalData[index + ROW_DELTA].shift();
+
+            makePair(this, startFrom, startTo, colorHex);
+
+            var endFrom = wallPortalData[index].pop();
+            var endTo = wallPortalData[index + ROW_DELTA].pop();
+
+            makePair(this, endFrom, endTo, colorHex);
+            console.log(wallPortalData);
+
+            wallPortalData[index].forEach(portalTo => {
+                var portalFrom = wallPortalData[index + ROW_DELTA].shift();
+                makePair(this, portalTo, portalFrom, colorHex);
+            });
+            }
+        }
+
+        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
 
             // TODO: rename basePortalSpawnPools X doesn't have to do with coordinates and is confusing and not needed.
             if (basePortalSpawnPools[index]) {
+                var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
                 // consider throwing an error if a portal doesn't have a correctly defined _to or _from
                 
                 let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
-                let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + PORTAL_TILE_DIFF]);
+                let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
                 console.log("Portal Base Logic: FROM TO",_from, _to, index);
-                makePair(this, _to, _from);
+                makePair(this, _to, _from, colorHex);
             }
         }
+        
+
+
 
         //portalLayerX.destroy()
 

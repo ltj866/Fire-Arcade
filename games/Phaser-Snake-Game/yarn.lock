@@ -239,6 +239,11 @@ iconv-lite@0.4.24:
   dependencies:
     safer-buffer ">= 2.1.2 < 3"
 
+index.js@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.npmjs.org/index.js/-/index.js-0.0.3.tgz"
+  integrity sha512-62dN71h/y6X96muC2hxI95oPRpOwf+0mwS7S0TsMuEy857w41qjz8XJjob7eyuesQ71nbylasZx8sIkPAc5pXA==
+
 inherits@2.0.4:
   version "2.0.4"
   resolved "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz"
