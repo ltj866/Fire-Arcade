@@ -2427,15 +2427,18 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.easeOutIn',
                 }).setFrequency(667,[1]).setDepth(0);*/
 
-                this.add.particles(0, 0, "starIdle", { 
+                this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
                     x:{min: 0, max: SCREEN_WIDTH},
                     y:{min: 0, max: SCREEN_HEIGHT},
-                    moveToX: -SCREEN_WIDTH,
-                    moveToY: SCREEN_HEIGHT,
+                    gravityX: -50,
+                    gravityY: 50,
                     anim: 'starIdle',
-                    lifespan: 1000,
-                    rotation: 5
-                }).setFrequency(150,[1]).setDepth(51);
+                    lifespan: 3000,
+                }).setFrequency(300,[1]).setDepth(1);
+
+                if (this.winned){
+                    this.starEmitter.forEachAlive(console.log('working'))
+                }
             
 
                 
@@ -4929,8 +4932,8 @@ class GameScene extends Phaser.Scene {
             this.comboFade();
         }
 
-        
     }
+    
 }
 
 const COPPER = 0;
