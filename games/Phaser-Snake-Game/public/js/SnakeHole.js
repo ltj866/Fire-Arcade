@@ -2835,7 +2835,9 @@ class GameScene extends Phaser.Scene {
             toN = Phaser.Math.RND.pick(toArea);
             delete portalArrayN[toAreaKey];
 
-            makePair(this, fromN, toN);
+
+            var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
+            makePair(this, fromN, toN, colorHex);
     
             portalLayerN.visible = false;
             layerIndex ++; 
