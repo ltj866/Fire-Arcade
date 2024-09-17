@@ -21,7 +21,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -264,7 +264,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'r09-16-5'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1061,7 +1061,7 @@ class MainMenuScene extends Phaser.Scene {
                 console.log("Practice");
                 return true;
             },
-            'arcade': function () {
+            'play': function () {
                 console.log("Arcade");
                 thisScene.scene.launch('GameScene');
                 thisScene.scene.stop();
@@ -2683,29 +2683,40 @@ class GameScene extends Phaser.Scene {
             //} 
         //});
         console.log(wallPortalData);
+        
         for (let index = PORTAL_WALL_START + 1; index < PORTAL_WALL_START + 9; index++) {
             
             if (wallPortalData[index]) {
 
+                var wallDir = ""; // If we use this in more places it should be made an enum.
+
+                if (wallPortalData[index][1][0] - wallPortalData[index][0][0] === GRID) {
+                    wallDir = "Horz";
+                } else if (wallPortalData[index][1][1] - wallPortalData[index][0][1] === GRID) {
+                    wallDir = "Vert";
+                }
+                
+                console.log(wallDir); 
+
                 // Check for if vertical or horizontal
             
-            var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
-            
-            var startFrom = wallPortalData[index].shift();
-            var startTo = wallPortalData[index + ROW_DELTA].shift();
+                var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
+                
+                var startFrom = wallPortalData[index].shift();
+                var startTo = wallPortalData[index + ROW_DELTA].shift();
 
-            makePair(this, startFrom, startTo, colorHex);
+                makePair(this, startFrom, startTo, '#131313');
 
-            var endFrom = wallPortalData[index].pop();
-            var endTo = wallPortalData[index + ROW_DELTA].pop();
+                var endFrom = wallPortalData[index].pop();
+                var endTo = wallPortalData[index + ROW_DELTA].pop();
 
-            makePair(this, endFrom, endTo, colorHex);
-            console.log(wallPortalData);
+                makePair(this, endFrom, endTo, '#DDDDDD');
+                console.log(wallPortalData);
 
-            wallPortalData[index].forEach(portalTo => {
-                var portalFrom = wallPortalData[index + ROW_DELTA].shift();
-                makePair(this, portalTo, portalFrom, colorHex);
-            });
+                wallPortalData[index].forEach(portalTo => {
+                    var portalFrom = wallPortalData[index + ROW_DELTA].shift();
+                    makePair(this, portalTo, portalFrom, colorHex);
+                });
             }
         }
 
