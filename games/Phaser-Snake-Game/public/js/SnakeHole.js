@@ -264,7 +264,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'r09-16-2'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -2412,20 +2412,6 @@ class GameScene extends Phaser.Scene {
                 updateSumOfBest(ourPersist);
 
                 //victory stars
-                /*this.add.particles(X_OFFSET + Phaser.Math.RND.integerInRange(0, SCREEN_WIDTH), 
-                    Y_OFFSET + Phaser.Math.RND.integerInRange(0, SCREEN_HEIGHT), 'starIdle', {
-                    //frame: ['portalParticle01.png'],
-                    //color: [ 0xFFFFFF,0x000000],
-                    //colorEase: 'quad.out',
-                    x:SCREEN_WIDTH,
-                    y:SCREEN_HEIGHT,
-                    //scale: {start: 1, end: .25},
-                    speed: 5,
-                    moveToX:-SCREEN_WIDTH,
-                    moveToY: -SCREEN_WIDTH,
-                    alpha:{start: 1, end: 0 },
-                    ease: 'Sine.easeOutIn',
-                }).setFrequency(667,[1]).setDepth(0);*/
 
                 this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
                     x:{min: 0, max: SCREEN_WIDTH},
@@ -2435,10 +2421,6 @@ class GameScene extends Phaser.Scene {
                     anim: 'starIdle',
                     lifespan: 3000,
                 }).setFrequency(300,[1]).setDepth(1);
-
-                if (this.winned){
-                    this.starEmitter.forEachAlive(console.log('working'))
-                }
             
 
                 
