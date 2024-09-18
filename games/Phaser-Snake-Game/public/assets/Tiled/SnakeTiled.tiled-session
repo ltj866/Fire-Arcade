@@ -1,5 +1,5 @@
 {
-    "activeFile": "World_6-4_Adv_Portaling.json",
+    "activeFile": "testingFuturistic.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1826,8 +1826,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 162.33333333333334,
-                "y": 152.99999999999997
+                "x": 101.66666666666666,
+                "y": 146.99999999999997
             }
         },
         "testingFuturistic.json#tileSheetx12": {
@@ -1959,7 +1959,9 @@
         "Stage-06.json",
         "Stage-08.json",
         "Stage-07.json",
-        "World_6-4_Adv_Portaling.json"
+        "World_6-4_Adv_Portaling.json",
+        "testingx01.json",
+        "testingFuturistic.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",

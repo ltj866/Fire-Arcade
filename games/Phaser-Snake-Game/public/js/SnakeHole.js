@@ -337,6 +337,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
+        this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         
@@ -360,6 +361,7 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiGlassR', 'assets/sprites/UI_Glass_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiPanelL', 'assets/sprites/UI_Panel_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('boostMeterBG', 'assets/sprites/UI_boostMeterBG.png');
@@ -1055,13 +1057,14 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
         const thisScene = this.scene.get('MainMenuScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         var menuOptions = {
             'practice': function () {
                 console.log("Practice");
                 return true;
             },
-            'play': function () {
+            'adventure': function () {
                 console.log("Arcade");
                 thisScene.scene.launch('GameScene');
                 thisScene.scene.stop();
@@ -1070,7 +1073,13 @@ class MainMenuScene extends Phaser.Scene {
             'extraction': function () {
                 return true;
             },
-            'world-championship': function () {
+            'championship': function () {
+                return true;
+            },
+            'gauntlet': function () {
+                return true;
+            },
+            'endless': function () {
                 return true;
             },
             'extras': function () {
@@ -1083,41 +1092,82 @@ class MainMenuScene extends Phaser.Scene {
 
         var menuList = Object.keys(menuOptions);
         var cursorIndex = 1;
-        var textStart = 160;
-        var spacing = 30;
+        var textStart = 152;
+        var spacing = 24;
 
         
-        this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
-            "fontSize":'48px',
-            }), 
-                'PORTAL SNAKE',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        // TODO: Title
 
         
         var menuElements = []
         for (let index = 0; index < menuList.length; index++) {
-            var textElement = this.add.dom(SCREEN_WIDTH/2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {  
-                "fontSize":'48px',
-                "font-weight": 400,
-                }),
+            var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 3.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+                "color": "#181818"
+            }),
                     `${menuList[index].toUpperCase()}`
-            ).setOrigin(0.5,0).setScale(0.5);
+            ).setOrigin(0.0,0).setScale(0.5);
 
             menuElements.push(textElement);
             
         }
 
+        //panels
+
+        let _hOffset = SCREEN_WIDTH/2 - GRID * 5.5;
+        let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
+
+        const practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.practiceIcon = this.add.sprite(practiceButton.x + 2,practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5);
+        
+        const adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.adventureIcon = this.add.sprite(adventureButton.x + 2,adventureButton.y,"menuIcons", 1 ).setOrigin(0,0.5);
+        
+        const extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.extractionIcon = this.add.sprite(extractionButton.x + 2,extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5);
+
+        const championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.championshipIcon = this.add.sprite(championshipButton.x + 2,championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5);
+
+        const gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.gauntletIcon = this.add.sprite(gauntletButton.x + 2,gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5);
+
+        const endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.endlessIcon = this.add.sprite(endlessButton.x + 2,endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5);
+
+        const extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.extrasIcon = this.add.sprite(extrasButton.x + 2,extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5);
+
+        const optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 128, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.optionsIcon = this.add.sprite(optionsButton.x + 2,optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5);
+
+        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 6.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault')
+
+        //TODO: arrows
+
         var selected = menuElements[cursorIndex];
-        selected.node.style.color = COLOR_FOCUS;
+        selected.node.style.color = "white";
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            selected.node.style.color = "white";
+            selected.node.style.color = '#181818';
             cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
 
             selected = menuElements[cursorIndex];
-            selected.node.style.color = COLOR_FOCUS;
-            //selector.y = selected.y + 6;
+
+            if (cursorIndex >= 2 && cursorIndex <= 5) {
+                selected.node.style.color = "darkred";
+            }
+            else{
+                selected.node.style.color = "white";
+            }
+
+
+            menuSelector.y = selected.y + 7
             
+            ourPersist.bgCoords.y += 5;
+            
+            thisScene.changeMenuSprite(cursorIndex);
             //upArrow.y = selected.y - 42;
             //downArrow.y = selected.y + 32;
 
@@ -1126,12 +1176,21 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            selected.node.style.color = "white";
+            selected.node.style.color = "#181818";
             cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
             
             selected = menuElements[cursorIndex];
-            selected.node.style.color = COLOR_FOCUS;
-            //selector.y = selected[0].y + 6;
+            if (cursorIndex >= 2 && cursorIndex <= 5) {
+                selected.node.style.color = "darkred";
+            }
+            else{
+                selected.node.style.color = "white";
+            }
+            menuSelector.y = selected.y + 7
+
+            ourPersist.bgCoords.y -= 5;
+
+            thisScene.changeMenuSprite(cursorIndex);
             
             //upArrow.y = selected[0].y - 42;
             //downArrow.y = selected[0].y + 32;
@@ -1139,11 +1198,64 @@ class MainMenuScene extends Phaser.Scene {
             //continueTextUI.setText(`[GOTO ${selected[1]}]`);
         }, [], this);
 
+        
+
         this.input.keyboard.on('keydown-SPACE', function() {
             console.log(menuOptions[menuList[cursorIndex]].call());
         });
         
         
+    }
+
+    changeMenuSprite(cursorIndex){
+        this.practiceIcon.setFrame(0);
+        this.adventureIcon.setFrame(1);
+        this.extractionIcon.setFrame(2);
+        this.championshipIcon.setFrame(3);
+        this.gauntletIcon.setFrame(4);
+        this.endlessIcon.setFrame(5);
+        this.extrasIcon.setFrame(6);
+        this.optionsIcon.setFrame(7);
+
+        switch (cursorIndex) {
+            case 0:
+                console.log('0')
+                this.practiceIcon.setFrame(8)
+                break;
+            case 1:
+                console.log('1')
+                this.adventureIcon.setFrame(9)
+                break;
+            case 2:
+                console.log('2')
+                this.extractionIcon.setFrame(10)
+                break;
+            case 3:
+                console.log('3')
+                this.championshipIcon.setFrame(11)
+                break;
+            case 4:
+                console.log('4')
+                this.gauntletIcon.setFrame(12)
+                break;
+            case 5:
+                console.log('5')
+                this.endlessIcon.setFrame(13)
+                break;
+            case 6:
+                console.log('6')
+                this.extrasIcon.setFrame(14)
+                break;
+            case 7:
+                console.log('7')
+                this.optionsIcon.setFrame(15)
+                break;
+
+                
+            default:
+                //;    
+                break;
+        }
     }
 }
 
@@ -1173,8 +1285,8 @@ class PersistScene extends Phaser.Scene {
     this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
         .setOrigin(0.0,0.0).setDepth(11);
     this.comboCover.setScrollFactor(0);
-    this.add.image(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
-
+    this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
+    //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
 
     // # Backgrounds
 
@@ -1820,7 +1932,9 @@ class GameScene extends Phaser.Scene {
     
         var noRenderTiles = [9,10,11,12,
             257,258,258,259,260,261,262,263,264,
-            289,290,291,292,293,294,295,296] //need to populate with full list and move elsewhere;
+            289,290,291,292,293,294,295,296,
+            673,674,675,676,677,678,679,680,
+            704,705,706,707,708,709,710,711,712] //need to populate with full list and move elsewhere;
         //var noRenderTilesList = [];
         
         for (let i = 0; i < noRenderTiles.length; i++) {
@@ -7636,7 +7750,7 @@ var config = {
     //pixelArt: false, // if not commented out and set to false, will still override scale settings.
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
-        mode: Phaser.Scale.FIT,
+        //mode: Phaser.Scale.FIT,
     },
     //parent: 'phaser-example',
     physics: {
