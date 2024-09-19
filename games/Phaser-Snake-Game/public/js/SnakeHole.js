@@ -1066,7 +1066,7 @@ class MainMenuScene extends Phaser.Scene {
         this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
         this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
             'uiPanelL', 'Glass', 
-            GRID * 10, GRID * 8, 
+            GRID * 10, 75, 
             16, 16, 16, 16).setDepth(50).setOrigin(0,0);
         this.descriptionText = this.add.dom(SCREEN_WIDTH/2 + GRID * 3.25, SCREEN_HEIGHT/2 - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '16px',
@@ -1081,7 +1081,7 @@ class MainMenuScene extends Phaser.Scene {
         ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
 
 
-        this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff } });
+        this.graphics = this.add.graphics({ lineStyle: { width: 1, color: 0xffffff }, fillStyle: { color: 0xffffff } });
         this.descriptionPointer = new Phaser.Geom.Circle(SCREEN_WIDTH/2 - GRID * 1, SCREEN_HEIGHT/2 + 3, 3);
         this.graphics.fillCircleShape(this.descriptionPointer);
         this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
@@ -1130,14 +1130,25 @@ class MainMenuScene extends Phaser.Scene {
         
         var menuElements = []
         for (let index = 0; index < menuList.length; index++) {
-            var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                "fontSize": '24px',
-                "fontWeight": 400,
-                "color": "#181818"
-            }),
-                    `${menuList[index].toUpperCase()}`
-            ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
-
+            if (index == 2 || index == 3 || index == 5) {
+                var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": "darkgrey",
+                    "text-decoration": 'line-through'
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
+            }
+            else{
+                var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": "#181818",
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(1); 
+            }
             menuElements.push(textElement);
             
         }
@@ -1180,7 +1191,13 @@ class MainMenuScene extends Phaser.Scene {
         selected.node.style.color = "white";
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            selected.node.style.color = '#181818';
+            if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
+                selected.node.style.color = 'darkgrey';
+            }
+            else{
+                selected.node.style.color = '#181818';
+            }
+            
             selected.setAlpha(1);
             cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
 
@@ -1209,7 +1226,12 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            selected.node.style.color = "#181818";
+            if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
+                selected.node.style.color = 'darkgrey';
+            }
+            else{
+                selected.node.style.color = '#181818';
+            }
             selected.setAlpha(1);
             cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
             
@@ -1247,8 +1269,8 @@ class MainMenuScene extends Phaser.Scene {
         this.graphics.fillCircleShape(this.descriptionPointer);
         
         //left horizontal line connecting left dot
-        this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y,
-             this.descriptionPanel.x - 8,this.descriptionPointer.y);
+        this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y - 0.5,
+             this.descriptionPanel.x - 8,this.descriptionPointer.y - 0.5);
         
         //vertical line
         this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
@@ -1256,7 +1278,7 @@ class MainMenuScene extends Phaser.Scene {
 
         //second horizontal line from left
         this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
-            this.descriptionPanel.x,this.descriptionPanel.y + this.descriptionPanel.height/2);
+            this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2).setDepth(50);
     }
     
 
@@ -1382,7 +1404,7 @@ class MainMenuScene extends Phaser.Scene {
                 });
                 break;
             case 4:
-                this.descriptionDom = 'Beat adventure mode to find out!';
+                this.descriptionDom = 'Beat adventure mode to unlock.';
                 this.descriptionText.setText(this.descriptionDom)
                 this.gauntletIcon.setFrame(12)
                 this.tweens.add({
