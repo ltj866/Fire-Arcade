@@ -138,6 +138,11 @@
          "value":"18c92612-9b8e-409a-8a87-2548950f93e6"
         }, 
         {
+         "name":"customColors",
+         "type":"string",
+         "value":""
+        }, 
+        {
          "name":"diffBonus",
          "type":"int",
          "value":100
@@ -153,7 +158,7 @@
          "value":"hard-racer"
         }],
  "renderorder":"right-down",
- "tiledversion":"1.10.2",
+ "tiledversion":"1.11.0",
  "tileheight":24,
  "tilesets":[
         {
