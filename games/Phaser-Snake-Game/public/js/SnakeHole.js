@@ -1101,48 +1101,49 @@ class MainMenuScene extends Phaser.Scene {
         
         var menuElements = []
         for (let index = 0; index < menuList.length; index++) {
-            var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 3.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+            var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 400,
                 "color": "#181818"
             }),
                     `${menuList[index].toUpperCase()}`
-            ).setOrigin(0.0,0).setScale(0.5);
+            ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
 
             menuElements.push(textElement);
             
         }
+        menuElements[1].setAlpha(1);
 
         //panels
 
-        let _hOffset = SCREEN_WIDTH/2 - GRID * 5.5;
+        let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
         let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
 
-        const practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.practiceIcon = this.add.sprite(practiceButton.x + 2,practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5);
+        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5);
         
-        const adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.adventureIcon = this.add.sprite(adventureButton.x + 2,adventureButton.y,"menuIcons", 1 ).setOrigin(0,0.5);
+        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5);
         
-        const extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.extractionIcon = this.add.sprite(extractionButton.x + 2,extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5);
+        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5);
 
-        const championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.championshipIcon = this.add.sprite(championshipButton.x + 2,championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5);
+        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5);
 
-        const gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.gauntletIcon = this.add.sprite(gauntletButton.x + 2,gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5);
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5);
 
-        const endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.endlessIcon = this.add.sprite(endlessButton.x + 2,endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5);
+        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5);
 
-        const extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.extrasIcon = this.add.sprite(extrasButton.x + 2,extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5);
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5);
 
-        const optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 128, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.optionsIcon = this.add.sprite(optionsButton.x + 2,optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5);
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5);
 
-        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 6.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault')
+        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault')
 
         //TODO: arrows
 
@@ -1150,16 +1151,19 @@ class MainMenuScene extends Phaser.Scene {
         selected.node.style.color = "white";
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            selected.node.style.color = '#181818';
+            //selected.node.style.color = '#181818';
+            selected.setAlpha(0);
             cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
 
             selected = menuElements[cursorIndex];
 
             if (cursorIndex >= 2 && cursorIndex <= 5) {
-                selected.node.style.color = "darkred";
+                selected.node.style.color = "darkgrey";
+                selected.setAlpha(1)
             }
             else{
                 selected.node.style.color = "white";
+                selected.setAlpha(1)
             }
 
 
@@ -1176,15 +1180,18 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            selected.node.style.color = "#181818";
+            //selected.node.style.color = "#181818";
+            selected.setAlpha(0);
             cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
             
             selected = menuElements[cursorIndex];
             if (cursorIndex >= 2 && cursorIndex <= 5) {
-                selected.node.style.color = "darkred";
+                selected.node.style.color = "darkgrey";
+                selected.setAlpha(1)
             }
             else{
                 selected.node.style.color = "white";
+                selected.setAlpha(1)
             }
             menuSelector.y = selected.y + 7
 
@@ -1217,38 +1224,86 @@ class MainMenuScene extends Phaser.Scene {
         this.extrasIcon.setFrame(6);
         this.optionsIcon.setFrame(7);
 
+        this.tweens.add({
+            targets: [this.practiceButton,this.adventureButton,this.extractionButton,this.championshipButton,
+                this.gauntletButton,this.endlessButton,this.extrasButton,this.optionsButton],
+            width: 0,
+            duration: 100,
+            ease: 'Sine.InOut',
+        });
+
         switch (cursorIndex) {
             case 0:
-                console.log('0')
                 this.practiceIcon.setFrame(8)
+                this.tweens.add({
+                    targets: this.practiceButton,
+                    width: 88,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 1:
-                console.log('1')
                 this.adventureIcon.setFrame(9)
+                this.tweens.add({
+                    targets: this.adventureButton,
+                    width: 104,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 2:
-                console.log('2')
                 this.extractionIcon.setFrame(10)
+                this.tweens.add({
+                    targets: this.extractionButton,
+                    width: 106,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 3:
-                console.log('3')
                 this.championshipIcon.setFrame(11)
+                this.tweens.add({
+                    targets: this.championshipButton,
+                    width: 124,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 4:
-                console.log('4')
                 this.gauntletIcon.setFrame(12)
+                this.tweens.add({
+                    targets: this.gauntletButton,
+                    width: 94,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 5:
-                console.log('5')
                 this.endlessIcon.setFrame(13)
+                this.tweens.add({
+                    targets: this.endlessButton,
+                    width: 84,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 6:
-                console.log('6')
                 this.extrasIcon.setFrame(14)
+                this.tweens.add({
+                    targets: this.extrasButton,
+                    width: 76,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 7:
-                console.log('7')
                 this.optionsIcon.setFrame(15)
+                this.tweens.add({
+                    targets: this.optionsButton,
+                    width: 84,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
 
                 
