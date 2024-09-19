@@ -339,7 +339,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
-
+        this.load.image('titleLogo','assets/sprites/UI_titleLogo.png')
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -1059,6 +1059,35 @@ class MainMenuScene extends Phaser.Scene {
         const thisScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
 
+        //title logo
+        this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 7,'titleLogo')
+
+        //description panel
+        this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
+        this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
+            'uiPanelL', 'Glass', 
+            GRID * 10, GRID * 8, 
+            16, 16, 16, 16).setDepth(50).setOrigin(0,0);
+        this.descriptionText = this.add.dom(SCREEN_WIDTH/2 + GRID * 3.25, SCREEN_HEIGHT/2 - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '16px',
+            "fontWeight": 200,
+            "color": "white",
+            "width": '210px',
+            "height": '75px',
+            "textAlign": 'left'
+
+        }),
+                `${this.descriptionDom}`
+        ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
+
+
+        this.graphics = this.add.graphics({ lineStyle: { width: 2, color: 0xffffff }, fillStyle: { color: 0xffffff } });
+        this.descriptionPointer = new Phaser.Geom.Circle(SCREEN_WIDTH/2 - GRID * 1, SCREEN_HEIGHT/2 + 3, 3);
+        this.graphics.fillCircleShape(this.descriptionPointer);
+        this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
+
+
+
         var menuOptions = {
             'practice': function () {
                 console.log("Practice");
@@ -1107,7 +1136,7 @@ class MainMenuScene extends Phaser.Scene {
                 "color": "#181818"
             }),
                     `${menuList[index].toUpperCase()}`
-            ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+            ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
 
             menuElements.push(textElement);
             
@@ -1119,28 +1148,28 @@ class MainMenuScene extends Phaser.Scene {
         let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
         let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
 
-        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5);
         
         this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5);
         this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5);
         
-        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5);
 
-        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5);
 
-        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5);
 
-        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5);
 
-        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5);
 
-        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 18, 18, 9,9,9,9).setOrigin(0,0.5);
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5);
         this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5);
 
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault')
@@ -1151,8 +1180,8 @@ class MainMenuScene extends Phaser.Scene {
         selected.node.style.color = "white";
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            //selected.node.style.color = '#181818';
-            selected.setAlpha(0);
+            selected.node.style.color = '#181818';
+            selected.setAlpha(1);
             cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
 
             selected = menuElements[cursorIndex];
@@ -1180,8 +1209,8 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            //selected.node.style.color = "#181818";
-            selected.setAlpha(0);
+            selected.node.style.color = "#181818";
+            selected.setAlpha(1);
             cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
             
             selected = menuElements[cursorIndex];
@@ -1213,6 +1242,24 @@ class MainMenuScene extends Phaser.Scene {
         
         
     }
+    update() {
+        this.graphics.clear();
+        this.graphics.fillCircleShape(this.descriptionPointer);
+        
+        //left horizontal line connecting left dot
+        this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y,
+             this.descriptionPanel.x - 8,this.descriptionPointer.y);
+        
+        //vertical line
+        this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
+            this.descriptionPanel.x - 8,this.descriptionPanel.y + this.descriptionPanel.height/2);
+
+        //second horizontal line from left
+        this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
+            this.descriptionPanel.x,this.descriptionPanel.y + this.descriptionPanel.height/2);
+    }
+    
+
 
     changeMenuSprite(cursorIndex){
         this.practiceIcon.setFrame(0);
@@ -1223,17 +1270,23 @@ class MainMenuScene extends Phaser.Scene {
         this.endlessIcon.setFrame(5);
         this.extrasIcon.setFrame(6);
         this.optionsIcon.setFrame(7);
+        
 
         this.tweens.add({
             targets: [this.practiceButton,this.adventureButton,this.extractionButton,this.championshipButton,
                 this.gauntletButton,this.endlessButton,this.extrasButton,this.optionsButton],
-            width: 0,
+            width: 136,
             duration: 100,
             ease: 'Sine.InOut',
         });
 
+        let _xOffset = SCREEN_WIDTH/2;
+        let _yOffset = SCREEN_HEIGHT/2+ 3;
+
         switch (cursorIndex) {
             case 0:
+                this.descriptionDom = 'Build your skills and replay any level you have gotten to previously.';
+                this.descriptionText.setText(this.descriptionDom)
                 this.practiceIcon.setFrame(8)
                 this.tweens.add({
                     targets: this.practiceButton,
@@ -1241,8 +1294,24 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2.5,
+                    y: _yOffset - GRID * 2,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                
                 break;
             case 1:
+                this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.';
+                this.descriptionText.setText(this.descriptionDom)
                 this.adventureIcon.setFrame(9)
                 this.tweens.add({
                     targets: this.adventureButton,
@@ -1250,8 +1319,23 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 75,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 1,
+                    y: _yOffset,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 2:
+                this.descriptionDom = 'Playable in full game!';
+                this.descriptionText.setText(this.descriptionDom)
                 this.extractionIcon.setFrame(10)
                 this.tweens.add({
                     targets: this.extractionButton,
@@ -1259,8 +1343,23 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 1,
+                    y: _yOffset + GRID * 2,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 3:
+                this.descriptionDom = 'Playable in full game!';
+                this.descriptionText.setText(this.descriptionDom)
                 this.championshipIcon.setFrame(11)
                 this.tweens.add({
                     targets: this.championshipButton,
@@ -1268,8 +1367,23 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset + GRID * .5,
+                    y: _yOffset + GRID * 4,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 4:
+                this.descriptionDom = 'Beat adventure mode to find out!';
+                this.descriptionText.setText(this.descriptionDom)
                 this.gauntletIcon.setFrame(12)
                 this.tweens.add({
                     targets: this.gauntletButton,
@@ -1277,8 +1391,23 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2,
+                    y: _yOffset + GRID * 6,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 5:
+                this.descriptionDom = 'Playable in full game!';
+                this.descriptionText.setText(this.descriptionDom)
                 this.endlessIcon.setFrame(13)
                 this.tweens.add({
                     targets: this.endlessButton,
@@ -1286,8 +1415,23 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2.75,
+                    y: _yOffset + GRID * 8,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 6:
+                this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
+                this.descriptionText.setText(this.descriptionDom)
                 this.extrasIcon.setFrame(14)
                 this.tweens.add({
                     targets: this.extrasButton,
@@ -1295,12 +1439,40 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 100,
                     ease: 'Sine.Out',
                 });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 3.5,
+                    y: _yOffset + GRID * 10,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
                 break;
             case 7:
+                this.descriptionDom = 'Configure game settings.';
+                this.descriptionText.setText(this.descriptionDom)
                 this.optionsIcon.setFrame(15)
                 this.tweens.add({
                     targets: this.optionsButton,
                     width: 84,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2.75,
+                    y: _yOffset + GRID * 12,
                     duration: 100,
                     ease: 'Sine.Out',
                 });
