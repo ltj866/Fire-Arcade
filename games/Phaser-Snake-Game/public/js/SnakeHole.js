@@ -1059,15 +1059,47 @@ class MainMenuScene extends Phaser.Scene {
         const thisScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
 
+        this.pressedSpace = false;
+        this.portalColors = PORTAL_COLORS.slice();
+        // Select a random color
+        let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
+        let intColor = this.hexToInt(randomColor);
+        //console.log(_portalColor)
+
+        
+
         //title logo
-        this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 7,'titleLogo')
+        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo')
+        var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
+        //titlePortal.setTint(_portalColor);
+        titlePortal.setTint(intColor).setScale(1.25)
+        titlePortal.play('portalIdle')
+
+        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "white",
+            "textAlign": 'center'
+
+        }),
+                `Press Space`
+        ).setOrigin(0.5,0.5).setScale(0.5);
+
+        this.pressToPlayTween = this.tweens.add({
+            targets: this.pressToPlay,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Sine.InOut',
+            yoyo: true,
+            repeat: -1,
+        });
 
         //description panel
         this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
         this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
             'uiPanelL', 'Glass', 
             GRID * 10, 75, 
-            16, 16, 16, 16).setDepth(50).setOrigin(0,0);
+            16, 16, 16, 16).setDepth(50).setOrigin(0,0).setAlpha(0);
         this.descriptionText = this.add.dom(SCREEN_WIDTH/2 + GRID * 3.25, SCREEN_HEIGHT/2 - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '16px',
             "fontWeight": 200,
@@ -1078,13 +1110,14 @@ class MainMenuScene extends Phaser.Scene {
 
         }),
                 `${this.descriptionDom}`
-        ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
+        ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
 
 
         this.graphics = this.add.graphics({ lineStyle: { width: 1, color: 0xffffff }, fillStyle: { color: 0xffffff } });
         this.descriptionPointer = new Phaser.Geom.Circle(SCREEN_WIDTH/2 - GRID * 1, SCREEN_HEIGHT/2 + 3, 3);
         this.graphics.fillCircleShape(this.descriptionPointer);
         this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
+        this.graphics.setAlpha(0);
 
 
 
@@ -1138,7 +1171,7 @@ class MainMenuScene extends Phaser.Scene {
                     "text-decoration": 'line-through'
                 }),
                         `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
             }
             else{
                 var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1147,142 +1180,190 @@ class MainMenuScene extends Phaser.Scene {
                     "color": "#181818",
                 }),
                         `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(1); 
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0); 
             }
             menuElements.push(textElement);
             
         }
-        menuElements[1].setAlpha(1);
+        menuElements[1].setAlpha(0);
 
         //panels
 
         let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
         let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
 
-        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5);
+        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
         
-        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5);
+        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
         
-        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a');
-        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5);
+        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a');
-        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5);
+        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a');
-        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5);
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a');
-        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5);
+        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5);
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5);
-        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5);
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
 
-        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault')
-
+        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
         //TODO: arrows
 
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
-                selected.node.style.color = 'darkgrey';
+            if (thisScene.pressedSpace) {
+                if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
+                    selected.node.style.color = 'darkgrey';
+                }
+                else{
+                    selected.node.style.color = '#181818';
+                }
+                
+                selected.setAlpha(1);
+                cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+                selected = menuElements[cursorIndex];
+
+                if (cursorIndex >= 2 && cursorIndex <= 5) {
+                    selected.node.style.color = "darkgrey";
+                    selected.setAlpha(1)
+                }
+                else{
+                    selected.node.style.color = "white";
+                    selected.setAlpha(1)
+                }
+
+
+                menuSelector.y = selected.y + 7
+                
+                ourPersist.bgCoords.y += 5;
+                
+                thisScene.changeMenuSprite(cursorIndex);
+                //upArrow.y = selected.y - 42;
+                //downArrow.y = selected.y + 32;
+
+                //continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }
-            else{
-                selected.node.style.color = '#181818';
-            }
-            
-            selected.setAlpha(1);
-            cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
-
-            selected = menuElements[cursorIndex];
-
-            if (cursorIndex >= 2 && cursorIndex <= 5) {
-                selected.node.style.color = "darkgrey";
-                selected.setAlpha(1)
-            }
-            else{
-                selected.node.style.color = "white";
-                selected.setAlpha(1)
-            }
-
-
-            menuSelector.y = selected.y + 7
-            
-            ourPersist.bgCoords.y += 5;
-            
-            thisScene.changeMenuSprite(cursorIndex);
-            //upArrow.y = selected.y - 42;
-            //downArrow.y = selected.y + 32;
-
-            //continueTextUI.setText(`[GOTO ${selected[1]}]`);
             
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
-                selected.node.style.color = 'darkgrey';
+            if (thisScene.pressedSpace) {
+                
+                if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
+                    selected.node.style.color = 'darkgrey';
+                }
+                else{
+                    selected.node.style.color = '#181818';
+                }
+                selected.setAlpha(1);
+                cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
+                
+                selected = menuElements[cursorIndex];
+                if (cursorIndex >= 2 && cursorIndex <= 5) {
+                    selected.node.style.color = "darkgrey";
+                    selected.setAlpha(1)
+                }
+                else{
+                    selected.node.style.color = "white";
+                    selected.setAlpha(1)
+                }
+                menuSelector.y = selected.y + 7
+    
+                ourPersist.bgCoords.y -= 5;
+    
+                thisScene.changeMenuSprite(cursorIndex);
+                
+                //upArrow.y = selected[0].y - 42;
+                //downArrow.y = selected[0].y + 32;
+    
+                //continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }
-            else{
-                selected.node.style.color = '#181818';
-            }
-            selected.setAlpha(1);
-            cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
-            
-            selected = menuElements[cursorIndex];
-            if (cursorIndex >= 2 && cursorIndex <= 5) {
-                selected.node.style.color = "darkgrey";
-                selected.setAlpha(1)
-            }
-            else{
-                selected.node.style.color = "white";
-                selected.setAlpha(1)
-            }
-            menuSelector.y = selected.y + 7
-
-            ourPersist.bgCoords.y -= 5;
-
-            thisScene.changeMenuSprite(cursorIndex);
-            
-            //upArrow.y = selected[0].y - 42;
-            //downArrow.y = selected[0].y + 32;
-
-            //continueTextUI.setText(`[GOTO ${selected[1]}]`);
         }, [], this);
 
+        var titleContainer = this.add.container();
+
+        titleContainer.add(titleLogo);
+        titleContainer.add(titlePortal);
+
+        var titleTween = this.tweens.add({
+            targets: titleContainer,
+            y: -GRID * 7,
+            duration: 750,
+            ease: 'Sine.InOut',
+        });
         
+        var menuFadeTween = this.tweens.add({
+            targets: [this.practiceButton,this.practiceIcon,this.adventureButton,this.adventureIcon,
+                this.extractionButton,this.extractionIcon,this.championshipButton,
+                this.championshipIcon,this.gauntletButton,this.gauntletIcon,
+                this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
+                this.optionsButton,this.optionsIcon,menuSelector,
+                this.descriptionPanel,this.descriptionText,
+                menuElements[0],menuElements[1],menuElements[2],menuElements[3],
+                menuElements[4],menuElements[5],menuElements[6],menuElements[7],
+                this.graphics
+            ],
+            alpha: 1,
+            duration: 100,
+            delay: 500,
+            ease: 'linear',
+        });
+        titleTween.pause();
+        menuFadeTween.pause();
+        this.graphics.setDepth(50)
 
         this.input.keyboard.on('keydown-SPACE', function() {
-            console.log(menuOptions[menuList[cursorIndex]].call());
+            if (!thisScene.pressedSpace) {
+                thisScene.pressToPlayTween.stop();
+                thisScene.pressToPlay.setAlpha(0)
+                thisScene.pressedSpace = true;
+                titleTween.resume();
+                menuFadeTween.resume();            
+            }
+            else{
+                console.log(menuOptions[menuList[cursorIndex]].call());
+            }
+
         });
         
         
     }
     update() {
         this.graphics.clear();
-        this.graphics.fillCircleShape(this.descriptionPointer);
+            if (this.pressedSpace) {
+                this.graphics.fillCircleShape(this.descriptionPointer);
+            
+                //left horizontal line connecting left dot
+                this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y - 0.5,
+                    this.descriptionPanel.x - 8,this.descriptionPointer.y - 0.5);
+                
+                //vertical line
+                this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
+                    this.descriptionPanel.x - 8,this.descriptionPanel.y + this.descriptionPanel.height/2);
         
-        //left horizontal line connecting left dot
-        this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y - 0.5,
-             this.descriptionPanel.x - 8,this.descriptionPointer.y - 0.5);
-        
-        //vertical line
-        this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
-            this.descriptionPanel.x - 8,this.descriptionPanel.y + this.descriptionPanel.height/2);
+                //second horizontal line from left
+                this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
+                    this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2).setDepth(50);
+            } 
+        }
 
-        //second horizontal line from left
-        this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
-            this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2).setDepth(50);
+    // Function to convert hex color to RGB
+    hexToInt(hex) {
+        return parseInt(hex.slice(1), 16);
     }
-    
-
-
     changeMenuSprite(cursorIndex){
         this.practiceIcon.setFrame(0);
         this.adventureIcon.setFrame(1);
