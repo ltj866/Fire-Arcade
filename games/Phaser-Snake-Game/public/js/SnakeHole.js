@@ -264,7 +264,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Tutorial_1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -2207,6 +2207,7 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
+
         if (this.map.getLayer('Ground')) {
             this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET)
             this.groundLayer.setPipeline('Light2D')
@@ -2216,6 +2217,11 @@ class GameScene extends Phaser.Scene {
         this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
+        this.wallLayer.forEachTile(tile => {
+            if (tile.index === 481) {
+                tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
+            }
+        });
         
         //var renderIndex = 9
         //this.noRenderTiles = [8,9,10,11];
@@ -2263,6 +2269,7 @@ class GameScene extends Phaser.Scene {
         var noRenderTiles = [9,10,11,12,
             257,258,258,259,260,261,262,263,264,
             289,290,291,292,293,294,295,296,
+            481,
             673,674,675,676,677,678,679,680,
             704,705,706,707,708,709,710,711,712] //need to populate with full list and move elsewhere;
         //var noRenderTilesList = [];
@@ -2768,7 +2775,17 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("", );
                 },
                 */
-                'double-back-portals': function () {
+                //tutorial
+                'put-them-together': function () {
+                    return true;
+                },
+                'learn-to-wrap': function () {
+                    return true;
+                },
+                'these-are-walls': function () {
+                    return true;
+                },
+                'welcome': function () {
                     return true;
                 },
                 'unidirectional-portals': function () {
