@@ -468,6 +468,17 @@ class StartScene extends Phaser.Scene {
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GamesScene");
         const ourStartScene = this.scene.get("StartScene");
+
+        //pauses and resumes sound so queued sfx don't play all at once upon resuming
+        window.addEventListener('focus', function () {
+            game.sound.pauseAll();
+            //console.log('All sounds paused:', game.sound.sounds);
+        });
+        
+        window.addEventListener('blur', function () {
+            game.sound.resumeAll();
+            //console.log('All sounds resumed:', game.sound.sounds);
+        });
         
         
 
@@ -1946,6 +1957,7 @@ class GameScene extends Phaser.Scene {
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
+        
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
@@ -8112,6 +8124,13 @@ var config = {
             quality: .1
         }
     },
+    audio: 
+        { 
+            disableWebAudio: false // allows Phaser to use better Web Audio API
+        }, 
+    input: {
+            pauseOnBlur: false // This prevents the game from pausing tabbing out
+        },
     dom: {
         createContainer: true,
     },
