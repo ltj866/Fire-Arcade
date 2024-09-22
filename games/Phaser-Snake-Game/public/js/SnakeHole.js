@@ -264,7 +264,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Tutorial_1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -1853,6 +1853,10 @@ class GameScene extends Phaser.Scene {
     init(props) {
         
         // #region Init Vals
+
+        // Game State Bools
+        this.tutorialState = false;
+
         // Arrays for collision detection
         this.atoms = [];
         this.foodHistory = [];
@@ -1939,8 +1943,13 @@ class GameScene extends Phaser.Scene {
     
     
     preload () {
-        
-
+        const ourStartScene = this.scene.get('StartScene');
+        if (!ourStartScene.hasPlayedBefore && this.stage === 'World_1-1') {
+            console.log('noplay')
+            console.log(this.stage)
+            this.stage = 'Tutorial_1'
+            //this.tutorialState = true;
+        }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
         //const ourGame = this.scene.get("GameScene");
@@ -1956,6 +1965,7 @@ class GameScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
+
 
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
@@ -1977,6 +1987,11 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.Out',
         });
 
+        //testing game creation logic
+        if (/^Tutorial_[1-4]$/.test(this.stage)) { //checks for Tutorial_1-4
+            this.tutorialState = true;
+            ourPersist.coins = 99;
+        }
         //test portal walls
         if (this.stage == 'testingFuturistic_x' ) {
             var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
@@ -5231,7 +5246,7 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1) {
+                if (this.coinSpawnCounter < 1 && !this.tutorialState) {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
