@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Tutorial_1.json",
+    "activeFile": "World_1-2.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -637,7 +637,7 @@
         },
         "Tutorial_1.json": {
             "scale": 1,
-            "selectedLayer": -1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 289.5,
                 "y": 207.5
@@ -650,8 +650,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 220.33333333333334,
-                "y": 131.66666666666663
+                "x": 173.66666666666663,
+                "y": 161.66666666666663
             }
         },
         "Tutorial_2.json#tileSheetx12": {
@@ -672,8 +672,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 157.66666666666663,
-                "y": 121.66666666666663
+                "x": 173.66666666666663,
+                "y": 161.66666666666663
             }
         },
         "Tutorial_4.json#tileSheetx12": {
@@ -771,11 +771,11 @@
             "scaleInDock": 1
         },
         "World_1-2.json": {
-            "scale": 2,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.25,
-                "y": 161.75
+                "x": 153,
+                "y": 155.66666666666663
             }
         },
         "World_1-2.json#tileSheetx12": {
@@ -2026,15 +2026,15 @@
         "testingAztec.json",
         "World_1-1.json",
         "testingRacetrack.json",
-        "World_1-2.json",
-        "World_1-3.json",
-        "World_2-2.json",
-        "World_2-4.json",
-        "World_2-3.json",
-        "Wrap_Stage-03.json",
-        "Wrap_Stage-03b.json",
-        "rough-02.json",
-        "r-07-10.json"
+        "World_8-4_Final_Exams.json",
+        "Tutorial_4.json",
+        "Tutorial_3.json",
+        "Tutorial_2.json",
+        "World_4-3-ii.json",
+        "World_4-3.json",
+        "Tutorial_1.json",
+        "World_1-4.json",
+        "Bonus-Stage-x1.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

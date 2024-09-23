@@ -21,7 +21,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4159,6 +4159,21 @@ class GameScene extends Phaser.Scene {
            })
         
     }
+
+    // #region .setWallsPermeable(
+    setWallsPermeable() {
+        //this.wallsPermeable = true;
+        //this.snakeGlitch = true;
+
+        //makes wall tiles partially transparent. both wall layers are printed and are adjusted
+        this.wallLayer.forEachTile(tile => {
+            tile.alpha = 0.5;
+        });
+        this.wallLayerShadow.forEachTile(tile => {
+            tile.alpha = 0.0;
+        });
+    }
+
     // #region .screenShake(
     screenShake(){
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
@@ -4440,7 +4455,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer.culledTiles.forEach( tile => {
 
             var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
-            ).setOrigin(0,0).setDepth(50);
+            ).setOrigin(0,0).setDepth(20);
             _sprite.setPipeline('Light2D')
 
             
@@ -4457,7 +4472,7 @@ class GameScene extends Phaser.Scene {
                 var _spriteGround = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
                 ).setOrigin(0,0).setDepth(20);
                 //_spriteGround.setTint(0xaba2d8);
-                _spriteGround.setPipeline('Light2D').setDepth(20);
+                _spriteGround.setPipeline('Light2D');
                 
                 if (FADE_OUT_TILES.includes(tile.index)) {
                     fadeOutSprites.push(_spriteGround);
@@ -4969,6 +4984,7 @@ class GameScene extends Phaser.Scene {
 
             
             this.scene.launch('ScoreScene');
+            this.setWallsPermeable();
         }
 
         // #region Lose State
