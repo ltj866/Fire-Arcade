@@ -4166,7 +4166,7 @@ class GameScene extends Phaser.Scene {
         //this.snakeGlitch = true;
 
         //makes wall tiles partially transparent. both wall layers are printed and are adjusted
-        this.wallLayer.forEachTile(tile => {
+        this.wallLayer.culledTiles.forEach( tile => {
             tile.alpha = 0.5;
         });
         this.wallLayerShadow.forEachTile(tile => {
