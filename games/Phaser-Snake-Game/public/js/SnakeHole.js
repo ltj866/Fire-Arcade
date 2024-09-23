@@ -6626,7 +6626,7 @@ class ScoreScene extends Phaser.Scene {
                 }
             )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
-
+ 
             this.tweens.add({
                 targets: continueText,
                 alpha: { from: 0, to: 1 },
@@ -6637,6 +6637,13 @@ class ScoreScene extends Phaser.Scene {
               });
 
             const onContinue = function (scene) {
+
+                /*const tutorialMessageStages = ['Tutorial_2', 'Tutorial_3', 'Tutorial_4'];
+                if (ourGame.tutorialState && (tutorialMessageStages.includes(ourGame.stage))) {
+                    const helpPanel = ourGame.add.nineslice(SCREEN_WIDTH - X_OFFSET, + GRID * 4,
+                         'uiPanelL', 'Glass', 100, 60, 36,36,36,36).setDepth(10).setScrollFactor(0).setOrigin(0,0);
+                    console.log("it's tutorial time")
+                }*/
     
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
                 
