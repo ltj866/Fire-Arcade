@@ -340,6 +340,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
         this.load.image('titleLogo','assets/sprites/UI_titleLogo.png')
+        this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -1105,6 +1106,8 @@ class MainMenuScene extends Phaser.Scene {
             repeat: -1,
         });
 
+
+
         //description panel
         this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
         this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
@@ -1228,7 +1231,12 @@ class MainMenuScene extends Phaser.Scene {
         this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
 
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
-        //TODO: arrows
+
+        //menu arrows
+        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
 
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
@@ -1323,6 +1331,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
+                arrowMenuL,arrowMenuR,
                 menuElements[0],menuElements[1],menuElements[2],menuElements[3],
                 menuElements[4],menuElements[5],menuElements[6],menuElements[7],
                 this.graphics
@@ -7794,6 +7803,12 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'pWallFlatRight',
         frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [12,13,14,15,16,17]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'arrowMenuIdle',
+        frames: scene.anims.generateFrameNumbers('arrowMenu',{ frames: [0,1,2,3,4,5,6,7,8,9]}),
         frameRate: 8,
         repeat: -1
     });
