@@ -4499,6 +4499,17 @@ class GameScene extends Phaser.Scene {
 
         this.snake.head.setTexture('snakeDefault', 0);
 
+        //dim UI
+        this.time.delayedCall(1000, event => {
+            const ourGameScene = this.scene.get('GameScene');
+            this.tweens.add({
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                alpha: { from: 1, to: 0},
+                ease: 'Sine.InOut',
+                duration: 500,
+                });
+        });
+
         var wallSprites = [];
         var fadeOutSprites = []; 
         var groundSprites = [];
