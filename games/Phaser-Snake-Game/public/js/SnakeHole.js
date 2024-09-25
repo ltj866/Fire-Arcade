@@ -21,7 +21,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 5; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -2023,6 +2023,12 @@ class GameScene extends Phaser.Scene {
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
 
+
+        ourPersist.comboCover.setVisible(false);
+
+
+
+
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
@@ -2120,12 +2126,7 @@ class GameScene extends Phaser.Scene {
             });
         }*/
         //this.cameras.main.setAlpha(1)
-        this.time.delayedCall(1, function() {
-            ourGameScene.cameras.main.setAlpha(0)
-        });
-        this.time.delayedCall(17, function() {
-            ourGameScene.cameras.main.setAlpha(1)
-        });
+
         
         
         //loadAnimations(this);
@@ -3731,7 +3732,6 @@ class GameScene extends Phaser.Scene {
         
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
             .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
-        ourPersist.comboCover.setVisible(false) //this is set to invisible so the game scene can render one that's interacted in this scene
 
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,this.letterO2,this.letterExplanationPoint)
@@ -4494,6 +4494,8 @@ class GameScene extends Phaser.Scene {
 
         const ourPersist = this.scene.get('PersistScene');
         this.gState = GState.TRANSITION;
+
+        ourPersist.comboCover.setVisible(true);
 
         this.snake.head.setTexture('snakeDefault', 0);
 
