@@ -397,6 +397,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
+        this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
@@ -1065,6 +1066,11 @@ class MainMenuScene extends Phaser.Scene {
     constructor () {
         super({key: 'MainMenuScene', active: false});
     }
+    preload(){
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
+        this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
+
+    }
     create() {
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
@@ -1081,7 +1087,7 @@ class MainMenuScene extends Phaser.Scene {
         
 
         //title logo
-        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo')
+        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60)
         var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
         //titlePortal.setTint(_portalColor);
         titlePortal.setTint(intColor).setScale(1.25)
@@ -1133,6 +1139,8 @@ class MainMenuScene extends Phaser.Scene {
         this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
         this.graphics.setAlpha(0);
 
+        this.graphics.setDepth(50)
+
 
 
         var menuOptions = {
@@ -1164,15 +1172,15 @@ class MainMenuScene extends Phaser.Scene {
             'options': function () {
                 return true;
             },
+            'exit': function () {
+                return true;
+            },
         }
 
         var menuList = Object.keys(menuOptions);
         var cursorIndex = 1;
         var textStart = 152;
         var spacing = 24;
-
-        
-        // TODO: Title
 
         
         var menuElements = []
@@ -1183,6 +1191,15 @@ class MainMenuScene extends Phaser.Scene {
                     "fontWeight": 400,
                     "color": "darkgrey",
                     "text-decoration": 'line-through'
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+            }
+            else if (index == 8) { //exit button
+                var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": "#181818",
                 }),
                         `${menuList[index].toUpperCase()}`
                 ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
@@ -1199,7 +1216,7 @@ class MainMenuScene extends Phaser.Scene {
             menuElements.push(textElement);
             
         }
-        menuElements[1].setAlpha(0);
+        //menuElements[1].setAlpha(0);
 
         //panels
 
@@ -1230,6 +1247,8 @@ class MainMenuScene extends Phaser.Scene {
         this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
 
+        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
+        
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
 
         //menu arrows
@@ -1243,6 +1262,8 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-DOWN', function() {
             if (thisScene.pressedSpace) {
+                
+
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
                     selected.node.style.color = 'darkgrey';
                 }
@@ -1250,10 +1271,21 @@ class MainMenuScene extends Phaser.Scene {
                     selected.node.style.color = '#181818';
                 }
                 
-                selected.setAlpha(1);
-                cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length); // No idea why -1 works here. But it works so leave it until it doesn't/
-
+                cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length);
                 selected = menuElements[cursorIndex];
+                if (cursorIndex == 8) {
+                    menuSelector.x = menuSelector.x - GRID * 1.75
+                    menuSelector.y = selected.y + GRID * 2.25
+                    thisScene.exitButton.setFrame(1);
+                } else {
+                    thisScene.exitButton.setFrame(0);
+                    menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
+                    menuSelector.y = selected.y + 7
+                }
+                selected.setAlpha(1);
+                
+
+                
 
                 if (cursorIndex >= 2 && cursorIndex <= 5) {
                     selected.node.style.color = "darkgrey";
@@ -1263,9 +1295,6 @@ class MainMenuScene extends Phaser.Scene {
                     selected.node.style.color = "white";
                     selected.setAlpha(1)
                 }
-
-
-                menuSelector.y = selected.y + 7
                 
                 ourPersist.bgCoords.y += 5;
                 
@@ -1280,42 +1309,47 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-UP', function() {
             if (thisScene.pressedSpace) {
-                
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
                     selected.node.style.color = 'darkgrey';
                 }
                 else{
                     selected.node.style.color = '#181818';
+
+                }
+                cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
+                selected = menuElements[cursorIndex];
+                if (cursorIndex == 8) {
+                    menuSelector.x = menuSelector.x - GRID * 1.75
+                    menuSelector.y = selected.y + GRID * 2.25
+                    thisScene.exitButton.setFrame(1);
+                } else {
+                    thisScene.exitButton.setFrame(0);
+                    menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
+                    menuSelector.y = selected.y + 7
                 }
                 selected.setAlpha(1);
-                cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
                 
                 selected = menuElements[cursorIndex];
                 if (cursorIndex >= 2 && cursorIndex <= 5) {
                     selected.node.style.color = "darkgrey";
                     selected.setAlpha(1)
+
                 }
                 else{
                     selected.node.style.color = "white";
                     selected.setAlpha(1)
                 }
-                menuSelector.y = selected.y + 7
     
                 ourPersist.bgCoords.y -= 5;
     
                 thisScene.changeMenuSprite(cursorIndex);
-                
-                //upArrow.y = selected[0].y - 42;
-                //downArrow.y = selected[0].y + 32;
-    
-                //continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }
         }, [], this);
 
-        var titleContainer = this.add.container();
+        var titleContainer = this.add.container().setDepth(51);
 
         titleContainer.add(titleLogo);
-        titleContainer.add(titlePortal);
+        titleContainer.add(titlePortal)
 
         var titleTween = this.tweens.add({
             targets: titleContainer,
@@ -1332,8 +1366,8 @@ class MainMenuScene extends Phaser.Scene {
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
                 arrowMenuL,arrowMenuR,
-                menuElements[0],menuElements[1],menuElements[2],menuElements[3],
-                menuElements[4],menuElements[5],menuElements[6],menuElements[7],
+                ...menuElements,
+                this.exitButton,
                 this.graphics
             ],
             alpha: 1,
@@ -1343,7 +1377,6 @@ class MainMenuScene extends Phaser.Scene {
         });
         titleTween.pause();
         menuFadeTween.pause();
-        this.graphics.setDepth(50)
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!thisScene.pressedSpace) {
@@ -1376,7 +1409,7 @@ class MainMenuScene extends Phaser.Scene {
         
                 //second horizontal line from left
                 this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
-                    this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2).setDepth(50);
+                    this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2);
             } 
         }
 
@@ -1600,6 +1633,23 @@ class MainMenuScene extends Phaser.Scene {
                     ease: 'Sine.Out',
                 });
                 break;
+            case 8:
+                this.descriptionDom = 'Quit to desktop.';
+                this.descriptionText.setText(this.descriptionDom) 
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 10.5,
+                    y: _yOffset - GRID * 10.25,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
 
                 
             default:
@@ -1621,10 +1671,7 @@ class PersistScene extends Phaser.Scene {
         this.coins = 4; // 4
     }
     
-    preload(){
-        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
 
-    }
     
     create() {
 
@@ -7017,7 +7064,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             this.input.keyboard.on('keydown-DOWN', function() {
                 selected[0].node.style.color = "white";
-                index = Phaser.Math.Wrap(index + 1, -1, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+                index = Phaser.Math.Wrap(index + 1, 0, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
 
                 selected = playedStages[index];
                 selected[0].node.style.color = COLOR_FOCUS;
