@@ -57,7 +57,7 @@ const NO_BONK_BASE = 1000;
 
 const STAGE_TOTAL = 21
 
-let wavePipeline;
+
 
 
 //debug stuff
@@ -1717,30 +1717,6 @@ class PersistScene extends Phaser.Scene {
     
     create() {
 
-    /*const vertexShader = `
-        attribute vec2 aVertexPosition;
-        attribute vec2 aTextureCoord;
-        varying vec2 vTexCoord;
-        void main(void) {
-            gl_Position = vec4(aVertexPosition, 0.0, 1.0);
-            vTexCoord = aTextureCoord;
-        }
-    `;
-
-    const fragmentShader = `
-        precision mediump float;
-        uniform float uTime;
-        varying vec2 vTexCoord;
-        void main(void) {
-            vec2 uv = vTexCoord;
-            uv.y += sin(uv.x * 10.0 + uTime) * 0.1;
-            gl_FragColor = vec4(uv, 0.5 + 0.5 * sin(uTime), 1.0);
-        }
-    `;*/
-
-
-
-
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
@@ -1761,46 +1737,38 @@ class PersistScene extends Phaser.Scene {
     this.bgTimer = 0;
     this.bgTick = 0;
 
-             // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-            //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-            //this.UIbackground.setScale(32); 
+    // Furthest BG Object
+    this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+    //this.bgFurthest.tileScaleX = 2;
+    //this.bgFurthest.tileScaleY = 2;
 
-            // Furthest BG Object
-            this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-            //this.bgFurthest.tileScaleX = 2;
-            //this.bgFurthest.tileScaleY = 2;
-
-            
-            
     
-            // Scrolling BG1
-            this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-            //this.bgBack.tileScaleX = 2;
-            //this.bgBack.tileScaleY = 2;
-            
-            
-            
-            // Scrolling bgFront Planets
-            this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            
-            // Scrolling bgScrollMid Stars (depth is behind planets)
-            this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-            //this.bgMid.tileScaleX = 2;
-            //this.bgMid.tileScaleY = 2;
+    // Scrolling BG1
+    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+    //this.bgBack.tileScaleX = 2;
+    //this.bgBack.tileScaleY = 2;
     
-            // Hue Shift
-
-
-            this.fx = this.bgBack.preFX.addColorMatrix();
-            this.fx2 = this.bgFurthest.postFX.addColorMatrix();
-
-            this.fx2.hue(90)
-            this.bgFurthest.setPipeline('WaveShaderPipeline');
-            //this.fx2 = this.bgFurthest.preFX.addColorMatrix();
     
-            this.scrollFactorX = 0;
-            this.scrollFactorY = 0;
-            this.bgCoords = new Phaser.Math.Vector2(0,0);
+    // Scrolling bgFront Planets
+    this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+    
+    // Scrolling bgScrollMid Stars (depth is behind planets)
+    this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+    //this.bgMid.tileScaleX = 2;
+    //this.bgMid.tileScaleY = 2;
+
+    // Hue Shift
+
+    this.fx = this.bgBack.preFX.addColorMatrix();
+    this.fx2 = this.bgFurthest.postFX.addColorMatrix();
+
+    //this.fx2.hue(90)
+    this.bgFurthest.setPipeline('WaveShaderPipeline');
+    //this.fx2 = this.bgFurthest.preFX.addColorMatrix();
+
+    this.scrollFactorX = 0;
+    this.scrollFactorY = 0;
+    this.bgCoords = new Phaser.Math.Vector2(0,0);
 
     const graphics = this.add.graphics();
         
@@ -2116,6 +2084,21 @@ class GameScene extends Phaser.Scene {
         ourPersist.comboCover.setVisible(false);
 
 
+        if (this.stage == 'Tutorial_2') {
+            this.time.delayedCall(5000, () => {
+                this.tutorialPrompt(X_OFFSET + this.helpPanel.width/2 + GRID,
+                     Y_OFFSET + this.helpPanel.height/2 + GRID,2,)
+            })
+        }
+        if (this.stage == 'Tutorial_3') {
+            this.time.delayedCall(5000, () => {
+                this.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - this.helpPanel.width/2 - GRID,
+                    Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
+            })
+        }
+        //herehere
+
+
 
 
         
@@ -2139,9 +2122,13 @@ class GameScene extends Phaser.Scene {
         });
 
         //testing game creation logic
-        if (/^Tutorial_[1-4]$/.test(this.stage)) { //checks for Tutorial_1-4
+        if (/^Tutorial_[1-2]$/.test(this.stage)) { //checks for Tutorial_1-2
             this.tutorialState = true;
             ourPersist.coins = 99;
+        }
+        else if (this.stage == 'Tutorial_3'){
+            this.tutorialState = true;
+            ourPersist.coins = 30;
         }
         //test portal walls
         if (this.stage == 'testingFuturistic_x' ) {
@@ -2190,7 +2177,7 @@ class GameScene extends Phaser.Scene {
             ourPersist.fx.hue(300);
         }
         else{
-            ourPersist.fx.hue(330)
+            ourPersist.fx.hue(0)
         }
 
         /*if (this.startupAnim) {
@@ -2955,7 +2942,7 @@ class GameScene extends Phaser.Scene {
                 'learn-to-wrap': function () {
                     return true;
                 },
-                'these-are-walls': function () {
+                'these-are-coins': function () {
                     return true;
                 },
                 'welcome': function () {
@@ -4302,8 +4289,67 @@ class GameScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1,
            })
+
+        this.helpPanel = this.add.nineslice(0,0,
+            'uiPanelL', 'Glass', 100, 56, 18,18,18,18).setDepth(100)
+            .setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+
+        this.targetAlpha = 0; // Initialize target alpha
+        this.currentAlpha = 0; // Initialize current alpha
+
+        this.updatePanelAlpha = () => {
+            const distance = Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, this.helpPanel.x, this.helpPanel.y);
+            const maxDistance = 360;
+            const normalizedDistance = Phaser.Math.Clamp(distance / maxDistance, 0, 1);
+            this.targetAlpha = Math.sin(normalizedDistance * Math.PI / 2);
+            
+            const lerpFactor = 0.1; // Adjust this value for smoother or faster transitions
+            this.currentAlpha = Phaser.Math.Interpolation.Linear(
+                [this.currentAlpha, this.targetAlpha], lerpFactor);
+            this.helpPanel.setAlpha(this.currentAlpha);
+            this.helpText.setAlpha(this.currentAlpha);
+        }
+            this.helpText = this.add.dom(0, 0, 'div', {
+                color: 'white',
+                'font-size': '8px',
+                'font-family': 'Oxanium',
+                'font-weight': '200',
+                'text-align': 'left',
+                'letter-spacing': "1px",
+                'width': '86px',
+                'word-wrap': 'break-word'
+            });
+            this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
         
     }
+
+    tutorialPrompt(x,y,key){
+
+
+        this.helpPanel.setAlpha(1);
+        this.helpPanel.x = x;
+        this.helpPanel.y = y;
+        //print message based on key
+        var _message = '';
+        switch (key) {
+            case 1:
+                _message = 'Proceed through the blackhole to travel to a new stage.'
+                break;
+            case 2:
+                _message = 'Cross the side of the screen to wrap around to the other side!'
+                break;
+            case 3:
+                _message = 'Bonking will consume a coin. Collect coins to increase your lives!'
+                this.helpPanel.height = 68
+                break;
+            default:
+                _message = ''
+        }
+        this.helpText.x = x;
+        this.helpText.y = y;
+        this.helpText.setText(`${_message}`).setOrigin(0.5,0.5).setScrollFactor(0);
+    }
+    //herehere
 
     // #region .setWallsPermeable(
     setWallsPermeable() {
@@ -4587,6 +4633,15 @@ class GameScene extends Phaser.Scene {
         ourPersist.comboCover.setVisible(true);
 
         this.snake.head.setTexture('snakeDefault', 0);
+
+        if (this.helpPanel) {
+            this.tweens.add({
+                targets: [this.helpPanel,this.helpText],
+                alpha: { from: 1, to: 0},
+                ease: 'Sine.InOut',
+                duration: 500,
+                });
+        }
 
         //dim UI
         this.time.delayedCall(1000, event => {
@@ -5027,6 +5082,9 @@ class GameScene extends Phaser.Scene {
     // #region Game Update
     update (time, delta) {
 
+        if (this.gState != GState.TRANSITION){
+            this.updatePanelAlpha();
+        }
 
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
@@ -6710,15 +6768,6 @@ class ScoreScene extends Phaser.Scene {
             totalScore += stageData.calcTotal();
         });
 
-        /*const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '500px',
-            color: COLOR_SCORE,
-            "font-size":'28px',
-            'font-weight': 500,
-        })).setText(
-            `TOTAL SCORE: ${commaInt(totalScore)}`
-        ).setOrigin(0.5,0).setDepth(60);*/
-
         // #endregion
         /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
@@ -6796,12 +6845,11 @@ class ScoreScene extends Phaser.Scene {
 
             const onContinue = function (scene) {
 
-                /*const tutorialMessageStages = ['Tutorial_2', 'Tutorial_3', 'Tutorial_4'];
-                if (ourGame.tutorialState && (tutorialMessageStages.includes(ourGame.stage))) {
-                    const helpPanel = ourGame.add.nineslice(SCREEN_WIDTH - X_OFFSET, + GRID * 4,
-                         'uiPanelL', 'Glass', 100, 60, 36,36,36,36).setDepth(10).setScrollFactor(0).setOrigin(0,0);
-                    console.log("it's tutorial time")
-                }*/
+                if (ourGame.stage == 'Tutorial_1') {
+                    //herehere
+                    ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
+                         Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
+                }
     
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
                 
