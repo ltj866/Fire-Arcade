@@ -3,6 +3,7 @@ import { Portal } from './classes/Portal.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
+
 import {PORTAL_COLORS} from './const.js';
 
 
@@ -55,6 +56,8 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 const NO_BONK_BASE = 1000;
 
 const STAGE_TOTAL = 21
+
+let wavePipeline;
 
 
 //debug stuff
@@ -267,6 +270,42 @@ const DREAMWALLSKIP = [0,1,2];
 const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
+
+class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
+    constructor(game) {
+        super({
+            game: game,
+            renderer: game.renderer,
+            vertShader: `
+                precision mediump float;
+                attribute vec2 inPosition;
+                attribute vec2 inTexCoord;
+                uniform mat4 uProjectionMatrix;
+                varying vec2 vTexCoord;
+                void main(void) {
+                    vTexCoord = inTexCoord;
+                    gl_Position = uProjectionMatrix * vec4(inPosition, 0.0, 1.0);
+                }
+            `,
+            fragShader: `
+                precision mediump float;
+                uniform float uTime;
+                uniform sampler2D uMainSampler;
+                varying vec2 vTexCoord;
+                void main(void) {
+                    vec2 uv = vTexCoord;
+                    // Apply noise translation over time
+                    float noise = sin(uv.x * 5.0 + uTime) * 0.02;
+                    uv.y += noise;
+                    uv.x += noise;
+                    vec4 color = texture2D(uMainSampler, uv);
+                    gl_FragColor = vec4(color.rgb, color.a);
+                }
+            `
+        });
+    }
+}
+
 // #region SpaceBoyScene
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
@@ -466,6 +505,8 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+
+        
         const ourPersist = this.scene.get("PersistScene");
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GamesScene");
@@ -1670,10 +1711,35 @@ class PersistScene extends Phaser.Scene {
         this.stagesComplete = 0;
         this.coins = 4; // 4
     }
-    
-
+    /*preload() {
+        this.cache.shader.add(waveShader.key, waveShader);
+    }*/
     
     create() {
+
+    /*const vertexShader = `
+        attribute vec2 aVertexPosition;
+        attribute vec2 aTextureCoord;
+        varying vec2 vTexCoord;
+        void main(void) {
+            gl_Position = vec4(aVertexPosition, 0.0, 1.0);
+            vTexCoord = aTextureCoord;
+        }
+    `;
+
+    const fragmentShader = `
+        precision mediump float;
+        uniform float uTime;
+        varying vec2 vTexCoord;
+        void main(void) {
+            vec2 uv = vTexCoord;
+            uv.y += sin(uv.x * 10.0 + uTime) * 0.1;
+            gl_FragColor = vec4(uv, 0.5 + 0.5 * sin(uTime), 1.0);
+        }
+    `;*/
+
+
+
 
     // #region Persist Scene
 
@@ -1685,6 +1751,10 @@ class PersistScene extends Phaser.Scene {
     this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
 
+    //waveshader
+    //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
+    this.wavePipeline = game.renderer.pipelines.get('WaveShaderPipeline');
+    
     // # Backgrounds
 
     // for changing bg sprites
@@ -1699,16 +1769,19 @@ class PersistScene extends Phaser.Scene {
             this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
             //this.bgFurthest.tileScaleX = 2;
             //this.bgFurthest.tileScaleY = 2;
+
+            
+            
     
             // Scrolling BG1
             this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
             //this.bgBack.tileScaleX = 2;
             //this.bgBack.tileScaleY = 2;
             
+            
+            
             // Scrolling bgFront Planets
             this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            //this.bgFront.tileScaleX = 2;
-            //this.bgFront.tileScaleY = 2;
             
             // Scrolling bgScrollMid Stars (depth is behind planets)
             this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
@@ -1716,8 +1789,14 @@ class PersistScene extends Phaser.Scene {
             //this.bgMid.tileScaleY = 2;
     
             // Hue Shift
+
+
             this.fx = this.bgBack.preFX.addColorMatrix();
-            this.fx2 = this.bgFurthest.preFX.addColorMatrix();
+            this.fx2 = this.bgFurthest.postFX.addColorMatrix();
+
+            this.fx2.hue(90)
+            this.bgFurthest.setPipeline('WaveShaderPipeline');
+            //this.fx2 = this.bgFurthest.preFX.addColorMatrix();
     
             this.scrollFactorX = 0;
             this.scrollFactorY = 0;
@@ -1855,7 +1934,13 @@ class PersistScene extends Phaser.Scene {
     }
     
     update(time, delta) {
-        console.log()
+
+        //this.wavePipeline.setUniform('uTime', time / 1000);
+        this.wavePipeline.set1f('uTime', time / 1000);
+        this.renderer.gl.uniform1f(this.wavePipeline.uTimeLocation, time / 1000);
+        
+
+        //console.log()
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;
 
@@ -1894,6 +1979,10 @@ class PersistScene extends Phaser.Scene {
             }   
         }
 
+        const pipeline = this.bgBack.pipeline;
+        if (pipeline && pipeline.setFloat1) {
+            pipeline.setFloat1('uTime', this.time.now / 1000);
+        }
     }
 
 }
@@ -2101,7 +2190,7 @@ class GameScene extends Phaser.Scene {
             ourPersist.fx.hue(300);
         }
         else{
-            ourPersist.fx.hue(0)
+            ourPersist.fx.hue(330)
         }
 
         /*if (this.startupAnim) {
@@ -8214,7 +8303,7 @@ var config = {
         width: 640,
         height: 360
     },
-    
+    pipeline: { WaveShaderPipeline },
     //renderer: Phaser.AUTO,
     parent: 'phaser-example',
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
