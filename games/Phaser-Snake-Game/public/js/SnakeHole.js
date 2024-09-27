@@ -42,6 +42,8 @@ export const SPEED_WALK = 99; // 99 In milliseconds
 // 16.66 33.32
 export const SPEED_SPRINT = 33; // 24  // Also 16 is cool // 32 is the next
 
+const PORTAL_SPAWN_DELAY = 66;
+
 
 // Make into a ENUM
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
@@ -3451,7 +3453,7 @@ class GameScene extends Phaser.Scene {
         //});
         console.log(wallPortalData);
 
-        var portalSpawnDelay = 33;
+        var portalSpawnDelay = PORTAL_SPAWN_DELAY;
         
         for (let index = PORTAL_WALL_START + 1; index < PORTAL_WALL_START + 9; index++) {
             
@@ -3488,7 +3490,7 @@ class GameScene extends Phaser.Scene {
                 });
             }
 
-            portalSpawnDelay += 66;
+            portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
         }
 
         for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
@@ -3503,7 +3505,7 @@ class GameScene extends Phaser.Scene {
                 console.log("Portal Base Logic: FROM TO",_from, _to, index);
                 makePair(this, "portalIdle", _to, _from, colorHex, true, portalSpawnDelay);
 
-                portalSpawnDelay += 66;
+                portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
             }
         }
         
@@ -3623,7 +3625,7 @@ class GameScene extends Phaser.Scene {
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
             makePair(this, "portalIdle", fromN, toN, colorHex, true, portalSpawnDelay);
 
-            portalSpawnDelay += 66;
+            portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
     
             portalLayerN.visible = false;
             layerIndex ++; 
