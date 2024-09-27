@@ -22,7 +22,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -578,6 +578,7 @@ class StartScene extends Phaser.Scene {
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
         this.scene.launch('SpaceBoyScene');
+        this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
         
 
@@ -1117,6 +1118,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
         const thisScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
+        const ourMap = this.scene.get('GalaxyMapScene');
 
         this.pressedSpace = false;
         this.portalColors = PORTAL_COLORS.slice();
@@ -1301,6 +1303,36 @@ class MainMenuScene extends Phaser.Scene {
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
 
+        var mapEngaged = false;
+        this.menuState = 0
+
+        
+        this.input.keyboard.on('keydown-SPACE', function() {
+            if (this.menuState == 1) {
+                
+            }
+        })
+
+
+
+        this.input.keyboard.on('keydown-LEFT', e => {
+            if (this.pressedSpace && this.menuState == 0) {
+                this.cameras.main.scrollX -= SCREEN_WIDTH
+                ourMap.cameras.main.scrollX -= SCREEN_WIDTH
+                thisScene.scene.sleep('MainMenuScene');
+                this.menuState = 1;
+            }
+        });
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            if (this.pressedSpace && this.menuState == 1) {
+                this.cameras.main.scrollX += SCREEN_WIDTH
+                ourMap.cameras.main.scrollX += SCREEN_WIDTH
+                thisScene.scene.wake('MainMenuScene');
+                this.menuState = 0;
+            }
+        });
+    
+
         this.input.keyboard.on('keydown-DOWN', function() {
             if (thisScene.pressedSpace) {
                 
@@ -1432,6 +1464,7 @@ class MainMenuScene extends Phaser.Scene {
             }
 
         });
+
         
         
     }
@@ -1697,6 +1730,125 @@ class MainMenuScene extends Phaser.Scene {
                 //;    
                 break;
         }
+    }
+}
+
+// #region Galaxy Map
+class GalaxyMapScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'GalaxyMapScene', active: true});
+    }
+    create() {
+        this.input.keyboard.on('keydown-TAB', function (event) {
+            event.preventDefault();
+        });
+        this.cameras.main.scrollX += SCREEN_WIDTH
+        
+        const thisScene = this.scene.get('GalaxyMapScene');
+        const ourMenuScene = this.scene.get('MainMenuScene');
+
+        this.arrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        this.arrowR.play('arrowMenuIdle').setAlpha(1);
+
+        this.galaxyMapState = 0;
+        
+        
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            if (ourMenuScene.menuState == 1 && this.galaxyMapState == 0){
+                ourMenuScene.menuState = 0;
+                thisScene.cameras.main.scrollX += SCREEN_WIDTH
+                ourMenuScene.cameras.main.scrollX += SCREEN_WIDTH
+                thisScene.scene.wake('MainMenuScene');
+                thisScene.scene.sleep('GalaxMapScene');
+            }
+        })
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            this.galaxyMapState = 1;
+            this.arrowR.setAlpha(0);
+            
+        })
+        this.input.keyboard.on('keydown-TAB', e => {
+            this.galaxyMapState = 0;
+            this.arrowR.setAlpha(1);
+        })
+            
+        this.add.rectangle(SCREEN_WIDTH/2, (Y_OFFSET + SCREEN_HEIGHT)/2, 294, 280, 0x8fd3ff).setAlpha(0.2);
+
+        // Define the nodes
+
+        let _centerX = SCREEN_WIDTH/2
+        let _centeryY = (Y_OFFSET + SCREEN_HEIGHT)/2
+        let _segment1 = 50
+
+        this.nodes = [
+            { name: 'World_1-1', x: _centerX, y: _centeryY, neighbors: { up: 4, right: 1, down: 3, left: 2 } }, // Center node
+            
+            { name: 'World_1-2', x: _centerX + _segment1, y: _centeryY, neighbors: { left: 0 , right: 5} }, // Ring 1
+            { name: 'World_2-2', x: _centerX - _segment1, y: _centeryY, neighbors: { right: 0 } },
+            { name: 'World_3-2', x: _centerX, y: _centeryY + _segment1, neighbors: { up: 0 } },
+            { name: 'World_4-2', x: _centerX, y: _centeryY - _segment1, neighbors: { down: 0 } },
+
+            { name: 'World_2-3', x: _centerX + _segment1 * 2, y: _centeryY, neighbors: { left: 1 } }, // Ring 2
+            //{ name: 'World_2-2', x: _centerX - _segment1, y: _centeryY, neighbors: { right: 0 } },
+            //{ name: 'World_3-2', x: _centerX, y: _centeryY + _segment1, neighbors: { up: 0 } },
+            //{ name: 'World_4-2', x: _centerX, y: _centeryY - _segment1, neighbors: { down: 0 } }
+        ];
+
+        // Create graphics for nodes
+        this.nodeGraphics = this.nodes.map(node => {
+            let graphics = this.add.graphics();
+            graphics.fillStyle(0xffffff, 1);
+            graphics.fillCircle(node.x, node.y, 3);
+            return graphics;
+        });
+
+        // Current selected node index
+        this.currentNodeIndex = 0;
+        this.highlightNode(this.currentNodeIndex);
+
+        // Input handling
+        this.cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    update() {
+        //const ourMenuScene = this.scene.get('MainMenuScene');
+        if (this.galaxyMapState == 1) {
+            if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) {
+                this.changeNode('left');
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) {
+                this.changeNode('right');
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+                this.changeNode('up');
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+                this.changeNode('down');
+            }
+        }
+    }
+
+
+    changeNode(direction) {
+        let currentNode = this.nodes[this.currentNodeIndex];
+        let nextNodeIndex = currentNode.neighbors[direction];
+
+        if (nextNodeIndex !== undefined) {
+            // Remove highlight from current node
+            this.highlightNode(this.currentNodeIndex, false);
+
+            // Update current node index
+            this.currentNodeIndex = nextNodeIndex;
+
+            // Highlight new node
+            this.highlightNode(this.currentNodeIndex);
+        }
+    }
+
+    highlightNode(index, highlight = true) {
+        let node = this.nodes[index];
+        let graphics = this.nodeGraphics[index];
+        graphics.clear();
+        graphics.fillStyle(highlight ? 0xff0000 : 0xffffff, 1);
+        graphics.fillCircle(node.x, node.y, 3);
     }
 }
 
@@ -2096,7 +2248,6 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
-        //herehere
 
 
 
@@ -4349,7 +4500,6 @@ class GameScene extends Phaser.Scene {
         this.helpText.y = y;
         this.helpText.setText(`${_message}`).setOrigin(0.5,0.5).setScrollFactor(0);
     }
-    //herehere
 
     // #region .setWallsPermeable(
     setWallsPermeable() {
@@ -6846,7 +6996,6 @@ class ScoreScene extends Phaser.Scene {
             const onContinue = function (scene) {
 
                 if (ourGame.stage == 'Tutorial_1') {
-                    //herehere
                     ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
                          Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
                 }
@@ -8386,7 +8535,7 @@ var config = {
     },
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
-    scene: [ StartScene, MainMenuScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, MainMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
 };
 
 // #region Screen Settings
