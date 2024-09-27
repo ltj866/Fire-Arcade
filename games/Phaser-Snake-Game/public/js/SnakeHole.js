@@ -1,5 +1,6 @@
 import { Food } from './classes/Food.js';
 import { Portal } from './classes/Portal.js';
+import { Coin } from './classes/Coin.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
@@ -61,7 +62,7 @@ const STAGE_TOTAL = 21
 
 
 //debug stuff
-const PORTAL_PAUSE = 2; 
+export const PORTAL_PAUSE = 2; 
 
 
 // Speed Multiplier Stats
@@ -2411,6 +2412,18 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
+        this.interactLayer = []
+
+        for (let x = 0; x < this.map.width; x++) {
+            this.interactLayer[x] = [];
+            for (let y = 0; y < this.map.height; y++) {
+                this.interactLayer[x][y] = "empty";
+                //interactLayer[x][y].onOver() = function () {
+                //    return true;
+                //}
+            }
+        }
+
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
         //var spawnTile2 = this.mapShadow.findByIndex(9); // Snake Head Index
@@ -2529,7 +2542,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
         this.wallLayer.forEachTile(tile => {
-            if (tile.index === 481) {
+            if (tile.index === 481) { // No Food Spawn Tile
                 tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
             }
         });
@@ -2555,6 +2568,7 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
+       
 
         if (this.map.getLayer('Food')) {
             this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET, Y_OFFSET);
@@ -2562,12 +2576,10 @@ class GameScene extends Phaser.Scene {
 
             this.foodLayer.forEachTile(_tile => {
                 if(11 === _tile.index) {
-                    var food = new Food(this);
-                    food.x = _tile.x*GRID; // Not sure this works anymore.
-                    food.y = _tile.y*GRID;
-
-                    food.electrons.x = _tile.x*GRID;
-                    food.electrons.y = _tile.y*GRID;
+                    var food = new Food(this, {
+                        x: _tile.x*GRID + X_OFFSET, 
+                        y:_tile.y*GRID + Y_OFFSET
+                    });
                 }
             })
             this.foodLayer.destroy();
@@ -2998,9 +3010,11 @@ class GameScene extends Phaser.Scene {
                     });
                 }
             }
+            
 
-            if (gState === GState.PORTAL) {
+            if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
                 // Update snake facing direction but do not move the snake
+                console.log("Moving Freely");
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -3366,9 +3380,8 @@ class GameScene extends Phaser.Scene {
         //    var food = new Food(this);
         //}
 
-        // #region Coin Logic
-
-        this.coins = []
+        // #region Coin Layer Logic
+        this.coinsArray = [];
 
         var coinVarient = ''
         if (this.varientIndex) {
@@ -3383,35 +3396,32 @@ class GameScene extends Phaser.Scene {
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
-                    //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
-                    //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-                    var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875);
+                    var _coin = new Coin(this, this.coinsArray, tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET );
                     _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
-                    this.coins.push(_coin);
+                    this.interactLayer[tile.x][tile.y] = _coin;
+                    
                 }
             });
             coinLayer.destroy();
-        }
-
+        } 
         
-        
-        
-        
-        
+            
         // #region Stage Logic
         
-        var makePair = function (scene, to, from, colorHex) {
+        var makePair = function (scene, anim, to, from, colorHex, freeDir, spawnDelay) {
 
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
-            var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
+            var p1 = new Portal(scene, anim, color, to, from, freeDir, spawnDelay);
+            var p2 = new Portal(scene, anim, color, from, to, freeDir, spawnDelay + 33);
 
             p1.targetObject = p2;
             p2.targetObject = p1;
 
             p1.flipX = true;
+
+            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p1;
+            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p2;
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
@@ -3440,6 +3450,8 @@ class GameScene extends Phaser.Scene {
             //} 
         //});
         console.log(wallPortalData);
+
+        var portalSpawnDelay = 33;
         
         for (let index = PORTAL_WALL_START + 1; index < PORTAL_WALL_START + 9; index++) {
             
@@ -3455,26 +3467,28 @@ class GameScene extends Phaser.Scene {
                 
                 console.log(wallDir); 
 
-                // Check for if vertical or horizontal
+                // Check for if vertical or horizontal here
             
                 var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
                 
                 var startFrom = wallPortalData[index].shift();
                 var startTo = wallPortalData[index + ROW_DELTA].shift();
 
-                makePair(this, startFrom, startTo, '#131313');
+                makePair(this, "portalIdle", startFrom, startTo, '#131313', false, portalSpawnDelay);
 
                 var endFrom = wallPortalData[index].pop();
                 var endTo = wallPortalData[index + ROW_DELTA].pop();
 
-                makePair(this, endFrom, endTo, '#DDDDDD');
+                makePair(this, "portalIdle", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
                 console.log(wallPortalData);
 
                 wallPortalData[index].forEach(portalTo => {
                     var portalFrom = wallPortalData[index + ROW_DELTA].shift();
-                    makePair(this, portalTo, portalFrom, colorHex);
+                    makePair(this, "portalIdle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
                 });
             }
+
+            portalSpawnDelay += 66;
         }
 
         for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
@@ -3487,7 +3501,9 @@ class GameScene extends Phaser.Scene {
                 let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
                 let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
                 console.log("Portal Base Logic: FROM TO",_from, _to, index);
-                makePair(this, _to, _from, colorHex);
+                makePair(this, "portalIdle", _to, _from, colorHex, true, portalSpawnDelay);
+
+                portalSpawnDelay += 66;
             }
         }
         
@@ -3605,7 +3621,9 @@ class GameScene extends Phaser.Scene {
 
 
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
-            makePair(this, fromN, toN, colorHex);
+            makePair(this, "portalIdle", fromN, toN, colorHex, true, portalSpawnDelay);
+
+            portalSpawnDelay += 66;
     
             portalLayerN.visible = false;
             layerIndex ++; 
@@ -3679,22 +3697,22 @@ class GameScene extends Phaser.Scene {
         });
 
         //stagger portal spawns
-        this.time.delayedCall(600, event => {
-            var interval = 225
-            this.portals.forEach(function (portal, index) { 
-                setTimeout(function () {
+        //this.time.delayedCall(600, event => {
+        //    var interval = 33
+        //    this.portals.forEach(function (portal, index) { 
+        //       setTimeout(function () {
                     
-                    portal.playAfterRepeat('portalForm');
-                    portal.chain(['portalIdle'])
-                    portal.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
-                        ourGameScene.chime01.play({volume: 0.5});
-                    })
-                        
-                    //}
-                },index * interval)
-            })
-            
-        });
+        //            portal.playAfterRepeat('portalForm');
+        //            portal.chain(['portalIdle'])
+        //            portal.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+        //               ourGameScene.chime01.play({volume: 0.5});
+        //            })
+        //                
+        //            //}
+        //        },index * interval)
+        //    })
+        //    
+        //});
 
 
 
@@ -3717,11 +3735,11 @@ class GameScene extends Phaser.Scene {
   
 
 
-        var atom1 = new Food(this);
-        var atom2 = new Food(this);
-        var atom3 = new Food(this);
-        var atom4 = new Food(this);
-        var atom5 = new Food(this);
+        var atom1 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom2 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom3 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom4 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom5 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
 
 
         //this.tweens.add({
@@ -4433,7 +4451,7 @@ class GameScene extends Phaser.Scene {
         }
 
         this.tweens.add( {
-            targets: this.coins,
+            targets: this.coinsArray,
             originY: [0.1875 - .0466,0.1875 + .0466],
             ease: 'sine.inout',
             duration: 500, //
@@ -4631,16 +4649,15 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        if (this.map.getLayer('Food')) {
-            this.foodLayer.forEachTile(foodTile => {
-    
-                if (foodTile.index > 0) {
-                    
-                    testGrid[foodTile.x][foodTile.y] = 0;
-                }
-            });
-
+        // Check all active things
+        for (let x = 0; x < this.interactLayer.length; x++) {
+            for (let y = 0; y < this.interactLayer[x].length; y++) {
+                if (this.interactLayer[x][y] != "empty") {
+                    testGrid[x][y] = 0;
+                }        
+            }
         }
+
         
 
 
@@ -4664,13 +4681,13 @@ class GameScene extends Phaser.Scene {
         //    }
         //});
 
-        this.atoms.forEach(_fruit => {
+        //this.atoms.forEach(_fruit => {
 
-            var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
-            var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
-            testGrid[_x][_y] = "a";
+        //    var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
+        //    var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
+        //     testGrid[_x][_y] = "a";
             
-        });
+        //});
         
 
         // TEMP
@@ -4855,7 +4872,7 @@ class GameScene extends Phaser.Scene {
         Phaser.Utils.Array.Shuffle(wallSprites);
         
         var allTheThings = [
-            ...this.coins,
+            ...this.coinsArray,
             ...this.portals,
             ...this.atoms,
             ...wallSprites,
@@ -5516,7 +5533,7 @@ class GameScene extends Phaser.Scene {
 
                 // Move at last second
                 this.snake.move(this);
-                ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
+                ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
 
                 this.snakeCriticalState();
@@ -5632,21 +5649,23 @@ class GameScene extends Phaser.Scene {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
-                    var pos = Phaser.Math.RND.pick(validLocations)
+                    var pos = Phaser.Math.RND.pick(validLocations);
 
-                    debugger
-                    var _coin = this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
+                    var _coin = new Coin(this, this.coinsArray, pos.x, pos.y);
+                    this.interactLayer[(pos.x - X_OFFSET)/GRID][(pos.y - Y_OFFSET)/GRID] = _coin;
+                    
+                    //this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
+                    //).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
                     _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
 
-                    this.tweens.add( {
-                        targets: _coin,
-                        originY: [0.1875 - .0466,0.1875 + .0466],
-                        ease: 'sine.inout',
-                        duration: 500,
-                        yoyo: true,
-                        repeat: -1,
-                       })
+                    //this.tweens.add( {
+                    //    targets: _coin,
+                    //    originY: [0.1875 - .0466,0.1875 + .0466],
+                    //    ease: 'sine.inout',
+                    //    duration: 500,
+                    //    yoyo: true,
+                    //    repeat: -1,
+                    //   })
 
                     // tween code not working @holden I am not sure what I am missing -James
                     //this.tweens.add({
@@ -5658,7 +5677,7 @@ class GameScene extends Phaser.Scene {
                     //    repeat: -1
                     //});
                     
-                    this.coins.push(_coin);
+                    this.coinsArray.push(_coin);
 
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
@@ -7805,7 +7824,7 @@ class InputScene extends Phaser.Scene {
 
         switch (true) {
             case up:
-                console.log("I'm Facing Up");
+                //console.log("I'm Facing Up");
                 gameScene.snake.head.setTexture('snakeDefault', 6); 
                 gameScene.snake.direction = DIRS.UP
                 break;
@@ -7829,7 +7848,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
 
-            console.log("I'm Moving Up");
+            //console.log("I'm Moving Up");
             
             this.setPLAY(gameScene);
             
