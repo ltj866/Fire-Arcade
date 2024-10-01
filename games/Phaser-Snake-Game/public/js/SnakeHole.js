@@ -360,6 +360,8 @@ class StartScene extends Phaser.Scene {
             atlasURL: 'assets/atlasMeta24_08_07.json'
         });
 
+        this.load.bitmapFont('mainFont', 'assets/Fonts/mainFont_0.png', 'assets/Fonts/mainFont.fnt');
+
         
 
         //this.load.image('UIbg', 'assets/sprites/UI_background.png');
@@ -387,6 +389,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
+        this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
         this.load.image('comboBG','assets/sprites/UI_comboBG.png')
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png']);
@@ -509,6 +512,7 @@ class StartScene extends Phaser.Scene {
 
     create() {
 
+
         
         const ourPersist = this.scene.get("PersistScene");
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
@@ -599,8 +603,7 @@ class StartScene extends Phaser.Scene {
         //card.setOrigin(0,0);
         //card.setScale(1)
 
-        //this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-
+        
         // Masks
 
 
@@ -1881,6 +1884,10 @@ class PersistScene extends Phaser.Scene {
     this.comboCover.setScrollFactor(0);
     this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
+
+    
+
+    this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
 
     //waveshader
     //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
@@ -4010,15 +4017,15 @@ class GameScene extends Phaser.Scene {
         
 
         // Score Text SET INVISIBLE
-        this.scoreUI = this.add.dom(X_OFFSET + 1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Stage`).setOrigin(0,0).setScale(.5).setAlpha(0);
-        this.scoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 -4 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0).setScale(.5).setAlpha(0);
+        this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
+            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,16)
+            .setOrigin(0,0).setScale(.5).setScrollFactor(0).setTint(0x1f211b);
 
-        this.bestScoreUI = this.add.dom(X_OFFSET + 6, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Best`).setOrigin(0,0).setScale(.5).setAlpha(0);
-        this.bestScoreLabelUI = this.add.dom(X_OFFSET + GRID * 3 -4, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.bestBase).setOrigin(0,0).setScale(.5).setAlpha(0);
+        this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,16)
+            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,16)
+            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
 
@@ -4032,15 +4039,19 @@ class GameScene extends Phaser.Scene {
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         const lengthGoalStyle = {
+            "color":'0x1f211b',
             "font-size": '16px',
             "font-weight": 400,
             "text-align": 'right',
-        } 
+        }
+        
+                    //this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3, 'mainFont', `${commaInt(this.score.toString())}`, 16)
+            //.setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
-        this.lengthGoalUI = this.add.dom((X_OFFSET + GRID * 27.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setScale(.5)
-        .setAlpha(0);
-        this.lengthGoalUILabel = this.add.dom(X_OFFSET + GRID * 24.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)).setScale(.5)
-        .setAlpha(0);
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 33.25), 4, 'mainFont', ``, 16).setScale(.5)
+        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.lengthGoalUILabel = this.add.bitmapText(X_OFFSET + GRID * 30.25, 4, 'mainFont', ``, 16).setScale(.5)
+        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -4050,16 +4061,14 @@ class GameScene extends Phaser.Scene {
         
         var length = `${this.length}`;
         if (LENGTH_GOAL != 0) {
-            this.lengthGoalUI.setHTML(
-                `${length.padStart(2, "0")}<br/>
-                <hr style="font-size:3px"/>
-                ${LENGTH_GOAL.toString().padStart(2, "0")}`
-            ).setOrigin(0,0.5).setAlpha(0);
-            this.lengthGoalUILabel.setHTML(
-                `Length
-                <br/>
-                Goal`
-            ).setOrigin(0,0.5).setAlpha(0);
+            this.lengthGoalUI.setText(
+                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
+            ).setOrigin(0,0).setAlpha(1);
+            this.lengthGoalUILabel.setText(
+            `LENGTH\nGOAL`
+            ).setOrigin(0,0).setAlpha(1);
+            this.lengthGoalUILabel.setLineSpacing(3)
+            this.lengthGoalUI.setLineSpacing(3)
         }
         else {
             // Special Level
@@ -4069,8 +4078,8 @@ class GameScene extends Phaser.Scene {
         }
 
         if (this.startupAnim) {
-            this.lengthGoalUI.setAlpha(0)
-            this.lengthGoalUILabel.setAlpha(0)
+            this.lengthGoalUI.setAlpha(0);
+            this.lengthGoalUILabel.setAlpha(0);
         }
         
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
@@ -4149,12 +4158,18 @@ class GameScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(X_OFFSET + 1, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        /*this.runningScoreUI = this.add.dom(X_OFFSET + GRID * 23.75, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE, { color: '0x1f211b' })).setText(
             `Score`
-        ).setOrigin(0,1).setScale(.5).setAlpha(0);
-        this.runningScoreLabelUI = this.add.dom(X_OFFSET + GRID*3 -4, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1).setScale(.5).setAlpha(0);
+        ).setOrigin(0,1).setScale(.5).setAlpha(1).setScrollFactor(0);*/
+        this.runningScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 - 2, 'mainFont', 'SCORE', 16)
+            .setOrigin(0, 1)
+            .setScale(0.5)
+            .setAlpha(1)
+            .setScrollFactor(0)
+            .setTint(0x1f211b)
+            .setDepth(100);
+        this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3 -2, 'mainFont', `${commaInt(this.score.toString())}`, 16)
+            .setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
         
         if (DEBUG) {
@@ -4301,13 +4316,13 @@ class GameScene extends Phaser.Scene {
 
             // Update UI
 
-            this.scoreUI.setText(`Stage`);
+            this.scoreUI.setText(`STAGE`);
             this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
 
 
-            this.bestScoreUI.setText(`Best`).setAlpha(0);
-            this.bestScoreLabelUI.setText(this.bestBase).setAlpha(0);
+            this.bestScoreUI.setText(`BEST`).setAlpha(1).setScrollFactor(0);
+            this.bestScoreLabelUI.setText(this.bestBase).setAlpha(1).setScrollFactor(0);
 
             
              // Restart Score Timer
@@ -4398,7 +4413,7 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
                     targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
-                    alpha: 0,
+                    alpha: 1,
                     duration: 300,
                     ease: 'sine.inout',
                     yoyo: false,
@@ -5159,7 +5174,7 @@ class GameScene extends Phaser.Scene {
         if (this.UIScoreContainer.y === 0) {
             this.tweens.add({
                 targets: this.UIScoreContainer,
-                y: (-12),
+                y: (-11),
                 ease: 'Sine.InOut',
                 duration: 800,
                 repeat: 0,
@@ -5175,7 +5190,7 @@ class GameScene extends Phaser.Scene {
               });
             this.tweens.add({
                 targets: [this.bestScoreLabelUI, this.bestScoreUI],
-                alpha: 0,
+                alpha: 1,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -6142,7 +6157,7 @@ class ScoreScene extends Phaser.Scene {
         ourGame.continueBanner = ourGame.add.image(X_OFFSET,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
 
         // Scene Background Color
-        ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, GRID * 3, GRID * 31, GRID * 28, 0x323353, .75);
+        ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, Y_OFFSET, GRID * 29, GRID * 27, 0x323353, .75);
         ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
         ourGame.stageBackGround.alpha = 0;
 

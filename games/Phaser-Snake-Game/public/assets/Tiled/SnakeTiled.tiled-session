@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_1-3.json",
+    "activeFile": "testingAztec.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -639,8 +639,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.33333333333331,
-                "y": 161.66666666666663
+                "x": 131,
+                "y": 154.33333333333331
             }
         },
         "Tutorial_1.json#tileSheetx12": {
@@ -650,7 +650,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.33333333333331,
+                "x": 109,
                 "y": 161.66666666666663
             }
         },
@@ -790,7 +790,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.33333333333331,
+                "x": 133,
                 "y": 161.66666666666663
             }
         },
@@ -1864,7 +1864,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.33333333333331,
-                "y": 161.66666666666663
+                "y": 159.33333333333331
             }
         },
         "testingAztec.json#tileSheetx12": {
@@ -2028,10 +2028,6 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "testingAztec.json",
-        "World_1-1.json",
-        "testingRacetrack.json",
-        "World_1-2.json",
         "testing04.json",
         "testing03.json",
         "testing.json",
@@ -2039,7 +2035,11 @@
         "Racing_Stage-02.json",
         "World_8-4_Final_Exams.json",
         "Tutorial_4.json",
-        "Tutorial_3.json"
+        "Tutorial_3.json",
+        "Tutorial_2.json",
+        "World_4-3-ii.json",
+        "World_4-3.json",
+        "Tutorial_1.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
