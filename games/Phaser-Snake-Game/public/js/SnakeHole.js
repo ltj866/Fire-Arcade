@@ -4815,6 +4815,7 @@ class GameScene extends Phaser.Scene {
         this.gState = GState.TRANSITION;
 
         ourPersist.comboCover.setVisible(true);
+        this.scoreTweenShow();
 
         this.snake.head.setTexture('snakeDefault', 0);
 
@@ -5142,8 +5143,6 @@ class GameScene extends Phaser.Scene {
     }
 
     scoreTweenShow(){
-        if (this.UIScoreContainer.y === -20) {
-            console.log('showing')
             this.tweens.add({
                 targets: this.UIScoreContainer,
                 y: (0),
@@ -5168,7 +5167,6 @@ class GameScene extends Phaser.Scene {
                 repeat: 0,
                 yoyo: false
               });
-        }
     }
     scoreTweenHide(){
         if (this.UIScoreContainer.y === 0) {
@@ -5974,8 +5972,7 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
-
-        ourGame.scoreTweenShow();
+     
 
         /*var style = {
             'color': '0x828213'
