@@ -14,6 +14,12 @@ var Food = new Phaser.Class({
         this.setOrigin(0,-.0625);
         this.setDepth(47);
         this.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+
+        
+        this.play("atom05spawn");
+        this.chain(['atom01idle']);
+        
+
         
         
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(48);
@@ -90,8 +96,8 @@ var Food = new Phaser.Class({
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
-        this.playAfterDelay('atom05spawn',Phaser.Math.RND.integerInRange(0,100));
-        this.chain(['atom01idle']);
+        //this.play('atom05spawn');
+        //this.chain(['atom01idle']);
 
         scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = "empty";
         

@@ -587,6 +587,7 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
         
+        //temporarily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
             console.log("Testing LOCAL STORAGE. Has not played.", );
@@ -2245,6 +2246,7 @@ class GameScene extends Phaser.Scene {
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
+        const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
@@ -2909,7 +2911,7 @@ class GameScene extends Phaser.Scene {
         }
         */
 
-        this.CapSpark = this.add.sprite(X_OFFSET + GRID * 9, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
@@ -5709,11 +5711,16 @@ class GameScene extends Phaser.Scene {
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
                     case MAX_SCORE:  // 120 {}
-                        this.atoms.forEach( atom => {
+                    this.atoms.forEach(atom => {
+                        if (atom.anims.currentAnim.key !== 'atom01idle' ||atom.anims.currentAnim.key !== 'atom05spawn') {
                             atom.play("atom01idle");
+                        }
+                    
+                        if (atom.electrons.anims.currentAnim.key !== 'electronIdle') {
                             atom.electrons.play("electronIdle");
                             atom.electrons.anims.msPerFrame = 66;
-                        });
+                        }
+                    });
                         break;
                     
                     case 110: 
