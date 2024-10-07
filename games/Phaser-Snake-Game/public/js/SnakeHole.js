@@ -81,6 +81,10 @@ var calcBonus = function (scoreInput) {
     return _speedBonus
 }
 
+var showTurtorial = function (scene) {
+
+} 
+
 var updateSumOfBest = function(scene) {
     /***
      *  This most important thing this function does is update the bestOfStageData object.
@@ -596,7 +600,60 @@ class StartScene extends Phaser.Scene {
             this.hasPlayedBefore = true;
             console.log("Testing LOCAL STORAGE Has played.", );
         }
-        this.scene.launch('MainMenuScene');
+
+
+
+
+        this.portalColors = PORTAL_COLORS.slice();
+        // Select a random color
+        let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
+
+        var hexToInt = function (hex) {
+            return parseInt(hex.slice(1), 16);
+        }
+
+        let intColor = hexToInt(randomColor);
+        //console.log(_portalColor)
+
+        
+
+        //title logo
+        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
+        var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,);
+        //titlePortal.setTint(_portalColor);
+        titlePortal.setTint(intColor).setScale(1.25);
+        titlePortal.play('portalIdle');
+
+        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "white",
+            "textAlign": 'center'
+
+        }),
+                `Press Space`
+        ).setOrigin(0.5,0.5).setScale(0.5);
+
+        this.pressToPlayTween = this.tweens.add({
+            targets: this.pressToPlay,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Sine.InOut',
+            yoyo: true,
+            repeat: -1,
+        });
+
+        this.input.keyboard.on('keydown-SPACE', function () {
+            this.scene.start('MainMenuScene', {
+                portalTint: intColor,
+                portalFrame: Phaser.Math.Wrap(
+                    titlePortal.anims.currentFrame.index + 1, 
+                    0, 
+                    titlePortal.anims.getTotalFrames() - 1
+                    )
+            });
+        }, this);
+        
 
         /*
         
@@ -612,6 +669,8 @@ class StartScene extends Phaser.Scene {
 
         
         // Masks
+
+        var showTutorial = function ();
 
 
         const graphics = this.add.graphics();
@@ -1029,6 +1088,7 @@ class StartScene extends Phaser.Scene {
         
         // #region Pre-roll Zeds
 
+        /** For James later to calcualte zed level better.
         console.time("Full Roll");
 
         var lowestNum = 4294967295; // Start at Max Int
@@ -1051,6 +1111,7 @@ class StartScene extends Phaser.Scene {
 
         rolls--;
         } while (rolls > 0);
+        */
 
 
 
@@ -1127,7 +1188,40 @@ class MainMenuScene extends Phaser.Scene {
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
 
     }
-    create() {
+    create(props) {
+
+        var { startingAnimation = "default" } = props;
+
+        var { portalTint = parseInt("0xFFFFFF", 16)} = props;
+        var { portalFrame = 0 } = props;
+        
+        
+        
+
+        if (startingAnimation === "default") {
+            var titleContainer = this.add.container().setDepth(51);
+
+            var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
+            var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,);
+            
+            titlePortal.setTint(portalTint).setScale(1.25);
+            titlePortal.play('portalIdle', {startFrame: portalFrame} );
+
+
+            titleContainer.add(titleLogo);
+            titleContainer.add(titlePortal);
+            
+            var titleTween = this.tweens.add({
+                targets: titleContainer,
+                y: -GRID * 7,
+                duration: 750,
+                ease: 'Sine.InOut',
+            });
+            
+        } else if (startinAnimation === "menuReturn") {
+
+        }
+
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
         const thisScene = this.scene.get('MainMenuScene');
@@ -1135,39 +1229,7 @@ class MainMenuScene extends Phaser.Scene {
         const ourMap = this.scene.get('GalaxyMapScene');
 
         this.pressedSpace = false;
-        this.portalColors = PORTAL_COLORS.slice();
-        // Select a random color
-        let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
-        let intColor = this.hexToInt(randomColor);
-        //console.log(_portalColor)
 
-        
-
-        //title logo
-        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60)
-        var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
-        //titlePortal.setTint(_portalColor);
-        titlePortal.setTint(intColor).setScale(1.25)
-        titlePortal.play('portalIdle')
-
-        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "white",
-            "textAlign": 'center'
-
-        }),
-                `Press Space`
-        ).setOrigin(0.5,0.5).setScale(0.5);
-
-        this.pressToPlayTween = this.tweens.add({
-            targets: this.pressToPlay,
-            alpha: 0,
-            duration: 1000,
-            ease: 'Sine.InOut',
-            yoyo: true,
-            repeat: -1,
-        });
 
 
 
@@ -1433,17 +1495,11 @@ class MainMenuScene extends Phaser.Scene {
             }
         }, [], this);
 
-        var titleContainer = this.add.container().setDepth(51);
+        
 
-        titleContainer.add(titleLogo);
-        titleContainer.add(titlePortal)
+        
 
-        var titleTween = this.tweens.add({
-            targets: titleContainer,
-            y: -GRID * 7,
-            duration: 750,
-            ease: 'Sine.InOut',
-        });
+        
         
         var menuFadeTween = this.tweens.add({
             targets: [this.practiceButton,this.practiceIcon,this.adventureButton,this.adventureIcon,
@@ -5133,6 +5189,9 @@ class GameScene extends Phaser.Scene {
              */
             nextStage = Phaser.Math.RND.pick(this.nextStages);
         }
+
+
+
         
         
 
@@ -5144,6 +5203,11 @@ class GameScene extends Phaser.Scene {
             camDirection: this.camDirection
         });
         ourInputScene.scene.restart();
+
+        // Mainmenu Code @holden
+        ourMainMenuScene.scene.restart( {
+            startingAnimation: "menuReturn"
+        });
 
         // Add if time attack code here
         //ourGame.scene.stop();
