@@ -81,7 +81,7 @@ var calcBonus = function (scoreInput) {
     return _speedBonus
 }
 
-var showTurtorial = function (scene) {
+var showTutorial = function (currentScene, nextScene) {
 
 } 
 
