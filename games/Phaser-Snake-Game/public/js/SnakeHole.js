@@ -1039,6 +1039,12 @@ class StartScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-SPACE', function () {
+
+            // proof of concept for inteserting tutoral panels
+            showTutorial(this, 'GameScene');
+
+
+
             this.scene.start('MainMenuScene', {
                 portalTint: intColor,
                 portalFrame: Phaser.Math.Wrap(
