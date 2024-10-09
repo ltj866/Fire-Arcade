@@ -84,11 +84,11 @@ var calcBonus = function (scoreInput) {
 
 var showTutorial = function (currentScene, nextScene) {
 
-        currentScene.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+        /*currentScene.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
             "fontSize":'48px',
             }), 
                 'PORTAL SNAKE',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.*/
         
         //var card = currentScene.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
         //card.setOrigin(0,0);
@@ -99,7 +99,7 @@ var showTutorial = function (currentScene, nextScene) {
 
 
 
-        const graphics = currentScene.add.graphics();
+        /*const graphics = currentScene.add.graphics();
 
         currentScene.tweenValue = 0;
         currentScene.openingTweenStart = currentScene.tweens.addCounter({
@@ -118,7 +118,7 @@ var showTutorial = function (currentScene, nextScene) {
                     currentScene.cameras.main.setMask(geomask1,true)
                     
                 }
-        });
+        });*/
 
         // Tutorial Panels
 
@@ -1042,7 +1042,7 @@ class StartScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', function () {
 
             // proof of concept for inteserting tutoral panels
-            showTutorial(this, 'GameScene');
+            //showTutorial(this, 'GameScene');
 
 
 
@@ -5331,9 +5331,9 @@ class GameScene extends Phaser.Scene {
         ourInputScene.scene.restart();
 
         // Mainmenu Code @holden
-        ourMainMenuScene.scene.restart( {
-            startingAnimation: "menuReturn"
-        });
+        //ourMainMenuScene.scene.restart( {
+        //    startingAnimation: "menuReturn"
+        //});
 
         // Add if time attack code here
         //ourGame.scene.stop();
