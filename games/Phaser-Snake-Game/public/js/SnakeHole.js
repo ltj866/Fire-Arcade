@@ -2325,6 +2325,7 @@ class GameScene extends Phaser.Scene {
         this.portals = [];
         this.dreamWalls = [];
         this.nextStagePortals = [];
+        this.extractHole = [];
 
         this.lastMoveTime = 0; // The last time we called move()
         this.nextScore = 0; // Calculated and stored after score screen finishes.
@@ -3497,6 +3498,7 @@ class GameScene extends Phaser.Scene {
                                     })*/
                                     
                                     this.blackholes.push(blackholeImage)
+                                    this.extractHole.push(extractImage)
                                     
                                     
                                     

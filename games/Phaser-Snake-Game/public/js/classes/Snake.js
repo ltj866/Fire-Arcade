@@ -247,7 +247,7 @@ var Snake = new Phaser.Class({
         var onGridY = (this.head.y - Y_OFFSET) / GRID;
 
         if (scene.gState === GState.PLAY && scene.interactLayer[onGridX][onGridY] != "empty") {
-            debugger
+            //debugger
             scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
         
@@ -262,8 +262,16 @@ var Snake = new Phaser.Class({
                     console.log("ITS WARPING TIME to WORLD", index);
                     scene.warpToNext(index);
                 }
+
                 
             }
+            if (scene.extractHole[0]) { //check that there is an extract hole
+                if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
+                    console.log('WOO')
+                    //TODO: collapse snake and present final score
+                }
+            }
+
         }
 
         // #region Coin Collision
