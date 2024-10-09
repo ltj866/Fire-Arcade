@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3412,6 +3412,9 @@ class GameScene extends Phaser.Scene {
 
                     this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
                     var tiledIndex = 641; // First column in the row.
+                    var nextPortalIndex = 616;
+                    var extractState = false;
+
                     //debugger;
                     this.nextStages.forEach( stageName => {
 
@@ -3421,6 +3424,10 @@ class GameScene extends Phaser.Scene {
                         data.forEach( propObj => {
                             
                             var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
+                            if (this.nextStagePortalLayer.findByIndex(nextPortalIndex)) {
+                                var tile2 = this.nextStagePortalLayer.findByIndex(tiledIndex - 25); //616
+                                extractState = true;
+                            };
                             
                             if (propObj.name === 'slug') {
 
@@ -3460,8 +3467,25 @@ class GameScene extends Phaser.Scene {
                                     var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
                                     ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
 
-                                    var extractImage = this.add.sprite(tile.pixelX + X_OFFSET + GRID * 5, tile.pixelY + Y_OFFSET + GRID * 5, 'extractHole.png' 
-                                    ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
+                                    if (extractState) {
+                                        var extractImage = this.add.sprite(tile2.pixelX + X_OFFSET, tile2.pixelY + Y_OFFSET, 'extractHole.png' 
+                                        ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
+                                        tile2.index = -1;
+
+                                        var extractText = this.add.dom(tile2.pixelX + X_OFFSET + GRID * 0.5, tile2.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                                            "font-size": '8px',
+                                            "baselineX": 1.5,
+                                            })).setHTML(
+                                                'EXTRACT'
+                                        ).setDepth(50).setAlpha(0);
+                                        
+                                        var r2 = this.add.rectangle(tile2.pixelX + X_OFFSET + GRID * 0.5, tile2.pixelY - 12 + GRID * 3 + Y_OFFSET, extractText.width + 8, 14, 0x1a1a1a  
+                                        ).setDepth(49).setAlpha(0);
+                                        //debugger
+                                        r2.postFX.addShine(1, .5, 5)
+                                        r2.setStrokeStyle(2, 0x4d9be6, 0.75);
+                                    }
+
                                     //extractImage.playAfterRepeat('extractHoleClose');
                                     
                                     
@@ -3540,6 +3564,16 @@ class GameScene extends Phaser.Scene {
                                     duration: 50,
                                     delay: this.tweens.stagger(150)
                                 });
+                                if (extractState) {
+                                    this.tweens.add({
+                                        targets: [r2,extractText],
+                                        alpha: {from: 0, to: 1},
+                                        ease: 'Sine.easeOutIn',
+                                        duration: 50,
+                                        delay: this.tweens.stagger(150)
+                                    });
+                                }
+                                
                             }
                         });
 
