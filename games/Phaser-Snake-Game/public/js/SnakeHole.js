@@ -799,6 +799,7 @@ class StartScene extends Phaser.Scene {
 
 
         this.load.spritesheet('blackholeAnim', '/assets/sprites/blackholeAnim.png',{ frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('extractHole', '/assets/sprites/extractHole.png',{ frameWidth: 64, frameHeight: 64 });
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -1185,10 +1186,7 @@ class StartScene extends Phaser.Scene {
             }
         });
 
-        this.input.keyboard.on('keydown-SPACE', e => {
-            onInput(ourStartScene);
 
-        });
         
         // #region Pre-roll Zeds
 
@@ -1487,6 +1485,7 @@ class MainMenuScene extends Phaser.Scene {
         this.menuState = 0
 
         
+
         this.input.keyboard.on('keydown-SPACE', function() {
             if (this.menuState == 1) {
                 
@@ -1624,18 +1623,37 @@ class MainMenuScene extends Phaser.Scene {
         });
         titleTween.pause();
         menuFadeTween.pause();
+        
+        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "white",
+            "textAlign": 'center'
+
+        }),
+                `Press Space`
+        ).setOrigin(0.5,0.5).setScale(0.5);
+
+        this.pressToPlayTween = this.tweens.add({
+            targets: this.pressToPlay,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Sine.InOut',
+            yoyo: true,
+            repeat: -1,
+        });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-            if (!thisScene.pressedSpace) {
-                thisScene.pressToPlayTween.stop();
-                thisScene.pressToPlay.setAlpha(0)
-                thisScene.pressedSpace = true;
-                titleTween.resume();
-                menuFadeTween.resume();            
-            }
-            else{
-                console.log(menuOptions[menuList[cursorIndex]].call());
-            }
+        if (!thisScene.pressedSpace) {
+            thisScene.pressToPlayTween.stop();
+            thisScene.pressToPlay.setAlpha(0)
+            thisScene.pressedSpace = true;
+            titleTween.resume();
+            menuFadeTween.resume();            
+        }
+        else{
+            console.log(menuOptions[menuList[cursorIndex]].call());
+        }
 
         });
 
@@ -3441,6 +3459,10 @@ class GameScene extends Phaser.Scene {
                                     
                                     var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
                                     ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+
+                                    var extractImage = this.add.sprite(tile.pixelX + X_OFFSET + GRID * 5, tile.pixelY + Y_OFFSET + GRID * 5, 'extractHole.png' 
+                                    ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
+                                    //extractImage.playAfterRepeat('extractHoleClose');
                                     
                                     
                                     //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
@@ -8552,6 +8574,19 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: 0,
         hideOnComplete: true
+    });
+
+    scene.anims.create({
+        key: 'extractHoleIdle',
+        frames: scene.anims.generateFrameNumbers('extractHole',{ frames: [ 0,1,2,3,4,5,6,7]}),
+        frameRate: 8,
+        repeat: -1,
+    });
+    scene.anims.create({
+        key: 'extractHoleClose',
+        frames: scene.anims.generateFrameNumbers('extractHole',{ frames: [ 8,9,10,11,12,13,14,15]}),
+        frameRate: 8,
+        repeat: -1,
     });
 
     scene.anims.create({
