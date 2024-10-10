@@ -1194,10 +1194,6 @@
                         }]
                 }],
          "tilewidth":12
-        }, 
-        {
-         "firstgid":1025,
-         "source":"..\/..\/..\/..\/..\/..\/Fire-Arcade\/games\/Phaser-Snake-Game\/public\/assets\/Tiled\/tileSheetx12.tsx"
         }],
  "tilewidth":12,
  "type":"map",

@@ -2624,6 +2624,7 @@ class GameScene extends Phaser.Scene {
         // #region TileMap
 
         // Tilemap
+        debugger
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
