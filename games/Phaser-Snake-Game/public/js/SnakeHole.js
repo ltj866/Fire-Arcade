@@ -279,6 +279,8 @@ const DREAMWALLSKIP = [0,1,2];
 const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
+const START_COINS = 4;
+
 
 class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
     constructor(game) {
@@ -649,7 +651,12 @@ class TutorialScene extends Phaser.Scene {
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
                 // @Holden add transition to nextScene here.
-                scene.scene.start("GameScene");
+                scene.scene.start("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    lives: START_COINS,
+                    startupAnim: true,
+                });
             }
 
         //continueText.on('pointerdown', e =>
@@ -5264,7 +5271,7 @@ class GameScene extends Phaser.Scene {
                         ease: 'Sine.In',
                         delay: 500,
                         onComplete: () =>{
-                            this.nextStage(this.nextStages[nextStageIndex],camDirection);
+                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
                         }
                     });
                 });
