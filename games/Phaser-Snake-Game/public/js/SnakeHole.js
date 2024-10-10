@@ -3415,6 +3415,7 @@ class GameScene extends Phaser.Scene {
                     var tiledIndex = 641; // First column in the row.
                     var nextPortalIndex = 616;
                     var extractState = false;
+                    this.extractLables = [];
 
                     //debugger;
                     this.nextStages.forEach( stageName => {
@@ -3499,6 +3500,7 @@ class GameScene extends Phaser.Scene {
                                     
                                     this.blackholes.push(blackholeImage)
                                     this.extractHole.push(extractImage)
+                                    this.extractLables.push(extractText,r2)
                                     
                                     
                                     
@@ -5033,6 +5035,70 @@ class GameScene extends Phaser.Scene {
                 return ;  //Don't know why this is here but I left it -James
             }
         });
+    }
+
+    warpToMenu(){
+
+        const ourPersist = this.scene.get('PersistScene');
+        this.gState = GState.TRANSITION;
+
+        this.snake.head.setTexture('snakeDefault', 0);
+
+        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+        this.extractHole[0].play('extractHoleClose');
+
+        this.tweens.add({
+            targets: this.snake.body, 
+            yoyo: false,
+            duration: 500,
+            ease: 'Linear',
+            repeat: 0,
+            alpha: 0,
+            delay: this.tweens.stagger(30),
+        });
+
+        //dim UI
+        this.time.delayedCall(1000, event => {
+            const ourGameScene = this.scene.get('GameScene');
+            this.tweens.add({
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                alpha: { from: 1, to: 0},
+                ease: 'Sine.InOut',
+                duration: 500,
+                });
+        });
+
+        this.tweens.add({
+            targets: this.extractLables,
+            alpha: 0,
+            yoyo: false,
+            duration: 50,
+            ease: 'linear',
+            repeat: 0,
+        });
+
+        var centerLocation = new Phaser.Math.Vector2(X_OFFSET + GRID * 14,Y_OFFSET + GRID * 13)
+        var extractLocation = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
+
+        var camDirection = new Phaser.Math.Vector2((extractLocation.y - centerLocation.y),(extractLocation.x - centerLocation.x));
+
+
+        ourPersist.bgCoords.x += camDirection.y/2;
+                    ourPersist.bgCoords.y += camDirection.x/2;
+                    var cameraPanTween = this.tweens.add({
+                        targets: this.cameras.main,
+                        scrollX: camDirection.y * 10,
+                        scrollY: camDirection.x * 10,
+                        duration: 3000,
+                        ease: 'Sine.In',
+                        delay: 500,
+                        onComplete: () =>{
+                            //TODO: reset back to stage 1
+                            this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
+                        }
+                    });
+        
     }
     
 
@@ -8622,7 +8688,8 @@ function loadSpriteSheetsAndAnims(scene) {
         key: 'extractHoleClose',
         frames: scene.anims.generateFrameNumbers('extractHole',{ frames: [ 8,9,10,11,12,13,14,15]}),
         frameRate: 8,
-        repeat: -1,
+        repeat: 0,
+        hideOnComplete: true
     });
 
     scene.anims.create({
