@@ -657,6 +657,11 @@ class TutorialScene extends Phaser.Scene {
                     lives: START_COINS,
                     startupAnim: true,
                 });
+
+                // Clear for reseting game
+                scene.scene.get("StartScene").stageHistory = [];
+
+                
             }
 
         //continueText.on('pointerdown', e =>
