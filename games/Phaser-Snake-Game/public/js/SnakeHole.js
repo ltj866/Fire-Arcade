@@ -654,12 +654,14 @@ class TutorialScene extends Phaser.Scene {
                 scene.scene.start("GameScene", {
                     stage: START_STAGE,
                     score: 0,
-                    lives: START_COINS,
                     startupAnim: true,
                 });
 
+
+
                 // Clear for reseting game
                 scene.scene.get("StartScene").stageHistory = [];
+                scene.scene.get("PersistScene").coins = START_COINS;
 
                 
             }
@@ -2069,7 +2071,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 4; // 4
+        this.coins = START_COINS;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
