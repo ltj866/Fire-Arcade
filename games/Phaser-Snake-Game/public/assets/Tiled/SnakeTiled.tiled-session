@@ -771,11 +771,11 @@
             "scaleInDock": 1
         },
         "World_1-2.json": {
-            "scale": 1.5,
+            "scale": 1,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 173.66666666666669,
-                "y": 161.66666666666663
+                "x": 206.5,
+                "y": 154.5
             }
         },
         "World_1-2.json#tileSheetx12": {
@@ -826,8 +826,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.66666666666669,
-                "y": 161.66666666666663
+                "x": 106.66666666666669,
+                "y": 166.99999999999997
             }
         },
         "World_1-4.json#tileSheetx12": {
@@ -851,9 +851,12 @@
             "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 372.66666666666663,
-                "y": 371.33333333333326
+                "x": 125.33333333333331,
+                "y": 307.33333333333326
             }
+        },
+        "World_2-2.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "World_2-2.json#tileSheetx24": {
             "scaleInDock": 1
@@ -862,20 +865,26 @@
             "scale": 1.3509408602150537,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.9629887573376,
-                "y": 371.9629887573376
+                "x": 156.1874440354194,
+                "y": 257.9683613570789
             }
+        },
+        "World_2-3.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "World_2-3.json#tileSheetx24": {
             "scaleInDock": 1
         },
         "World_2-4.json": {
-            "scale": 0.75,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.66666666666663,
-                "y": 371.33333333333326
+                "x": 168.5,
+                "y": 227.25
             }
+        },
+        "World_2-4.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "World_2-4.json#tileSheetx24": {
             "scaleInDock": 1
@@ -884,8 +893,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 243.33333333333337,
-                "y": 372.66666666666674
+                "x": 243.99999999999997,
+                "y": 372.6666666666667
             }
         },
         "World_4-2.json#tileSheetx24": {
