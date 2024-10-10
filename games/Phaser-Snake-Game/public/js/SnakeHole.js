@@ -83,401 +83,8 @@ var calcBonus = function (scoreInput) {
 }
 
 var showTutorial = function (currentScene, nextScene) {
-
-        /*currentScene.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
-            "fontSize":'48px',
-            }), 
-                'PORTAL SNAKE',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.*/
-        
-        //var card = currentScene.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
-        //card.setOrigin(0,0);
-        //card.setScale(1)
-
-        
-        // Masks
-
-
-
-        /*const graphics = currentScene.add.graphics();
-
-        currentScene.tweenValue = 0;
-        currentScene.openingTweenStart = currentScene.tweens.addCounter({
-            from: 0,
-            to: 600,
-            ease: 'Sine.InOut',
-            duration: 1000,
-            onUpdate: tween =>
-                {   
-                    graphics.clear();
-                    var value = (tween.getValue());
-                    currentScene.tweenValue = value
-                    currentScene.shape1 = currentScene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                    var geomask1 = currentScene.shape1.createGeometryMask();
-                    
-                    currentScene.cameras.main.setMask(geomask1,true)
-                    
-                }
-        });*/
-
-        // Tutorial Panels
-
-        var tutStyle = {
-            "fontSize":'24px',
-        }
-
-        currentScene.selectedPanel = 1;
-
-
-        currentScene.tutText1 = currentScene.add.dom(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-             'Press arrow keys to move.',
-        ).setOrigin(0.5,0).setScale(.5).setAlpha(0); // Sets the origin to the middle top.
-        currentScene.tutText2 = currentScene.add.dom(SCREEN_WIDTH + 250, GRID * 9.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-            'Collect atoms to grow longer.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        currentScene.tutText3 = currentScene.add.dom(SCREEN_WIDTH + 250 * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-            'Use portals to bend spacetime.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        currentScene.tutText4 = currentScene.add.dom((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-                'Hold space to sprint.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        
-        currentScene.tutWASD = currentScene.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
-             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutWASD.play('tutAll').setAlpha(0);
-
-        currentScene.tutSnake = currentScene.add.sprite(SCREEN_WIDTH/2,
-             SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
-        currentScene.time.delayedCall(600, event => {
-            currentScene.tweens.add({
-                targets: [currentScene.tutText1, currentScene.tutSnake, currentScene.tutWASD, currentScene.panelArrowR, currentScene.panelArrowL],
-                alpha: {from: 0, to: 1},
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        const panel1 = currentScene.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel1.setDepth(100);
-        panel1.setScale(0);
-        currentScene.time.delayedCall(500, event => {
-            currentScene.tweens.add({
-                targets: panel1,
-                scale: 1,
-                width: 240,
-                height: 160,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        const panel2 = currentScene.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel2.setDepth(100);
-        panel2.setScale(0);
-        currentScene.time.delayedCall(500, event => {
-            currentScene.tweens.add({
-                targets: panel2,
-                scale: 1,
-                width: 200,
-                height: 140,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        currentScene.tutAtomSmall = currentScene.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutAtomSmall.play('atom04idle');
-        currentScene.tutAtomMedium = currentScene.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutAtomMedium.play('atom03idle');
-        currentScene.tutAtomLarge = currentScene.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutAtomLarge.play('atom02idle');
-        currentScene.tutAtomCharged = currentScene.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutAtomCharged.play('atom01idle');
-        currentScene.tutAtomElectrons = currentScene.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutAtomElectrons.play('electronIdle');
-
-        const panel3 = currentScene.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
-        panel3.setDepth(100);
-
-        currentScene.tutPortal1 = currentScene.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
-            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutPortal1.play('portalIdle');
-        currentScene.tutPortal2 = currentScene.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutPortal2.play('portalIdle');
-
-        currentScene.tutSnake2 = currentScene.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
-        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
-        currentScene.tutSnake3 = currentScene.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
-        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
-
-        const panel4 = currentScene.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
-        panel4.setDepth(100);
-
-        currentScene.tutSPACE = currentScene.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
-             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.tutSPACE.play('tutSpace');
-
-        currentScene.tutSnake4 = currentScene.add.sprite((SCREEN_WIDTH + 250 * 6),
-        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
-
-        currentScene.panels = [];
-        currentScene.panels.push(panel1, currentScene.tutWASD, currentScene.tutSnake, currentScene.tutText1,
-            panel2, currentScene.tutText2, currentScene.tutAtomSmall,currentScene.tutAtomMedium,currentScene.tutAtomLarge,currentScene.tutAtomCharged,currentScene.tutAtomElectrons,
-            panel3, currentScene.tutText3, currentScene.tutPortal1,currentScene.tutPortal2,currentScene.tutSnake2,currentScene.tutSnake3,
-            panel4, currentScene.tutText4,currentScene.tutSPACE,currentScene.tutSnake4);
-
-        currentScene.panelsContainer = currentScene.make.container(0, 0);
-        currentScene.panelsContainer.add(currentScene.panels);
-
-
-
-        
-        
-        if (localStorage["version"] === undefined) {
-            currentScene.hasPlayedBefore = false;
-            console.log("Testing LOCAL STORAGE. Has not played.", );
-
-        } else {
-            currentScene.hasPlayedBefore = true;
-            console.log("Testing LOCAL STORAGE Has played.", );
-        }
-
-        //currentScene.continueText = currentScene.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
-        
-        currentScene.continueText = currentScene.add.dom(SCREEN_WIDTH/2, GRID*24.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
-            "fontSize":'32px',
-            }), 
-                '[PRESS SPACE TO CONTINUE]',
-        ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
-        
-        
-        
-        currentScene.continueText.setVisible(false)
-        if (!currentScene.hasPlayedBefore) {
-            //continueText = currentScene.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
-        }
-        else {
-            currentScene.continueText.setVisible(true)        
-        }
-
-        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
-        currentScene.continueText.setVisible(true)
-        
-        currentScene.tweens.add({
-            targets: currentScene.continueText,
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 1000,
-            repeat: -1,
-            yoyo: true
-        });
-        
-        currentScene.panelArrowR = currentScene.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.panelArrowR.play('startArrowIdle').setAlpha(0);
-        currentScene.panelArrowR.angle = 90;
-        
-        currentScene.panelArrowL = currentScene.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        currentScene.panelArrowL.play('startArrowIdle');
-        currentScene.panelArrowL.angle = 270;
-        currentScene.panelArrowL.setVisible(false).setAlpha(0);
-
-        currentScene.input.keyboard.on('keydown-RIGHT', e => {
-            
-            const ourStartScene = currentScene.scene.get('StartScene');
-            const ourPersist = currentScene.scene.get('PersistScene');
-            if (currentScene.selectedPanel < 4) {
-                currentScene.pop02.play();
-                currentScene.selectedPanel += 1
-            }
-            currentScene.panelContainerX = 0
-            switch (currentScene.selectedPanel){
-                case 1:
-                    currentScene.panelContainerX = 0;
-                    ourStartScene.panelArrowL.setVisible(false)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x += 20;
-                    currentScene.panelContainerX = -570;
-                    ourStartScene.panelArrowL.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x += 20;
-                    currentScene.panelContainerX = -1195;
-                    ourStartScene.panelArrowL.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x = 60;
-                    currentScene.panelContainerX = -1820;
-                    ourStartScene.panelArrowL.setVisible(true)
-                    ourStartScene.panelArrowR.setVisible(false)
-                    currentScene.continueText.setVisible(true)
-                    break;
-            }
-            
-            currentScene.tweens.add({
-                targets: currentScene.panelsContainer,
-                x: currentScene.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-            });   
-        })
-        currentScene.input.keyboard.on('keydown-LEFT', e => {
-            const ourStartScene = currentScene.scene.get('StartScene');
-            const ourPersist = currentScene.scene.get('PersistScene');
-            if (currentScene.selectedPanel > 1) {
-                currentScene.selectedPanel -= 1
-                currentScene.pop02.play();
-            }
-            currentScene.panelContainerX = 0
-            switch (currentScene.selectedPanel){
-                case 1:
-                    ourPersist.bgCoords.x = 0;
-                    currentScene.panelContainerX = 0;
-                    ourStartScene.panelArrowL.setVisible(false)
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x -= 20;
-                    currentScene.panelContainerX = -570;
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x -= 20;
-                    currentScene.panelContainerX = -1195;
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x -= 20;
-                    currentScene.panelContainerX = -1820;
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-            }
-            
-            
-            currentScene.tweens.add({
-                targets: currentScene.panelsContainer,
-                x: currentScene.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: function () {
-                    if (ourStartScene.selectedPanel < 4) {
-                        ourStartScene.panelArrowR.setVisible(true);
-                    }
-                    else{
-                        ourStartScene.panelArrowR.setVisible(false);
-                    }
-                    
-                }
-            });   
-        })
-
-        const onInput = function (scene) {
-            if (scene.continueText.visible === true) {
-                const ourPersist = scene.scene.get('PersistScene');
-                // @Holden add transition to nextScene here.
-            }
-
-
-
-        //continueText.on('pointerdown', e =>
-        //{
-        //    this.onInput();
-        //    //ourInput.moveUp(ourGame, "upUI")
-    
-        //});
-                
-                /*** to run when skipping to score screen.
-                ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
-                ourGame.stageDiffBonus = 140;
-                ourGame.stage = END_STAGE;
-                //END_STAGE = "Stage-01";
-
-                this.score = 12345;
-                this.bonks = 3;
-                this.length = 28;
-                this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
-                this.zedLevel = 77;
-                this.medals = {
-                    "fast":'silver',
-                    "Rank":'gold'
-                }
-
-                ourInput.turns = 79;
-                ourInput.cornerTime = 190;
-                ourInput.boostTime = 400;
-
-                var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
-                var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
-                var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
-
-                this.stageHistory = [stage01, stage02, stage03];
-                this.scene.start('ScoreScene');
-                */
-            /*}
-            else {
-                                                
-
-            }
-            ourPersist.closingTween();
-            scene.tweens.addCounter({
-                from: 600,
-                to: 0,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                onUpdate: tween =>
-                    {   
-                        graphics.clear();
-                        var value = (tween.getValue());
-                        scene.tweenValue = value
-                        scene.shape1 = scene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                        var geomask1 = scene.shape1.createGeometryMask();
-                        
-                        scene.cameras.main.setMask(geomask1,true)
-                    },
-                onComplete: () => {
-                    scene.scene.setVisible(false);
-                    //this.scene.get("UIScene").setVisible(false);
-                    
-                    //this.scene.launch('UIScene');
-                    //scene.scene.launch('GameScene');
-                    scene.scene.launch('MainMenuScene');
-                    ourPersist.starterTween.stop();
-                    ourPersist.openingTween(scene.tweenValue);
-                    scene.openingTweenStart.stop();
-                    scene.scene.stop();
-                    
-                    //var ourGameScene = this.scene.get("GameScene");
-                    //console.log(e)
-                }
-            });*/
-        }
-    
-        
-        this.continueText.on('pointerdown', e => {
-            console.log("I CLICK");
-            if (this.continueText.visible === true) {
-                console.log("I click and continue");
-                onInput(ourStartScene);
-            }
-        });
-
-        this.input.keyboard.on('keydown-SPACE', e => {
-            onInput(ourStartScene);
-
-        });
-
+    // Stops the current Scene and starts the tutorial one.
+    currentScene.scene.start(nextScene);
 } 
 
 var updateSumOfBest = function(scene) {
@@ -729,6 +336,411 @@ class SpaceBoyScene extends Phaser.Scene {
     }
 }
 
+// #region TutorialScene
+class TutorialScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'TutorialScene', active: false});
+    }
+    create() {
+        this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'48px',
+            }), 
+                'PORTAL SNAKE',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        
+        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
+        //card.setOrigin(0,0);
+        //card.setScale(1)
+
+        
+        // Masks
+        // AUDIO
+        this.pop02 = this.sound.add('pop02');
+
+
+
+        const graphics = this.add.graphics();
+
+        this.tweenValue = 0;
+        this.openingTweenStart = this.tweens.addCounter({
+            from: 0,
+            to: 600,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            onUpdate: tween =>
+                {   
+                    graphics.clear();
+                    var value = (tween.getValue());
+                    this.tweenValue = value
+                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                    var geomask1 = this.shape1.createGeometryMask();
+                    
+                    this.cameras.main.setMask(geomask1,true)
+                    
+                }
+        });
+
+        // Tutorial Panels
+
+        var tutStyle = {
+            "fontSize":'24px',
+        }
+
+        this.selectedPanel = 1;
+
+
+        this.tutText1 = this.add.dom(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+             'Press arrow keys to move.',
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0); // Sets the origin to the middle top.
+        this.tutText2 = this.add.dom(SCREEN_WIDTH + 250, GRID * 9.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+            'Collect atoms to grow longer.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.tutText3 = this.add.dom(SCREEN_WIDTH + 250 * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+            'Use portals to bend spacetime.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.tutText4 = this.add.dom((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+                'Hold space to sprint.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        
+        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
+             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutWASD.play('tutAll').setAlpha(0);
+
+        this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
+             SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
+        this.time.delayedCall(600, event => {
+            this.tweens.add({
+                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
+                alpha: {from: 0, to: 1},
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
+        panel1.setDepth(100);
+        panel1.setScale(0);
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel1,
+                scale: 1,
+                width: 240,
+                height: 160,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
+        panel2.setDepth(100);
+        panel2.setScale(0);
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel2,
+                scale: 1,
+                width: 200,
+                height: 140,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomSmall.play('atom04idle');
+        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomMedium.play('atom03idle');
+        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomLarge.play('atom02idle');
+        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomCharged.play('atom01idle');
+        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomElectrons.play('electronIdle');
+
+        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
+        panel3.setDepth(100);
+
+        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
+            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal1.play('portalIdle');
+        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal2.play('portalIdle');
+
+        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
+        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
+
+        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
+        panel4.setDepth(100);
+
+        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
+             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutSPACE.play('tutSpace');
+
+        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
+        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
+
+        this.panels = [];
+        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
+            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
+            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
+            panel4, this.tutText4,this.tutSPACE,this.tutSnake4);
+
+        this.panelsContainer = this.make.container(0, 0);
+        this.panelsContainer.add(this.panels);
+
+
+
+        
+        
+        if (localStorage["version"] === undefined) {
+            this.hasPlayedBefore = false;
+            console.log("Testing LOCAL STORAGE. Has not played.", );
+
+        } else {
+            this.hasPlayedBefore = true;
+            console.log("Testing LOCAL STORAGE Has played.", );
+        }
+
+        //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
+        
+        this.continueText = this.add.dom(SCREEN_WIDTH/2, GRID*24.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'32px',
+            }), 
+                '[PRESS SPACE TO CONTINUE]',
+        ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
+        
+        
+        
+        this.continueText.setVisible(false)
+        if (!this.hasPlayedBefore) {
+            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        }
+        else {
+            this.continueText.setVisible(true)        
+        }
+
+        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
+        this.continueText.setVisible(true)
+        
+        this.tweens.add({
+            targets: this.continueText,
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: -1,
+            yoyo: true
+        });
+        
+        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowR.play('startArrowIdle').setAlpha(0);
+        this.panelArrowR.angle = 90;
+        
+        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL.play('startArrowIdle');
+        this.panelArrowL.angle = 270;
+        this.panelArrowL.setVisible(false).setAlpha(0);
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            
+            const ourTutorialScene = this.scene.get('TutorialScene');
+            const ourPersist = this.scene.get('PersistScene');
+            if (this.selectedPanel < 4) {
+                this.pop02.play();
+                this.selectedPanel += 1
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    this.panelContainerX = 0;
+                    this.panelArrowL.setVisible(false)
+                    break;
+                case 2:
+                    ourPersist.bgCoords.x += 20;
+                    this.panelContainerX = -570;
+                    this.panelArrowL.setVisible(true)
+                    break;
+                case 3:
+                    ourPersist.bgCoords.x += 20;
+                    this.panelContainerX = -1195;
+                    this.panelArrowL.setVisible(true)
+                    break;
+                case 4:
+                    ourPersist.bgCoords.x = 60;
+                    this.panelContainerX = -1820;
+                    this.panelArrowL.setVisible(true)
+                    this.panelArrowR.setVisible(false)
+                    this.continueText.setVisible(true)
+                    break;
+            }
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+            });   
+        }, this)
+        this.input.keyboard.on('keydown-LEFT', e => {
+            const ourPersist = this.scene.get('PersistScene');
+            if (this.selectedPanel > 1) {
+                this.selectedPanel -= 1
+                this.pop02.play();
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    ourPersist.bgCoords.x = 0;
+                    this.panelContainerX = 0;
+                    this.panelArrowL.setVisible(false)
+                    this.panelArrowR.setVisible(true)
+                    break;
+                case 2:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -570;
+                    this.panelArrowR.setVisible(true)
+                    break;
+                case 3:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -1195;
+                    this.panelArrowR.setVisible(true)
+                    break;
+                case 4:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -1820;
+                    this.panelArrowR.setVisible(true)
+                    break;
+            }
+
+            
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+                onComplete: function () {
+                    
+                    if (ourTutorialScene.selectedPanel < 4) {
+                        debugger
+                        ourTutorialScene.panelArrowR.setVisible(true);
+                    }
+                    else{
+                        debugger
+                        ourTutorialScene.panelArrowR.setVisible(false);
+                    }
+                    
+                }
+            }, this);   
+        }, this)
+
+        const onInput = function (scene) {
+            if (scene.continueText.visible === true) {
+                // @Holden add transition to nextScene here.
+                scene.scene.start("GameScene");
+            }
+
+        //continueText.on('pointerdown', e =>
+        //{
+        //    this.onInput();
+        //    //ourInput.moveUp(ourGame, "upUI")
+    
+        //});
+                
+                /*** to run when skipping to score screen.
+                ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
+                ourGame.stageDiffBonus = 140;
+                ourGame.stage = END_STAGE;
+                //END_STAGE = "Stage-01";
+
+                this.score = 12345;
+                this.bonks = 3;
+                this.length = 28;
+                this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+                this.zedLevel = 77;
+                this.medals = {
+                    "fast":'silver',
+                    "Rank":'gold'
+                }
+
+                ourInput.turns = 79;
+                ourInput.cornerTime = 190;
+                ourInput.boostTime = 400;
+
+                var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
+                var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
+                var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
+
+                this.stageHistory = [stage01, stage02, stage03];
+                this.scene.start('ScoreScene');
+                */
+            /*}
+            else {
+                                                
+
+            }
+            ourPersist.closingTween();
+            scene.tweens.addCounter({
+                from: 600,
+                to: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                onUpdate: tween =>
+                    {   
+                        graphics.clear();
+                        var value = (tween.getValue());
+                        scene.tweenValue = value
+                        scene.shape1 = scene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                        var geomask1 = scene.shape1.createGeometryMask();
+                        
+                        scene.cameras.main.setMask(geomask1,true)
+                    },
+                onComplete: () => {
+                    scene.scene.setVisible(false);
+                    //this.scene.get("UIScene").setVisible(false);
+                    
+                    //this.scene.launch('UIScene');
+                    //scene.scene.launch('GameScene');
+                    scene.scene.launch('MainMenuScene');
+                    ourPersist.starterTween.stop();
+                    ourPersist.openingTween(scene.tweenValue);
+                    scene.openingTweenStart.stop();
+                    scene.scene.stop();
+                    
+                    //var ourGameScene = this.scene.get("GameScene");
+                    //console.log(e)
+                }
+            });*/
+        }
+    
+        
+        this.continueText.on('pointerdown', e => {
+            console.log("I CLICK");
+            if (this.continueText.visible === true) {
+                console.log("I click and continue");
+                onInput(this);
+            }
+        });
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            onInput(this);
+
+        });
+    }
+}
+
 // #region StartScene
 class StartScene extends Phaser.Scene {
     constructor () {
@@ -975,7 +987,7 @@ class StartScene extends Phaser.Scene {
         
         ///
         // AUDIO
-        this.pop02 = this.sound.add('pop02')
+        this.pop02 = this.sound.add('pop02');
         
 
         
@@ -1178,13 +1190,6 @@ class StartScene extends Phaser.Scene {
             var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");            
         }
         
-        this.continueText.on('pointerdown', e => {
-            console.log("I CLICK");
-            if (this.continueText.visible === true) {
-                console.log("I click and continue");
-                onInput(ourStartScene);
-            }
-        });
 
 
         
@@ -1369,9 +1374,8 @@ class MainMenuScene extends Phaser.Scene {
                 console.log("Practice");
                 return true;
             },
-            'adventure': function () {
-                console.log("Arcade");
-                thisScene.scene.launch('GameScene');
+            'adventure': function () {   
+                thisScene.scene.launch('TutorialScene');
                 thisScene.scene.stop();
                 return true;
             },
@@ -2374,7 +2378,7 @@ class GameScene extends Phaser.Scene {
 
         // from  the  UI
         //this.score = 0;
-        var { score = 0 } = props
+        var { score = 0 } = props;
         this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
         this.stageStartScore = Math.trunc(score);
 
@@ -8821,7 +8825,7 @@ var config = {
     },
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
-    scene: [ StartScene, MainMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, MainMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene, TutorialScene]
 };
 
 // #region Screen Settings
