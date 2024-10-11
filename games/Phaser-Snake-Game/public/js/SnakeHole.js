@@ -2624,11 +2624,10 @@ class GameScene extends Phaser.Scene {
         // #region TileMap
 
         // Tilemap
-        debugger
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
-        this.interactLayer = []
+        this.interactLayer = [];
 
         for (let x = 0; x < this.map.width; x++) {
             this.interactLayer[x] = [];
@@ -2712,6 +2711,9 @@ class GameScene extends Phaser.Scene {
 
         });
 
+        
+
+        
         this.load.start(); // Loader doesn't start on its own outside of the preload function.
         this.load.on('complete', function () {
             console.log('Loaded all the json properties for NextStages');
@@ -3443,6 +3445,7 @@ class GameScene extends Phaser.Scene {
                     var nextStagesCopy = this.nextStages.slice();
                     
 
+                    debugger
                     console.log('PORTAL LAYER',this.nextStagePortalLayer);
                     // Add one extract hole spawn here if it exists.
                     if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
@@ -5136,6 +5139,7 @@ class GameScene extends Phaser.Scene {
  
     warpToNext(nextStageIndex) {
 
+        debugger
         const ourPersist = this.scene.get('PersistScene');
         this.gState = GState.TRANSITION;
 
@@ -5292,6 +5296,7 @@ class GameScene extends Phaser.Scene {
                         ease: 'Sine.In',
                         delay: 500,
                         onComplete: () =>{
+                            debugger
                             this.nextStage(this.nextStages[nextStageIndex], camDirection);
                         }
                     });
@@ -5335,10 +5340,6 @@ class GameScene extends Phaser.Scene {
 
 
 
-
-        
-
-
         snakeholeTween.on('complete', () => {
             var cameraZoomTween = this.tweens.add({
                 targets: this.map,
@@ -5354,10 +5355,6 @@ class GameScene extends Phaser.Scene {
             })
             
         });
-
-
-
-       
                     
     }
 
@@ -5453,8 +5450,7 @@ class GameScene extends Phaser.Scene {
 
 
         
-        
-
+    
         this.scene.restart( { 
             stage: stageName, 
             score: this.nextScore, 
@@ -7407,7 +7403,8 @@ class ScoreScene extends Phaser.Scene {
                     "CompleteStage",
                     extraFields.toString(),
                     );
-                // Event listeners need to be removed manually
+                
+                    // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
