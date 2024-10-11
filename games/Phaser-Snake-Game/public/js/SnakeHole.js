@@ -3434,12 +3434,16 @@ class GameScene extends Phaser.Scene {
 
                 if (this.map.getLayer('Next')) {
 
+                    
                     this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
+                    
+                    
                     var blackholeTileIndex = 641; // Starting First column in the row.
                     this.extractLables = [];
                     var nextStagesCopy = this.nextStages.slice();
+                    
 
-
+                    console.log('PORTAL LAYER',this.nextStagePortalLayer);
                     // Add one extract hole spawn here if it exists.
                     if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
                         var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
@@ -5125,6 +5129,7 @@ class GameScene extends Phaser.Scene {
                             this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
                         }
                     });
+        
         
     }
     
@@ -7333,9 +7338,9 @@ class ScoreScene extends Phaser.Scene {
             var gameOver = false;
 
             if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
-                debugger
-                continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
-                gameOver = true;
+                //debugger
+                //continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
+                //gameOver = true;
                 // Should restart here, with a popup that shows your run score info.
                 // Should be the same screen as the GameOver Screen.
             }
