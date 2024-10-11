@@ -5284,22 +5284,25 @@ class GameScene extends Phaser.Scene {
                 }
             },
             onComplete: () =>{
+                debugger
                 this.nextStagePortals.forEach( blackholeImage=> {
+                    debugger
                     blackholeImage.play('blackholeClose')
                     ourPersist.bgCoords.x += camDirection.y/2;
                     ourPersist.bgCoords.y += camDirection.x/2;
-                    var cameraPanTween = this.tweens.add({
-                        targets: this.cameras.main,
-                        scrollX: camDirection.y * 10,
-                        scrollY: camDirection.x * 10,
-                        duration: 1000,
-                        ease: 'Sine.In',
-                        delay: 500,
-                        onComplete: () =>{
-                            debugger
-                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
-                        }
-                    });
+                    
+                });
+                var cameraPanTween = this.tweens.add({
+                    targets: this.cameras.main,
+                    scrollX: camDirection.y * 10,
+                    scrollY: camDirection.x * 10,
+                    duration: 1000,
+                    ease: 'Sine.In',
+                    delay: 500,
+                    onComplete: () =>{
+                        debugger
+                        this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                    }
                 });
             }
         });
