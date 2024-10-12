@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -5049,9 +5049,9 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    warpToMenu(){
+    finalScore(){
+        const ourStartScene = this.scene.get('StartScene');
 
-        const ourPersist = this.scene.get('PersistScene');
         this.gState = GState.TRANSITION;
 
         this.snake.head.setTexture('snakeDefault', 0);
@@ -5069,6 +5069,102 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
             delay: this.tweens.stagger(30),
         });
+        
+
+        //style
+        const finalScoreStyle = {
+            color: "white",
+            //"text-shadow": "2px 2px 4px #000000",
+            "font-size":'22px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
+
+        //EXTRACTION COMPLETE
+        this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size":'32px',
+            'font-weight': 400,
+            'text-align': 'center',
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            })).setHTML(
+                `EXTRACTION COMPLETE`
+        ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
+
+        //nineSlice
+        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, Y_OFFSET + GRID * 10, 
+            'uiPanelL', 'Glass', 
+            GRID * 16, GRID * 3, 
+            8, 8, 8, 8);
+        this.finalScorePanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0);
+
+        //FINAL SCORE LABEL
+        const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `FINAL SCORE :`
+        ).setOrigin(1,0).setScale(0.5);
+        
+        var _totalScore = 0
+
+        ourStartScene.stageHistory.forEach( stageData => {
+            _totalScore += stageData.calcTotal();
+        });
+        _totalScore = Math.floor(_totalScore); //rounds down to whole number
+
+        //FINAL SCORE VALUE
+        const finalScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `${_totalScore}`
+        ).setOrigin(0,0).setScale(0.5);
+
+        //PRESS SPACE TO CONTINUE TEXT
+        // Give a few seconds before a player can hit continue
+        this.time.delayedCall(900, function() {
+            const ourGameScene = this.scene.get('GameScene');
+            var _continue_text = '[SPACE TO CONTINUE]';
+
+            var _continueText = this.add.dom(SCREEN_WIDTH/2, GRID * 17,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'32px',
+                "font-family": '"Press Start 2P", system-ui',
+                "text-shadow": "4px 4px 0px #000000",
+                }
+            )).setText(_continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
+
+ 
+            this.tweens.add({
+                targets: _continueText,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: -1,
+                yoyo: true
+              });
+
+            const onContinue = function () {
+                ourGameScene.warpToMenu(); 
+            }
+            this.input.keyboard.on('keydown-SPACE', function() { 
+                onContinue();
+            });
+
+            _continueText.on('pointerdown', e => {
+                onContinue();
+            });
+        }, [], this);
+
+
+
+        
+    }
+
+    warpToMenu(){
+
+        const ourPersist = this.scene.get('PersistScene');
+
 
         //dim UI
         this.time.delayedCall(1000, event => {
@@ -5090,26 +5186,17 @@ class GameScene extends Phaser.Scene {
             repeat: 0,
         });
 
-        var centerLocation = new Phaser.Math.Vector2(X_OFFSET + GRID * 14,Y_OFFSET + GRID * 13)
-        var extractLocation = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
-
-        var camDirection = new Phaser.Math.Vector2((extractLocation.y - centerLocation.y),(extractLocation.x - centerLocation.x));
-
-
-        ourPersist.bgCoords.x += camDirection.y/2;
-                    ourPersist.bgCoords.y += camDirection.x/2;
-                    var cameraPanTween = this.tweens.add({
-                        targets: this.cameras.main,
-                        scrollX: camDirection.y * 10,
-                        scrollY: camDirection.x * 10,
-                        duration: 3000,
-                        ease: 'Sine.In',
-                        delay: 500,
-                        onComplete: () =>{
-                            //TODO: reset back to stage 1
-                            this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
-                        }
-                    });
+        
+        this.tweens.add({
+            targets: this.cameras.main,
+            duration: 3000,
+            ease: 'Sine.In',
+            delay: 1000,
+            onComplete: () =>{
+                //TODO: reset back to stage 1
+                this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
+            }
+        });
         
         
     }
