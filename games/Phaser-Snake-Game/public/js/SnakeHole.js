@@ -979,8 +979,6 @@ class StartScene extends Phaser.Scene {
 
         
         ///
-        // AUDIO
-        this.pop02 = this.sound.add('pop02');
         
 
         
@@ -1044,7 +1042,7 @@ class StartScene extends Phaser.Scene {
             repeat: -1,
         });
 
-        this.input.keyboard.on('keydown-SPACE', function () {
+        //this.input.keyboard.on('keydown-SPACE', function () {
 
             // proof of concept for inteserting tutoral panels
             //showTutorial(this, 'GameScene');
@@ -1059,7 +1057,7 @@ class StartScene extends Phaser.Scene {
                     titlePortal.anims.getTotalFrames() - 1
                     )
             });
-        }, this);
+        //}, this);
         
 
         
@@ -1369,7 +1367,7 @@ class MainMenuScene extends Phaser.Scene {
             },
             'adventure': function () {   
                 thisScene.scene.launch('TutorialScene');
-                thisScene.scene.bringToTop('SpaceBoyScene');
+                thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
                 thisScene.scene.stop();
                 return true;
             },
@@ -2118,7 +2116,7 @@ class PersistScene extends Phaser.Scene {
 
     const graphics = this.add.graphics();
         
-    this.starterTween = this.tweens.addCounter({
+    /*this.starterTween = this.tweens.addCounter({
         from: 0,
         to: 600,
         ease: 'Sine.InOut',
@@ -2135,7 +2133,7 @@ class PersistScene extends Phaser.Scene {
                 this.bgFront.setMask(geomask1,true)
                 this.bgMid.setMask(geomask1,true)
             }
-    });
+    });*/
     
     
     
@@ -2194,7 +2192,7 @@ class PersistScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     }
 
-    openingTween(tweenValue){
+   /* openingTween(tweenValue){
         this.tweens.addCounter({
             from: tweenValue,
             to: 600,
@@ -2213,7 +2211,7 @@ class PersistScene extends Phaser.Scene {
                     this.bgMid.setMask(geomask1,true)
                 }
         });
-    }
+    }*/
     closingTween(){
         this.tweens.addCounter({
             from: 600,
