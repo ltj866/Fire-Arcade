@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -344,43 +344,21 @@ class TutorialScene extends Phaser.Scene {
         super({key: 'TutorialScene', active: false});
     }
     create() {
-        this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+        
+        /*this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
             "fontSize":'48px',
             }), 
                 'PORTAL SNAKE',
         ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        
-        var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
-        //card.setOrigin(0,0);
-        //card.setScale(1)
+        */
 
         
-        // Masks
         // AUDIO
         this.pop02 = this.sound.add('pop02');
 
 
 
-        const graphics = this.add.graphics();
 
-        this.tweenValue = 0;
-        this.openingTweenStart = this.tweens.addCounter({
-            from: 0,
-            to: 600,
-            ease: 'Sine.InOut',
-            duration: 1000,
-            onUpdate: tween =>
-                {   
-                    graphics.clear();
-                    var value = (tween.getValue());
-                    this.tweenValue = value
-                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                    var geomask1 = this.shape1.createGeometryMask();
-                    
-                    this.cameras.main.setMask(geomask1,true)
-                    
-                }
-        });
 
         // Tutorial Panels
 
@@ -596,6 +574,7 @@ class TutorialScene extends Phaser.Scene {
             });   
         }, this)
         this.input.keyboard.on('keydown-LEFT', e => {
+            const ourTutorialScene = this.scene.get('TutorialScene');
             const ourPersist = this.scene.get('PersistScene');
             if (this.selectedPanel > 1) {
                 this.selectedPanel -= 1
@@ -1390,6 +1369,7 @@ class MainMenuScene extends Phaser.Scene {
             },
             'adventure': function () {   
                 thisScene.scene.launch('TutorialScene');
+                thisScene.scene.bringToTop('SpaceBoyScene');
                 thisScene.scene.stop();
                 return true;
             },

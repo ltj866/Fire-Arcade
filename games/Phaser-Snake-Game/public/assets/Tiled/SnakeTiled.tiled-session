@@ -809,6 +809,7 @@
             }
         },
         "World_1-4 OLD.json#tileSheetx12": {
+            "dynamicWrapping": false,
             "scaleInDock": 1
         },
         "World_1-4--s.json": {
@@ -851,7 +852,7 @@
             "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 125.33333333333331,
+                "x": 129.33333333333331,
                 "y": 307.33333333333326
             }
         },
