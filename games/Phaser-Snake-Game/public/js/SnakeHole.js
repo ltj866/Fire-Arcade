@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -5001,7 +5001,7 @@ class GameScene extends Phaser.Scene {
         let snake = this.snake;
 
         this.portals.forEach(portal => { 
-            if(snake.head.x === portal.x && snake.head.y === portal.y){
+            if(this.gState != GState.BONK && snake.head.x === portal.x && snake.head.y === portal.y){
                 this.gState = GState.PORTAL;
                 this.scoreTimer.paused = true;
 
@@ -5186,7 +5186,7 @@ class GameScene extends Phaser.Scene {
             repeat: 0,
         });
 
-        
+        //This tween doesn't playout yet, but it holds the onComplete to reset to main menu
         this.tweens.add({
             targets: this.cameras.main,
             duration: 3000,

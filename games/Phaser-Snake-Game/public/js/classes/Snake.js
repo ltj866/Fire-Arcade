@@ -243,13 +243,18 @@ var Snake = new Phaser.Class({
          * Interface requirement that all objects in the interative layer 
          * need an onOver function to work properly.
          */
+
         var onGridX = (this.head.x - X_OFFSET) / GRID;
         var onGridY = (this.head.y - Y_OFFSET) / GRID;
+        //remove decimals to prevent erroring
+        onGridX = Math.round(onGridX);
+        onGridY = Math.round(onGridY);
 
         if (scene.gState === GState.PLAY && scene.interactLayer[onGridX][onGridY] != "empty") {
-            //debugger
             scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
+
+
         
         // Check for Warp Portals
         if (scene.winned) {
@@ -322,9 +327,7 @@ var Snake = new Phaser.Class({
             portal.snakePortalingSprite.visible = false;
         });
 
-        
         scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
-
     }
 });
 
