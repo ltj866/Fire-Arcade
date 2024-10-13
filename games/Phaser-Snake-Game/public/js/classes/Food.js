@@ -11,7 +11,7 @@ var Food = new Phaser.Class({
         Phaser.GameObjects.Sprite.call(this, scene);
         const ourInputScene = scene.scene.get("InputScene");
 
-        this.setOrigin(0,-.0625);
+        this.setOrigin(0,0);
         this.setDepth(47);
         this.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
 
