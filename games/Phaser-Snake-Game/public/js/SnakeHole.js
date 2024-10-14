@@ -2401,8 +2401,8 @@ class GameScene extends Phaser.Scene {
     
     
     preload () {
-        const ourStartScene = this.scene.get('StartScene');
-        if (!ourStartScene.hasPlayedBefore && this.stage === 'World_1-1') {
+        const ourTutorialScene = this.scene.get('TutorialScene');
+        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_1-1') {
             console.log('noplay')
             console.log(this.stage)
             this.stage = 'Tutorial_1'
@@ -7434,7 +7434,7 @@ class ScoreScene extends Phaser.Scene {
                     ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
                          Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
                 }
-    
+                //score screen starting arrows
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
                 
                 ourGame.startingArrowsAnimN.setAlpha(1)
@@ -7479,9 +7479,9 @@ class ScoreScene extends Phaser.Scene {
                 ourGame.events.off('spawnBlackholes');
                 
 
-
+                    
                 if (!gameOver) {
-                                    // Go Back Playing To Select New Stage
+                    // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
                     debugger
                     ourGame.gState = GState.START_WAIT;
