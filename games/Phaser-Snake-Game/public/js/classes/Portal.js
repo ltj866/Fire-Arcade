@@ -15,6 +15,7 @@ var Portal = new Phaser.Class({
 
         this.anim = anim;
         this.playAfterDelay(anim, spawnDelay);
+        this.chain(['portalIdle']);
 
 
         //debugger
