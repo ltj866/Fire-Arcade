@@ -2350,8 +2350,6 @@ class GameScene extends Phaser.Scene {
 
         const { stage = START_STAGE } = props 
         this.stage = stage;
-        
-        //this.startingArrowState = true; // Deprecate
 
         this.moveInterval = SPEED_WALK;
 
@@ -2916,12 +2914,6 @@ class GameScene extends Phaser.Scene {
             duration: 500,
             delay: 5000,
         });
-
-        //this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
-        //this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
-        //this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
-        //this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
-        //console.log(this.gState)
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY && !this.winned) {
@@ -5715,23 +5707,6 @@ class GameScene extends Phaser.Scene {
              * Checks for Tween complete on each frame.
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
-
-            //if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
-            //    this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
-            //    this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
-            //    this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
-            //    this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
-            //}
-            
-           /* this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('startArrowIdle')
-            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('startArrowIdle')
-            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('startArrowIdle')*/
             
             this.tweenRespawn.on('complete', () => {
 
@@ -5823,12 +5798,6 @@ class GameScene extends Phaser.Scene {
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
             // #region Check Update
-            /*if (this.snake.direction != DIRS.STOP) {
-                this.startingArrowsAnimN.setAlpha(0);
-                this.startingArrowsAnimS.setAlpha(0);
-                this.startingArrowsAnimE.setAlpha(0);
-                this.startingArrowsAnimW.setAlpha(0);
-            }*/
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -7436,20 +7405,27 @@ class ScoreScene extends Phaser.Scene {
                 }
                 //score screen starting arrows
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
+                    ourGame.startingArrowsAnimN2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimN2.play('startArrowIdle');
+                }
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y +1 * GRID)) {
+                    ourGame.startingArrowsAnimS2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimS2.flipY = true;
+                    ourGame.startingArrowsAnimS2.play('startArrowIdle');
+                }
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
+                    ourGame.startingArrowsAnimE2 = ourGame.add.sprite(ourGame.snake.head.x + GRID * 2, ourGame.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimE2.angle = 90;
+                    ourGame.startingArrowsAnimE2.play('startArrowIdle');
+                }
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
+                    ourGame.startingArrowsAnimW2 = ourGame.add.sprite(ourGame.snake.head.x - GRID,ourGame.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimW2.angle = 270;
+                    ourGame.startingArrowsAnimW2.play('startArrowIdle');
+                }
                 
-                ourGame.startingArrowsAnimN.setAlpha(1)
-                ourGame.startingArrowsAnimS.setAlpha(1)
-                ourGame.startingArrowsAnimE.setAlpha(1)
-                ourGame.startingArrowsAnimW.setAlpha(1)
-                
-                ourGame.startingArrowsAnimN.x = ourGame.snake.head.x + GRID * .5
-                ourGame.startingArrowsAnimN.y = ourGame.snake.head.y - GRID
-                ourGame.startingArrowsAnimS.x = ourGame.snake.head.x + GRID * .5
-                ourGame.startingArrowsAnimS.y = ourGame.snake.head.y + GRID * 2
-                ourGame.startingArrowsAnimE.x = ourGame.snake.head.x + GRID * 2
-                ourGame.startingArrowsAnimE.y = ourGame.snake.head.y + GRID * .5
-                ourGame.startingArrowsAnimW.x = ourGame.snake.head.x - GRID
-                ourGame.startingArrowsAnimW.y = ourGame.snake.head.y + GRID * .5
 
                 
                 console.log()
@@ -8209,13 +8185,6 @@ class InputScene extends Phaser.Scene {
             
         }
         /*
-        if (startingArrowState == true){
-            startingArrowState = false;
-            startingArrowsAnimN.setVisible(false)
-            startingArrowsAnimS.setVisible(false)
-            startingArrowsAnimE.setVisible(false)
-            startingArrowsAnimW.setVisible(false)
-        }
     })
 
     this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
@@ -8453,6 +8422,19 @@ class InputScene extends Phaser.Scene {
         if (gameScene.startingArrowsAnimW != undefined){
             gameScene.startingArrowsAnimW.setAlpha(0);
         }
+        if (gameScene.startingArrowsAnimN2) {
+            gameScene.startingArrowsAnimN2.setAlpha(0);
+        }
+        if (gameScene.startingArrowsAnimE2) {
+            gameScene.startingArrowsAnimE2.setAlpha(0);
+        }
+        if (gameScene.startingArrowsAnimS2) {
+            gameScene.startingArrowsAnimS2.setAlpha(0);
+        }
+        if (gameScene.startingArrowsAnimW2) {
+            gameScene.startingArrowsAnimW2.setAlpha(0);
+        }
+        
         
 
 
