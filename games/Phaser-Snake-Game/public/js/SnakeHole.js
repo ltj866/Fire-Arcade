@@ -6544,16 +6544,19 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTimeScale = .25;
 
         //STAGE CLEAR
-        this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "text-shadow": "4px 4px 0px #000000",
-            "font-size":'32px',
-            'font-weight': 400,
-            'text-align': 'center',
-            'text-transform': 'uppercase',
-            "font-family": '"Press Start 2P", system-ui',
+        this.time.delayedCall(100, () => {
+            this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "text-shadow": "4px 4px 0px #000000",
+                "font-size": '32px',
+                'font-weight': 400,
+                'text-align': 'center',
+                'text-transform': 'uppercase',
+                "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
                 `${this.stageData.stage} CLEAR`
-        ).setOrigin(0.5, 0).setScale(.5);
+            ).setOrigin(0.5, 0).setScale(.5);
+        });
+        
 
         
         // #region Main Stats
