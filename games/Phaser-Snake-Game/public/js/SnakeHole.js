@@ -3716,17 +3716,17 @@ class GameScene extends Phaser.Scene {
                 var startFrom = wallPortalData[index].shift();
                 var startTo = wallPortalData[index + ROW_DELTA].shift();
 
-                makePair(this, "portalIdle", startFrom, startTo, '#131313', false, portalSpawnDelay);
+                makePair(this, "portalForm", startFrom, startTo, '#131313', false, portalSpawnDelay);
 
                 var endFrom = wallPortalData[index].pop();
                 var endTo = wallPortalData[index + ROW_DELTA].pop();
 
-                makePair(this, "portalIdle", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
+                makePair(this, "portalForm", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
                 console.log(wallPortalData);
 
                 wallPortalData[index].forEach(portalTo => {
                     var portalFrom = wallPortalData[index + ROW_DELTA].shift();
-                    makePair(this, "portalIdle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
+                    makePair(this, "portalForm", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
                 });
             }
 
@@ -3743,7 +3743,7 @@ class GameScene extends Phaser.Scene {
                 let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
                 let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
                 console.log("Portal Base Logic: FROM TO",_from, _to, index);
-                makePair(this, "portalIdle", _to, _from, colorHex, true, portalSpawnDelay);
+                makePair(this, "portalForm", _to, _from, colorHex, true, portalSpawnDelay);
 
                 portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
             }
@@ -3863,7 +3863,7 @@ class GameScene extends Phaser.Scene {
 
 
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
-            makePair(this, "portalIdle", fromN, toN, colorHex, true, portalSpawnDelay);
+            makePair(this, "portalForm", fromN, toN, colorHex, true, portalSpawnDelay);
 
             portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
     
@@ -5749,7 +5749,10 @@ class GameScene extends Phaser.Scene {
 
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
             this.gState = GState.TRANSITION;
-            
+            this.snake.direction = DIRS.STOP;
+            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+
             this.events.off('addScore');
 
             
@@ -6541,16 +6544,19 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTimeScale = .25;
 
         //STAGE CLEAR
-        this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "text-shadow": "4px 4px 0px #000000",
-            "font-size":'32px',
-            'font-weight': 400,
-            'text-align': 'center',
-            'text-transform': 'uppercase',
-            "font-family": '"Press Start 2P", system-ui',
+        this.time.delayedCall(100, () => {
+            this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "text-shadow": "4px 4px 0px #000000",
+                "font-size": '32px',
+                'font-weight': 400,
+                'text-align': 'center',
+                'text-transform': 'uppercase',
+                "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
                 `${this.stageData.stage} CLEAR`
-        ).setOrigin(0.5, 0).setScale(.5);
+            ).setOrigin(0.5, 0).setScale(.5);
+        });
+        
 
         
         // #region Main Stats

@@ -14,7 +14,8 @@ var Portal = new Phaser.Class({
         Phaser.GameObjects.Sprite.call(this, scene);
 
         this.anim = anim;
-        this.playAfterDelay(anim, spawnDelay);
+        this.playAfterDelay(anim, 0); //setting spawnDelay to 0 for now
+        this.chain(['portalIdle']);
 
 
         //debugger
