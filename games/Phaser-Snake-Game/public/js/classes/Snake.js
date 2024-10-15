@@ -256,7 +256,7 @@ var Snake = new Phaser.Class({
 
 
         
-        // Check for Warp Portals
+        // Check for Blackholes
         if (scene.winned) {
             /**
              * Okay to not be part of the interact layer because there is only ever 8?
@@ -326,8 +326,9 @@ var Snake = new Phaser.Class({
         scene.portals.forEach ( portal => {
             portal.snakePortalingSprite.visible = false;
         });
-
-        scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+        if (ourPersistScene.coins > -1) {
+            scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+        }
     }
 });
 

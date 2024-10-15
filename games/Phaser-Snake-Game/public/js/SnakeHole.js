@@ -2347,6 +2347,7 @@ class GameScene extends Phaser.Scene {
         this.stageOver = false; // deprecated to be removed
 
         this.winned = false; // marked as true any time this.winCondition is met.
+        this.canContinue = true; // used to check for a true game over
 
         const { stage = START_STAGE } = props 
         this.stage = stage;
@@ -3157,7 +3158,7 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveDirection(this, e);
                 //this.panelTweenCollapse.resume();
                 
-                this.tweens.add({
+                this.tweens.add({//SHOULD BE MOVED to not be added every input
                     targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
                     x: + SCREEN_WIDTH * 2,
                     ease: 'Sine.easeOutIn',
@@ -5041,6 +5042,73 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    gameOver(){
+        const ourStartScene = this.scene.get('StartScene');
+
+        //style
+        const finalScoreStyle = {
+            color: "white",
+            //"text-shadow": "2px 2px 4px #000000",
+            "font-size":'22px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
+
+        //EXTRACTION COMPLETE
+        this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size":'32px',
+            'font-weight': 400,
+            'text-align': 'center',
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            })).setHTML(
+                `GAME OVER`
+        ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
+
+        
+
+        //PRESS SPACE TO CONTINUE TEXT
+        // Give a few seconds before a player can hit continue
+        this.time.delayedCall(900, function() {
+            const ourGameScene = this.scene.get('GameScene');
+            var _continue_text = '[SPACE TO CONTINUE]';
+
+            var _continueText = this.add.dom(SCREEN_WIDTH/2, GRID * 17,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'32px',
+                "font-family": '"Press Start 2P", system-ui',
+                "text-shadow": "4px 4px 0px #000000",
+                }
+            )).setText(_continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
+
+ 
+            this.tweens.add({
+                targets: _continueText,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: -1,
+                yoyo: true
+              });
+
+            const onContinue = function () {
+                ourGameScene.scene.start('MainMenuScene');
+            }
+            this.input.keyboard.on('keydown-SPACE', function() { 
+                onContinue();
+            });
+
+            _continueText.on('pointerdown', e => {
+                onContinue();
+            });
+        }, [], this);
+
+
+
+        
+    }
+
     finalScore(){
         const ourStartScene = this.scene.get('StartScene');
 
@@ -5082,7 +5150,7 @@ class GameScene extends Phaser.Scene {
             'text-transform': 'uppercase',
             "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
-                `EXTRACTION COMPLETE`
+                `GAME OVER`
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         //nineSlice
@@ -5653,9 +5721,6 @@ class GameScene extends Phaser.Scene {
     // #region Game Update
     update (time, delta) {
 
-        if (this.gState != GState.TRANSITION){
-            this.updatePanelAlpha();
-        }
 
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
@@ -5761,8 +5826,16 @@ class GameScene extends Phaser.Scene {
         }
 
         // #region Lose State
-        if (this.checkLoseCon()) {
-            var coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
+        if (this.checkLoseCon() && this.canContinue) {
+            this.canContinue = false;
+            this.gState = GState.TRANSITION;
+            this.snake.direction = DIRS.STOP;
+            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+            this.events.off('addScore');
+            this.events.off('spawnBlackholes');
+            this.gameOver();
+
+            /*var coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
                 {
                     "font-size": '32px',
                     "text-align": 'center',
@@ -5779,11 +5852,11 @@ class GameScene extends Phaser.Scene {
 
             this.scene.get("UIScene").coinUIText.setHTML(
                 ` \u{1F480}`
-            )
+            )*/
 
 
 
-            this.scene.pause("GameScene");
+            //this.scene.pause("GameScene");
             
         }
 
