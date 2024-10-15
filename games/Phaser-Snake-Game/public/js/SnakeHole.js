@@ -3286,12 +3286,14 @@ class GameScene extends Phaser.Scene {
             const STAGE_UNLOCKS = {
                 /* Template
                 '': function () {
-                    return ourPersist.checkCompletedRank("", );
+                    return ourPersist.checkCompletedRank("", COPPER);
                 },
                 */
-                //tutorial
-                'put-them-together': function () {
-                    return true;
+                'more-blocks': function () {
+                    return ourPersist.checkCompletedRank("World_2-2", COPPER);
+                },
+                'wrap-and-warp': function () {
+                    return ourPersist.checkCompletedRank("World_1-3", COPPER);
                 },
                 'learn-to-wrap': function () {
                     return true;
@@ -3333,14 +3335,13 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'vertical-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER); 
                 },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER); 
                 },
                 'first-medium': function () {
                     return true;
-                    //return ourPersist.checkCompletedRank("", );
                 },
                 'lights-out': function () {
                     return false;
@@ -3363,12 +3364,12 @@ class GameScene extends Phaser.Scene {
                     return true
                 },
                 'babies-first-wall': function () {
-                    return true
+                    return ourPersist.checkCompletedRank("World_1-1", COPPER);
                 },
                 'horz-rows': function () {
-                    return true
+                    return ourPersist.checkCompletedRank("World_1-2", COPPER);
                 },
-                'now-vertical': function () {
+                'first-blocks': function () {
                     return ourPersist.checkCompletedRank("World_1-4", COPPER);
                 },
                 'medium-wrap': function () {
@@ -3381,6 +3382,7 @@ class GameScene extends Phaser.Scene {
                 'vert-rows': function () {
                     return true;
                 }
+
             }
 
             if (this.winned) {
