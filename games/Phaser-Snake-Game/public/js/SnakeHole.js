@@ -3320,10 +3320,10 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("World_4-4", GOLD);
                 },
                 'col': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_4-3", COPPER);
                 },
                 'its-a-snek': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_4-2", COPPER);
                 },
                 'now-a-fourth': function () {
                     return true;
@@ -3353,8 +3353,8 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'medium-happy': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
-                    return true;
+                    return ourPersist.checkCompletedRank("World_2-4", COPPER);
+                    
                 },
                 'bidirectional-portals': function () {
                     return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
