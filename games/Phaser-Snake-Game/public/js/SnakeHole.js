@@ -5072,7 +5072,7 @@ class GameScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
 
-        //EXTRACTION COMPLETE
+        //GAME OVER
         this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "4px 4px 0px #000000",
             "font-size":'32px',
@@ -5167,7 +5167,7 @@ class GameScene extends Phaser.Scene {
             'text-transform': 'uppercase',
             "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
-                `GAME OVER`
+                `EXTRACTION COMPLETE`
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         //nineSlice
