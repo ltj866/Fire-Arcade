@@ -800,7 +800,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 200.4548239940083,
+                "x": 200.69176823040786,
                 "y": 140.0340437121264
             }
         },
@@ -1021,7 +1021,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1032,7 +1032,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1043,7 +1043,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1062,15 +1062,16 @@
             "scaleInDock": 1
         },
         "World_4-2.json": {
-            "scale": 2.0856321839080456,
+            "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 163.97905759162308,
-                "y": 161.82143841278594
+                "x": 60.333333333333314,
+                "y": 126.33333333333334
             }
         },
         "World_4-2.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "World_4-2.json#tileSheetx24": {
             "dynamicWrapping": false,
@@ -2424,6 +2425,7 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "World_3-3_Wrap.json",
         "Stage-05.json",
         "Stage-02e.json",
         "World_2-4.json",
@@ -2434,8 +2436,7 @@
         "snakeMap.tmx",
         "tileSheetx12.tsx",
         "World_2-3.json",
-        "World_2-2.json",
-        "World_1-4.json"
+        "World_2-2.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

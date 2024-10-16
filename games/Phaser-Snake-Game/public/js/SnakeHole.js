@@ -2606,8 +2606,6 @@ class GameScene extends Phaser.Scene {
 
         console.log(this.map.culledTiles);
 
-        this.interactLayer = [];
-
         for (let x = 0; x < this.map.width; x++) {
             this.interactLayer[x] = [];
             for (let y = 0; y < this.map.height; y++) {
@@ -3586,6 +3584,12 @@ class GameScene extends Phaser.Scene {
                                         }).setFrequency(667,[1]).setDepth(0);
 
                                     }
+                                    else {
+                                        // Push false portal so index is correct on warp to next
+                                        this.nextStagePortals.push(undefined);
+                                    }
+                                    console.log(this.nextStagePortals);
+                                     
                                     this.tweens.add({
                                         targets: this.blackholeLabels,
                                         alpha: {from: 0, to: 1},
@@ -5420,11 +5424,11 @@ class GameScene extends Phaser.Scene {
             onComplete: () =>{
                 debugger
                 this.nextStagePortals.forEach( blackholeImage=> {
-                    debugger
-                    blackholeImage.play('blackholeClose')
-                    ourPersist.bgCoords.x += camDirection.y/2;
-                    ourPersist.bgCoords.y += camDirection.x/2;
-                    
+                    if (blackholeImage != undefined) {
+                        blackholeImage.play('blackholeClose')
+                        ourPersist.bgCoords.x += camDirection.y/2;
+                        ourPersist.bgCoords.y += camDirection.x/2;
+                    }
                 });
                 var cameraPanTween = this.tweens.add({
                     targets: this.cameras.main,

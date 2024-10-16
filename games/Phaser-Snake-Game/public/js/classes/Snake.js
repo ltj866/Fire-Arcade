@@ -263,9 +263,9 @@ var Snake = new Phaser.Class({
              */
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
                 
-                if (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y) {
+                if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
                     debugger
-                    console.log("ITS WARPING TIME to WORLD", index);
+                    console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
                     scene.warpToNext(index);
                 }
 
