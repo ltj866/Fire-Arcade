@@ -180,21 +180,12 @@
          "value":"1868ea63-a48a-4311-ac53-1495360e898f"
         }],
  "renderorder":"right-down",
- "tiledversion":"1.10.2",
+ "tiledversion":"1.11.0",
  "tileheight":24,
  "tilesets":[
         {
-         "columns":32,
          "firstgid":1,
-         "image":"tileSheetx24.png",
-         "imageheight":768,
-         "imagewidth":768,
-         "margin":0,
-         "name":"tileSheetx24",
-         "spacing":0,
-         "tilecount":1024,
-         "tileheight":24,
-         "tilewidth":24
+         "source":"tileSheetx12.tsx"
         }],
  "tilewidth":24,
  "type":"map",

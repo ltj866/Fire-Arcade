@@ -3289,6 +3289,18 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("", COPPER);
                 },
                 */
+               'two-wide-corridors': function () {
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER);
+                },
+                'double-back-portals': function () {
+                    return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", COPPER);
+                },
+                'easy-wrap': function () {
+                    return ourPersist.checkCompletedRank("World_1-4", SILVER);
+                },
+                'hard-wrap': function () {
+                    return ourPersist.checkCompletedRank("World_3-3_Wrap", COPPER);
+                },
                 'more-blocks': function () {
                     return ourPersist.checkCompletedRank("World_2-2", COPPER);
                 },
@@ -3305,10 +3317,10 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'unidirectional-portals': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", COPPER);
                 },
                 'hardest----for-now': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_10-4", COPPER);
                 },
                 'swirl-swirl': function () {
                     return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
@@ -3317,7 +3329,7 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'plus-plus': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", GOLD);
+                    return ourPersist.checkCompletedRank("World_10-3", COPPER);
                 },
                 'col': function () {
                     return ourPersist.checkCompletedRank("World_4-3", COPPER);
@@ -3326,19 +3338,13 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("World_4-2", COPPER);
                 },
                 'now-a-fourth': function () {
-                    return true;
-                },
-                'vertical-uturns': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER);
                 },
                 'horizontal-uturns': function () {
-                    return true;
-                },
-                'vertical-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER); 
+                    return ourPersist.checkCompletedRank("World_9-4_Final_Exams", COPPER);
                 },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER); 
+                    return ourPersist.checkCompletedRank("World_9-3_Final_Exams", COPPER); 
                 },
                 'first-medium': function () {
                     return true;
@@ -3357,8 +3363,7 @@ class GameScene extends Phaser.Scene {
                     
                 },
                 'bidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
-                    return true
+                    return ourPersist.checkCompletedRank("World_4-4", COPPER); 
                 },
                 'start': function ( ) { 
                     return true
@@ -3373,8 +3378,7 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("World_1-4", COPPER);
                 },
                 'medium-wrap': function () {
-                    //return ourPersist.checkCompletedRank("Stage-01", SILVER);
-                    return false;
+                    return ourPersist.checkCompletedRank("World_3-2_Wrap", COPPER)
                 },
                 'dark-precision': function () {
                     return true
