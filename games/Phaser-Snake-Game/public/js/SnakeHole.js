@@ -2604,7 +2604,7 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
-        console.log(this.map.culledTiles);
+        this.interactLayer = [];
 
         for (let x = 0; x < this.map.width; x++) {
             this.interactLayer[x] = [];
@@ -3730,18 +3730,22 @@ class GameScene extends Phaser.Scene {
                 var startFrom = wallPortalData[index].shift();
                 var startTo = wallPortalData[index + ROW_DELTA].shift();
 
-                makePair(this, "portalForm", startFrom, startTo, '#131313', false, portalSpawnDelay);
+                if (wallDir === "Vert") {
+                    makePair(this, "portalForm", startFrom, startTo, '#131313', false, portalSpawnDelay);
 
-                var endFrom = wallPortalData[index].pop();
-                var endTo = wallPortalData[index + ROW_DELTA].pop();
+                    var endFrom = wallPortalData[index].pop();
+                    var endTo = wallPortalData[index + ROW_DELTA].pop();
 
-                makePair(this, "portalForm", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
-                console.log(wallPortalData);
+                    makePair(this, "portalForm", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
+                    console.log(wallPortalData);
 
-                wallPortalData[index].forEach(portalTo => {
+                    wallPortalData[index].forEach(portalTo => {
                     var portalFrom = wallPortalData[index + ROW_DELTA].shift();
                     makePair(this, "portalForm", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
-                });
+                    });
+                    
+                }
+                
             }
 
             portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
