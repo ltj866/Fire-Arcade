@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -2604,6 +2604,8 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
+        console.log(this.map.culledTiles);
+
         this.interactLayer = [];
 
         for (let x = 0; x < this.map.width; x++) {
@@ -3421,8 +3423,6 @@ class GameScene extends Phaser.Scene {
                     this.extractLables = [];
                     var nextStagesCopy = this.nextStages.slice();
                     
-
-                    debugger
                     console.log('PORTAL LAYER',this.nextStagePortalLayer);
                     // Add one extract hole spawn here if it exists.
                     if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
@@ -3458,7 +3458,9 @@ class GameScene extends Phaser.Scene {
                     }
 
                     for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
+                        
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
+                            debugger
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
                             var stageName = nextStagesCopy.shift();
@@ -3477,9 +3479,10 @@ class GameScene extends Phaser.Scene {
 
                                     
                                     // Easier to see when debugging with debugger in console.
-                                    //stageName;
-                                    //var temp = STAGE_UNLOCKS[propObj.value];
-                                    //var tempEval = STAGE_UNLOCKS[propObj.value].call();
+                                    stageName;
+                                    var temp = STAGE_UNLOCKS[propObj.value];
+                                    var tempEval = STAGE_UNLOCKS[propObj.value].call();
+                                    debugger
                                     
                                    
                                     
@@ -7489,6 +7492,7 @@ class ScoreScene extends Phaser.Scene {
                          Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
                 }
                 //score screen starting arrows
+                debugger
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
                 if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
