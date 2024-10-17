@@ -20,8 +20,16 @@ var Portal = new Phaser.Class({
 
         //debugger
         this.setPosition(from[0], from[1]);
-        this.setOrigin(.3125,.3125);
+        
         this.setDepth(47);
+
+        if (anim === "portalForm") {
+            this.setOrigin(.3125,.3125);
+            scene.portals.push(this);
+        } else {
+            this.setOrigin(0,0);
+            scene.portalWalls.push(this);
+        }
         //this.play("portalIdle");
 
         this.freeDir = freeDir;
@@ -33,10 +41,8 @@ var Portal = new Phaser.Class({
         this.snakePortalingSprite.setAlpha(0.66);
         scene.snakePortalingSprites.push(this.snakePortalingSprite);
 
+
         
-
-
-        scene.portals.push(this);
         
         this.tint = color.color; // Color is a Phaser Color Object
         this.snakePortalingSprite.setTint(color.color);
@@ -65,7 +71,7 @@ var Portal = new Phaser.Class({
     },
     onOver: function(scene) {
         scene.gState = GState.PORTAL;
-        scene.snake.lastPortal = this
+        scene.snake.lastPortal = this;
         scene.scoreTimer.paused = true;
 
 
@@ -80,11 +86,13 @@ var Portal = new Phaser.Class({
         var _x = this.target.x;
         var _y = this.target.y;
 
-        var portalSound = scene.portalSounds[0]
+        var portalSound = scene.portalSounds[0];
         portalSound.play();
 
+        console.log([this.x, this.y], [_x, _y]);
+
         var _tween = scene.tweens.add({
-            targets: scene.snake.head, 
+            targets: scene.snake.body[0], 
             x: _x,
             y: _y,
             yoyo: false,
@@ -92,6 +100,8 @@ var Portal = new Phaser.Class({
             ease: 'Linear',
             repeat: 0,
             //delay: 500
+            onStart: function () {       
+            }
         });
         
         _tween.on('complete',()=>{
@@ -106,8 +116,7 @@ var Portal = new Phaser.Class({
             // Set last move to now. Fixes Corner Time.
             scene.lastMoveTime = scene.time.now;
         });
-                            
-        return ;  //Don't know why this is here but I left it -James
+                        
     },
     
 });

@@ -2319,6 +2319,7 @@ class GameScene extends Phaser.Scene {
         this.foodHistory = [];
         this.walls = [];
         this.portals = [];
+        this.portalWalls = [];
         this.dreamWalls = [];
         this.nextStagePortals = [];
         this.extractHole = [];
@@ -3353,7 +3354,7 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'easy-racer': function () {
-                    return false;
+                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
                 },
                 'hello-ghosts': function () {
                     return false;
@@ -3458,7 +3459,6 @@ class GameScene extends Phaser.Scene {
                     for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
                         
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
-                            debugger
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
                             var stageName = nextStagesCopy.shift();
@@ -3480,7 +3480,6 @@ class GameScene extends Phaser.Scene {
                                     stageName;
                                     var temp = STAGE_UNLOCKS[propObj.value];
                                     var tempEval = STAGE_UNLOCKS[propObj.value].call();
-                                    debugger
                                     
                                    
                                     
@@ -3676,8 +3675,8 @@ class GameScene extends Phaser.Scene {
 
             //p1.flipX = true;
 
-            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p1;
-            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p2;
+            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p2;
+            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p1;
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
@@ -4776,6 +4775,8 @@ class GameScene extends Phaser.Scene {
                 'word-wrap': 'break-word'
             });
             this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
+
+            console.log(this.interactLayer);
         
     }
 
@@ -5025,58 +5026,6 @@ class GameScene extends Phaser.Scene {
 
     }
 
-    // #region .checkPortalandMove(
-    checkPortalAndMove() {
-        let snake = this.snake;
-
-        this.portals.forEach(portal => { 
-            if(this.gState != GState.BONK && snake.head.x === portal.x && snake.head.y === portal.y){
-                this.gState = GState.PORTAL;
-                this.scoreTimer.paused = true;
-
-
-                if (DEBUG) { console.log("PORTAL"); }
-
-                // Show portal snake body after head arrives.
-                if (this.snake.body.length > 2) {
-                    portal.snakePortalingSprite.visible = true;   
-                }
-
-
-                var _x = portal.target.x;
-                var _y = portal.target.y;
-    
-                var portalSound = this.portalSounds[0]
-                portalSound.play();
-
-                var _tween = this.tweens.add({
-                    targets: snake.head, 
-                    x: _x,
-                    y: _y,
-                    yoyo: false,
-                    duration: SPEED_WALK * PORTAL_PAUSE,
-                    ease: 'Linear',
-                    repeat: 0,
-                    //delay: 500
-                });
-                
-                _tween.on('complete',()=>{
-                    this.gState = GState.PLAY;
-                    this.scoreTimer.paused = false;
-
-                    // Show portal snake body after head arrives.
-                    if (this.snake.body.length > 2) {
-                        portal.targetObject.snakePortalingSprite.visible = true;   
-                    }
-
-                    // Set last move to now. Fixes Corner Time.
-                    this.lastMoveTime = this.time.now;
-                });
-                                    
-                return ;  //Don't know why this is here but I left it -James
-            }
-        });
-    }
 
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
@@ -5909,7 +5858,6 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
-            // #region Check Update
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -6030,7 +5978,6 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveCount += 1;
 
                 this.snakeCriticalState();
-                this.checkPortalAndMove()
                 
 
                 if (this.boostEnergy < 1) {
@@ -7528,7 +7475,6 @@ class ScoreScene extends Phaser.Scene {
                          Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
                 }
                 //score screen starting arrows
-                debugger
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
                 if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
@@ -8380,7 +8326,6 @@ class InputScene extends Phaser.Scene {
 
                 
             gameScene.snake.move(gameScene);
-            gameScene.checkPortalAndMove();
             this.turnInputs[key] += 1;
 
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
@@ -8410,7 +8355,6 @@ class InputScene extends Phaser.Scene {
            gameScene.lastMoveTime = gameScene.time.now;
 
            gameScene.snake.move(gameScene);
-           gameScene.checkPortalAndMove();
            this.turnInputs[key] += 1;
 
            this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
@@ -8445,7 +8389,6 @@ class InputScene extends Phaser.Scene {
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
 
-            gameScene.checkPortalAndMove();
             this.turnInputs[key] += 1;
             
         }
@@ -8474,7 +8417,6 @@ class InputScene extends Phaser.Scene {
 
             this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            gameScene.checkPortalAndMove();
             this.turnInputs[key] += 1;
         }
 

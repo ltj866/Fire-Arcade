@@ -5,6 +5,7 @@ import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     Y_OFFSET
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
+import { Portal } from './Portal.js';
 
 var Snake = new Phaser.Class({
     initialize:
@@ -188,10 +189,7 @@ var Snake = new Phaser.Class({
                 }
             }
         }
-        
 
-        
-    
         // #region Intersect Self
         if (GState.PLAY === scene.gState) { //GState.PLAY
             /***
@@ -201,15 +199,15 @@ var Snake = new Phaser.Class({
             var checkBody = this.body.slice(1);
             checkBody.pop();
 
+            var nextHeadGridX = (xN - X_OFFSET) / GRID;
+            var nextHeadGridY = (yN - Y_OFFSET) / GRID;
+
             var portalSafe = false; // Assume not on portal
             checkBody.some(part => {
                 if (part.x === xN && part.y === yN) {
-                    scene.portals.forEach(portal => {  // remove this as well TODO. Use an interactive type check.
-                        if(xN === portal.x && yN === portal.y){
-                            portalSafe = true; // Mark on portal
-                        }
-                    });
-                    
+                    if(scene.interactLayer[nextHeadGridX][nextHeadGridY] instanceof Portal){
+                        portalSafe = true; // Mark on portal
+                    }
                     if (!portalSafe && scene.bonkable) {
                         this.bonk(scene);    
                     }  
@@ -220,18 +218,18 @@ var Snake = new Phaser.Class({
 
         // Make Portal Snake body piece invisible. 
         // TODO redo this to check every move for if there is a portal using the interact layer.
+        
+        
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
-                scene.portals.forEach(portal => {
-                    if(this.body[this.body.length -2].x === portal.x && 
-                        this.body[this.body.length -2].y === portal.y)  {
-                        /***
-                         * -2 checks the second to last piece because the tail
-                         *  overlaps otherwise. This looks better.
-                         */
-                        portal.snakePortalingSprite.visible = false;
-                        portal.targetObject.snakePortalingSprite.visible = false;
-                    }
-                });
+            var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
+            var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
+
+            if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
+                var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
+                portal.snakePortalingSprite.visible = false;
+                portal.targetObject.snakePortalingSprite.visible = false;
+            }
+
         }
     
         // Actually Move the Snake Head
@@ -326,6 +324,12 @@ var Snake = new Phaser.Class({
         scene.portals.forEach ( portal => {
             portal.snakePortalingSprite.visible = false;
         });
+
+        scene.portalWalls.forEach ( portalWallSegment => {
+            portalWallSegment.snakePortalingSprite.visible = false;
+
+        });
+
         if (ourPersistScene.coins > -1) {
             scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
         }
