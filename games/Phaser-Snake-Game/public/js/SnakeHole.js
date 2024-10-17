@@ -3674,7 +3674,7 @@ class GameScene extends Phaser.Scene {
             p1.targetObject = p2;
             p2.targetObject = p1;
 
-            p1.flipX = true;
+            //p1.flipX = true;
 
             scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p1;
             scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p2;
@@ -3731,17 +3731,36 @@ class GameScene extends Phaser.Scene {
                 var startTo = wallPortalData[index + ROW_DELTA].shift();
 
                 if (wallDir === "Vert") {
-                    makePair(this, "portalForm", startFrom, startTo, '#131313', false, portalSpawnDelay);
+                    //top
+                    makePair(this, "pWallVertTop", startFrom, startTo, colorHex, false, portalSpawnDelay);
 
+                    //bottom
                     var endFrom = wallPortalData[index].pop();
                     var endTo = wallPortalData[index + ROW_DELTA].pop();
-
-                    makePair(this, "portalForm", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
+                    makePair(this, "pWallVertBot", endFrom, endTo, colorHex, false, portalSpawnDelay);
                     console.log(wallPortalData);
 
+                    //middle
                     wallPortalData[index].forEach(portalTo => {
                     var portalFrom = wallPortalData[index + ROW_DELTA].shift();
-                    makePair(this, "portalForm", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
+                    makePair(this, "pWallVertMiddle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
+                    });
+                    
+                }
+                if (wallDir === "Horz") {
+                    //left
+                    makePair(this, "pWallFlatLeft", startFrom, startTo, colorHex, false, portalSpawnDelay);
+
+                    //right
+                    var endFrom = wallPortalData[index].pop();
+                    var endTo = wallPortalData[index + ROW_DELTA].pop();
+                    makePair(this, "pWallFlatRight", endFrom, endTo, colorHex, false, portalSpawnDelay);
+                    console.log(wallPortalData);
+
+                    //middle
+                    wallPortalData[index].forEach(portalTo => {
+                    var portalFrom = wallPortalData[index + ROW_DELTA].shift();
+                    makePair(this, "pWallFlatMiddle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
                     });
                     
                 }
@@ -8667,6 +8686,25 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1
     });
+    scene.anims.create({
+        key: 'pWallVertBot',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [18,19,20,21,22,23]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallVertMiddle',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [24,25,26,27,28,29]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallVertTop',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [30,31,32,33,34,35]}),
+        frameRate: 8,
+        repeat: -1
+    });
+
     scene.anims.create({
         key: 'arrowMenuIdle',
         frames: scene.anims.generateFrameNumbers('arrowMenu',{ frames: [0,1,2,3,4,5,6,7,8,9]}),
