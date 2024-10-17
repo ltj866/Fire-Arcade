@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -7152,6 +7152,8 @@ class ScoreScene extends Phaser.Scene {
         // #region Atomic Food List
        
         var scoreAtoms = [];
+        var scoreCombos= [];
+        var emptySprite = this.add.sprite(0, 0, null);
 
         var count = 0;
         
@@ -7169,28 +7171,31 @@ class ScoreScene extends Phaser.Scene {
                 _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
                 _y = (GRID * 8.75) + 8;
             }
-
+                    var emptySprite = this.add.sprite(0, 0, null);
             switch (true) {
                 case logTime > COMBO_ADD_FLOOR:
                     anim = "atomScore01";
                     if (i != 0) { // First Can't Connect
-                        var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
+                        var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
                         ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
                         this.ScoreContainerL.add(rectangle)
-                        //scoreAtoms.push(rectangle)
+                        scoreCombos.push(rectangle)
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
                     console.log(logTime, "Boost", i);
                     anim = "atomScore02";
+                    scoreCombos.push(emptySprite);
                     break
                 case logTime > SCORE_FLOOR:
                     console.log(logTime, "Boost", i);
                     anim = "atomScore03";
+                    scoreCombos.push(emptySprite);
                     break
                 default:
                     console.log(logTime, "dud", i);
                     anim = "atomScore04";
+                    scoreCombos.push(emptySprite);
                     break
             }
 
@@ -7218,6 +7223,10 @@ class ScoreScene extends Phaser.Scene {
                     //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
                     
                     scoreAtoms[_frame-1].setAlpha(1);
+                    if (scoreCombos[_frame-1]) {
+                        scoreCombos[_frame-1].setAlpha(1);
+                    }
+
                     //ourGame.atomSounds[_index].play()
                     ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
                 }
