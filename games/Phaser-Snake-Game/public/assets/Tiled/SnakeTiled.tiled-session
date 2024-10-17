@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_1-1.json",
+    "activeFile": "",
     "expandedProjectPaths": [
         "."
     ],
@@ -389,12 +389,16 @@
             "scaleInDock": 1
         },
         "Stage-02e.json": {
-            "scale": 0.75,
+            "scale": 1.093010752688172,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 370.6666666666667,
-                "y": 621.3333333333333
+                "x": 371.9085095917364,
+                "y": 371.9085095917364
             }
+        },
+        "Stage-02e.json#tileSheetx12": {
+            "scaleInDock": 1,
+            "scaleInEditor": 3
         },
         "Stage-02e.json#tileSheetx24": {
             "scaleInDock": 1
@@ -524,9 +528,12 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 373.33333333333326,
-                "y": 827.9999999999999
+                "x": 372.66666666666674,
+                "y": 459.33333333333337
             }
+        },
+        "Stage-05.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "Stage-05.json#tileSheetx24": {
             "dynamicWrapping": false,
@@ -790,11 +797,11 @@
             "scaleInDock": 1
         },
         "World_1-1.json": {
-            "scale": 3,
+            "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": -31.33333333333333,
-                "y": 151.49999999999997
+                "x": 200.69176823040786,
+                "y": 140.0340437121264
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -808,7 +815,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 173.91706951726016,
-                "y": 161.3590249880847
+                "y": 161.35902498808474
             }
         },
         "World_1-2.json#tileSheetx12": {
@@ -886,8 +893,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 162.06985769728334
+                "x": 173.68012528086064,
+                "y": 162.30680193368283
             }
         },
         "World_10-3.json#tileSheetx12": {
@@ -908,8 +915,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 162.06985769728334
+                "x": 173.68012528086064,
+                "y": 162.30680193368283
             }
         },
         "World_10-4.json#tileSheetx12": {
@@ -930,8 +937,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 162.06985769728334
+                "x": 173.68012528086064,
+                "y": 162.30680193368283
             }
         },
         "World_10-5.json#tileSheetx12": {
@@ -939,10 +946,10 @@
         },
         "World_2-2.json": {
             "scale": 1.5,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 154,
-                "y": 108.33333333333331
+                "y": 108.33333333333334
             }
         },
         "World_2-2.json#tileSheetx12": {
@@ -965,7 +972,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 162.16666666666663
+                "y": 162.16666666666666
             }
         },
         "World_2-3-old.json": {
@@ -984,7 +991,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 185.91135017362296,
-                "y": 185.91135017362294
+                "y": 185.65806495540275
             }
         },
         "World_2-3.json#tileSheetx12": {
@@ -996,15 +1003,16 @@
         },
         "World_2-4.json": {
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 116.75,
                 "y": 161.75
             }
         },
         "World_2-4.json#tileSheetx12": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "World_2-4.json#tileSheetx24": {
             "scaleInDock": 1
@@ -1013,7 +1021,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1024,7 +1032,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1035,7 +1043,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1054,15 +1062,16 @@
             "scaleInDock": 1
         },
         "World_4-2.json": {
-            "scale": 2.0856321839080456,
+            "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 163.97905759162308,
-                "y": 161.82143841278594
+                "x": 60.333333333333314,
+                "y": 126.33333333333334
             }
         },
         "World_4-2.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "World_4-2.json#tileSheetx24": {
             "dynamicWrapping": false,
@@ -1070,10 +1079,10 @@
         },
         "World_4-3-ii.json": {
             "scale": 2,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 162.5,
-                "y": 169.5
+                "x": 162.25,
+                "y": 169.25
             }
         },
         "World_4-3-ii.json#tileSheetx12": {
@@ -1098,9 +1107,9 @@
         },
         "World_4-3.json": {
             "scale": 1.9733024691358025,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.82028622820053,
+                "x": 174.07366856964106,
                 "y": 161.91131618049582
             }
         },
@@ -1114,7 +1123,7 @@
             "scale": 3.4501344086021506,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.90626826132686,
+                "x": 173.7613463711091,
                 "y": 161.87775137325178
             }
         },
@@ -1142,7 +1151,7 @@
             "scale": 1.9733024691358025,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.82028622820053,
+                "x": 174.07366856964106,
                 "y": 161.91131618049582
             }
         },
@@ -1150,6 +1159,17 @@
             "scaleInDock": 1
         },
         "World_4-4.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "World_5-2_Racing.json": {
+            "scale": 2.336781609195402,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 173.95720609936058,
+                "y": 161.9749139203148
+            }
+        },
+        "World_5-2_Racing.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "World_6-2_Adv_Portaling.json": {
@@ -1247,10 +1267,10 @@
         },
         "World_8-2_Adv_Portaling.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 162.06985769728334
+                "x": 173.68012528086064,
+                "y": 162.30680193368283
             }
         },
         "World_8-2_Adv_Portaling.json#tileSheetx12": {
@@ -1260,8 +1280,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 162.06985769728334
+                "x": 173.68012528086064,
+                "y": 162.30680193368283
             }
         },
         "World_8-3_Adv_Portaling.json#tileSheetx12": {
@@ -1294,10 +1314,10 @@
         },
         "World_8-4_Adv_Portaling.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 162.30680193368286
+                "x": 173.68012528086064,
+                "y": 162.30680193368283
             }
         },
         "World_8-4_Adv_Portaling.json#tileSheetx12": {
@@ -1332,7 +1352,7 @@
             "scale": 2,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 202.5,
+                "x": 202.25,
                 "y": 94.25
             }
         },
@@ -1343,8 +1363,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 161.59596922448424
+                "x": 173.68012528086064,
+                "y": 161.35902498808474
             }
         },
         "World_9-4_Final_Exams.json#tileSheetx12": {
@@ -1354,7 +1374,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 247.8436712739157,
+                "x": 248.08061551031525,
                 "y": 140.0340437121264
             }
         },
@@ -1844,11 +1864,11 @@
             "scaleInDock": 1
         },
         "snakeMap.tmj": {
-            "scale": 0.5,
+            "scale": 1.1875,
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 384,
-                "y": 237
+                "y": 359.99999999999994
             }
         },
         "snakeMap.tmj#tileSheetx24": {
@@ -1858,8 +1878,8 @@
             "scale": 0.7137768817204301,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.66547406082293,
-                "y": 371.96497504943034
+                "x": 236.76866585067324,
+                "y": 603.1296488089633
             }
         },
         "snakeMap.tmx#tileSheetx24": {
@@ -1935,7 +1955,7 @@
             "scale": 1.3509408602150537,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.33310118396184,
+                "x": 371.96298875733754,
                 "y": 371.9629887573376
             }
         },
@@ -1946,7 +1966,7 @@
             "scale": 1.3509408602150537,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.33310118396184,
+                "x": 372.70321361058603,
                 "y": 371.9629887573376
             }
         },
@@ -1990,7 +2010,7 @@
             "scale": 1.3509408602150537,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 299.05084071236695,
+                "x": 298.6807282857427,
                 "y": 371.22276390408916
             }
         },
@@ -2123,7 +2143,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": -160.33333333333331,
-                "y": 362
+                "y": 362.33333333333337
             }
         },
         "testing11.json#tileSheetx24": {
@@ -2401,24 +2421,21 @@
     "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
     "openFiles": [
-        "snakeMap.tmx",
-        "snakeMap.tmj",
-        "World_1-1.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "snakeMap.tmx",
-        "snakeMap.tmj",
-        "World_1-1.json",
-        "World_1-3.json",
-        "World_1-4.json",
-        "World_1-2.json",
+        "World_9-5_Final_Exams.json",
+        "World_9-4_Final_Exams.json",
+        "World_9-3_Final_Exams.json",
+        "World_8-4_Adv_Portaling.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_8-2_Adv_Portaling.json",
+        "World_5-2_Racing.json",
         "World_4-4-ii.json",
         "World_4-4.json",
+        "World_4-3-ii.json",
         "World_4-3.json",
-        "template-10-24.json",
-        "World_8-4_Adv_Portaling.json",
         "World_4-2.json"
     ],
     "resizeMap.removeObjects": false,
