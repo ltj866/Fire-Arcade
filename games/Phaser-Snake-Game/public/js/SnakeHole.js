@@ -23,7 +23,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 6; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3291,22 +3291,22 @@ class GameScene extends Phaser.Scene {
                 },
                 */
                'two-wide-corridors': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER);
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
                 },
                 'double-back-portals': function () {
-                    return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", COPPER);
+                    return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", WOOD);
                 },
                 'easy-wrap': function () {
                     return ourPersist.checkCompletedRank("World_1-4", SILVER);
                 },
                 'hard-wrap': function () {
-                    return ourPersist.checkCompletedRank("World_3-3_Wrap", COPPER);
+                    return ourPersist.checkCompletedRank("World_3-3_Wrap", WOOD);
                 },
                 'more-blocks': function () {
-                    return ourPersist.checkCompletedRank("World_2-2", COPPER);
+                    return ourPersist.checkCompletedRank("World_2-2", WOOD);
                 },
                 'wrap-and-warp': function () {
-                    return ourPersist.checkCompletedRank("World_1-3", COPPER);
+                    return ourPersist.checkCompletedRank("World_1-3", WOOD);
                 },
                 'learn-to-wrap': function () {
                     return true;
@@ -3318,10 +3318,10 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'unidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", COPPER);
+                    return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", WOOD);
                 },
                 'hardest----for-now': function () {
-                    return ourPersist.checkCompletedRank("World_10-4", COPPER);
+                    return ourPersist.checkCompletedRank("World_10-4", WOOD);
                 },
                 'swirl-swirl': function () {
                     return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
@@ -3330,22 +3330,22 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'plus-plus': function () {
-                    return ourPersist.checkCompletedRank("World_10-3", COPPER);
+                    return ourPersist.checkCompletedRank("World_10-3", WOOD);
                 },
                 'col': function () {
-                    return ourPersist.checkCompletedRank("World_4-3", COPPER);
+                    return ourPersist.checkCompletedRank("World_4-3", WOOD);
                 },
                 'its-a-snek': function () {
-                    return ourPersist.checkCompletedRank("World_4-2", COPPER);
+                    return ourPersist.checkCompletedRank("World_4-2", WOOD);
                 },
                 'now-a-fourth': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", COPPER);
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
                 },
                 'horizontal-uturns': function () {
-                    return ourPersist.checkCompletedRank("World_9-4_Final_Exams", COPPER);
+                    return ourPersist.checkCompletedRank("World_9-4_Final_Exams", WOOD);
                 },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_9-3_Final_Exams", COPPER); 
+                    return ourPersist.checkCompletedRank("World_9-3_Final_Exams", WOOD); 
                 },
                 'first-medium': function () {
                     return true;
@@ -3354,32 +3354,34 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'easy-racer': function () {
+                    debugger
                     return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
                 },
                 'hello-ghosts': function () {
                     return false;
                 },
                 'medium-happy': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", COPPER);
+                    debugger
+                    return ourPersist.checkCompletedRank("World_2-4", WOOD);
                     
                 },
                 'bidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", COPPER); 
+                    return ourPersist.checkCompletedRank("World_4-4", WOOD); 
                 },
                 'start': function ( ) { 
                     return true
                 },
                 'babies-first-wall': function () {
-                    return ourPersist.checkCompletedRank("World_1-1", COPPER);
+                    return ourPersist.checkCompletedRank("World_1-1", WOOD);
                 },
                 'horz-rows': function () {
-                    return ourPersist.checkCompletedRank("World_1-2", COPPER);
+                    return ourPersist.checkCompletedRank("World_1-2", WOOD);
                 },
                 'first-blocks': function () {
-                    return ourPersist.checkCompletedRank("World_1-4", COPPER);
+                    return ourPersist.checkCompletedRank("World_1-4", WOOD);
                 },
                 'medium-wrap': function () {
-                    return ourPersist.checkCompletedRank("World_3-2_Wrap", COPPER)
+                    return ourPersist.checkCompletedRank("World_3-2_Wrap", WOOD)
                 },
                 'dark-precision': function () {
                     return true
@@ -3542,7 +3544,7 @@ class GameScene extends Phaser.Scene {
                                         
                                         if (ourPersist.bestOfStageData[stageName] != undefined) {
                                             switch (ourPersist.bestOfStageData[stageName].stageRank()) {
-                                                case COPPER:
+                                                case WOOD:
                                                     blackholeImage.setTint(0xB87333);
                                                     break;
                                                 case BRONZE:
@@ -6252,7 +6254,7 @@ class GameScene extends Phaser.Scene {
     
 }
 
-const COPPER = 0;
+const WOOD = 0;
 const BRONZE = 1;
 const SILVER = 2;
 const GOLD = 3;
@@ -6321,7 +6323,7 @@ var StageData = new Phaser.Class({
                 rank = BRONZE;
                 break;
             default:
-                rank = COPPER;
+                rank = WOOD;
         }
         return rank;
         

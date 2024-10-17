@@ -123,7 +123,7 @@
         {
          "name":"UUID",
          "type":"string",
-         "value":"0d6b133c-d6a0-4788-b5e6-3159c49eca34"
+         "value":"78dc0653-c6d4-4296-88c3-24f7f8415a68"
         }, 
         {
          "name":"diffBonus",
@@ -133,7 +133,7 @@
         {
          "name":"next",
          "type":"string",
-         "value":"end"
+         "value":""
         }, 
         {
          "name":"slug",
