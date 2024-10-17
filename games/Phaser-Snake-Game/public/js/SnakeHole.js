@@ -7100,7 +7100,7 @@ class ScoreScene extends Phaser.Scene {
        
         var scoreAtoms = [];
         var scoreCombos= [];
-        var emptySprite = this.add.sprite(0, 0, null);
+        var emptySprite = undefined;
 
         var count = 0;
         
@@ -7118,7 +7118,7 @@ class ScoreScene extends Phaser.Scene {
                 _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
                 _y = (GRID * 8.75) + 8;
             }
-                    var emptySprite = this.add.sprite(0, 0, null);
+
             switch (true) {
                 case logTime > COMBO_ADD_FLOOR:
                     anim = "atomScore01";
