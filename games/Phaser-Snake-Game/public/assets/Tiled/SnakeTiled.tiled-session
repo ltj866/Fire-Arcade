@@ -214,11 +214,11 @@
             "scaleInDock": 0.75
         },
         "Racing_Stage-03.json": {
-            "scale": 1.6650537634408602,
+            "scale": 2.336781609195402,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 312.60251856635455,
-                "y": 337.2263480787859
+                "x": 173.95720609936058,
+                "y": 161.9749139203148
             }
         },
         "Racing_Stage-03.json#tileSheetx12": {
@@ -228,12 +228,15 @@
             "scaleInDock": 1
         },
         "Racing_Stage-04_Dark.json": {
-            "scale": 1.6650537634408602,
+            "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 371.7597675169519,
-                "y": 345.63448498546984
+                "x": 184.75,
+                "y": 201.75
             }
+        },
+        "Racing_Stage-04_Dark.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "Racing_Stage-04_Dark.json#tileSheetx24": {
             "scaleInDock": 1
@@ -251,10 +254,10 @@
         },
         "Racing_Stage-04_test.json": {
             "scale": 1.6650537634408602,
-            "selectedLayer": -1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 373.5615111398127,
-                "y": 218.91185017759125
+                "x": 191.8856958346787,
+                "y": 218.91185017759122
             }
         },
         "Racing_Stage-04_test.json#tileSheetx12": {
@@ -264,11 +267,11 @@
             "scaleInDock": 1
         },
         "Racing_Stage-05.json": {
-            "scale": 3,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 178.66666666666669,
-                "y": 187.5
+                "x": 197.75,
+                "y": 158.75
             }
         },
         "Racing_Stage-05.json#tileSheetx12": {
@@ -281,7 +284,7 @@
             "scale": 1.6650537634408602,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 371.7597675169519,
+                "x": 372.06005812076205,
                 "y": 403.8908621246367
             }
         },
@@ -292,11 +295,11 @@
             "scaleInDock": 1
         },
         "Racing_Stage-test.json": {
-            "scale": 1.6650537634408602,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 373.56151113981275,
-                "y": 338.4275104940265
+                "x": 177.66666666666663,
+                "y": 111.66666666666669
             }
         },
         "Racing_Stage-test.json#tileSheetx12": {
@@ -306,11 +309,11 @@
             "scaleInDock": 1
         },
         "Racing_Stage-test02.json": {
-            "scale": 1.6650537634408602,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 373.56151113981275,
-                "y": 318.007749434937
+                "x": 163.75,
+                "y": 154.25
             }
         },
         "Racing_Stage-test02.json#tileSheetx12": {
@@ -1375,7 +1378,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 248.08061551031525,
-                "y": 140.0340437121264
+                "y": 217.7517532511745
             }
         },
         "World_9-5_Final_Exams.json#tileSheetx12": {
@@ -1399,7 +1402,7 @@
             "scale": 0.8018817204301075,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.6258799865907,
+                "x": 371.0023466309085,
                 "y": 372.2494133422729
             }
         },
@@ -1410,8 +1413,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.91706951726016,
-                "y": 239.55062299993193
+                "x": 173.68012528086064,
+                "y": 317.26833253898
             }
         },
         "Wrap_Stage-03c.json#tileSheetx12": {
@@ -2363,8 +2366,8 @@
             "scale": 0.7482526881720429,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 372.868690497575,
-                "y": 371.5322435782289
+                "x": 372.20046703790194,
+                "y": 370.8640201185558
             }
         },
         "warp-draft-01.json#tileSheetx24": {
@@ -2425,18 +2428,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "Racing_Stage-05.json",
+        "Racing_Stage-04_test.json",
+        "Racing_Stage-04_Dark.json",
+        "warp-draft-01.json",
+        "Wrap_Stage-03b.json",
+        "Wrap_Stage-03c.json",
         "World_9-5_Final_Exams.json",
         "World_9-4_Final_Exams.json",
         "World_9-3_Final_Exams.json",
+        "Racing_Stage-03.json",
         "World_8-4_Adv_Portaling.json",
-        "World_8-3_Adv_Portaling.json",
-        "World_8-2_Adv_Portaling.json",
-        "World_5-2_Racing.json",
-        "World_4-4-ii.json",
-        "World_4-4.json",
-        "World_4-3-ii.json",
-        "World_4-3.json",
-        "World_4-2.json"
+        "World_8-3_Adv_Portaling.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
