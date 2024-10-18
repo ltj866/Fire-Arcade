@@ -20,7 +20,7 @@ const DEV_BRANCH = "dev";
 const ANALYTICS_ON = false;
 
 
-const GAME_VERSION = 'v0.7.07.13.002';
+const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 6; //28..................... Win Condition
@@ -2156,6 +2156,7 @@ class PersistScene extends Phaser.Scene {
         "text-align": 'right',
     }   
 
+    /*
     this.zedsUI = this.add.dom(2, SCREEN_HEIGHT - 2, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
@@ -2165,7 +2166,7 @@ class PersistScene extends Phaser.Scene {
             border-radius: 5px;
             padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
     ).setOrigin(0, 1).setScale(.5);
-
+*/
 
     /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
         styleBottomText    
@@ -2323,6 +2324,8 @@ class GameScene extends Phaser.Scene {
         this.dreamWalls = [];
         this.nextStagePortals = [];
         this.extractHole = [];
+
+        this.snakeLights = [];
 
         this.lastMoveTime = 0; // The last time we called move()
         this.nextScore = 0; // Calculated and stored after score screen finishes.
@@ -5904,6 +5907,8 @@ class GameScene extends Phaser.Scene {
                                                                     closestPortal.x/GRID, closestPortal.y/GRID);
 
                 this.portals.forEach( portal => {
+
+                    // Add here a for loop that goes through the five lights and continues with the shortest distance
                     var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                         portal.x/GRID, portal.y/GRID);
 
@@ -7644,6 +7649,7 @@ class ScoreScene extends Phaser.Scene {
                 You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
+            
             if (this.prevZeds + this.difficulty > ourPersist.zeds) {
                 ourPersist.zeds = this.prevZeds + this.difficulty;
                 var zedsObj = calcZedLevel(ourPersist.zeds);

@@ -23,6 +23,8 @@ var Snake = new Phaser.Class({
 
         this.lastPlayedCombo = 0;
         this.lastPortal = undefined; // Set
+        this.closestPortal = undefined; // TYPE Portal.
+        
 
 
 
@@ -44,6 +46,8 @@ var Snake = new Phaser.Class({
         this.snakeLightE = scene.lights.addLight(this.head.x + GRID * 29, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
         this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y - GRID * 27, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
         this.snakeLightW = scene.lights.addLight(this.head.x - GRID * 29, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+
+        this.snakeLights = [this.snakeLight, this.snakeLightN, this.snakeLightE, this.snakeLightS, this.snakeLightW];
     },
     
     // #region Grow
@@ -116,17 +120,17 @@ var Snake = new Phaser.Class({
         this.snakeLight.x = x + GRID/2;
         this.snakeLight.y = y + GRID/2;
 
-        this.snakeLightN.x = x
-        this.snakeLightN.y = y + GRID * 27
+        this.snakeLightN.x = x;
+        this.snakeLightN.y = y + GRID * 27;
 
-        this.snakeLightE.x = x + GRID * 29
-        this.snakeLightE.y = y
+        this.snakeLightE.x = x + GRID * 29;
+        this.snakeLightE.y = y;
 
-        this.snakeLightS.x = x
-        this.snakeLightS.y = y - GRID * 27
+        this.snakeLightS.x = x;
+        this.snakeLightS.y = y - GRID * 27;
 
-        this.snakeLightW.x = x - GRID * 29
-        this.snakeLightW.y = y
+        this.snakeLightW.x = x - GRID * 29;
+        this.snakeLightW.y = y;
 
         // wrapping tiles
         scene.map.setLayer(scene.wallVarient);
@@ -276,6 +280,49 @@ var Snake = new Phaser.Class({
                 }
             }
 
+        }
+
+        // Update closet portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
+        // Not sure if it should stay that way or not.
+
+        if (scene.portals.length > 1) {
+            var testPortal = Phaser.Math.RND.pick(scene.portals);
+            var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
+                testPortal.x, testPortal.y);
+
+            if (this.closestPortal === undefined) {
+                this.closestPortal = testPortal;
+                this.closestPortal.flipX = true;
+                this.closestPortal.setScale(2);
+            }
+
+            scene.portals.forEach( portal => {
+
+                this.snakeLights.forEach( light => {
+
+                    var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
+
+                    if (dist > distN) {
+                        dist = distN;
+                        testPortal = portal;
+                    }
+
+                });
+
+            });
+
+            if (this.closestPortal != testPortal) {
+                console.log("New Closest Portal:", testPortal.x, testPortal.y);
+                this.closestPortal.flipX = false;
+                this.closestPortal.setScale(1);
+                testPortal.flipX = true;
+                testPortal.setScale(2);
+                
+                this.closestPortal = testPortal;
+            }
+            
+            //debugger
+            
         }
 
         // #region Coin Collision
