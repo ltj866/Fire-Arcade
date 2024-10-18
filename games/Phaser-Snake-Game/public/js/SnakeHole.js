@@ -17,7 +17,7 @@ const IS_DEV = false;
 const ANALYTICS_VERS = "0.3.241018";
 const DEV_BRANCH = "dev";
 
-const ANALYTICS_ON = false;
+const ANALYTICS_ON = true;
 
 
 const GAME_VERSION = '';
