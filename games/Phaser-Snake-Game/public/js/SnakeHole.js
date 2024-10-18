@@ -2156,7 +2156,7 @@ class PersistScene extends Phaser.Scene {
         "text-align": 'right',
     }   
 
-    /*
+    
     this.zedsUI = this.add.dom(2, SCREEN_HEIGHT - 2, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
@@ -2166,7 +2166,7 @@ class PersistScene extends Phaser.Scene {
             border-radius: 5px;
             padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
     ).setOrigin(0, 1).setScale(.5);
-*/
+
 
     /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
         styleBottomText    
