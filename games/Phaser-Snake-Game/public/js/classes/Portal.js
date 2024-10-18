@@ -28,7 +28,7 @@ var Portal = new Phaser.Class({
             scene.portals.push(this);
         } else {
             this.setOrigin(0,0);
-            scene.portalWalls.push(this);
+            scene.wallPortals.push(this);
         }
         //this.play("portalIdle");
 
