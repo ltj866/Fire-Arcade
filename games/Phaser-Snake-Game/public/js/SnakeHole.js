@@ -3324,10 +3324,10 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", WOOD);
                 },
                 'hardest----for-now': function () {
-                    return ourPersist.checkCompletedRank("World_10-4", WOOD);
+                    return ourPersist.checkCompletedRank("World_4-3-ii", WOOD);
                 },
                 'swirl-swirl': function () {
-                    return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
+                    return ourPersist.checkCompletedRank("World_4-4", WOOD); // Should this one be harder to unlock?
                 },
                 'eye': function () {
                     return true;
