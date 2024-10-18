@@ -378,7 +378,7 @@ var Snake = new Phaser.Class({
             portal.snakePortalingSprite.visible = false;
         });
 
-        scene.portalWalls.forEach ( portalWallSegment => {
+        scene.wallPortals.forEach ( portalWallSegment => {
             portalWallSegment.snakePortalingSprite.visible = false;
 
         });
