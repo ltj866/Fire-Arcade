@@ -276,7 +276,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingWallPortal-2'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -3287,6 +3287,7 @@ class GameScene extends Phaser.Scene {
 
         this.events.on('spawnBlackholes', function (thingWePass) {
 
+            // #region is unlocked?
             const STAGE_UNLOCKS = {
                 /* Template
                 '': function () {
@@ -3417,6 +3418,7 @@ class GameScene extends Phaser.Scene {
                 const BLACK_HOLE_START_TILE_INDEX = 641;
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
+                // #region Layer: Next
                 if (this.map.getLayer('Next')) {
 
                     
@@ -3697,7 +3699,7 @@ class GameScene extends Phaser.Scene {
             portalVarient = `Portal`
         }
 
-        // #region Portal-X
+        // #region Portals
         //var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
         //this.map.getLayer(`${this.wallVarient}`) // Navigate to wall.
         //var basePortalSpawnPools = [];
@@ -3978,6 +3980,23 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+
+        // #region Play Portals
+        if (this.portals.length > 0) {
+            var sortedPortals = this.portals.toSorted(
+                (a, b) => {
+                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) 
+                    - Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y)
+                }); 
+    
+            sortedPortals.forEach (portal => {
+                portal.play(portal.anim);
+            });
+            
+        }
+        
+
+
 
         //stagger portal spawns
         //this.time.delayedCall(600, event => {
@@ -4458,7 +4477,7 @@ class GameScene extends Phaser.Scene {
         }
 
         
-        //  Event: addScore
+        //  #region @E: addScore
         this.events.on('addScore', function (fruit) {
 
             const ourGameScene = this.scene.get('GameScene');
@@ -4609,7 +4628,7 @@ class GameScene extends Phaser.Scene {
             
         }, this);
 
-        //  Event: saveScore
+        //  #region @E: saveScore
         this.events.on('saveScore', function () {
             const ourScoreScene = this.scene.get('ScoreScene');
             const ourStartScene = this.scene.get('StartScene');

@@ -14,7 +14,7 @@ var Portal = new Phaser.Class({
         Phaser.GameObjects.Sprite.call(this, scene);
 
         this.anim = anim;
-        this.playAfterDelay(anim, 0); //setting spawnDelay to 0 for now
+        //this.playAfterDelay(anim, 0); //setting spawnDelay to 0 for now
         this.chain(['portalIdle']);
 
 
@@ -29,6 +29,7 @@ var Portal = new Phaser.Class({
         } else {
             this.setOrigin(0,0);
             scene.wallPortals.push(this);
+            this.play(this.anim);
         }
         //this.play("portalIdle");
 
