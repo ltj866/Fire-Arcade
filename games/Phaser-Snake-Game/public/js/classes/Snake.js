@@ -295,7 +295,7 @@ var Snake = new Phaser.Class({
                 this.closestPortal.flipX = true;
                 this.closestPortal.setScale(2);
 
-                this.closestPortal.targetObject.setScale(3);
+                this.closestPortal.targetObject.setScale(2);
             }
 
             scene.portals.forEach( portal => {
@@ -321,7 +321,7 @@ var Snake = new Phaser.Class({
 
                 testPortal.flipX = true;
                 testPortal.setScale(2);
-                testPortal.targetObject.setScale(3);
+                testPortal.targetObject.setScale(2);
                 
                 this.closestPortal = testPortal;
             }
