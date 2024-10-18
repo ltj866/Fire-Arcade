@@ -1,7 +1,9 @@
 import { Food } from './classes/Food.js';
 import { Portal } from './classes/Portal.js';
+import { Coin } from './classes/Coin.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
+
 
 import {PORTAL_COLORS} from './const.js';
 
@@ -15,9 +17,11 @@ const IS_DEV = false;
 const ANALYTICS_VERS = "0.3.241018";
 const DEV_BRANCH = "dev";
 
+const ANALYTICS_ON = false;
 
-const GAME_VERSION = 'v0.7.07.13.002';
-export const GRID = 24;        //....................... Size of Sprites and GRID
+
+const GAME_VERSION = '';
+export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
@@ -29,6 +33,7 @@ const GHOST_WALLS = true;
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
+const DEBUG_SHOW_LOCAL_STORAGE = false;
 
 
 // 1 frame is 16.666 milliseconds
@@ -38,12 +43,16 @@ export const SPEED_WALK = 99; // 99 In milliseconds
 // 16.66 33.32
 export const SPEED_SPRINT = 33; // 24  // Also 16 is cool // 32 is the next
 
+const PORTAL_SPAWN_DELAY = 66;
+
 
 // Make into a ENUM
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
+export const X_OFFSET = 292 / 2;
+export const Y_OFFSET = 72 / 2;
 
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
@@ -53,8 +62,10 @@ const NO_BONK_BASE = 1000;
 const STAGE_TOTAL = 21
 
 
+
+
 //debug stuff
-const PORTAL_PAUSE = 2; 
+export const PORTAL_PAUSE = 2; 
 
 
 // Speed Multiplier Stats
@@ -70,6 +81,11 @@ var calcBonus = function (scoreInput) {
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
 }
+
+var showTutorial = function (currentScene, nextScene) {
+    // Stops the current Scene and starts the tutorial one.
+    currentScene.scene.start(nextScene);
+} 
 
 var updateSumOfBest = function(scene) {
     /***
@@ -162,7 +178,8 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 var map;  // Phaser.Tilemaps.Tilemap 
 var tileset;
 var tileset2;
-const FADE_OUT_TILES = [104];
+const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
+    113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,241,242,243];
 
 //  Direction consts
 //export const LEFT = 3;
@@ -262,11 +279,462 @@ const DREAMWALLSKIP = [0,1,2];
 const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
+const START_COINS = 4;
+
+
+class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
+    constructor(game) {
+        super({
+            game: game,
+            renderer: game.renderer,
+            vertShader: `
+                precision mediump float;
+                attribute vec2 inPosition;
+                attribute vec2 inTexCoord;
+                uniform mat4 uProjectionMatrix;
+                varying vec2 vTexCoord;
+                void main(void) {
+                    vTexCoord = inTexCoord;
+                    gl_Position = uProjectionMatrix * vec4(inPosition, 0.0, 1.0);
+                }
+            `,
+            fragShader: `
+                precision mediump float;
+                uniform float uTime;
+                uniform sampler2D uMainSampler;
+                varying vec2 vTexCoord;
+                void main(void) {
+                    vec2 uv = vTexCoord;
+                    // Apply noise translation over time
+                    float noise = sin(uv.x * 5.0 + uTime) * 0.02;
+                    uv.y += noise;
+                    uv.x += noise;
+                    vec4 color = texture2D(uMainSampler, uv);
+                    gl_FragColor = vec4(color.rgb, color.a);
+                }
+            `
+        });
+    }
+}
+
+// #region SpaceBoyScene
+class SpaceBoyScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'SpaceBoyScene', active: true});
+    }
+    create() {
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
+        setOrigin(0,0).setDepth(51).setAlpha(0);
+
+        this.tweens.add({
+            targets: this.spaceBoyLight,
+            alpha: {from: 0, to: 1},
+            duration: 600,
+            ease: 'Sine.Out',
+            delay: 500,
+            });
+
+    }
+}
+
+// #region TutorialScene
+class TutorialScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'TutorialScene', active: false});
+    }
+    create() {
+        
+        /*this.add.dom(SCREEN_WIDTH/2, GRID * 5.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'48px',
+            }), 
+                'PORTAL SNAKE',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        */
+
+        
+        // AUDIO
+        this.pop02 = this.sound.add('pop02');
 
 
 
 
 
+        // Tutorial Panels
+
+        var tutStyle = {
+            "fontSize":'24px',
+        }
+
+        this.selectedPanel = 1;
+
+
+        this.tutText1 = this.add.dom(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+             'Press arrow keys to move.',
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0); // Sets the origin to the middle top.
+        this.tutText2 = this.add.dom(SCREEN_WIDTH + 250, GRID * 9.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+            'Collect atoms to grow longer.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.tutText3 = this.add.dom(SCREEN_WIDTH + 250 * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+            'Use portals to bend spacetime.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.tutText4 = this.add.dom((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+                'Hold space to sprint.',
+        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        
+        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
+             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutWASD.play('tutAll').setAlpha(0);
+
+        this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
+             SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
+        this.time.delayedCall(600, event => {
+            this.tweens.add({
+                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
+                alpha: {from: 0, to: 1},
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
+        panel1.setDepth(100);
+        panel1.setScale(0);
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel1,
+                scale: 1,
+                width: 240,
+                height: 160,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
+        panel2.setDepth(100);
+        panel2.setScale(0);
+        this.time.delayedCall(500, event => {
+            this.tweens.add({
+                targets: panel2,
+                scale: 1,
+                width: 200,
+                height: 140,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        });
+
+        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomSmall.play('atom04idle');
+        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomMedium.play('atom03idle');
+        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomLarge.play('atom02idle');
+        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomCharged.play('atom01idle');
+        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomElectrons.play('electronIdle');
+
+        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
+        panel3.setDepth(100);
+
+        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
+            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal1.play('portalIdle');
+        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal2.play('portalIdle');
+
+        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
+        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
+
+        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
+        panel4.setDepth(100);
+
+        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
+             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutSPACE.play('tutSpace');
+
+        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
+        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
+
+        this.panels = [];
+        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
+            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
+            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
+            panel4, this.tutText4,this.tutSPACE,this.tutSnake4);
+
+        this.panelsContainer = this.make.container(0, 0);
+        this.panelsContainer.add(this.panels);
+
+
+
+        
+        
+        if (localStorage["version"] === undefined) {
+            this.hasPlayedBefore = false;
+            console.log("Testing LOCAL STORAGE. Has not played.", );
+
+        } else {
+            this.hasPlayedBefore = true;
+            console.log("Testing LOCAL STORAGE Has played.", );
+        }
+
+        //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
+        
+        this.continueText = this.add.dom(SCREEN_WIDTH/2, GRID*24.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
+            "fontSize":'32px',
+            }), 
+                '[PRESS SPACE TO CONTINUE]',
+        ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
+        
+        
+        
+        this.continueText.setVisible(false)
+        if (!this.hasPlayedBefore) {
+            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        }
+        else {
+            this.continueText.setVisible(true)        
+        }
+
+        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
+        this.continueText.setVisible(true)
+        
+        this.tweens.add({
+            targets: this.continueText,
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: -1,
+            yoyo: true
+        });
+        
+        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowR.play('startArrowIdle').setAlpha(0);
+        this.panelArrowR.angle = 90;
+        
+        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL.play('startArrowIdle');
+        this.panelArrowL.angle = 270;
+        this.panelArrowL.setVisible(false).setAlpha(0);
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            
+            const ourTutorialScene = this.scene.get('TutorialScene');
+            const ourPersist = this.scene.get('PersistScene');
+            if (this.selectedPanel < 4) {
+                this.pop02.play();
+                this.selectedPanel += 1
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    this.panelContainerX = 0;
+                    this.panelArrowL.setVisible(false)
+                    break;
+                case 2:
+                    ourPersist.bgCoords.x += 20;
+                    this.panelContainerX = -570;
+                    this.panelArrowL.setVisible(true)
+                    break;
+                case 3:
+                    ourPersist.bgCoords.x += 20;
+                    this.panelContainerX = -1195;
+                    this.panelArrowL.setVisible(true)
+                    break;
+                case 4:
+                    ourPersist.bgCoords.x = 60;
+                    this.panelContainerX = -1820;
+                    this.panelArrowL.setVisible(true)
+                    this.panelArrowR.setVisible(false)
+                    this.continueText.setVisible(true)
+                    break;
+            }
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+            });   
+        }, this)
+        this.input.keyboard.on('keydown-LEFT', e => {
+            const ourTutorialScene = this.scene.get('TutorialScene');
+            const ourPersist = this.scene.get('PersistScene');
+            if (this.selectedPanel > 1) {
+                this.selectedPanel -= 1
+                this.pop02.play();
+            }
+            this.panelContainerX = 0
+            switch (this.selectedPanel){
+                case 1:
+                    ourPersist.bgCoords.x = 0;
+                    this.panelContainerX = 0;
+                    this.panelArrowL.setVisible(false)
+                    this.panelArrowR.setVisible(true)
+                    break;
+                case 2:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -570;
+                    this.panelArrowR.setVisible(true)
+                    break;
+                case 3:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -1195;
+                    this.panelArrowR.setVisible(true)
+                    break;
+                case 4:
+                    ourPersist.bgCoords.x -= 20;
+                    this.panelContainerX = -1820;
+                    this.panelArrowR.setVisible(true)
+                    break;
+            }
+
+            
+            
+            this.tweens.add({
+                targets: this.panelsContainer,
+                x: this.panelContainerX,
+                ease: 'Sine.InOut',
+                duration: 500,
+                onComplete: function () {
+                    
+                    if (ourTutorialScene.selectedPanel < 4) {
+                        debugger
+                        ourTutorialScene.panelArrowR.setVisible(true);
+                    }
+                    else{
+                        debugger
+                        ourTutorialScene.panelArrowR.setVisible(false);
+                    }
+                    
+                }
+            }, this);   
+        }, this)
+
+        const onInput = function (scene) {
+            if (scene.continueText.visible === true) {
+                // @Holden add transition to nextScene here.
+                scene.scene.start("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    startupAnim: true,
+                });
+
+
+
+                // Clear for reseting game
+                scene.scene.get("StartScene").stageHistory = [];
+                scene.scene.get("PersistScene").coins = START_COINS;
+
+                
+            }
+
+        //continueText.on('pointerdown', e =>
+        //{
+        //    this.onInput();
+        //    //ourInput.moveUp(ourGame, "upUI")
+    
+        //});
+                
+                /*** to run when skipping to score screen.
+                ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
+                ourGame.stageDiffBonus = 140;
+                ourGame.stage = END_STAGE;
+                //END_STAGE = "Stage-01";
+
+                this.score = 12345;
+                this.bonks = 3;
+                this.length = 28;
+                this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+                this.zedLevel = 77;
+                this.medals = {
+                    "fast":'silver',
+                    "Rank":'gold'
+                }
+
+                ourInput.turns = 79;
+                ourInput.cornerTime = 190;
+                ourInput.boostTime = 400;
+
+                var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
+                var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
+                var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
+
+                this.stageHistory = [stage01, stage02, stage03];
+                this.scene.start('ScoreScene');
+                */
+            /*}
+            else {
+                                                
+
+            }
+            ourPersist.closingTween();
+            scene.tweens.addCounter({
+                from: 600,
+                to: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                onUpdate: tween =>
+                    {   
+                        graphics.clear();
+                        var value = (tween.getValue());
+                        scene.tweenValue = value
+                        scene.shape1 = scene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
+                        var geomask1 = scene.shape1.createGeometryMask();
+                        
+                        scene.cameras.main.setMask(geomask1,true)
+                    },
+                onComplete: () => {
+                    scene.scene.setVisible(false);
+                    //this.scene.get("UIScene").setVisible(false);
+                    
+                    //this.scene.launch('UIScene');
+                    //scene.scene.launch('GameScene');
+                    scene.scene.launch('MainMenuScene');
+                    ourPersist.starterTween.stop();
+                    ourPersist.openingTween(scene.tweenValue);
+                    scene.openingTweenStart.stop();
+                    scene.scene.stop();
+                    
+                    //var ourGameScene = this.scene.get("GameScene");
+                    //console.log(e)
+                }
+            });*/
+        }
+    
+        
+        this.continueText.on('pointerdown', e => {
+            console.log("I CLICK");
+            if (this.continueText.visible === true) {
+                console.log("I click and continue");
+                onInput(this);
+            }
+        });
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            onInput(this);
+
+        });
+    }
+}
+
+// #region StartScene
 class StartScene extends Phaser.Scene {
     constructor () {
         super({key: 'StartScene', active: true});
@@ -291,10 +759,12 @@ class StartScene extends Phaser.Scene {
         //this.load.atlas('megaAtlas', 'assets/atlas/textureAtlas24_06_27.png', 'assets/atlas/atlasMeta24_06_27.json');
         this.load.atlas({
             key: 'megaAtlas',
-            textureURL: 'assets/atlas/textureAtlas24_06_27.png',
-            normalMap: 'assets/atlas/textureAtlas24_06_27_n.png',
-            atlasURL: 'assets/atlas/atlasMeta24_06_27.json'
+            textureURL: 'assets/atlasMeta24_08_07.png',
+            normalMap: 'assets/atlasMeta24_08_07_n.png',
+            atlasURL: 'assets/atlasMeta24_08_07.json'
         });
+
+        this.load.bitmapFont('mainFont', 'assets/Fonts/mainFont_0.png', 'assets/Fonts/mainFont.fnt');
 
         
 
@@ -312,21 +782,29 @@ class StartScene extends Phaser.Scene {
         //this.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim', frameWidth: 64, frameHeight: 64 });
         //scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim.png', frameWidth: 64, frameHeight: 64 }); 
         //debugger
-        //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-
+        this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
+        this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
-
+        this.load.image('titleLogo','assets/sprites/UI_titleLogo.png')
+        this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
+        this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
+        this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
+        this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
+        this.load.image('comboBG','assets/sprites/UI_comboBG.png')
         // Tilemap
-        this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
+        this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png']);
 
         // Load Tilemap as Sprite sheet to allow conversion to Sprites later.
         // Doesn't need to be GPU optimized unless we use it more regularly.
-        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-        this.load.image('blackHole', '/assets/sprites/blackHole.png');
+        this.load.spritesheet('blackholeAnim', '/assets/sprites/blackholeAnim.png',{ frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('extractHole', '/assets/sprites/extractHole.png',{ frameWidth: 64, frameHeight: 64 });
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -334,8 +812,10 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiGlassR', 'assets/sprites/UI_Glass_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiPanelL', 'assets/sprites/UI_Panel_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
+        this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
+        this.load.image('boostMeterBG', 'assets/sprites/UI_boostMeterBG.png');
         this.load.image('atomScoreFrame', 'assets/sprites/UI_atomScoreFrame.png');
         this.load.image('fuseFrame', 'assets/sprites/UI_fuseHolder.png');
         //this.load.image('boostMask', "assets/sprites/boostMask.png");
@@ -350,8 +830,8 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
-        //this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
-
+        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
+        this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
             /**
@@ -365,12 +845,14 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
-        //this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
-        this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 24, frameHeight: 48 });
+        this.load.spritesheet('UI_CapSpark', 'assets/sprites/UI_CapSpark.png', { frameWidth: 12, frameHeight: 24 });
         //this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
         this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
@@ -384,6 +866,8 @@ class StartScene extends Phaser.Scene {
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
         this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
+        this.load.audio('pop03', [ 'pop03.ogg', 'pop03.mp3']);
+        this.load.audio('chime01',[ 'chime01.ogg', 'chime01.mp3'])
         //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
@@ -432,9 +916,22 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+
         const ourPersist = this.scene.get("PersistScene");
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GamesScene");
         const ourStartScene = this.scene.get("StartScene");
+
+        //pauses and resumes sound so queued sfx don't play all at once upon resuming
+        window.addEventListener('focus', function () {
+            game.sound.pauseAll();
+            //console.log('All sounds paused:', game.sound.sounds);
+        });
+        
+        window.addEventListener('blur', function () {
+            game.sound.resumeAll();
+            //console.log('All sounds resumed:', game.sound.sounds);
+        });
         
         
 
@@ -468,7 +965,10 @@ class StartScene extends Phaser.Scene {
             "120s",
             "130s"
         );
-        gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
+        if (ANALYTICS_ON) {
+            gameanalytics.GameAnalytics.initialize("95237fa6c6112516519d921eaba4f125", "12b87cf9c4dc6d513e3f6fff4c62a8f4c9a63570");
+        }
+        
         gameanalytics.GameAnalytics.setEnabledInfoLog(true);
         //gameanalytics.GameAnalytics.setEnabledVerboseLog(true);
         
@@ -479,170 +979,18 @@ class StartScene extends Phaser.Scene {
 
         
         ///
-        // AUDIO
-        this.pop02 = this.sound.add('pop02')
+        
+
         
         
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
+        this.scene.launch('SpaceBoyScene');
+        this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
-
- 
-
-
-
-        this.add.text(SCREEN_WIDTH/2, GRID * 5.5, 'PORTAL SNAKE',{font: '32px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        //var card = this.add.image(SCREEN_WIDTH/2, 6*GRID, 'megaAtlas', 'howToCardNew.png').setDepth(10).setOrigin(0.5,0);
-        //card.setOrigin(0,0);
-        //card.setScale(1)
-
-        // Masks
-
-
-        const graphics = this.add.graphics();
-
-        this.tweenValue = 0;
-        this.openingTweenStart = this.tweens.addCounter({
-            from: 0,
-            to: 600,
-            ease: 'Sine.InOut',
-            duration: 1000,
-            onUpdate: tween =>
-                {   
-                    graphics.clear();
-                    var value = (tween.getValue());
-                    this.tweenValue = value
-                    this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                    var geomask1 = this.shape1.createGeometryMask();
-                    
-                    this.cameras.main.setMask(geomask1,true)
-                    
-                }
-        });
-
-        // Tutorial Panels
-
-        this.selectedPanel = 1;
-
-        this.tutText1 = this.add.text(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 20,
-             'Press arrow keys to move.',
-             {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0).setAlpha(0);
-        this.tutText2 = this.add.text(SCREEN_WIDTH + 250, GRID * 11,
-            'Collect atoms to grow longer.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
-        this.tutText3 = this.add.text(SCREEN_WIDTH + 250 * 3.5, GRID * 20,
-            'Use portals to bend spacetime.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
-        this.tutText4 = this.add.text((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 20,
-            'Boost with spacebar.',
-            {font: '24px Oxanium', "fontSize":'48px'}).setOrigin(0.5,0);
-        
-        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
-             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutAll').setScale(2).setAlpha(0);
-
-        this.tutSnake = this.add.sprite(SCREEN_HEIGHT/2,
-             SCREEN_WIDTH/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(2).setAlpha(0);
-
-        this.time.delayedCall(600, event => {
-            this.tweens.add({
-                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
-                alpha: {from: 0, to: 1},
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
-        panel1.setDepth(100)
-        panel1.setScale(0)
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel1,
-                scale: 1,
-                width: 480,
-                height: 320,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 72,72,72,72);
-        panel2.setDepth(100)
-        panel2.setScale(0)
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel2,
-                scale: 1,
-                width: 400,
-                height: 280,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomSmall.play('atom04idle')
-        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomMedium.play('atom03idle')
-        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomLarge.play('atom02idle')
-        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomCharged.play('atom01idle')
-        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomElectrons.play('electronIdle')
-
-        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
-        panel3.setDepth(100)
-
-        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
-            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal1.play('portalIdle')
-        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal2.play('portalIdle')
-
-        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
-        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(2);
-        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
-        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(2);
-
-        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 480, 320, 72,72,72,72);
-        panel4.setDepth(100)
-
-        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
-            SCREEN_HEIGHT/2 + GRID  * 4.75).setDepth(103).setOrigin(0.5,0.5);
-       this.tutSPACE.play('tutSpace').setScale(2);
-
-       this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
-        SCREEN_WIDTH/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(2);
-
-        this.panels = []
-        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
-            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
-            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
-            panel4, this.tutText4,this.tutSPACE,this.tutSnake4)
-
-        this.panelsContainer = this.make.container(0, 0);
-        this.panelsContainer.add(this.panels)
-
-
-
-        
-        
+        //temporarily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
             console.log("Testing LOCAL STORAGE. Has not played.", );
@@ -652,127 +1000,69 @@ class StartScene extends Phaser.Scene {
             console.log("Testing LOCAL STORAGE Has played.", );
         }
 
-        this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive();
-        this.continueText.setVisible(false)
-        if (!this.hasPlayedBefore) {
-            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
-        }
-        else {
-            this.continueText.setVisible(true)        
+
+
+
+        this.portalColors = PORTAL_COLORS.slice();
+        // Select a random color
+        let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
+
+        var hexToInt = function (hex) {
+            return parseInt(hex.slice(1), 16);
         }
 
-        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
-        this.continueText.setVisible(true)
+        let intColor = hexToInt(randomColor);
+        //console.log(_portalColor)
+
         
-        this.tweens.add({
-            targets: this.continueText,
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
+
+        //title logo
+        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
+        var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,);
+        //titlePortal.setTint(_portalColor);
+        titlePortal.setTint(intColor).setScale(1.25);
+        titlePortal.play('portalIdle');
+
+        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "white",
+            "textAlign": 'center'
+
+        }),
+                `Press Space`
+        ).setOrigin(0.5,0.5).setScale(0.5);
+
+        this.pressToPlayTween = this.tweens.add({
+            targets: this.pressToPlay,
+            alpha: 0,
             duration: 1000,
+            ease: 'Sine.InOut',
+            yoyo: true,
             repeat: -1,
-            yoyo: true
         });
-        
-        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 +300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowR.play('startArrowIdle').setAlpha(0);
-        this.panelArrowR.angle = 90;
-        
-        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 -300, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowL.play('startArrowIdle');
-        this.panelArrowL.angle = 270;
-        this.panelArrowL.setVisible(false).setAlpha(0);
 
-        this.input.keyboard.on('keydown-RIGHT', e => {
-            
-            const ourStartScene = this.scene.get('StartScene');
-            const ourPersist = this.scene.get('PersistScene');
-            if (this.selectedPanel < 4) {
-                this.pop02.play();
-                this.selectedPanel += 1
-            }
-            this.panelContainerX = 0
-            switch (this.selectedPanel){
-                case 1:
-                    this.panelContainerX = 0;
-                    ourStartScene.panelArrowL.setVisible(false)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -625;
-                    ourStartScene.panelArrowL.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -1250;
-                    ourStartScene.panelArrowL.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x = 60;
-                    this.panelContainerX = -1870;
-                    ourStartScene.panelArrowL.setVisible(true)
-                    ourStartScene.panelArrowR.setVisible(false)
-                    this.continueText.setVisible(true)
-                    break;
-            }
-            
-            this.tweens.add({
-                targets: this.panelsContainer,
-                x: this.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-            });   
-        })
-        this.input.keyboard.on('keydown-LEFT', e => {
-            const ourStartScene = this.scene.get('StartScene');
-            const ourPersist = this.scene.get('PersistScene');
-            if (this.selectedPanel > 1) {
-                this.selectedPanel -= 1
-                this.pop02.play();
-            }
-            this.panelContainerX = 0
-            switch (this.selectedPanel){
-                case 1:
-                    ourPersist.bgCoords.x = 0;
-                    this.panelContainerX = 0;
-                    ourStartScene.panelArrowL.setVisible(false)
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -625;
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1250;
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1870;
-                    ourStartScene.panelArrowR.setVisible(true)
-                    break;
-            }
-            
-            
-            this.tweens.add({
-                targets: this.panelsContainer,
-                x: this.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: function () {
-                    if (ourStartScene.selectedPanel < 4) {
-                        ourStartScene.panelArrowR.setVisible(true);
-                    }
-                    else{
-                        ourStartScene.panelArrowR.setVisible(false);
-                    }
-                    
-                }
-            });   
-        })
+        //this.input.keyboard.on('keydown-SPACE', function () {
 
-        var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
+            // proof of concept for inteserting tutoral panels
+            //showTutorial(this, 'GameScene');
+
+
+
+            this.scene.start('MainMenuScene', {
+                portalTint: intColor,
+                portalFrame: Phaser.Math.Wrap(
+                    titlePortal.anims.currentFrame.index + 1, 
+                    0, 
+                    titlePortal.anims.getTotalFrames() - 1
+                    )
+            });
+        //}, this);
+        
+
+        
+
+        /*var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(50);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(50);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(50);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(50);
@@ -802,10 +1092,10 @@ class StartScene extends Phaser.Scene {
             wallShimmerBottom.play('wrapBlock07');
             this.dreamWalls.push(wallShimmerBottom);
         
-        }
+        }*/
 
-        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-        this.UIbackground.setScale(32); 
+        //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+        //this.UIbackground.setScale(32); 
 
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
@@ -844,7 +1134,7 @@ class StartScene extends Phaser.Scene {
                 this.stageHistory = [stage01, stage02, stage03];
                 this.scene.start('ScoreScene');
                 */
-            }
+            /*}
             else {
                                                 
 
@@ -870,7 +1160,8 @@ class StartScene extends Phaser.Scene {
                     //this.scene.get("UIScene").setVisible(false);
                     
                     //this.scene.launch('UIScene');
-                    scene.scene.launch('GameScene');
+                    //scene.scene.launch('GameScene');
+                    scene.scene.launch('MainMenuScene');
                     ourPersist.starterTween.stop();
                     ourPersist.openingTween(scene.tweenValue);
                     scene.openingTweenStart.stop();
@@ -879,26 +1170,23 @@ class StartScene extends Phaser.Scene {
                     //var ourGameScene = this.scene.get("GameScene");
                     //console.log(e)
                 }
-            });
+            });*/
 
         }
-        var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");
+    }
+        
+        // Shows Local Storage Sizes for Debugging.
 
-        this.continueText.on('pointerdown', e => {
-            console.log("I CLICK");
-            if (this.continueText.visible === true) {
-                console.log("I click and continue");
-                onInput(ourStartScene);
-            }
-        });
+        if (DEBUG_SHOW_LOCAL_STORAGE) {
+            var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");            
+        }
+        
 
-        this.input.keyboard.on('keydown-SPACE', e => {
-            onInput(ourStartScene);
 
-        });
         
         // #region Pre-roll Zeds
 
+        /** For James later to calcualte zed level better.
         console.time("Full Roll");
 
         var lowestNum = 4294967295; // Start at Max Int
@@ -921,6 +1209,7 @@ class StartScene extends Phaser.Scene {
 
         rolls--;
         } while (rolls > 0);
+        */
 
 
 
@@ -987,6 +1276,770 @@ class StartScene extends Phaser.Scene {
     }
 }
 
+// #region MainMenuScene
+class MainMenuScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'MainMenuScene', active: false});
+    }
+    preload(){
+        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
+        this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
+
+    }
+    create(props) {
+
+        var { startingAnimation = "default" } = props;
+
+        var { portalTint = parseInt("0xFFFFFF", 16)} = props;
+        var { portalFrame = 0 } = props;
+        
+        
+        
+
+        if (startingAnimation === "default") {
+            var titleContainer = this.add.container().setDepth(51);
+
+            var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
+            var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,);
+            
+            titlePortal.setTint(portalTint).setScale(1.25);
+            titlePortal.play('portalIdle', {startFrame: portalFrame} );
+
+
+            titleContainer.add(titleLogo);
+            titleContainer.add(titlePortal);
+            
+            var titleTween = this.tweens.add({
+                targets: titleContainer,
+                y: -GRID * 7,
+                duration: 750,
+                ease: 'Sine.InOut',
+            });
+            
+        } else if (startinAnimation === "menuReturn") {
+
+        }
+
+
+        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+        const thisScene = this.scene.get('MainMenuScene');
+        const ourPersist = this.scene.get('PersistScene');
+        const ourMap = this.scene.get('GalaxyMapScene');
+
+        this.pressedSpace = false;
+
+
+
+
+        //description panel
+        this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
+        this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
+            'uiPanelL', 'Glass', 
+            GRID * 10, 75, 
+            16, 16, 16, 16).setDepth(50).setOrigin(0,0).setAlpha(0);
+        this.descriptionText = this.add.dom(SCREEN_WIDTH/2 + GRID * 3.25, SCREEN_HEIGHT/2 - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '16px',
+            "fontWeight": 200,
+            "color": "white",
+            "width": '210px',
+            "height": '75px',
+            "textAlign": 'left'
+
+        }),
+                `${this.descriptionDom}`
+        ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+
+
+        this.graphics = this.add.graphics({ lineStyle: { width: 1, color: 0xffffff }, fillStyle: { color: 0xffffff } });
+        this.descriptionPointer = new Phaser.Geom.Circle(SCREEN_WIDTH/2 - GRID * 1, SCREEN_HEIGHT/2 + 3, 3);
+        this.graphics.fillCircleShape(this.descriptionPointer);
+        this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
+        this.graphics.setAlpha(0);
+
+        this.graphics.setDepth(50)
+
+
+
+        var menuOptions = {
+            'practice': function () {
+                console.log("Practice");
+                return true;
+            },
+            'adventure': function () {   
+                thisScene.scene.launch('TutorialScene');
+                thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+                thisScene.scene.stop();
+                return true;
+            },
+            'extraction': function () {
+                return true;
+            },
+            'championship': function () {
+                return true;
+            },
+            'gauntlet': function () {
+                return true;
+            },
+            'endless': function () {
+                return true;
+            },
+            'extras': function () {
+                return true;
+            },
+            'options': function () {
+                return true;
+            },
+            'exit': function () {
+                return true;
+            },
+        }
+
+        var menuList = Object.keys(menuOptions);
+        var cursorIndex = 1;
+        var textStart = 152;
+        var spacing = 24;
+
+        
+        var menuElements = []
+        for (let index = 0; index < menuList.length; index++) {
+            if (index == 2 || index == 3 || index == 5) {
+                var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": "darkgrey",
+                    "text-decoration": 'line-through'
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+            }
+            else if (index == 8) { //exit button
+                var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": "#181818",
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+            }
+            else{
+                var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": "#181818",
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0); 
+            }
+            menuElements.push(textElement);
+            
+        }
+        //menuElements[1].setAlpha(0);
+
+        //panels
+
+        let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
+        let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
+
+        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
+        
+        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
+
+        //menu arrows
+        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
+
+        var selected = menuElements[cursorIndex];
+        selected.node.style.color = "white";
+
+        var mapEngaged = false;
+        this.menuState = 0
+
+        
+
+        this.input.keyboard.on('keydown-SPACE', function() {
+            if (this.menuState == 1) {
+                
+            }
+        })
+
+
+
+        this.input.keyboard.on('keydown-LEFT', e => {
+            if (this.pressedSpace && this.menuState == 0) {
+                this.cameras.main.scrollX -= SCREEN_WIDTH
+                ourMap.cameras.main.scrollX -= SCREEN_WIDTH
+                thisScene.scene.sleep('MainMenuScene');
+                this.menuState = 1;
+            }
+        });
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            if (this.pressedSpace && this.menuState == 1) {
+                this.cameras.main.scrollX += SCREEN_WIDTH
+                ourMap.cameras.main.scrollX += SCREEN_WIDTH
+                thisScene.scene.wake('MainMenuScene');
+                this.menuState = 0;
+            }
+        });
+    
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            if (thisScene.pressedSpace) {
+                
+
+                if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
+                    selected.node.style.color = 'darkgrey';
+                }
+                else{
+                    selected.node.style.color = '#181818';
+                }
+                
+                cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length);
+                selected = menuElements[cursorIndex];
+                if (cursorIndex == 8) {
+                    menuSelector.x = menuSelector.x - GRID * 1.75
+                    menuSelector.y = selected.y + GRID * 2.25
+                    thisScene.exitButton.setFrame(1);
+                } else {
+                    thisScene.exitButton.setFrame(0);
+                    menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
+                    menuSelector.y = selected.y + 7
+                }
+                selected.setAlpha(1);
+                
+
+                
+
+                if (cursorIndex >= 2 && cursorIndex <= 5) {
+                    selected.node.style.color = "darkgrey";
+                    selected.setAlpha(1)
+                }
+                else{
+                    selected.node.style.color = "white";
+                    selected.setAlpha(1)
+                }
+                
+                ourPersist.bgCoords.y += 5;
+                
+                thisScene.changeMenuSprite(cursorIndex);
+                //upArrow.y = selected.y - 42;
+                //downArrow.y = selected.y + 32;
+
+                //continueTextUI.setText(`[GOTO ${selected[1]}]`);
+            }
+            
+        }, [], this);
+
+        this.input.keyboard.on('keydown-UP', function() {
+            if (thisScene.pressedSpace) {
+                if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
+                    selected.node.style.color = 'darkgrey';
+                }
+                else{
+                    selected.node.style.color = '#181818';
+
+                }
+                cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
+                selected = menuElements[cursorIndex];
+                if (cursorIndex == 8) {
+                    menuSelector.x = menuSelector.x - GRID * 1.75
+                    menuSelector.y = selected.y + GRID * 2.25
+                    thisScene.exitButton.setFrame(1);
+                } else {
+                    thisScene.exitButton.setFrame(0);
+                    menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
+                    menuSelector.y = selected.y + 7
+                }
+                selected.setAlpha(1);
+                
+                selected = menuElements[cursorIndex];
+                if (cursorIndex >= 2 && cursorIndex <= 5) {
+                    selected.node.style.color = "darkgrey";
+                    selected.setAlpha(1)
+
+                }
+                else{
+                    selected.node.style.color = "white";
+                    selected.setAlpha(1)
+                }
+    
+                ourPersist.bgCoords.y -= 5;
+    
+                thisScene.changeMenuSprite(cursorIndex);
+            }
+        }, [], this);
+
+        
+
+        
+
+        
+        
+        var menuFadeTween = this.tweens.add({
+            targets: [this.practiceButton,this.practiceIcon,this.adventureButton,this.adventureIcon,
+                this.extractionButton,this.extractionIcon,this.championshipButton,
+                this.championshipIcon,this.gauntletButton,this.gauntletIcon,
+                this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
+                this.optionsButton,this.optionsIcon,menuSelector,
+                this.descriptionPanel,this.descriptionText,
+                arrowMenuL,arrowMenuR,
+                ...menuElements,
+                this.exitButton,
+                this.graphics
+            ],
+            alpha: 1,
+            duration: 100,
+            delay: 500,
+            ease: 'linear',
+        });
+        titleTween.pause();
+        menuFadeTween.pause();
+        
+        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "white",
+            "textAlign": 'center'
+
+        }),
+                `Press Space`
+        ).setOrigin(0.5,0.5).setScale(0.5);
+
+        this.pressToPlayTween = this.tweens.add({
+            targets: this.pressToPlay,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Sine.InOut',
+            yoyo: true,
+            repeat: -1,
+        });
+
+        this.input.keyboard.on('keydown-SPACE', function() {
+        if (!thisScene.pressedSpace) {
+            thisScene.pressToPlayTween.stop();
+            thisScene.pressToPlay.setAlpha(0)
+            thisScene.pressedSpace = true;
+            titleTween.resume();
+            menuFadeTween.resume();            
+        }
+        else{
+            console.log(menuOptions[menuList[cursorIndex]].call());
+        }
+
+        });
+
+        
+        
+    }
+    update() {
+        this.graphics.clear();
+            if (this.pressedSpace) {
+                this.graphics.fillCircleShape(this.descriptionPointer);
+            
+                //left horizontal line connecting left dot
+                this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y - 0.5,
+                    this.descriptionPanel.x - 8,this.descriptionPointer.y - 0.5);
+                
+                //vertical line
+                this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
+                    this.descriptionPanel.x - 8,this.descriptionPanel.y + this.descriptionPanel.height/2);
+        
+                //second horizontal line from left
+                this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
+                    this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2);
+            } 
+        }
+
+    // Function to convert hex color to RGB
+    hexToInt(hex) {
+        return parseInt(hex.slice(1), 16);
+    }
+    changeMenuSprite(cursorIndex){
+        this.practiceIcon.setFrame(0);
+        this.adventureIcon.setFrame(1);
+        this.extractionIcon.setFrame(2);
+        this.championshipIcon.setFrame(3);
+        this.gauntletIcon.setFrame(4);
+        this.endlessIcon.setFrame(5);
+        this.extrasIcon.setFrame(6);
+        this.optionsIcon.setFrame(7);
+        
+
+        this.tweens.add({
+            targets: [this.practiceButton,this.adventureButton,this.extractionButton,this.championshipButton,
+                this.gauntletButton,this.endlessButton,this.extrasButton,this.optionsButton],
+            width: 136,
+            duration: 100,
+            ease: 'Sine.InOut',
+        });
+
+        let _xOffset = SCREEN_WIDTH/2;
+        let _yOffset = SCREEN_HEIGHT/2+ 3;
+
+        switch (cursorIndex) {
+            case 0:
+                this.descriptionDom = 'Build your skills and replay any level you have gotten to previously.';
+                this.descriptionText.setText(this.descriptionDom)
+                this.practiceIcon.setFrame(8)
+                this.tweens.add({
+                    targets: this.practiceButton,
+                    width: 88,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2.5,
+                    y: _yOffset - GRID * 2,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                
+                break;
+            case 1:
+                this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.';
+                this.descriptionText.setText(this.descriptionDom)
+                this.adventureIcon.setFrame(9)
+                this.tweens.add({
+                    targets: this.adventureButton,
+                    width: 104,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 75,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 1,
+                    y: _yOffset,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 2:
+                this.descriptionDom = 'Playable in full game!';
+                this.descriptionText.setText(this.descriptionDom)
+                this.extractionIcon.setFrame(10)
+                this.tweens.add({
+                    targets: this.extractionButton,
+                    width: 106,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 1,
+                    y: _yOffset + GRID * 2,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 3:
+                this.descriptionDom = 'Playable in full game!';
+                this.descriptionText.setText(this.descriptionDom)
+                this.championshipIcon.setFrame(11)
+                this.tweens.add({
+                    targets: this.championshipButton,
+                    width: 124,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset + GRID * .5,
+                    y: _yOffset + GRID * 4,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 4:
+                this.descriptionDom = 'Beat adventure mode to unlock.';
+                this.descriptionText.setText(this.descriptionDom)
+                this.gauntletIcon.setFrame(12)
+                this.tweens.add({
+                    targets: this.gauntletButton,
+                    width: 94,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2,
+                    y: _yOffset + GRID * 6,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 5:
+                this.descriptionDom = 'Playable in full game!';
+                this.descriptionText.setText(this.descriptionDom)
+                this.endlessIcon.setFrame(13)
+                this.tweens.add({
+                    targets: this.endlessButton,
+                    width: 84,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2.75,
+                    y: _yOffset + GRID * 8,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 6:
+                this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
+                this.descriptionText.setText(this.descriptionDom)
+                this.extrasIcon.setFrame(14)
+                this.tweens.add({
+                    targets: this.extrasButton,
+                    width: 76,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 3.5,
+                    y: _yOffset + GRID * 10,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 7:
+                this.descriptionDom = 'Configure game settings.';
+                this.descriptionText.setText(this.descriptionDom)
+                this.optionsIcon.setFrame(15)
+                this.tweens.add({
+                    targets: this.optionsButton,
+                    width: 84,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 2.75,
+                    y: _yOffset + GRID * 12,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+            case 8:
+                this.descriptionDom = 'Quit to desktop.';
+                this.descriptionText.setText(this.descriptionDom) 
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: _xOffset - GRID * 10.5,
+                    y: _yOffset - GRID * 10.25,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                break;
+
+                
+            default:
+                //;    
+                break;
+        }
+    }
+}
+
+// #region Galaxy Map
+class GalaxyMapScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'GalaxyMapScene', active: true});
+    }
+    create() {
+        this.input.keyboard.on('keydown-TAB', function (event) {
+            event.preventDefault();
+        });
+        this.cameras.main.scrollX += SCREEN_WIDTH
+        
+        const thisScene = this.scene.get('GalaxyMapScene');
+        const ourMenuScene = this.scene.get('MainMenuScene');
+
+        this.arrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        this.arrowR.play('arrowMenuIdle').setAlpha(1);
+
+        this.galaxyMapState = 0;
+        
+        
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            if (ourMenuScene.menuState == 1 && this.galaxyMapState == 0){
+                ourMenuScene.menuState = 0;
+                thisScene.cameras.main.scrollX += SCREEN_WIDTH
+                ourMenuScene.cameras.main.scrollX += SCREEN_WIDTH
+                thisScene.scene.wake('MainMenuScene');
+                thisScene.scene.sleep('GalaxMapScene');
+            }
+        })
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            this.galaxyMapState = 1;
+            this.arrowR.setAlpha(0);
+            
+        })
+        this.input.keyboard.on('keydown-TAB', e => {
+            this.galaxyMapState = 0;
+            this.arrowR.setAlpha(1);
+        })
+            
+        this.add.rectangle(SCREEN_WIDTH/2, (Y_OFFSET + SCREEN_HEIGHT)/2, 294, 280, 0x8fd3ff).setAlpha(0.2);
+
+        // Define the nodes
+
+        let _centerX = SCREEN_WIDTH/2
+        let _centeryY = (Y_OFFSET + SCREEN_HEIGHT)/2
+        let _segment1 = 50
+
+        this.nodes = [
+            { name: 'World_1-1', x: _centerX, y: _centeryY, neighbors: { up: 4, right: 1, down: 3, left: 2 } }, // Center node
+            
+            { name: 'World_1-2', x: _centerX + _segment1, y: _centeryY, neighbors: { left: 0 , right: 5} }, // Ring 1
+            { name: 'World_2-2', x: _centerX - _segment1, y: _centeryY, neighbors: { right: 0 } },
+            { name: 'World_3-2', x: _centerX, y: _centeryY + _segment1, neighbors: { up: 0 } },
+            { name: 'World_4-2', x: _centerX, y: _centeryY - _segment1, neighbors: { down: 0 } },
+
+            { name: 'World_2-3', x: _centerX + _segment1 * 2, y: _centeryY, neighbors: { left: 1 } }, // Ring 2
+            //{ name: 'World_2-2', x: _centerX - _segment1, y: _centeryY, neighbors: { right: 0 } },
+            //{ name: 'World_3-2', x: _centerX, y: _centeryY + _segment1, neighbors: { up: 0 } },
+            //{ name: 'World_4-2', x: _centerX, y: _centeryY - _segment1, neighbors: { down: 0 } }
+        ];
+
+        // Create graphics for nodes
+        this.nodeGraphics = this.nodes.map(node => {
+            let graphics = this.add.graphics();
+            graphics.fillStyle(0xffffff, 1);
+            graphics.fillCircle(node.x, node.y, 3);
+            return graphics;
+        });
+
+        // Current selected node index
+        this.currentNodeIndex = 0;
+        this.highlightNode(this.currentNodeIndex);
+
+        // Input handling
+        this.cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    update() {
+        //const ourMenuScene = this.scene.get('MainMenuScene');
+        if (this.galaxyMapState == 1) {
+            if (Phaser.Input.Keyboard.JustDown(this.cursors.left)) {
+                this.changeNode('left');
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.right)) {
+                this.changeNode('right');
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+                this.changeNode('up');
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+                this.changeNode('down');
+            }
+        }
+    }
+
+
+    changeNode(direction) {
+        let currentNode = this.nodes[this.currentNodeIndex];
+        let nextNodeIndex = currentNode.neighbors[direction];
+
+        if (nextNodeIndex !== undefined) {
+            // Remove highlight from current node
+            this.highlightNode(this.currentNodeIndex, false);
+
+            // Update current node index
+            this.currentNodeIndex = nextNodeIndex;
+
+            // Highlight new node
+            this.highlightNode(this.currentNodeIndex);
+        }
+    }
+
+    highlightNode(index, highlight = true) {
+        let node = this.nodes[index];
+        let graphics = this.nodeGraphics[index];
+        graphics.clear();
+        graphics.fillStyle(highlight ? 0xff0000 : 0xffffff, 1);
+        graphics.fillCircle(node.x, node.y, 3);
+    }
+}
+
 class PersistScene extends Phaser.Scene {
     constructor () {
         super({key: 'PersistScene', active: false});
@@ -996,66 +2049,74 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 4; // 4
+        this.coins = START_COINS;
     }
-    
-    preload(){
-        this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
-
-    }
+    /*preload() {
+        this.cache.shader.add(waveShader.key, waveShader);
+    }*/
     
     create() {
 
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
+    this.add.image(SCREEN_WIDTH/2 - 1,GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
+    this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+        .setOrigin(0.0,0.0).setDepth(11);
+    this.comboCover.setScrollFactor(0);
+    this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
+    //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
 
+    
 
+    this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
+
+    //waveshader
+    //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
+    this.wavePipeline = game.renderer.pipelines.get('WaveShaderPipeline');
+    
     // # Backgrounds
 
     // for changing bg sprites
     this.bgTimer = 0;
     this.bgTick = 0;
 
-             // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-            //this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
-            //this.UIbackground.setScale(32); 
+    // Furthest BG Object
+    this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+    //this.bgFurthest.tileScaleX = 2;
+    //this.bgFurthest.tileScaleY = 2;
 
-            // Furthest BG Object
-            this.bg0 = this.add.tileSprite(0, 0, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-            this.bg0.tileScaleX = 3;
-            this.bg0.tileScaleY = 3;
     
-            // Scrolling BG1
-            this.bg = this.add.tileSprite(0, 0, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-            this.bg.tileScaleX = 3;
-            this.bg.tileScaleY = 3;
-            
-            // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            this.bg2.tileScaleX = 3;
-            this.bg2.tileScaleY = 3;
-            
-            // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(0, 0, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-            this.bg3.tileScaleX = 3;
-            this.bg3.tileScaleY = 3;
-    
-            // Hue Shift
-            this.fx = this.bg.preFX.addColorMatrix();
-            this.fx2 = this.bg0.preFX.addColorMatrix();
+    // Scrolling BG1
+    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+    //this.bgBack.tileScaleX = 2;
+    //this.bgBack.tileScaleY = 2;
     
     
-            //if (this.stage === "Stage-04") {
-            //    this.fx.hue(330);
-            //}
-            this.scrollFactorX = 0;
-            this.scrollFactorY = 0;
-            this.bgCoords = new Phaser.Math.Vector2(0,0);
+    // Scrolling bgFront Planets
+    this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+    
+    // Scrolling bgScrollMid Stars (depth is behind planets)
+    this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+    //this.bgMid.tileScaleX = 2;
+    //this.bgMid.tileScaleY = 2;
+
+    // Hue Shift
+
+    this.fx = this.bgBack.preFX.addColorMatrix();
+    this.fx2 = this.bgFurthest.postFX.addColorMatrix();
+
+    //this.fx2.hue(90)
+    this.bgFurthest.setPipeline('WaveShaderPipeline');
+    //this.fx2 = this.bgFurthest.preFX.addColorMatrix();
+
+    this.scrollFactorX = 0;
+    this.scrollFactorY = 0;
+    this.bgCoords = new Phaser.Math.Vector2(0,0);
 
     const graphics = this.add.graphics();
         
-    this.starterTween = this.tweens.addCounter({
+    /*this.starterTween = this.tweens.addCounter({
         from: 0,
         to: 600,
         ease: 'Sine.InOut',
@@ -1067,12 +2128,12 @@ class PersistScene extends Phaser.Scene {
                 this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
                 var geomask1 = this.shape1.createGeometryMask();
                 
-                this.bg.setMask(geomask1,true)
-                this.bg0.setMask(geomask1,true)
-                this.bg2.setMask(geomask1,true)
-                this.bg3.setMask(geomask1,true)
+                this.bgBack.setMask(geomask1,true)
+                this.bgFurthest.setMask(geomask1,true)
+                this.bgFront.setMask(geomask1,true)
+                this.bgMid.setMask(geomask1,true)
             }
-    });
+    });*/
     
     
     
@@ -1090,20 +2151,21 @@ class PersistScene extends Phaser.Scene {
     updateSumOfBest(this);
 
     const styleBottomText = {
-        "font-size": '8px',
+        "font-size": '12px',
         "font-weight": 400,
         "text-align": 'right',
     }   
 
-    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 1, 'div', Object.assign({}, STYLE_DEFAULT, 
+    
+    this.zedsUI = this.add.dom(2, SCREEN_HEIGHT - 2, 'div', Object.assign({}, STYLE_DEFAULT, 
         styleBottomText
         )).setHTML(
             `<span style ="color: limegreen;
-            font-size: 9px;
+            font-size: 14px;
             border: limegreen solid 1px;
             border-radius: 5px;
             padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
-    ).setOrigin(0, 1);
+    ).setOrigin(0, 1).setScale(.5);
 
 
     /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -1118,19 +2180,20 @@ class PersistScene extends Phaser.Scene {
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
     ).setOrigin(0,0.5);*/
 
-    this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '8px',
-        'letter-spacing': '3px',
+    this.gameVersionUI = this.add.dom(SCREEN_WIDTH, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+        'font-size': '12px',
+        'letter-spacing': '2px',
+        'text-align': 'right',
         })).setText(
             `portalsnake.${GAME_VERSION}`
-    ).setOrigin(1,1);
+    ).setOrigin(1,1).setScale(.5);
 
     this.scene.moveBelow("StartScene", "PersistScene");
 
     this.graphics = this.add.graphics();
     }
 
-    openingTween(tweenValue){
+   /* openingTween(tweenValue){
         this.tweens.addCounter({
             from: tweenValue,
             to: 600,
@@ -1143,13 +2206,13 @@ class PersistScene extends Phaser.Scene {
                     this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, value);
                     var geomask1 = this.shape1.createGeometryMask();
                     
-                    this.bg.setMask(geomask1,true)
-                    this.bg0.setMask(geomask1,true)
-                    this.bg2.setMask(geomask1,true)
-                    this.bg3.setMask(geomask1,true)
+                    this.bgBack.setMask(geomask1,true)
+                    this.bgFurthest.setMask(geomask1,true)
+                    this.bgFront.setMask(geomask1,true)
+                    this.bgMid.setMask(geomask1,true)
                 }
         });
-    }
+    }*/
     closingTween(){
         this.tweens.addCounter({
             from: 600,
@@ -1163,10 +2226,10 @@ class PersistScene extends Phaser.Scene {
                     this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
                     var geomask1 = this.shape1.createGeometryMask();
                     
-                    this.bg.setMask(geomask1,true)
-                    this.bg0.setMask(geomask1,true)
-                    this.bg2.setMask(geomask1,true)
-                    this.bg3.setMask(geomask1,true)
+                    this.bgBack.setMask(geomask1,true)
+                    this.bgFurthest.setMask(geomask1,true)
+                    this.bgFront.setMask(geomask1,true)
+                    this.bgMid.setMask(geomask1,true)
                 }
         });
     }
@@ -1184,38 +2247,44 @@ class PersistScene extends Phaser.Scene {
     }
     
     update(time, delta) {
-        console.log()
+
+        //this.wavePipeline.setUniform('uTime', time / 1000);
+        this.wavePipeline.set1f('uTime', time / 1000);
+        this.renderer.gl.uniform1f(this.wavePipeline.uTimeLocation, time / 1000);
+        
+
+        //console.log()
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;
 
 
-        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+        this.bgFurthest.tilePositionX = (Phaser.Math.Linear(this.bgBack.tilePositionX, 
             (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
-        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+        this.bgFurthest.tilePositionY = (Phaser.Math.Linear(this.bgBack.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
 
-        this.bg.tilePositionX = (this.bg0.tilePositionX ) * 4;
-        this.bg.tilePositionY = (this.bg0.tilePositionY ) * 4;
+        this.bgBack.tilePositionX = (this.bgFurthest.tilePositionX ) * 4;
+        this.bgBack.tilePositionY = (this.bgFurthest.tilePositionY ) * 4;
             
-        this.bg2.tilePositionX = (this.bg0.tilePositionX ) * 8;
-        this.bg2.tilePositionY = (this.bg0.tilePositionY ) * 8;
+        this.bgFront.tilePositionX = (this.bgFurthest.tilePositionX ) * 8;
+        this.bgFront.tilePositionY = (this.bgFurthest.tilePositionY ) * 8;
 
-        this.bg3.tilePositionX = (this.bg0.tilePositionX ) * 2;
-        this.bg3.tilePositionY = (this.bg0.tilePositionY ) * 2;
+        this.bgMid.tilePositionX = (this.bgFurthest.tilePositionX ) * 2;
+        this.bgMid.tilePositionY = (this.bgFurthest.tilePositionY ) * 2;
 
         this.bgTimer += delta;
 
         if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
             if (this.bgTick === 0) {
-                this.bg3.setTexture('megaAtlas', 'background02_3_2.png'); 
-                this.bg.setTexture('megaAtlas', 'background02_frame2.png'); 
+                this.bgMid.setTexture('megaAtlas', 'background02_3_2.png'); 
+                this.bgBack.setTexture('megaAtlas', 'background02_frame2.png'); 
                 this.bgTick += 1;
             }
 
             if (this.bgTimer >= 2000) {
                 if (this.bgTick === 1) {
-                    this.bg3.setTexture('megaAtlas', 'background02_3.png');
-                    this.bg.setTexture('megaAtlas','background02.png'); 
+                    this.bgMid.setTexture('megaAtlas', 'background02_3.png');
+                    this.bgBack.setTexture('megaAtlas','background02.png'); 
                     this.bgTimer = 0;
                     this.bgTick -=1;
                 }
@@ -1223,6 +2292,10 @@ class PersistScene extends Phaser.Scene {
             }   
         }
 
+        const pipeline = this.bgBack.pipeline;
+        if (pipeline && pipeline.setFloat1) {
+            pipeline.setFloat1('uTime', this.time.now / 1000);
+        }
     }
 
 }
@@ -1238,13 +2311,21 @@ class GameScene extends Phaser.Scene {
     init(props) {
         
         // #region Init Vals
+
+        // Game State Bools
+        this.tutorialState = false;
+
         // Arrays for collision detection
         this.atoms = [];
         this.foodHistory = [];
         this.walls = [];
         this.portals = [];
+        this.wallPortals = [];
         this.dreamWalls = [];
         this.nextStagePortals = [];
+        this.extractHole = [];
+
+        this.snakeLights = [];
 
         this.lastMoveTime = 0; // The last time we called move()
         this.nextScore = 0; // Calculated and stored after score screen finishes.
@@ -1264,15 +2345,16 @@ class GameScene extends Phaser.Scene {
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
+        this.portalParticles = [];
+        this.snakePortalingSprites = [];
 
         this.stageOver = false; // deprecated to be removed
 
         this.winned = false; // marked as true any time this.winCondition is met.
+        this.canContinue = true; // used to check for a true game over
 
         const { stage = START_STAGE } = props 
         this.stage = stage;
-        
-        //this.startingArrowState = true; // Deprecate
 
         this.moveInterval = SPEED_WALK;
 
@@ -1291,7 +2373,7 @@ class GameScene extends Phaser.Scene {
 
         // from  the  UI
         //this.score = 0;
-        var { score = 0 } = props
+        var { score = 0 } = props;
         this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
         this.stageStartScore = Math.trunc(score);
 
@@ -1305,7 +2387,8 @@ class GameScene extends Phaser.Scene {
 
         var {startupAnim = true } = props;
         this.startupAnim = startupAnim
-
+        var {camDirection = new Phaser.Math.Vector2(0,0)} = props
+        this.camDirection = camDirection
         this.scoreHistory = [];
 
         // BOOST METER
@@ -1321,8 +2404,13 @@ class GameScene extends Phaser.Scene {
     
     
     preload () {
-        
-
+        const ourTutorialScene = this.scene.get('TutorialScene');
+        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_1-1') {
+            console.log('noplay')
+            console.log(this.stage)
+            this.stage = 'Tutorial_1'
+            //this.tutorialState = true;
+        }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
         //const ourGame = this.scene.get("GameScene");
@@ -1336,13 +2424,111 @@ class GameScene extends Phaser.Scene {
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
+        const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
 
+        this.scene.moveBelow("SpaceBoyScene", "GameScene");
+
+
+
+        ourPersist.comboCover.setVisible(false);
+
+
+        if (this.stage == 'Tutorial_2') {
+            this.time.delayedCall(5000, () => {
+                this.tutorialPrompt(X_OFFSET + this.helpPanel.width/2 + GRID,
+                     Y_OFFSET + this.helpPanel.height/2 + GRID,2,)
+            })
+        }
+        if (this.stage == 'Tutorial_3') {
+            this.time.delayedCall(5000, () => {
+                this.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - this.helpPanel.width/2 - GRID,
+                    Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
+            })
+        }
+
+
+
+
+        
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
+
+
+        this.cameras.main.scrollX = -this.camDirection.y * 10
+        this.cameras.main.scrollY = -this.camDirection.x * 10
         
+        //ourPersist.bgCoords.x += this.camDirection.y/4;
+        //ourPersist.bgCoords.y += this.camDirection.x/4;
         
-        if (this.startupAnim) {
+        var cameraOpeningTween = this.tweens.add({
+            targets: this.cameras.main,
+            scrollX: 0,
+            scrollY: 0,
+            duration: 1000,
+            ease: 'Sine.Out',
+        });
+
+        //testing game creation logic
+        if (/^Tutorial_[1-2]$/.test(this.stage)) { //checks for Tutorial_1-2
+            this.tutorialState = true;
+            ourPersist.coins = 99;
+        }
+        else if (this.stage == 'Tutorial_3'){
+            this.tutorialState = true;
+            ourPersist.coins = 30;
+        }
+        //test portal walls
+        if (this.stage == 'testingFuturistic_x' ) {
+            var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
+            var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
+            var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
+            portalWall.play('pWallFlatMiddle')
+            portalWallL.play('pWallFlatLeft')
+            portalWallR.play('pWallFlatRight')
+            portalWall.setTint(0xFF0000)
+            portalWallL.setTint(0xFF0000)
+            portalWallR.setTint(0xFF0000)
+            var portalWall2 = this.add.sprite(X_OFFSET + GRID * 19, GRID * 23).setOrigin(0,0);
+            var portalWallL2 = this.add.sprite(X_OFFSET + GRID * 18, GRID * 23).setOrigin(0,0);
+            var portalWallR2 = this.add.sprite(X_OFFSET + GRID * 20, GRID * 23).setOrigin(0,0);
+            //this.wallLight = this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 66, 'lightColor').setIntensity(1.5);
+
+            portalWall2.play('pWallFlatMiddle')
+            portalWallL2.play('pWallFlatLeft')
+            portalWallR2.play('pWallFlatRight')
+            portalWall2.setTint(0xFF0000)
+            portalWallL2.setTint(0xFF0000)
+            portalWallR2.setTint(0xFF0000)
+            this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
+            this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
+            var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
+            var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
+            portalWallL3.play('pWallFlatLeft')
+            portalWallR3.play('pWallFlatRight')
+            portalWallR3.setTint(0x9900FF)
+            portalWallL3.setTint(0x9900FF)
+            var portalWallL4 = this.add.sprite(X_OFFSET + GRID * 15, GRID * 28).setOrigin(0,0);
+            var portalWallR4 = this.add.sprite(X_OFFSET + GRID * 16, GRID * 28).setOrigin(0,0);
+            portalWallL4.play('pWallFlatLeft')
+            portalWallR4.play('pWallFlatRight')
+            portalWallL4.setTint(0x9900FF)
+            portalWallR4.setTint(0x9900FF)
+            this.lights.addLight(X_OFFSET + GRID * 16, GRID * 28, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
+            this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
+        }
+
+        if (this.stage === "testingFuturistic") {
+            ourPersist.fx.hue(330);
+        }
+        if (this.stage === "testingRacetrack") {
+            ourPersist.fx.hue(300);
+        }
+        else{
+            ourPersist.fx.hue(0)
+        }
+
+        /*if (this.startupAnim) {
             var tween = this.tweens.addCounter({
                 from: 0,
                 to: 600,
@@ -1362,14 +2548,9 @@ class GameScene extends Phaser.Scene {
             tween.on('complete', ()=>{ //need this or else visual bugs occur
                 this.cameras.main.setMask(false)
             });
-        }
+        }*/
         //this.cameras.main.setAlpha(1)
-        this.time.delayedCall(1, function() {
-            ourGameScene.cameras.main.setAlpha(0)
-        });
-        this.time.delayedCall(17, function() {
-            ourGameScene.cameras.main.setAlpha(1)
-        });
+
         
         
         //loadAnimations(this);
@@ -1384,8 +2565,10 @@ class GameScene extends Phaser.Scene {
         this.coinSound = this.sound.add('coinCollect');
 
         var _chargeUp = this.sound.add('chargeUp');
+        this.pop03 = this.sound.add('pop03')
+        this.chime01 = this.sound.add('chime01')
 
-        _chargeUp.play();
+        //_chargeUp.play();
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage );
@@ -1413,23 +2596,73 @@ class GameScene extends Phaser.Scene {
         
 
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png').setDepth(40).setOrigin(0,0);
+        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png'
+            
+        ).setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
         this.UIbackground.setVisible(false);
-
-       
 
         // #region TileMap
 
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
+        this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
+
+        this.interactLayer = [];
+
+        for (let x = 0; x < this.map.width; x++) {
+            this.interactLayer[x] = [];
+            for (let y = 0; y < this.map.height; y++) {
+                this.interactLayer[x][y] = "empty";
+                //interactLayer[x][y].onOver() = function () {
+                //    return true;
+                //}
+            }
+        }
+
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
-        this.startCoords = { x: spawnTile.x, y: spawnTile.y};
+        //var spawnTile2 = this.mapShadow.findByIndex(9); // Snake Head Index
+        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
         spawnTile.index = -1; // Set to empty tile
-
+        //spawnTile2.index = -1; // Set to empty tile
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
         this.snake.direction = DIRS.STOP;
+
+        //set snake invisible so it can appear from blackhole
+        this.snake.head.setAlpha(0);
+
+        var startingBlackhole = this.add.sprite(this.snake.head.x + GRID * 0.5,this.snake.head.y + GRID * 0.5);
+        startingBlackhole.play('blackholeForm');
+        if (startingBlackhole.anims.getName() === 'blackholeForm')
+            {
+                startingBlackhole.playAfterRepeat('blackholeIdle');
+            }
+        
+        this.tweens.add({
+            targets: this.snake.head,
+            alpha: 1,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 125
+        });
+        this.time.delayedCall(1500, event => {
+            startingBlackhole.play('blackholeClose');
+        });
+        
+        
+
+        //moved below to only reference spawn tile from wall layer
+        /*var spawnTile = this.map.findByIndex(9); // Snake Head Index
+        console.log(spawnTile)
+        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+        spawnTile.index = -1; // Set to empty tile*/
+
+       
+
+       
+        //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
+
         
 
         this.tiledProperties = {};
@@ -1437,6 +2670,9 @@ class GameScene extends Phaser.Scene {
         this.map.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
         });
+        /*this.mapShadow.properties.forEach(prop => {
+            this.tiledProperties[prop.name] = prop.value;
+        });*/
 
 
         // Loading all Next Stage name to slug to grab from the cache later.
@@ -1456,6 +2692,9 @@ class GameScene extends Phaser.Scene {
 
         });
 
+        
+
+        
         this.load.start(); // Loader doesn't start on its own outside of the preload function.
         this.load.on('complete', function () {
             console.log('Loaded all the json properties for NextStages');
@@ -1466,10 +2705,10 @@ class GameScene extends Phaser.Scene {
         this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
-        ourPersist.gameVersionUI.setText(`portalsnake.${GAME_VERSION} -- ${this.stage}`);
+        ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
-        this.tileset = this.map.addTilesetImage('tileSheetx24');
+        this.tileset = this.map.addTilesetImage('tileSheetx12');
 
         // #region Wall Varients
         if (this.map.getLayer('Wall_1')) {
@@ -1491,34 +2730,82 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset]).setPipeline('Light2D');
+
+        if (this.map.getLayer('Ground')) {
+            this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET)
+            this.groundLayer.setPipeline('Light2D')
+            //this.groundLayer.setTint(0xaba2d8)
+        }
+
+        this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
+        
+        this.wallLayer.forEachTile(tile => {
+            if (tile.index === 481) { // No Food Spawn Tile
+                tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
+            }
+        });
+        
+        //var renderIndex = 9
+        //this.noRenderTiles = [8,9,10,11];
+        /*for (let index = 0; index < 256; index++) {
+            //renderIndex = noRenderTiles[index];
+            var noRenderTile = this.wallLayerShadow.findByIndex(renderIndex)
+            noRenderTile.index = -1
+            //noRenderTiles.push(noRenderTile)
+        }*/
+
+        //var noRenderTile = this.wallLayerShadow.findByIndex(9)
+        //noRenderTile.index = -1
+        
+        this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+        this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
+
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
+       
 
         if (this.map.getLayer('Food')) {
-            this.foodLayer = this.map.createLayer('Food', [this.tileset]);
+            this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET, Y_OFFSET);
             this.foodLayer.visible = false;
 
             this.foodLayer.forEachTile(_tile => {
                 if(11 === _tile.index) {
-                    var food = new Food(this);
-                    food.x = _tile.x*GRID;
-                    food.y = _tile.y*GRID;
-
-                    food.electrons.x = _tile.x*GRID;
-                    food.electrons.y = _tile.y*GRID;
+                    var food = new Food(this, {
+                        x: _tile.x*GRID + X_OFFSET, 
+                        y:_tile.y*GRID + Y_OFFSET
+                    });
                 }
             })
             this.foodLayer.destroy();
         }
 
+
         // end on the wall map
         this.map.getLayer(this.wallVarient);
-
+    
+        var noRenderTiles = [9,10,11,12,
+            257,258,258,259,260,261,262,263,264,
+            289,290,291,292,293,294,295,296,
+            481,
+            673,674,675,676,677,678,679,680,
+            704,705,706,707,708,709,710,711,712] //need to populate with full list and move elsewhere;
+        //var noRenderTilesList = [];
+        
+        for (let i = 0; i < noRenderTiles.length; i++) {
+            this.mapShadow.forEachTile(tile =>{
+                if (tile.index == noRenderTiles[i]) {
+                    tile.index = -1;
+                }
+            })
+            
+        }
+        //this.wallLayerShadow.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+        //this.wallLayer.setPipeline('Light2D'); //setPostPipeline to get it to work with postFX.addshadow
 
 
         
@@ -1538,35 +2825,100 @@ class GameScene extends Phaser.Scene {
             }
         });*/
 
+        //camera
+
+        //this.cameras.main.setZoom(.01, .01)
+        /*this.tweens.add({
+            targets: this.cameras.main,
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'Sine.Out',
+            delay: 500,
+            //zoom: 1
+            });*/
+
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
 
         if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 24).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
-            this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimS.flipY = true;
             this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimE.angle = 90;
             this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
         }
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW.angle = 270;
             this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
         }
-        this.arrowN_start = new Phaser.Math.Vector2(this.startingArrowsAnimN.x,this.startingArrowsAnimN.y)
-        this.arrowS_start = new Phaser.Math.Vector2(this.startingArrowsAnimS.x,this.startingArrowsAnimS.y)
-        this.arrowE_start = new Phaser.Math.Vector2(this.startingArrowsAnimE.x,this.startingArrowsAnimE.y)
-        this.arrowW_start = new Phaser.Math.Vector2(this.startingArrowsAnimW.x,this.startingArrowsAnimW.y)
-        console.log(this.gState)
+
+
+
+        //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
+        
+        this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        ).setText('GOAL : Collect 28 Atoms').setOrigin(0.5,0);
+
+        this.stageText = this.add.dom(-SCREEN_WIDTH, GRID * 7.5, 'div', Object.assign({},STYLE_DEFAULT,{
+            'color': '#272727',
+            'font-size': '12px',
+            'font-weight': '400',
+            'padding': '0px 0px 0px 12px'
+        })
+        ).setText(`${this.stage}`).setOrigin(0,0);
+
+        this.r2 = this.add.rectangle(this.stageText.x, this.stageText.y, this.stageText.width - 8, 16, 0xffffff
+        ).setDepth(101).setOrigin(0,0);
+        
+        
+        this.openingGoalPanel = this.add.nineslice(-SCREEN_WIDTH, GRID * 8.25, 
+            'uiPanelL', 'Glass', 
+            GRID * 18, GRID * 3, 
+            8, 8, 8, 8);
+        this.openingGoalPanel.setDepth(100).setOrigin(0.475,0);
+        this.tweens.add({
+            targets: [this.openingGoalText, this.openingGoalPanel],
+            x: SCREEN_WIDTH/2,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 500,
+            alpha: {from: 0, to: 1}
+        });
+        this.tweens.add({
+            targets: this.stageText,
+            x: X_OFFSET + GRID * 6,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 500,
+            alpha: {from: 0, to: 1}
+        });
+        this.tweens.add({
+            targets: this.r2,
+            x: X_OFFSET + GRID * 6.75,
+            ease: 'Sine.easeOutIn',
+            duration: 300,
+            delay: 500,
+            alpha: {from: 0, to: 1}
+        });
+        
+
+        this.tweens.add({
+            targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
+            alpha: 0,
+            ease: 'linear',
+            duration: 500,
+            delay: 5000,
+        });
         
         this.time.delayedCall(3000, event => {
             if (this.gState != GState.PLAY && !this.winned) {
@@ -1584,57 +2936,93 @@ class GameScene extends Phaser.Scene {
         // TODO Move out of here
         // Reserves two rows in the tilesheet for making portal areas.
         const PORTAL_TILE_START = 256; // FYI: TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
-        const PORTAL_TILE_DIFF = 32;
-        var portalArrayX = [];
+        const PORTAL_WALL_START = 672;
+        const ROW_DELTA = 32;
+
+        
+        
+        var basePortalSpawnPools = {};
+        var wallPortalData = {};
+
+        
         
         this.map.getLayer(this.wallVarient);
         this.map.forEachTile( tile => {
 
-            // Make Portal Spawning List
-            if (tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + PORTAL_TILE_DIFF * 2) {
-                if (portalArrayX[tile.index]) {
-                    portalArrayX[tile.index].push([tile.x, tile.y]);
+            // Make Portal Walls
+
+            if ((tile.index > PORTAL_WALL_START && tile.index < PORTAL_WALL_START + 9) ||
+                (tile.index > PORTAL_WALL_START + ROW_DELTA && tile.index < PORTAL_WALL_START + ROW_DELTA + 9)
+            ) {
+                if (wallPortalData[tile.index]) {
+                    
+                    wallPortalData[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                 }
                 else {
-                    portalArrayX[tile.index] = [[tile.x, tile.y]];
+                    wallPortalData[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                }
+                tile.index = -1;
+            }
+
+            
+
+
+
+
+            // Make Portal Spawning List based on the wall layer
+            if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
+                (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
+            ) {
+
+                if (basePortalSpawnPools[tile.index]) {
+                    
+                    basePortalSpawnPools[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                }
+                else {
+                    basePortalSpawnPools[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
                 }
                 tile.index = -1;
                 
             }
+            
+
+            
+            
+            
 
             // Draw Dream walls
             switch (tile.index) {
                 // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
                 case 550:
-                    var wallShimmerTop = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerTop.play('wrapBlock02');
                     this.dreamWalls.push(wallShimmerTop);
                     tile.index = -1;
                     break;
 
                 case 614:
-                    var wallShimmerBottom = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerBottom.play('wrapBlock07');
                     this.dreamWalls.push(wallShimmerBottom);
                     tile.index = -1;
                     break;
 
                 case 581:
-                    var wallShimmerLeft = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerLeft.play('wrapBlock04');
                     this.dreamWalls.push(wallShimmerLeft);
                     tile.index = -1;
                     break;
 
                 case 583:
-                    var wallShimmerRight = this.add.sprite(tile.x * GRID, tile.y * GRID).setDepth(50).setOrigin(0,0);
+                    var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
                     wallShimmerRight.play('wrapBlock05');
                     this.dreamWalls.push(wallShimmerRight);
                     tile.index = -1;
                     break;
 
                 case 549:
-                    var wrapBlock01 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock01);
@@ -1642,7 +3030,7 @@ class GameScene extends Phaser.Scene {
                     break;
 
                 case 551:
-                    var wrapBlock03 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock03);
@@ -1650,7 +3038,7 @@ class GameScene extends Phaser.Scene {
                     break;
                 
                 case 613:
-                    var wrapBlock06 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock06);
@@ -1658,7 +3046,7 @@ class GameScene extends Phaser.Scene {
                     break;
 
                 case 615:
-                    var wrapBlock08 = this.add.sprite(tile.x * GRID, tile.y * GRID
+                    var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
                     ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
 
                     this.dreamWalls.push(wrapBlock08);
@@ -1669,6 +3057,8 @@ class GameScene extends Phaser.Scene {
                     break;
             }
         });
+
+
 
         /*
         for (let index = 2; index < END_Y - 1; index++) {
@@ -1696,7 +3086,7 @@ class GameScene extends Phaser.Scene {
         }
         */
 
-        this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
@@ -1772,6 +3162,14 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveDirection(this, e);
                 //this.panelTweenCollapse.resume();
                 
+                this.tweens.add({//SHOULD BE MOVED to not be added every input
+                    targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
+                    x: + SCREEN_WIDTH * 2,
+                    ease: 'Sine.easeOutIn',
+                    duration: 300,
+                    delay: 125,
+                    alpha: 0,
+                });
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
                     
@@ -1805,9 +3203,11 @@ class GameScene extends Phaser.Scene {
                     });
                 }
             }
+            
 
-            if (gState === GState.PORTAL) {
+            if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
                 // Update snake facing direction but do not move the snake
+                console.log("Moving Freely");
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -1883,90 +3283,109 @@ class GameScene extends Phaser.Scene {
         
         this.blackholes = [];
         this.blackholeLabels = [];
+        this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
 
+            // #region is unlocked?
             const STAGE_UNLOCKS = {
                 /* Template
                 '': function () {
-                    return ourPersist.checkCompletedRank("", );
+                    return ourPersist.checkCompletedRank("", COPPER);
                 },
                 */
+               'two-wide-corridors': function () {
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
+                },
                 'double-back-portals': function () {
+                    return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", WOOD);
+                },
+                'easy-wrap': function () {
+                    return ourPersist.checkCompletedRank("World_1-4", SILVER);
+                },
+                'hard-wrap': function () {
+                    return ourPersist.checkCompletedRank("World_3-3_Wrap", WOOD);
+                },
+                'more-blocks': function () {
+                    return ourPersist.checkCompletedRank("World_2-2", WOOD);
+                },
+                'wrap-and-warp': function () {
+                    return ourPersist.checkCompletedRank("World_1-3", WOOD);
+                },
+                'learn-to-wrap': function () {
+                    return true;
+                },
+                'these-are-coins': function () {
+                    return true;
+                },
+                'welcome': function () {
                     return true;
                 },
                 'unidirectional-portals': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", WOOD);
                 },
                 'hardest----for-now': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_4-3-ii", WOOD);
                 },
                 'swirl-swirl': function () {
-                    return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
+                    return ourPersist.checkCompletedRank("World_4-4", WOOD); // Should this one be harder to unlock?
                 },
                 'eye': function () {
                     return true;
                 },
                 'plus-plus': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", GOLD);
+                    return ourPersist.checkCompletedRank("World_10-3", WOOD);
                 },
                 'col': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_4-3", WOOD);
                 },
                 'its-a-snek': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_4-2", WOOD);
                 },
                 'now-a-fourth': function () {
-                    return true;
-                },
-                'vertical-uturns': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
                 },
                 'horizontal-uturns': function () {
-                    return true;
-                },
-                'vertical-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                    return ourPersist.checkCompletedRank("World_9-4_Final_Exams", WOOD);
                 },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
+                    return ourPersist.checkCompletedRank("World_9-3_Final_Exams", WOOD); 
                 },
                 'first-medium': function () {
                     return true;
-                    //return ourPersist.checkCompletedRank("", );
                 },
                 'lights-out': function () {
                     return false;
                 },
                 'easy-racer': function () {
-                    return false;
+                    debugger
+                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
                 },
                 'hello-ghosts': function () {
                     return false;
                 },
                 'medium-happy': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", BRONZE); // SILVER
-                    return true;
+                    debugger
+                    return ourPersist.checkCompletedRank("World_2-4", WOOD);
+                    
                 },
                 'bidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
-                    return true
+                    return ourPersist.checkCompletedRank("World_4-4", WOOD); 
                 },
                 'start': function ( ) { 
                     return true
                 },
                 'babies-first-wall': function () {
-                    return true
+                    return ourPersist.checkCompletedRank("World_1-1", WOOD);
                 },
                 'horz-rows': function () {
-                    return true
+                    return ourPersist.checkCompletedRank("World_1-2", WOOD);
                 },
-                'now-vertical': function () {
-                    return ourPersist.checkCompletedRank("World_1-4", COPPER);
+                'first-blocks': function () {
+                    return ourPersist.checkCompletedRank("World_1-4", WOOD);
                 },
                 'medium-wrap': function () {
-                    //return ourPersist.checkCompletedRank("Stage-01", SILVER);
-                    return false;
+                    return ourPersist.checkCompletedRank("World_3-2_Wrap", WOOD)
                 },
                 'dark-precision': function () {
                     return true
@@ -1974,119 +3393,226 @@ class GameScene extends Phaser.Scene {
                 'vert-rows': function () {
                     return true;
                 }
+
             }
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
+
+
+                //victory stars
+
+                this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
+                    x:{min: 0, max: SCREEN_WIDTH},
+                    y:{min: 0, max: SCREEN_HEIGHT},
+                    gravityX: -50,
+                    gravityY: 50,
+                    anim: 'starIdle',
+                    lifespan: 3000,
+                }).setFrequency(300,[1]).setDepth(1);
+            
+
                 
                 
                 
+                const BLACK_HOLE_START_TILE_INDEX = 641;
+                const EXTRACT_BLACK_HOLE_INDEX = 616;
+
+                // #region Layer: Next
                 if (this.map.getLayer('Next')) {
 
-                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
-                    var tiledIndex = 641; // First column in the row.
-                    //debugger;
-                    this.nextStages.forEach( stageName => {
-
-                        var dataName = `${stageName}data`;
-                        var data = this.cache.json.get(dataName);
                     
-                        data.forEach( propObj => {
-                            
-                            var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
-                            
-                            if (propObj.name === 'slug') {
+                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
+                    
+                    
+                    var blackholeTileIndex = 641; // Starting First column in the row.
+                    this.extractLables = [];
+                    var nextStagesCopy = this.nextStages.slice();
+                    
+                    console.log('PORTAL LAYER',this.nextStagePortalLayer);
+                    // Add one extract hole spawn here if it exists.
+                    if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
+                        var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
+                        var extractImage = this.add.sprite(extractTile.pixelX + X_OFFSET, extractTile.pixelY + Y_OFFSET, 'extractHole.png' 
+                        ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
+                        extractTile.index = -1;
 
-                                if (STAGE_UNLOCKS[propObj.value] != undefined) {
-                                    // Makes it so it only removes levels that have unlock slugs.
-                                    // Easier to debug which levels don't have slugs formatted correctly.
-                                    tile.index = -1;
-                                }
-                                
-                                var temp = STAGE_UNLOCKS[propObj.value];
-                                
+                        var extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                            "font-size": '8px',
+                            "baselineX": 1.5,
+                            })).setHTML(
+                                'EXTRACT'
+                        ).setDepth(50).setAlpha(0);
+                        
+                        var r2 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, extractText.width + 8, 14, 0x1a1a1a  
+                        ).setDepth(49).setAlpha(0);
+                        //debugger
+                        r2.postFX.addShine(1, .5, 5)
+                        r2.setStrokeStyle(2, 0x4d9be6, 0.75);
 
-                                if (STAGE_UNLOCKS[propObj.value].call()) {
-                                    // Now we know the Stage is unlocked, so make the black hole tile.
-                                    
-                                    console.log("MAKING Black Hole TILE AT", tile.index, tile.x, tile.y , "For Stage", stageName);
+                        this.extractHole.push(extractImage);
+                        this.extractLables.push(extractText,r2);
 
-                                    var stageText = this.add.text(tile.x * GRID + 12, tile.y * GRID - GRID,
-                                        stageName,{ fontFamily: 'Oxanium', fontSize: 16, color: 'white', baselineX: 1.5 }
-                                    ).setDepth(50).setOrigin(0,0).setAlpha(0);
-                                    
-                                    var r1 = this.add.rectangle(tile.x * GRID + 8, tile.y * GRID - 26, stageText.width + 8, 24, 0x1a1a1a  
-                                    ).setDepth(49).setOrigin(0,0).setAlpha(0);
-                                    //debugger
-
-                                    r1.setStrokeStyle(2, 0x4d9be6);
-
-                                    
-                                    var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
-                                        'blackHole' 
-                                    ).setDepth(10).setOrigin(0.4125,0.4125).setScale(0);
-                                    this.blackholes.push(portalImage)
-                                    this.blackholeLabels.push(stageText,r1)
-
-                                    //line code doesn't work yet
-                                    //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
-                                    //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, portalImage.x,portalImage.y, r1.x,r1.y[0x000000],1)
-                                    
-                                    if (ourPersist.bestOfStageData[stageName] != undefined) {
-                                        switch (ourPersist.bestOfStageData[stageName].stageRank()) {
-                                            case COPPER:
-                                                portalImage.setTint(0xB87333);
-                                                break;
-                                            case BRONZE:
-                                                portalImage.setTint(0xCD7F32);
-                                                break;
-                                            case SILVER:
-                                                portalImage.setTint(0xC0C0C0);
-                                                break;
-                                            case GOLD:
-                                                portalImage.setTint(0xDAA520);
-                                                break;
-                                            case PLATINUM:
-                                                portalImage.setTint(0xE5E4E2);
-                                                break;
-                                            default:
-                                                // here is if you have never played a level before
-                                                portalImage.setTint(0xFFFFFF);    
-                                                break;
-                                        }
-                                    } else {
-                                        portalImage.setTint(0xFFFFFF);
-                                    }
-                                    
-                                    this.nextStagePortals.push(portalImage);
-                                }
-                                this.tweens.add({
-                                    targets: this.blackholes,
-                                    scale: {from: 0, to: 2},
-                                    ease: 'Sine.easeOutIn',
-                                    duration: 500,
-                                    delay: this.tweens.stagger(360)
-                                });
-                                this.tweens.add({
-                                    targets: this.blackholeLabels,
-                                    alpha: {from: 0, to: 1},
-                                    ease: 'Sine.easeOutIn',
-                                    duration: 300,
-                                    delay: this.tweens.stagger(360)
-                                });
-                            }
+                        this.tweens.add({
+                            targets: [r2,extractText],
+                            alpha: {from: 0, to: 1},
+                            ease: 'Sine.easeOutIn',
+                            duration: 50,
+                            delay: this.tweens.stagger(150)
                         });
+                        
+                    }
 
-                        tiledIndex++;
-                    });
-        
-                }
+                    for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
+                        
+                        if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
+                            var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
-    
+                            var stageName = nextStagesCopy.shift();
+                            var dataName = `${stageName}data`;
+                            var data = this.cache.json.get(dataName);
+                        
+                            data.forEach( propObj => {
+                                
+                                if (propObj.name === 'slug') {
+
+                                    if (STAGE_UNLOCKS[propObj.value] != undefined) {
+                                        tile.index = -1;
+                                        // Only removes levels that have unlock slugs.
+                                        // Easier to debug which levels don't have slugs formatted correctly.
+                                    }
+
+                                    
+                                    // Easier to see when debugging with debugger in console.
+                                    stageName;
+                                    var temp = STAGE_UNLOCKS[propObj.value];
+                                    var tempEval = STAGE_UNLOCKS[propObj.value].call();
+                                    
+                                   
+                                    
+
+                                    if (STAGE_UNLOCKS[propObj.value].call()) {
+                                        // Now we know the Stage is unlocked, so make the black hole tile.
+                                        
+                                        console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
+
+                                        //var stageText = this.add.text(tile.pixelX + 6 + X_OFFSET, tile.pixelY - GRID + Y_OFFSET,
+                                        //    stageName,{ fontFamily: 'Oxanium', fontSize: 8, color: 'white', baselineX: 1.5 }
+                                        //).setDepth(50).setOrigin(0,0).setAlpha(0);
+
+                                        var stageText = this.add.dom(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                                            "font-size": '8px',
+                                            "baselineX": 1.5,
+                                            })).setHTML(
+                                                stageName
+                                        ).setDepth(50).setAlpha(0);
+                                        
+                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 12 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
+                                        ).setDepth(49).setAlpha(0);
+                                        //debugger
+                                        r1.postFX.addShine(1, .5, 5)
+                                        r1.setStrokeStyle(2, 0x4d9be6, 0.75);
+
+                                        
+                                        
+                                        var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                        ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+
+
+
+
+                                        //extractImage.playAfterRepeat('extractHoleClose');
+                                        
+                                        
+                                        //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+                                        //this.cameras.main.postFX.addBarrel(this,-0.5);
+                                        //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
+                                        /*this.blackholes.forEach(blackholeImage =>{
+                                            this.cameras.main.postFX.addBarrel([.125]) 
+                                        })*/
+                                        
+                                        this.blackholes.push(blackholeImage);
+                                        
+                                        
+                                        this.blackholesContainer.add(this.blackholes);
+                                    
+
+                                        this.blackholeLabels.push(stageText,r1);
+                                        if (blackholeImage.anims.getName() === 'blackholeForm')
+                                            {
+                                                blackholeImage.playAfterRepeat('blackholeIdle');
+                                            }
+
+                                        //line code doesn't work yet
+                                        //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
+                                        //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
+                                        
+                                        if (ourPersist.bestOfStageData[stageName] != undefined) {
+                                            switch (ourPersist.bestOfStageData[stageName].stageRank()) {
+                                                case WOOD:
+                                                    blackholeImage.setTint(0xB87333);
+                                                    break;
+                                                case BRONZE:
+                                                    blackholeImage.setTint(0xCD7F32);
+                                                    break;
+                                                case SILVER:
+                                                    blackholeImage.setTint(0xC0C0C0);
+                                                    break;
+                                                case GOLD:
+                                                    blackholeImage.setTint(0xDAA520);
+                                                    break;
+                                                case PLATINUM:
+                                                    blackholeImage.setTint(0xE5E4E2);
+                                                    break;
+                                                default:
+                                                    // here is if you have never played a level before
+                                                    blackholeImage.setTint(0xFFFFFF);    
+                                                    break;
+                                            }
+                                        } else {
+                                            blackholeImage.setTint(0xFFFFFF);
+                                        }
+                                        
+                                        this.nextStagePortals.push(blackholeImage);
+                                        
+                                        this.add.particles(blackholeImage.x, blackholeImage.y, 'megaAtlas', {
+                                            frame: ['portalParticle01.png'],
+                                            color: [ 0xFFFFFF,0x000000],
+                                            colorEase: 'quad.out',
+                                            x:{min: -9 - 12, max: 24 + 12},
+                                            y:{min: -9 - 12, max: 24 + 12},
+                                            scale: {start: 1, end: .25},
+                                            speed: 1,
+                                            moveToX: 7,
+                                            moveToY: 7,
+                                            alpha:{start: 1, end: 0 },
+                                            ease: 'Sine.easeOutIn',
+                                        }).setFrequency(667,[1]).setDepth(0);
+
+                                    }
+                                    else {
+                                        // Push false portal so index is correct on warp to next
+                                        this.nextStagePortals.push(undefined);
+                                    }
+                                    console.log(this.nextStagePortals);
+                                     
+                                    this.tweens.add({
+                                        targets: this.blackholeLabels,
+                                        alpha: {from: 0, to: 1},
+                                        ease: 'Sine.easeOutIn',
+                                        duration: 50,
+                                        delay: this.tweens.stagger(150)
+                                    });
+
+                                    
+                                }
+                            });
+
+                            blackholeTileIndex++;
+                        }
+                    }
+                } 
             }
-                
-     
-        
         }, this);
 
 
@@ -2116,9 +3642,8 @@ class GameScene extends Phaser.Scene {
         //    var food = new Food(this);
         //}
 
-        // #region Coin Logic
-
-        this.coins = []
+        // #region Coin Layer Logic
+        this.coinsArray = [];
 
         var coinVarient = ''
         if (this.varientIndex) {
@@ -2129,37 +3654,36 @@ class GameScene extends Phaser.Scene {
 
         if (this.map.getLayer(coinVarient)) {
 
-            var coinLayer = this.map.createLayer(coinVarient, [this.tileset]);
+            var coinLayer = this.map.createLayer(coinVarient, [this.tileset], X_OFFSET, Y_OFFSET);
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
-                    //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
-                    //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-                    var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'coinPickup01Anim', 'coinPickup01Anim.png' 
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
-
-                    this.coins.push(_coin);
+                    var _coin = new Coin(this, this.coinsArray, tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET );
+                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+                    this.interactLayer[tile.x][tile.y] = _coin;
+                    
                 }
             });
             coinLayer.destroy();
-        }
+        } 
         
-        
-        
+            
         // #region Stage Logic
         
-        var makePair = function (scene, to, from) {
-            
-            var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
+        var makePair = function (scene, anim, to, from, colorHex, freeDir, spawnDelay) {
+
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
-            var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
+            var p1 = new Portal(scene, anim, color, to, from, freeDir, spawnDelay);
+            var p2 = new Portal(scene, anim, color, from, to, freeDir, spawnDelay + 33);
 
             p1.targetObject = p2;
             p2.targetObject = p1;
 
-            p1.flipX = true;
+            //p1.flipX = true;
+
+            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p2;
+            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p1;
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
@@ -2175,10 +3699,10 @@ class GameScene extends Phaser.Scene {
             portalVarient = `Portal`
         }
 
-        // #region Portal-X
+        // #region Portals
         //var portalLayerX = this.map.createLayer(`${portalVarient}-X`, [this.tileset]);
         //this.map.getLayer(`${this.wallVarient}`) // Navigate to wall.
-        //var portalArrayX = [];
+        //var basePortalSpawnPools = [];
 
         //portalLayerX.forEachTile(tile => {
 
@@ -2187,21 +3711,89 @@ class GameScene extends Phaser.Scene {
                 
             //} 
         //});
+        console.log(wallPortalData);
 
-        let toIndex;
+        var portalSpawnDelay = PORTAL_SPAWN_DELAY;
+        
+        for (let index = PORTAL_WALL_START + 1; index < PORTAL_WALL_START + 9; index++) {
+            
+            if (wallPortalData[index]) {
 
-        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 1 + PORTAL_TILE_DIFF; index++) {
+                var wallDir = ""; // If we use this in more places it should be made an enum.
 
-            if (portalArrayX[index]) {
+                if (wallPortalData[index][1][0] - wallPortalData[index][0][0] === GRID) {
+                    wallDir = "Horz";
+                } else if (wallPortalData[index][1][1] - wallPortalData[index][0][1] === GRID) {
+                    wallDir = "Vert";
+                }
+                
+                console.log(wallDir); 
+
+                // Check for if vertical or horizontal here
+            
+                var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
+                
+                var startFrom = wallPortalData[index].shift();
+                var startTo = wallPortalData[index + ROW_DELTA].shift();
+
+                if (wallDir === "Vert") {
+                    //top
+                    makePair(this, "pWallVertTop", startFrom, startTo, colorHex, false, portalSpawnDelay);
+
+                    //bottom
+                    var endFrom = wallPortalData[index].pop();
+                    var endTo = wallPortalData[index + ROW_DELTA].pop();
+                    makePair(this, "pWallVertBot", endFrom, endTo, colorHex, false, portalSpawnDelay);
+                    console.log(wallPortalData);
+
+                    //middle
+                    wallPortalData[index].forEach(portalTo => {
+                    var portalFrom = wallPortalData[index + ROW_DELTA].shift();
+                    makePair(this, "pWallVertMiddle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
+                    });
+                    
+                }
+                if (wallDir === "Horz") {
+                    //left
+                    makePair(this, "pWallFlatLeft", startFrom, startTo, colorHex, false, portalSpawnDelay);
+
+                    //right
+                    var endFrom = wallPortalData[index].pop();
+                    var endTo = wallPortalData[index + ROW_DELTA].pop();
+                    makePair(this, "pWallFlatRight", endFrom, endTo, colorHex, false, portalSpawnDelay);
+                    console.log(wallPortalData);
+
+                    //middle
+                    wallPortalData[index].forEach(portalTo => {
+                    var portalFrom = wallPortalData[index + ROW_DELTA].shift();
+                    makePair(this, "pWallFlatMiddle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
+                    });
+                    
+                }
+                
+            }
+
+            portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
+        }
+
+        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
+
+            // TODO: rename basePortalSpawnPools X doesn't have to do with coordinates and is confusing and not needed.
+            if (basePortalSpawnPools[index]) {
+                var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
                 // consider throwing an error if a portal doesn't have a correctly defined _to or _from
                 
-                toIndex = index + PORTAL_TILE_DIFF
-                let _from = Phaser.Math.RND.pick(portalArrayX[index]);
-                let _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
-                //console.log("Portal X Logic: FROM TO",_from, _to);
-                makePair(this, _to, _from);
+                let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
+                let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
+                console.log("Portal Base Logic: FROM TO",_from, _to, index);
+                makePair(this, "portalForm", _to, _from, colorHex, true, portalSpawnDelay);
+
+                portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
             }
         }
+        
+
+
 
         //portalLayerX.destroy()
 
@@ -2242,7 +3834,7 @@ class GameScene extends Phaser.Scene {
         while (this.map.getLayer(`${portalVarient}-${layerIndex}`)) {
 
             //console.log(`Portal-${layerIndex} Logic`);
-            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset]);
+            var portalLayerN = this.map.createLayer(`${portalVarient}-${layerIndex}`, [this.tileset], X_OFFSET, Y_OFFSET);
             var portalArrayN = {};
             
             var toN = [];
@@ -2253,10 +3845,10 @@ class GameScene extends Phaser.Scene {
                 if (tile.index > 0) {
     
                     if (portalArrayN[tile.index]) {
-                        portalArrayN[tile.index].push([tile.x, tile.y]);
+                        portalArrayN[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
                     }
                     else {
-                        portalArrayN[tile.index] = [[tile.x, tile.y]];
+                        portalArrayN[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
                     }
                 } 
             });
@@ -2279,7 +3871,7 @@ class GameScene extends Phaser.Scene {
                     var count = 0;
                     value.forEach(tile => {
                         this.portals.some( portal => {
-                            if(portal.x === tile[0]*GRID && portal.y === tile[1]*GRID){
+                            if(portal.x === tile[0] && portal.y === tile[1]){
                                 count += 1;
                                 //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
                             }
@@ -2312,7 +3904,11 @@ class GameScene extends Phaser.Scene {
             toN = Phaser.Math.RND.pick(toArea);
             delete portalArrayN[toAreaKey];
 
-            makePair(this, fromN, toN);
+
+            var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
+            makePair(this, "portalForm", fromN, toN, colorHex, true, portalSpawnDelay);
+
+            portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
     
             portalLayerN.visible = false;
             layerIndex ++; 
@@ -2320,6 +3916,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
+        
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -2353,20 +3950,22 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             
-            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
+            this.lights.addLight(portal.x +8, portal.y + 8, 128,  portalLightColor).setIntensity(1);
 
-            this.add.particles(portal.x, portal.y, 'megaAtlas', {
+            var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
-                x:{steps: 2, min: -18, max: 48},
-                y:{steps: 2, min: -18, max: 48},
+                x:{steps: 2, min: -9, max: 24},
+                y:{steps: 2, min: -9, max: 24},
                 scale: {start: 1, end: .5},
                 speed: 5,
-                moveToX: 14,
-                moveToY: 14,
+                moveToX: 7,
+                moveToY: 7,
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
+
+            this.portalParticles.push(portalParticles)
             
             if (!this.hasGhostTiles) {
                 this.portalMask = this.make.image({
@@ -2381,6 +3980,43 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+
+        // #region Play Portals
+        if (this.portals.length > 0) {
+            var sortedPortals = this.portals.toSorted(
+                (a, b) => {
+                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) 
+                    - Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y)
+                }); 
+    
+            sortedPortals.forEach (portal => {
+                portal.play(portal.anim);
+            });
+            
+        }
+        
+
+
+
+        //stagger portal spawns
+        //this.time.delayedCall(600, event => {
+        //    var interval = 33
+        //    this.portals.forEach(function (portal, index) { 
+        //       setTimeout(function () {
+                    
+        //            portal.playAfterRepeat('portalForm');
+        //            portal.chain(['portalIdle'])
+        //            portal.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+        //               ourGameScene.chime01.play({volume: 0.5});
+        //            })
+        //                
+        //            //}
+        //        },index * interval)
+        //    })
+        //    
+        //});
+
+
 
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
@@ -2401,11 +4037,11 @@ class GameScene extends Phaser.Scene {
   
 
 
-        var atom1 = new Food(this);
-        var atom2 = new Food(this);
-        var atom3 = new Food(this);
-        var atom4 = new Food(this);
-        var atom5 = new Food(this);
+        var atom1 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom2 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom3 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom4 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom5 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
 
 
         //this.tweens.add({
@@ -2438,7 +4074,7 @@ class GameScene extends Phaser.Scene {
             this.bestBase = 0;
         }
 
-
+        
 
 
         
@@ -2502,13 +4138,17 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
         }
+
+
+        
+
         
         // #endregion
 
         // #region UI HUD
         this.UIScoreContainer = this.make.container(0,0)
        if (this.startupAnim) {
-        this.UIScoreContainer.setAlpha(0);
+        this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
         }
 
 
@@ -2517,25 +4157,34 @@ class GameScene extends Phaser.Scene {
 
 
        // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.scoreFrame = this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.fuseFrame = this.add.image(GRID * 25.5 + 8,GRID,'fuseFrame').setDepth(51).setOrigin(0.5,0.5).setScale(2);
+       const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+       //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
+        if (ourSpaceBoy.scoreFrame == undefined) {
+            ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5).setAlpha(0);
+        }
+       
 
        this.boostMask = this.make.image({ // name is unclear.
            x: SCREEN_WIDTH/2,
-           y: GRID,
+           y: GRID * 1.5,
            key: 'megaAtlas',
            frame: 'boostMask.png',
            add: false
        }).setOrigin(0.5,0.5);
+       this.boostMask.setScrollFactor(0);
 
        const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2 -3, GRID).setOrigin(0.5,0.5);
-       boostBar.setDepth(50);
-       boostBar.play('increasing');
 
-       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
-       this.boostMask.scaleX = 0;
+       
+        this.boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID * 1.5)
+            .setOrigin(0.5,0.5).setDepth(52);
+        this.boostBar.setScrollFactor(0);
+        this.boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.boostMask);
+        this.boostMask.scaleX = 0;
+       
+       
+        this.boostBar.play('increasing');
+
 
        const ourGame = this.scene.get("GameScene");
 
@@ -2569,14 +4218,84 @@ class GameScene extends Phaser.Scene {
 
        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(51).setAlpha(0);
-       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(51).setAlpha(0);
-       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(51).setAlpha(0);
-       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(51).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(51).setAlpha(0);
-       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(51).setAlpha(0);
-       
+       /*this.letterC = this.add.sprite(X_OFFSET + GRID * 0 - GRID * 4,GRID * 1.25,"comboLetters", 0).setDepth(51)//.setAlpha(0);
+       this.letterO = this.add.sprite(X_OFFSET + GRID * 1.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51)//.setAlpha(0);
+       this.letterM = this.add.sprite(X_OFFSET + GRID * 2.75 - GRID * 4,GRID * 1.25,"comboLetters", 2).setDepth(51)//.setAlpha(0);
+       this.letterB = this.add.sprite(X_OFFSET + GRID * 4 - GRID * 4,GRID * 1.25,"comboLetters", 3).setDepth(51)//.setAlpha(0);
+       this.letterO2 = this.add.sprite(X_OFFSET + GRID * 5.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51)//.setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(X_OFFSET + GRID * 6 - GRID * 4,GRID * 1.25,"comboLetters", 4).setDepth(51)//.setAlpha(0);
+       this.letterX = this.add.sprite(X_OFFSET + GRID * 7 - GRID * 4,GRID * 1.25,"comboLetters", 5).setDepth(51).setAlpha(0);
+       */
+
+       this.letterC = this.make.image({
+        x: X_OFFSET + GRID * 0 - GRID * 4 -6,
+        y:  GRID * 1.25,
+        key: 'comboLetters',
+        frame: 0,
+        add: false,
+        alpha: 0,
+        });
+        this.letterO = this.make.image({
+            x: X_OFFSET + GRID * 1.25 - GRID * 4 -5,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 1,
+            add: false,
+            alpha: 0,
+        });
+        this.letterM = this.make.image({
+            x: X_OFFSET + GRID * 2.75 - GRID * 4 -4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 2,
+            add: false,
+            alpha: 0,
+        });
+        this.letterB = this.make.image({
+            x: X_OFFSET + GRID * 4 - GRID * 4 -3,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 3,
+            add: false,
+            alpha: 0,
+        });
+        this.letterO2 = this.make.image({
+            x: X_OFFSET + GRID * 5.25 - GRID * 4 -2,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 1,
+            add: false,
+            alpha: 0,
+        });
+        this.letterExplanationPoint = this.make.image({
+            x: X_OFFSET + GRID * 6 - GRID * 4 -1,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 4,
+            add: false,
+            alpha: 0,
+        });
+        
+        
+        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+            .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+
+        this.comboMasks = []
+        this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,this.letterO2,this.letterExplanationPoint)
+
+        this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
+        this.comboMasksContainer.add(this.comboMasks);
+
+        this.comboMasksContainer.setVisible(false);
+
+
+        this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
+
+        this.comboCover.mask.invertAlpha = true;
+        
+
+        //this.comboMasksContainer.setScrollFactor(0);
+        
        // #endregion
 
         
@@ -2590,16 +4309,16 @@ class GameScene extends Phaser.Scene {
         
         
 
-        // Score Text
-        this.scoreUI = this.add.dom(5 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Stage`).setOrigin(0,0);
-        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0);
+        // Score Text SET INVISIBLE
+        this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
+            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,16)
+            .setOrigin(0,0).setScale(.5).setScrollFactor(0).setTint(0x1f211b);
 
-        this.bestScoreUI = this.add.dom(12, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Best`).setOrigin(0,0);
-        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.bestBase).setOrigin(0,0);
+        this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,16)
+            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,16)
+            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
 
@@ -2613,13 +4332,19 @@ class GameScene extends Phaser.Scene {
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         const lengthGoalStyle = {
+            "color":'0x1f211b',
             "font-size": '16px',
             "font-weight": 400,
             "text-align": 'right',
-        } 
+        }
+        
+                    //this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3, 'mainFont', `${commaInt(this.score.toString())}`, 16)
+            //.setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
-        this.lengthGoalUI = this.add.dom((GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        this.lengthGoalUILabel = this.add.dom(GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 33.25), 4, 'mainFont', ``, 16).setScale(.5)
+        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.lengthGoalUILabel = this.add.bitmapText(X_OFFSET + GRID * 30.25, 4, 'mainFont', ``, 16).setScale(.5)
+        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -2629,26 +4354,25 @@ class GameScene extends Phaser.Scene {
         
         var length = `${this.length}`;
         if (LENGTH_GOAL != 0) {
-            this.lengthGoalUI.setHTML(
-                `${length.padStart(2, "0")}<br/>
-                <hr style="font-size:3px"/>
-                ${LENGTH_GOAL.toString().padStart(2, "0")}`
-            ).setOrigin(0,0.5)//.setAlpha(0);
-            this.lengthGoalUILabel.setHTML(
-                `Length
-                <br/>
-                Goal`
-            ).setOrigin(0,0.5)//.setAlpha(0);
+            this.lengthGoalUI.setText(
+                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
+            ).setOrigin(0,0).setAlpha(1);
+            this.lengthGoalUILabel.setText(
+            `LENGTH\nGOAL`
+            ).setOrigin(0,0).setAlpha(1);
+            this.lengthGoalUILabel.setLineSpacing(3)
+            this.lengthGoalUI.setLineSpacing(3)
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
+            .setAlpha(0);
             this.lengthGoalUI.x = GRID * 27
         }
 
         if (this.startupAnim) {
-            this.lengthGoalUI.setAlpha(0)
-            this.lengthGoalUILabel.setAlpha(0)
+            this.lengthGoalUI.setAlpha(0);
+            this.lengthGoalUILabel.setAlpha(0);
         }
         
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
@@ -2662,10 +4386,11 @@ class GameScene extends Phaser.Scene {
          });
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 11, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 4, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -2674,15 +4399,19 @@ class GameScene extends Phaser.Scene {
             'padding': '2px 7px 0px 0px',
             })).setHTML(
                 countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0.5).setAlpha(0);
+        ).setOrigin(1,0.5).setAlpha(0).setScale(.5);
+        this.countDown.setScrollFactor(0);
 
         
 
         //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
         //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
-        this.coinsUIIcon = this.add.sprite(GRID*21.5 -6, 4, 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2).setVisible(false);
+        if (this.coinsUIIcon == undefined) {
+            this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2 + GRID * .5, 'coinPickup01Anim.png'
+            ).play('coin01idle').setDepth(101).setOrigin(0,0).setVisible(false);
+        }
+
         if (this.scene.get("PersistScene").coins > 0) {
             this.coinsUIIcon.setVisible(true)
         }
@@ -2690,7 +4419,7 @@ class GameScene extends Phaser.Scene {
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*22.5 + 2, 11, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.coinUIText = this.add.dom(X_OFFSET + GRID*21 + 9, 6 + GRID * .5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
             'color': 'white',
             'font-weight': '400',
@@ -2701,7 +4430,8 @@ class GameScene extends Phaser.Scene {
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
                 `${commaInt(this.scene.get("PersistScene").coins).padStart(2, '0')}`
-        ).setOrigin(0,0).setAlpha(0);
+        ).setOrigin(0,0).setAlpha(0).setScale(.5);
+        this.coinUIText.setScrollFactor(0);
 
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
@@ -2721,12 +4451,18 @@ class GameScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        /*this.runningScoreUI = this.add.dom(X_OFFSET + GRID * 23.75, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE, { color: '0x1f211b' })).setText(
             `Score`
-        ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1);
+        ).setOrigin(0,1).setScale(.5).setAlpha(1).setScrollFactor(0);*/
+        this.runningScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 - 2, 'mainFont', 'SCORE', 16)
+            .setOrigin(0, 1)
+            .setScale(0.5)
+            .setAlpha(1)
+            .setScrollFactor(0)
+            .setTint(0x1f211b)
+            .setDepth(100);
+        this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3 -2, 'mainFont', `${commaInt(this.score.toString())}`, 16)
+            .setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
         
         if (DEBUG) {
@@ -2741,7 +4477,7 @@ class GameScene extends Phaser.Scene {
         }
 
         
-        //  Event: addScore
+        //  #region @E: addScore
         this.events.on('addScore', function (fruit) {
 
             const ourGameScene = this.scene.get('GameScene');
@@ -2754,7 +4490,7 @@ class GameScene extends Phaser.Scene {
                 'font-size': '22px',
                 'font-family': 'Oxanium',
                 'padding': '3px 8px 0px 0px',
-            })).setOrigin(0,0);
+            })).setOrigin(0,0).setScale(.5);
             
             // Remove score text after a time period.
             this.time.delayedCall(1000, event => {
@@ -2764,7 +4500,7 @@ class GameScene extends Phaser.Scene {
             this.tweens.add({
                 targets: scoreText,
                 alpha: { from: 1, to: 0.0 },
-                y: scoreText.y - 10,
+                y: scoreText.y - 6,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -2778,31 +4514,31 @@ class GameScene extends Phaser.Scene {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
      
 
-                var electronToCapacitor = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
-                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
-                var electronToCapacitor2 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
-                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
-                var electronToCapacitor3 = this.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
-                .setOrigin(0.5,0.5).setDepth(80).setScale(2);
+                var electronToCapacitor = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(1);
+                var electronToCapacitor2 = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(1);
+                var electronToCapacitor3 = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
+                .setOrigin(0.5,0.5).setDepth(80).setScale(1);
                 //electronToCapacitor.play("electronIdle");
                 //electronToCapacitor.anims.msPerFrame = 66;
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: this.scoreFrame.getCenter().x -7,
-                    y: this.scoreFrame.getCenter().y,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                    y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 0,
                     ease: 'Sine.in',
                     onComplete: () => {
-                        electronToCapacitor.playAfterRepeat({ key: 'CapElectronDispersion' }, 0).setScale(2);
+                        electronToCapacitor.playAfterRepeat({ key: 'CapElectronDispersion' }, 0).setScale(1);
                         //electronToCapacitor.play({ key: 'electronDispersion01' })
                     }
                 });
                 var movingElectronTween2 = this.tweens.add( {
                     targets: electronToCapacitor2,
-                    x: this.scoreFrame.getCenter().x -7,
-                    y: this.scoreFrame.getCenter().y,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 33.3,
                     ease: 'Sine.in',
@@ -2813,8 +4549,8 @@ class GameScene extends Phaser.Scene {
                 });
                 var movingElectronTween3 = this.tweens.add( {
                     targets: electronToCapacitor3,
-                    x: this.scoreFrame.getCenter().x -7,
-                    y: this.scoreFrame.getCenter().y,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 66.7,
                     ease: 'Sine.in',
@@ -2873,13 +4609,13 @@ class GameScene extends Phaser.Scene {
 
             // Update UI
 
-            this.scoreUI.setText(`Stage`);
+            this.scoreUI.setText(`STAGE`);
             this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
 
 
-            this.bestScoreUI.setText(`Best`);
-            this.bestScoreLabelUI.setText(this.bestBase);
+            this.bestScoreUI.setText(`BEST`).setAlpha(1).setScrollFactor(0);
+            this.bestScoreLabelUI.setText(this.bestBase).setAlpha(1).setScrollFactor(0);
 
             
              // Restart Score Timer
@@ -2892,7 +4628,7 @@ class GameScene extends Phaser.Scene {
             
         }, this);
 
-        //  Event: saveScore
+        //  #region @E: saveScore
         this.events.on('saveScore', function () {
             const ourScoreScene = this.scene.get('ScoreScene');
             const ourStartScene = this.scene.get('StartScene');
@@ -2934,15 +4670,16 @@ class GameScene extends Phaser.Scene {
         this.runningScore = this.score + calcBonus(baseScore);
         this.scoreDigitLength = this.runningScore.toString().length;
         
-        this.scorePanel = this.add.nineslice(GRID * .125, 0, 
+        /*this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
             'uiGlassL', 'Glass', 
-            ((96) + (this.scoreDigitLength * 10)), 78, 
-            80, 18, 18, 18);
+            ((42) + (this.scoreDigitLength * 6)), 39, 40, 9, 9, 9);
         this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
-        this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
-        this.progressPanel.setDepth(100).setOrigin(0,0)
+        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
+             'uiGlassR', 'Glass',
+             57, 29, 9, 29, 9, 9);
+        this.progressPanel.setDepth(100).setOrigin(1,0)*/
         
         
 
@@ -2950,14 +4687,15 @@ class GameScene extends Phaser.Scene {
             this.bestScoreUI,this.bestScoreLabelUI,
             this.runningScoreUI, this.runningScoreLabelUI])
 
-        if (this.startupAnim) {
+        /*if (this.startupAnim) {
             this.progressPanel.setAlpha(0)
             this.scorePanel.setAlpha(0)
-        }
+        }*/
 
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
+
         /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
         text.setOrigin(0.5, 0.5);
         text.setScale(0)
@@ -3023,7 +4761,7 @@ class GameScene extends Phaser.Scene {
         }
 
         this.tweens.add( {
-            targets: this.coins,
+            targets: this.coinsArray,
             originY: [0.1875 - .0466,0.1875 + .0466],
             ease: 'sine.inout',
             duration: 500, //
@@ -3031,14 +4769,92 @@ class GameScene extends Phaser.Scene {
             repeat: -1,
            })
 
+        this.helpPanel = this.add.nineslice(0,0,
+            'uiPanelL', 'Glass', 100, 56, 18,18,18,18).setDepth(100)
+            .setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+
+        this.targetAlpha = 0; // Initialize target alpha
+        this.currentAlpha = 0; // Initialize current alpha
+
+        this.updatePanelAlpha = () => {
+            const distance = Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, this.helpPanel.x, this.helpPanel.y);
+            const maxDistance = 360;
+            const normalizedDistance = Phaser.Math.Clamp(distance / maxDistance, 0, 1);
+            this.targetAlpha = Math.sin(normalizedDistance * Math.PI / 2);
+            
+            const lerpFactor = 0.1; // Adjust this value for smoother or faster transitions
+            this.currentAlpha = Phaser.Math.Interpolation.Linear(
+                [this.currentAlpha, this.targetAlpha], lerpFactor);
+            this.helpPanel.setAlpha(this.currentAlpha);
+            this.helpText.setAlpha(this.currentAlpha);
+        }
+            this.helpText = this.add.dom(0, 0, 'div', {
+                color: 'white',
+                'font-size': '8px',
+                'font-family': 'Oxanium',
+                'font-weight': '200',
+                'text-align': 'left',
+                'letter-spacing': "1px",
+                'width': '86px',
+                'word-wrap': 'break-word'
+            });
+            this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
+
+            console.log(this.interactLayer);
+        
     }
+
+    tutorialPrompt(x,y,key){
+
+
+        this.helpPanel.setAlpha(1);
+        this.helpPanel.x = x;
+        this.helpPanel.y = y;
+        //print message based on key
+        var _message = '';
+        switch (key) {
+            case 1:
+                _message = 'Proceed through the blackhole to travel to a new stage.'
+                break;
+            case 2:
+                _message = 'Cross the side of the screen to wrap around to the other side!'
+                break;
+            case 3:
+                _message = 'Bonking will consume a coin. Collect coins to increase your lives!'
+                this.helpPanel.height = 68
+                break;
+            default:
+                _message = ''
+        }
+        this.helpText.x = x;
+        this.helpText.y = y;
+        this.helpText.setText(`${_message}`).setOrigin(0.5,0.5).setScrollFactor(0);
+    }
+
+    // #region .setWallsPermeable(
+    setWallsPermeable() {
+        //this.wallsPermeable = true;
+        //this.snakeGlitch = true;
+
+        //makes wall tiles partially transparent. both wall layers are printed and are adjusted
+        this.wallLayer.culledTiles.forEach( tile => {
+            tile.alpha = 0.5;
+        });
+        this.wallLayerShadow.forEachTile(tile => {
+            tile.alpha = 0.0;
+        });
+    }
+
     // #region .screenShake(
     screenShake(){
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         if (this.moveInterval === SPEED_SPRINT) {
             this.cameras.main.shake(400, .01);
+            ourSpaceBoy.cameras.main.shake(400, .01); //shakes differently than main when referencing different cameras
         }
         else if (this.moveInterval === SPEED_WALK){
             this.cameras.main.shake(300, .00625);
+            ourSpaceBoy.cameras.main.shake(300, .00625); //above note
         }    
     }
 
@@ -3095,59 +4911,75 @@ class GameScene extends Phaser.Scene {
 
     // #region .validSpawnLocation(
     validSpawnLocations() {
-        var testGrid = {};
+        var testGrid = [];
 
         // Start with all safe points as true. This is important because Javascript treats 
         // non initallized values as undefined and so any comparison or look up throws an error.
-        for (var x1 = 0; x1 <= END_X; x1++) {
-            testGrid[x1] = {};
-    
-            for (var y1 = 2; y1 < END_Y; y1++)
-            {
-                testGrid[x1][y1] = true;
+        
+        // 2. Make a viritual GRID space to minimise the size of the array.
+        for (var _x = 0; _x < 29; _x++) {
+            testGrid[_x] = [];
+            for (var _y = 0; _y < 27; _y++) {
+                testGrid[_x][_y] = 1; // Note: In the console the grid looks rotated.
             }
         }
-    
+
+        // No Spawning on the edges under the bezel.
+        for (let row = 0; row < 27; row++) {
+            testGrid[0][row] = 0;
+            testGrid[28][row] = 0; 
+        }
+
+        for (let column = 0; column < 29; column++) {
+            testGrid[column][0] = 0;
+            testGrid[column][26] = 0;
+        }
         
+        
+    
         // Set all the unsafe places unsafe
 
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
+        
     
-            if (wall.index > 0) {
-                
-                testGrid[wall.x][wall.y] = false;
+            if (wall.index > 0) {                
+                testGrid[wall.x][wall.y] = 0; // In TileSpace
             }
         });
+        
+        
+        
         
         if (this.map.getLayer('Ghost-1')) {
             this.ghostWallLayer.forEachTile(wall => {
     
                 if (wall.index > 0) {
                     
-                    testGrid[wall.x][wall.y] = false;
+                    testGrid[wall.x][wall.y] = 0;
                 }
             });
         }
 
-        if (this.map.getLayer('Food')) {
-            this.foodLayer.forEachTile(foodTile => {
-    
-                if (foodTile.index > 0) {
-                    
-                    testGrid[foodTile.x][foodTile.y] = false;
-                }
-            });
-
+        // Check all active things
+        for (let x = 0; x < this.interactLayer.length; x++) {
+            for (let y = 0; y < this.interactLayer[x].length; y++) {
+                if (this.interactLayer[x][y] != "empty") {
+                    testGrid[x][y] = 0;
+                }        
+            }
         }
+
+        
 
 
         // Don't spawn on Dream Walls
 
 
-        this.dreamWalls.forEach( dreamwall => {
-            testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
-        });
+        // THIS IS BROKE NOW. Also no dream walls now.
+        //this.dreamWalls.forEach( dreamwall => {
+        //    testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
+        //});
         
 
 
@@ -3161,18 +4993,25 @@ class GameScene extends Phaser.Scene {
         //    }
         //});
 
-        this.atoms.forEach(_fruit => {
-            testGrid[Math.floor(_fruit.x/GRID)][Math.floor(_fruit.y/GRID)] = false;
-        });
+        //this.atoms.forEach(_fruit => {
 
-        this.portals.forEach(_portal => {
-            testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
-        });
+        //    var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
+        //    var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
+        //     testGrid[_x][_y] = "a";
+            
+        //});
+        
+
+        // TEMP
+        //this.portals.forEach(_portal => {
+        //    testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
+        //});
 
 
-        this.dreamWalls.forEach( _dreamWall => {
-            testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-        });
+        // THIS EXISTS TWICE????
+        //this.dreamWalls.forEach( _dreamWall => {
+        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
+        //});
 
 
         // Don't let fruit spawn on dreamwall blocks
@@ -3186,119 +5025,351 @@ class GameScene extends Phaser.Scene {
             if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
                 // This goes nan sometimes. Ignore if that happens.
                 // Round maths for the case when adding a fruit while the head interpolates across the screen
-                testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+                //testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
             }
             
         });
+
+
         
 
         
         var validLocations = [];
-    
-        for (var x2 = 0; x2 <= END_X; x2++)
-        {
-            for (var y2 = 0; y2 <= END_Y; y2++)
-            {
-                if (testGrid[x2][y2] === true)
-                {
+
+        for (var _x = 0; _x < 29; _x++) {
+            for (var _y = 0; _y < 27; _y++) {
+                if (testGrid[_x][_y] === 1) {
                     // Push only valid positions to an array.
-                    validLocations.push({x: x2, y: y2});
+                    validLocations.push({x: _x * GRID + X_OFFSET, y: _y * GRID + Y_OFFSET});     
                 }
             }
         }
+
 
         return validLocations;
 
     }
 
-    // #region .checkPortalandMove(
-    checkPortalAndMove() {
-        let snake = this.snake;
 
-        this.portals.forEach(portal => { 
-            if(snake.head.x === portal.x && snake.head.y === portal.y){
-                this.gState = GState.PORTAL;
-                this.scoreTimer.paused = true;
+    gameOver(){
+        const ourStartScene = this.scene.get('StartScene');
 
+        //style
+        const finalScoreStyle = {
+            color: "white",
+            //"text-shadow": "2px 2px 4px #000000",
+            "font-size":'22px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
 
-                if (DEBUG) { console.log("PORTAL"); }
+        //GAME OVER
+        this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size":'32px',
+            'font-weight': 400,
+            'text-align': 'center',
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            })).setHTML(
+                `GAME OVER`
+        ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
-                // Show portal snake body after head arrives.
-                if (this.snake.body.length > 2) {
-                    portal.snakePortalingSprite.visible = true;   
+        
+
+        //PRESS SPACE TO CONTINUE TEXT
+        // Give a few seconds before a player can hit continue
+        this.time.delayedCall(900, function() {
+            const ourGameScene = this.scene.get('GameScene');
+            var _continue_text = '[SPACE TO CONTINUE]';
+
+            var _continueText = this.add.dom(SCREEN_WIDTH/2, GRID * 17,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'32px',
+                "font-family": '"Press Start 2P", system-ui',
+                "text-shadow": "4px 4px 0px #000000",
                 }
+            )).setText(_continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
+ 
+            this.tweens.add({
+                targets: _continueText,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: -1,
+                yoyo: true
+              });
 
-                var _x = portal.target.x*GRID;
-                var _y = portal.target.y*GRID;
-    
-                var portalSound = this.portalSounds[0]
-                portalSound.play();
-
-                var _tween = this.tweens.add({
-                    targets: snake.head, 
-                    x: _x,
-                    y: _y,
-                    yoyo: false,
-                    duration: SPEED_WALK * PORTAL_PAUSE,
-                    ease: 'Linear',
-                    repeat: 0,
-                    //delay: 500
-                });
-                
-                _tween.on('complete',()=>{
-                    this.gState = GState.PLAY;
-                    this.scoreTimer.paused = false;
-
-                    // Show portal snake body after head arrives.
-                    if (this.snake.body.length > 2) {
-                        portal.targetObject.snakePortalingSprite.visible = true;   
-                    }
-
-                    // Set last move to now. Fixes Corner Time.
-                    this.lastMoveTime = this.time.now;
-                });
-                                    
-                return ;  //Don't know why this is here but I left it -James
+            const onContinue = function () {
+                ourGameScene.scene.start('MainMenuScene');
             }
-        });
+            this.input.keyboard.on('keydown-SPACE', function() { 
+                onContinue();
+            });
+
+            _continueText.on('pointerdown', e => {
+                onContinue();
+            });
+        }, [], this);
+
+
+
+        
     }
 
-    warpToNext(nextStageIndex) {
+    finalScore(){
+        const ourStartScene = this.scene.get('StartScene');
 
         this.gState = GState.TRANSITION;
 
         this.snake.head.setTexture('snakeDefault', 0);
 
+        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+        this.extractHole[0].play('extractHoleClose');
+
+        this.tweens.add({
+            targets: this.snake.body, 
+            yoyo: false,
+            duration: 500,
+            ease: 'Linear',
+            repeat: 0,
+            alpha: 0,
+            delay: this.tweens.stagger(30),
+        });
+        
+
+        //style
+        const finalScoreStyle = {
+            color: "white",
+            //"text-shadow": "2px 2px 4px #000000",
+            "font-size":'22px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
+
+        //EXTRACTION COMPLETE
+        this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size":'32px',
+            'font-weight': 400,
+            'text-align': 'center',
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            })).setHTML(
+                `EXTRACTION COMPLETE`
+        ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
+
+        //nineSlice
+        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, Y_OFFSET + GRID * 10, 
+            'uiPanelL', 'Glass', 
+            GRID * 16, GRID * 3, 
+            8, 8, 8, 8);
+        this.finalScorePanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0);
+
+        //FINAL SCORE LABEL
+        const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `FINAL SCORE :`
+        ).setOrigin(1,0).setScale(0.5);
+        
+        var _totalScore = 0
+
+        ourStartScene.stageHistory.forEach( stageData => {
+            _totalScore += stageData.calcTotal();
+        });
+        _totalScore = Math.floor(_totalScore); //rounds down to whole number
+
+        //FINAL SCORE VALUE
+        const finalScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `${_totalScore}`
+        ).setOrigin(0,0).setScale(0.5);
+
+        //PRESS SPACE TO CONTINUE TEXT
+        // Give a few seconds before a player can hit continue
+        this.time.delayedCall(900, function() {
+            const ourGameScene = this.scene.get('GameScene');
+            var _continue_text = '[SPACE TO CONTINUE]';
+
+            var _continueText = this.add.dom(SCREEN_WIDTH/2, GRID * 17,'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize":'32px',
+                "font-family": '"Press Start 2P", system-ui',
+                "text-shadow": "4px 4px 0px #000000",
+                }
+            )).setText(_continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
+
+ 
+            this.tweens.add({
+                targets: _continueText,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: -1,
+                yoyo: true
+              });
+
+            const onContinue = function () {
+                ourGameScene.warpToMenu(); 
+            }
+            this.input.keyboard.on('keydown-SPACE', function() { 
+                onContinue();
+            });
+
+            _continueText.on('pointerdown', e => {
+                onContinue();
+            });
+        }, [], this);
+
+
+
+        
+    }
+
+    warpToMenu(){
+
+        const ourPersist = this.scene.get('PersistScene');
+
+
+        //dim UI
+        this.time.delayedCall(1000, event => {
+            const ourGameScene = this.scene.get('GameScene');
+            this.tweens.add({
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                alpha: { from: 1, to: 0},
+                ease: 'Sine.InOut',
+                duration: 500,
+                });
+        });
+
+        this.tweens.add({
+            targets: this.extractLables,
+            alpha: 0,
+            yoyo: false,
+            duration: 50,
+            ease: 'linear',
+            repeat: 0,
+        });
+
+        //This tween doesn't playout yet, but it holds the onComplete to reset to main menu
+        this.tweens.add({
+            targets: this.cameras.main,
+            duration: 3000,
+            ease: 'Sine.In',
+            delay: 1000,
+            onComplete: () =>{
+                //TODO: reset back to stage 1
+                this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
+            }
+        });
+        
+        
+    }
+    
+ 
+    warpToNext(nextStageIndex) {
+
+        debugger
+        const ourPersist = this.scene.get('PersistScene');
+        this.gState = GState.TRANSITION;
+
+        ourPersist.comboCover.setVisible(true);
+        this.scoreTweenShow();
+
+        this.snake.head.setTexture('snakeDefault', 0);
+
+        if (this.helpPanel) {
+            this.tweens.add({
+                targets: [this.helpPanel,this.helpText],
+                alpha: { from: 1, to: 0},
+                ease: 'Sine.InOut',
+                duration: 500,
+                });
+        }
+
+        //dim UI
+        this.time.delayedCall(1000, event => {
+            const ourGameScene = this.scene.get('GameScene');
+            this.tweens.add({
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                alpha: { from: 1, to: 0},
+                ease: 'Sine.InOut',
+                duration: 500,
+                });
+        });
+
         var wallSprites = [];
         var fadeOutSprites = []; 
+        var groundSprites = [];
+
+        // Camera Pan Logic
+
+        var centerLocation = new Phaser.Math.Vector2(X_OFFSET + GRID * 14,Y_OFFSET + GRID * 13)
+        var blackholeLocation = new Phaser.Math.Vector2(this.snake.head.x,this.snake.head.y)
+
+        var camDirection = new Phaser.Math.Vector2((blackholeLocation.y - centerLocation.y),(blackholeLocation.x - centerLocation.x));
 
         this.wallLayer.culledTiles.forEach( tile => {
 
-            if (tile.y > 1 && tile.y < 30) {
-                
-                var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
-                ).setOrigin(0,0).setDepth(50);
-                
-                if (FADE_OUT_TILES.includes(tile.index)) {
-                    fadeOutSprites.push(_sprite);
-                } else {
-                    wallSprites.push(_sprite);
-                }               
-            }
+            var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+            ).setOrigin(0,0).setDepth(20);
+            _sprite.setPipeline('Light2D')
+
+            
+            if (FADE_OUT_TILES.includes(tile.index)) {
+                fadeOutSprites.push(_sprite);
+            } else {
+                wallSprites.push(_sprite);
+            }               
             
         });
+        if (this.groundLayer != undefined) {
+            this.groundLayer.culledTiles.forEach( tile => {
+
+                var _spriteGround = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+                ).setOrigin(0,0).setDepth(20);
+                //_spriteGround.setTint(0xaba2d8);
+                _spriteGround.setPipeline('Light2D');
+                
+                if (FADE_OUT_TILES.includes(tile.index)) {
+                    fadeOutSprites.push(_spriteGround);
+                } else {
+                    groundSprites.push(_spriteGround);
+                }    
+                Phaser.Actions.Shuffle(groundSprites)
+            });
+            this.groundLayer.visible = false;
+        }
+        
+
         this.wallLayer.visible = false;
+        this.wallLayerShadow.visible = false;
+        
 
         Phaser.Utils.Array.Shuffle(wallSprites);
         
         var allTheThings = [
-            ...this.coins,
+            ...this.coinsArray,
             ...this.portals,
             ...this.atoms,
-            ...wallSprites
+            ...wallSprites,
         ];
 
+        //turn off portal particles and any portal sprites
+        if (this.portalParticles != undefined) {
+            this.portalParticles.forEach(portalParticles => { 
+                portalParticles.stop();
+            });
+            this.snakePortalingSprites.forEach(snakePortalingSprite => { 
+                snakePortalingSprite.visible = false;
+            });
+            
+        }
+        
         var snakeholeTween = this.tweens.add({
             targets: this.snake.body, 
             x: this.snake.head.x,
@@ -3307,21 +5378,12 @@ class GameScene extends Phaser.Scene {
             duration: 500,
             ease: 'Sine.easeOutIn',
             repeat: 0,
-            delay: this.tweens.stagger(30)
+            delay: this.tweens.stagger(30),
+            alpha: 0
         });
 
-        
-
-        var blackholeTween = this.tweens.add({
-            targets: allTheThings, 
-            x: this.snake.head.x,
-            y: this.snake.head.y,
-            yoyo: false,
-            duration: 500,
-            ease: 'Sine.easeOutIn',
-            repeat: 0,
-            delay: this.tweens.stagger(30)
-        });
+        //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+        var popVolume = 1.0
 
         var fadeoutTween = this.tweens.add({
             targets: fadeOutSprites,
@@ -3330,31 +5392,106 @@ class GameScene extends Phaser.Scene {
             ease: 'linear'
             }, this);
 
+        var blackholeTween = this.tweens.add({
+            targets: allTheThings, 
+            x: this.snake.head.x - GRID * 1,
+            y: this.snake.head.y + GRID * 1,
+            //x: {from: this.snake.head.x + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.x},
+            //y: {from: this.snake.head.y + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.y},
+            yoyo: false,
+            duration: 600,
+            ease: 'Sine.in',
+            repeat: 0,
+            delay: this.tweens.stagger(60),
+            alpha: {from: 5, to: 0},
+            rotation: 5,
+            onDelay: () =>{
+                if (allTheThings.length > 150) {
+                    blackholeTween.timeScale += .04;
+                }
+                else{
+                    blackholeTween.timeScale += .02;
+                }
+                this.sound.play('pop03', { volume: popVolume });
+                if (popVolume >= 0.00) {
+                    popVolume -= .005
+                }
+            },
+            onComplete: () =>{
+                debugger
+                this.nextStagePortals.forEach( blackholeImage=> {
+                    if (blackholeImage != undefined) {
+                        blackholeImage.play('blackholeClose')
+                        ourPersist.bgCoords.x += camDirection.y/2;
+                        ourPersist.bgCoords.y += camDirection.x/2;
+                    }
+                });
+                var cameraPanTween = this.tweens.add({
+                    targets: this.cameras.main,
+                    scrollX: camDirection.y * 10,
+                    scrollY: camDirection.x * 10,
+                    duration: 1000,
+                    ease: 'Sine.In',
+                    delay: 500,
+                    onComplete: () =>{
+                        debugger
+                        this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                    }
+                });
+            }
+        });
+
+        var blackholeTweenGround = this.tweens.add({
+            targets: groundSprites, 
+            x: this.snake.head.x - GRID * 1,
+            y: this.snake.head.y + GRID * 1,
+            yoyo: false,
+            duration: 600,
+            ease: 'Sine.in',
+            repeat: 0,
+            delay: this.tweens.stagger(20),
+            alpha: {from: 5, to: 0},
+            rotation: 5,
+            onDelay: () =>{
+                if (groundSprites.length > 250) {
+                    blackholeTweenGround.timeScale += .06;
+                }
+                if (groundSprites.length > 150) {
+                    blackholeTweenGround.timeScale += .05;
+                }
+                else{
+                    blackholeTweenGround.timeScale += .03;
+                }
+            }
+        });
+
+        var blackholeTweenGround = this.tweens.add({
+            targets: this.blackholeLabels,
+            alpha: 0,
+            yoyo: false,
+            duration: 50,
+            ease: 'linear',
+            repeat: 0,
+            delay: this.tweens.stagger(150),
+        });
+
+
 
         snakeholeTween.on('complete', () => {
-            this.nextStage(this.nextStages[nextStageIndex]);
+            var cameraZoomTween = this.tweens.add({
+                targets: this.map,
+                alpha: {from: 1, to: 0},
+                duration: 500,
+                ease: 'Sine.InOut',
+                zoom: 1 //switched to 1 from 10 to quickly remove it. nextStage() needs to run from somewhere else once removed.
+                });
+            cameraZoomTween.on('complete', ()=>{
+                
+                
+                //this.nextStage(this.nextStages[nextStageIndex]);
+            })
+            
         });
-        /*var tween = this.tweens.addCounter({
-            from: 600,
-            to: 0,
-            ease: 'Sine.InOut',
-            duration: 2000,
-            onUpdate: tween =>
-                {   
-                    this.graphics.clear();
-                    var value = (tween.getValue());
-                    this.tweenValue = value
-                    this.shape1 = this.make.graphics().fillCircle(this.snake.head.x, this.snake.head.y, value);
-                    var geomask1 = this.shape1.createGeometryMask();
-                    
-                    this.cameras.main.setMask(geomask1,true)
-                    //this.cameras.main.ignore(this.scorePanel)
-                }
-        });
-        tween.on('complete', ()=>{
-            this.cameras.main.setMask(false)
-            this.nextStage(this.nextStages[nextStageIndex]);
-        });*/
                     
     }
 
@@ -3376,8 +5513,8 @@ class GameScene extends Phaser.Scene {
 
         var vortexTween = this.tweens.add({
             targets: target, 
-            x: x * GRID, //this.pathRegroup.vec.x,
-            y: y * GRID, //this.pathRegroup.vec.y,
+            x: x, //this.pathRegroup.vec.x,
+            y: y, //this.pathRegroup.vec.y,
             yoyo: false,
             duration: 500,
             ease: 'Sine.easeOutIn',
@@ -3403,10 +5540,11 @@ class GameScene extends Phaser.Scene {
         return snakeEating
     }
     loseCoin(){
-        this.coinsUICopy = this.physics.add.sprite(GRID*21.5 -7, 6,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(2.0);
-        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-200, -400));
-        this.coinsUICopy.setGravity(0,400)
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+        ourSpaceBoy.coinsUICopy = ourSpaceBoy.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
+        ourSpaceBoy.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        ourSpaceBoy.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
         //TODO trigger UI coin loader animation here
     }
@@ -3420,8 +5558,9 @@ class GameScene extends Phaser.Scene {
         return ourPersist.coins < 0;
     }
 
-    nextStage(stageName) {
+    nextStage(stageName,camDirection) {
         const ourInputScene = this.scene.get("InputScene");
+        this.camDirection = camDirection
 
         
         //console.log(STAGE_UNLOCKS['start'].call());
@@ -3444,16 +5583,24 @@ class GameScene extends Phaser.Scene {
              */
             nextStage = Phaser.Math.RND.pick(this.nextStages);
         }
-        
-        
 
+
+
+        
+    
         this.scene.restart( { 
             stage: stageName, 
             score: this.nextScore, 
             lives: this.lives, 
-            startupAnim: false 
+            startupAnim: false,
+            camDirection: this.camDirection
         });
         ourInputScene.scene.restart();
+
+        // Mainmenu Code @holden
+        //ourMainMenuScene.scene.restart( {
+        //    startingAnimation: "menuReturn"
+        //});
 
         // Add if time attack code here
         //ourGame.scene.stop();
@@ -3462,8 +5609,6 @@ class GameScene extends Phaser.Scene {
     }
 
     scoreTweenShow(){
-        if (this.UIScoreContainer.y === -20) {
-            console.log('showing')
             this.tweens.add({
                 targets: this.UIScoreContainer,
                 y: (0),
@@ -3474,7 +5619,7 @@ class GameScene extends Phaser.Scene {
               });
                 this.tweens.add({
                 targets: this.scorePanel,
-                height: 78,
+                height: 39,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -3488,13 +5633,12 @@ class GameScene extends Phaser.Scene {
                 repeat: 0,
                 yoyo: false
               });
-        }
     }
     scoreTweenHide(){
         if (this.UIScoreContainer.y === 0) {
             this.tweens.add({
                 targets: this.UIScoreContainer,
-                y: (-20),
+                y: (-11),
                 ease: 'Sine.InOut',
                 duration: 800,
                 repeat: 0,
@@ -3502,7 +5646,7 @@ class GameScene extends Phaser.Scene {
               });
             this.tweens.add({
                 targets: this.scorePanel,
-                height: 58,
+                height: 28,
                 ease: 'Sine.InOut',
                 duration: 800,
                 repeat: 0,
@@ -3510,7 +5654,7 @@ class GameScene extends Phaser.Scene {
               });
             this.tweens.add({
                 targets: [this.bestScoreLabelUI, this.bestScoreUI],
-                alpha: 0,
+                alpha: 1,
                 ease: 'Sine.InOut',
                 duration: 1000,
                 repeat: 0,
@@ -3525,7 +5669,7 @@ class GameScene extends Phaser.Scene {
         this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
                 this.letterO2, this.letterExplanationPoint], 
-            y: { from: GRID * 4, to: GRID * 3 },
+            y: { from: GRID * 1.25, to: GRID * 0 },
             ease: 'Sine.InOut',
             duration: 200,
             repeat: 0,
@@ -3637,24 +5781,9 @@ class GameScene extends Phaser.Scene {
              * Checks for Tween complete on each frame.
              * on. ("complete") is not run unless it is checked directly. It is not on an event listener
             ***/ 
-            if (this.startingArrowsAnimN.x != this.arrowN_start.x) {
-                this.startingArrowsAnimN.setPosition(this.arrowN_start.x,this.arrowN_start.y)
-                this.startingArrowsAnimS.setPosition(this.arrowS_start.x,this.arrowS_start.y)
-                this.startingArrowsAnimE.setPosition(this.arrowE_start.x,this.arrowE_start.y)
-                this.startingArrowsAnimW.setPosition(this.arrowW_start.x,this.arrowW_start.y)
-            }
-            
-           /* this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 48).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('startArrowIdle')
-            this.startingArrowsAnimE = this.add.sprite(_x + 48, _y + 12).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('startArrowIdle')
-            this.startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('startArrowIdle')*/
             
             this.tweenRespawn.on('complete', () => {
+
                 
                 if (this.scene.get("PersistScene").coins > 0) {
                     this.coinsUIIcon.setVisible(true)
@@ -3694,16 +5823,28 @@ class GameScene extends Phaser.Scene {
 
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
             this.gState = GState.TRANSITION;
-            
+            this.snake.direction = DIRS.STOP;
+            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+
             this.events.off('addScore');
 
             
             this.scene.launch('ScoreScene');
+            this.setWallsPermeable();
         }
 
         // #region Lose State
-        if (this.checkLoseCon()) {
-            var coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
+        if (this.checkLoseCon() && this.canContinue) {
+            this.canContinue = false;
+            this.gState = GState.TRANSITION;
+            this.snake.direction = DIRS.STOP;
+            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+            this.events.off('addScore');
+            this.events.off('spawnBlackholes');
+            this.gameOver();
+
+            /*var coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
                 {
                     "font-size": '32px',
                     "text-align": 'center',
@@ -3720,11 +5861,11 @@ class GameScene extends Phaser.Scene {
 
             this.scene.get("UIScene").coinUIText.setHTML(
                 ` \u{1F480}`
-            )
+            )*/
 
 
 
-            this.scene.pause("GameScene");
+            //this.scene.pause("GameScene");
             
         }
 
@@ -3741,13 +5882,6 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
-            // #region Check Update
-            /*if (this.snake.direction != DIRS.STOP) {
-                this.startingArrowsAnimN.setAlpha(0);
-                this.startingArrowsAnimS.setAlpha(0);
-                this.startingArrowsAnimE.setAlpha(0);
-                this.startingArrowsAnimW.setAlpha(0);
-            }*/
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -3792,6 +5926,8 @@ class GameScene extends Phaser.Scene {
                                                                     closestPortal.x/GRID, closestPortal.y/GRID);
 
                 this.portals.forEach( portal => {
+
+                    // Add here a for loop that goes through the five lights and continues with the shortest distance
                     var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                         portal.x/GRID, portal.y/GRID);
 
@@ -3864,11 +6000,10 @@ class GameScene extends Phaser.Scene {
 
                 // Move at last second
                 this.snake.move(this);
-                ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
+                ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
 
                 this.snakeCriticalState();
-                this.checkPortalAndMove()
                 
 
                 if (this.boostEnergy < 1) {
@@ -3935,8 +6070,8 @@ class GameScene extends Phaser.Scene {
         }
         */
         var timeTick = this.currentScoreTimer()
-        this.scoreDigitLength = this.runningScore.toString().length;
-        this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
+        //this.scoreDigitLength = this.runningScore.toString().length;
+        //this.scorePanel.width = ((42) + (this.scoreDigitLength * 6)); //should only run on score+
 
         
         
@@ -3976,23 +6111,27 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1) {
+                if (this.coinSpawnCounter < 1 && !this.tutorialState) {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
-                    var pos = Phaser.Math.RND.pick(validLocations)
+                    var pos = Phaser.Math.RND.pick(validLocations);
 
-                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(2);
+                    var _coin = new Coin(this, this.coinsArray, pos.x, pos.y);
+                    this.interactLayer[(pos.x - X_OFFSET)/GRID][(pos.y - Y_OFFSET)/GRID] = _coin;
+                    
+                    //this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
+                    //).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
+                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
 
-                    this.tweens.add( {
-                        targets: _coin,
-                        originY: [0.1875 - .0466,0.1875 + .0466],
-                        ease: 'sine.inout',
-                        duration: 500,
-                        yoyo: true,
-                        repeat: -1,
-                       })
+                    //this.tweens.add( {
+                    //    targets: _coin,
+                    //    originY: [0.1875 - .0466,0.1875 + .0466],
+                    //    ease: 'sine.inout',
+                    //    duration: 500,
+                    //    yoyo: true,
+                    //    repeat: -1,
+                    //   })
 
                     // tween code not working @holden I am not sure what I am missing -James
                     //this.tweens.add({
@@ -4004,7 +6143,7 @@ class GameScene extends Phaser.Scene {
                     //    repeat: -1
                     //});
                     
-                    this.coins.push(_coin);
+                    this.coinsArray.push(_coin);
 
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
@@ -4014,11 +6153,16 @@ class GameScene extends Phaser.Scene {
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
                     case MAX_SCORE:  // 120 {}
-                        this.atoms.forEach( atom => {
+                    this.atoms.forEach(atom => {
+                        if (atom.anims.currentAnim.key !== 'atom01idle' ||atom.anims.currentAnim.key !== 'atom05spawn') {
                             atom.play("atom01idle");
+                        }
+                    
+                        if (atom.electrons.anims.currentAnim.key !== 'electronIdle') {
                             atom.electrons.play("electronIdle");
                             atom.electrons.anims.msPerFrame = 66;
-                        });
+                        }
+                    });
                         break;
                     
                     case 110: 
@@ -4062,6 +6206,7 @@ class GameScene extends Phaser.Scene {
             }
             
         }
+        
         
 
 
@@ -4129,11 +6274,11 @@ class GameScene extends Phaser.Scene {
             this.comboFade();
         }
 
-        
     }
+    
 }
 
-const COPPER = 0;
+const WOOD = 0;
 const BRONZE = 1;
 const SILVER = 2;
 const GOLD = 3;
@@ -4202,10 +6347,10 @@ var StageData = new Phaser.Class({
                 rank = BRONZE;
                 break;
             default:
-                rank = COPPER;
+                rank = WOOD;
         }
-
         return rank;
+        
 
     },
 
@@ -4283,8 +6428,7 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
-
-        ourGame.scoreTweenShow();
+     
 
         /*var style = {
             'color': '0x828213'
@@ -4440,7 +6584,7 @@ class ScoreScene extends Phaser.Scene {
 
         // Panels
 
-        this.scorePanelL = this.add.nineslice(GRID * 4.75, GRID * 7.75, 
+        this.scorePanelL = this.add.nineslice(X_OFFSET +GRID * 4.75, GRID * 7.75, 
             'uiPanelL', 'Glass', 
             GRID * 12, GRID * 11.5, 
             8, 8, 8, 8);
@@ -4463,10 +6607,10 @@ class ScoreScene extends Phaser.Scene {
         //megaAtlas code reference
         //this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
         //this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
-        ourGame.continueBanner = ourGame.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(2);
+        ourGame.continueBanner = ourGame.add.image(X_OFFSET,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
 
         // Scene Background Color
-        ourGame.stageBackGround = ourGame.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x323353, .75);
+        ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, Y_OFFSET, GRID * 29, GRID * 27, 0x323353, .75);
         ourGame.stageBackGround.setOrigin(0,0).setDepth(49);
         ourGame.stageBackGround.alpha = 0;
 
@@ -4482,16 +6626,19 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTimeScale = .25;
 
         //STAGE CLEAR
-        this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "text-shadow": "4px 4px 0px #000000",
-            "font-size":'32px',
-            'font-weight': 400,
-            'text-align': 'center',
-            'text-transform': 'uppercase',
-            "font-family": '"Press Start 2P", system-ui',
+        this.time.delayedCall(100, () => {
+            this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "text-shadow": "4px 4px 0px #000000",
+                "font-size": '32px',
+                'font-weight': 400,
+                'text-align': 'center',
+                'text-transform': 'uppercase',
+                "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
                 `${this.stageData.stage} CLEAR`
-        ).setOrigin(0.5, 0);
+            ).setOrigin(0.5, 0).setScale(.5);
+        });
+        
 
         
         // #region Main Stats
@@ -4508,34 +6655,34 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `BASE SCORE:
                 SPEED BONUS:`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(0)}</span>`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore
                 `
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(0)}</span>
                 `
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore + _speedbonus
                 `
                 
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
         var frameTime = 16.667
 
@@ -4557,7 +6704,7 @@ class ScoreScene extends Phaser.Scene {
                 const value = Math.round(tween.getValue());
                 preAdditiveBaseScoreUI.setHTML(
                     `${commaInt(value)}</span>`
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
 
@@ -4574,7 +6721,7 @@ class ScoreScene extends Phaser.Scene {
                     `
                 <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(value)}</span>
                 `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             },
             onComplete: () => {
                 //SFX
@@ -4611,7 +6758,7 @@ class ScoreScene extends Phaser.Scene {
         });*/
         
 
-        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
@@ -4619,8 +6766,8 @@ class ScoreScene extends Phaser.Scene {
 
 
                 `
-        ).setOrigin(1,0);
-        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1,0).setScale(0.5);
+        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
@@ -4628,8 +6775,8 @@ class ScoreScene extends Phaser.Scene {
                 ZED LVL +${0}%
 
                 `
-        ).setOrigin(1,0);
-        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1,0).setScale(0.5);
+        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
@@ -4637,7 +6784,7 @@ class ScoreScene extends Phaser.Scene {
 
                 MEDAL +${0}%
                 `
-        ).setOrigin(1,0);
+        ).setOrigin(1,0).setScale(0.5);
         
         this.tweens.addCounter({
             from: 0,
@@ -4653,7 +6800,7 @@ class ScoreScene extends Phaser.Scene {
 
                     `
                 
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         this.tweens.addCounter({
@@ -4671,7 +6818,7 @@ class ScoreScene extends Phaser.Scene {
 
                     `
                 
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         this.tweens.addCounter({
@@ -4688,26 +6835,26 @@ class ScoreScene extends Phaser.Scene {
 
                     MEDAL +${value3}%
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
 
-        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `x ${0}%
                 `
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
-        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `
                 <hr style="font-size:3px"/><span style="font-size:16px">${0}</span>`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
 
         this.tweens.addCounter({
             from: 0,
@@ -4721,7 +6868,7 @@ class ScoreScene extends Phaser.Scene {
                 multValuesUI1.setHTML(
                     `x ${value}%
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             },
             onComplete: () => {
                 multValuesUI2.setHTML(
@@ -4754,31 +6901,31 @@ class ScoreScene extends Phaser.Scene {
             },
         });*/
 
-        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `CORNER TIME:
                 BOOST BONUS:
                 NO-BONK BONUS:`
-        ).setOrigin(1,0);
+        ).setOrigin(1,0).setScale(0.5);
 
-        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `${0}
                 
                 `
-        ).setOrigin(1, 0);
-        const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1, 0).setScale(0.5);
+        const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `
                 ${0}
                 `
-        ).setOrigin(1, 0);
-        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        ).setOrigin(1, 0).setScale(0.5);
+        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
@@ -4790,7 +6937,7 @@ class ScoreScene extends Phaser.Scene {
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.cornerBonus(),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
@@ -4800,14 +6947,14 @@ class ScoreScene extends Phaser.Scene {
                     `+${value}
                     
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.boostBonus(),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
@@ -4817,14 +6964,14 @@ class ScoreScene extends Phaser.Scene {
                     `
                     +${value}
                     `
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
         });
         
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.bonkBonus(),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+            duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
             onComplete: () =>
@@ -4843,12 +6990,12 @@ class ScoreScene extends Phaser.Scene {
                     
                     +${value}`
                     
-            ).setOrigin(1, 0);
+            ).setOrigin(1, 0).setScale(0.5);
             }
             
         });
 
-        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -4858,7 +7005,7 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
-        ).setOrigin(1, 0.5).setDepth(20);
+        ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
 
         
         this.ScoreContainerL.add(
@@ -4886,12 +7033,12 @@ class ScoreScene extends Phaser.Scene {
         let rank = this.stageData.stageRank() + 1; // FileNames start at 01.png
         //rank = 4; // Temp override.
         
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0, "megaAtlas", `ranksSprite0${rank}.png`
+        var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank -1
         ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         this.ScoreContainerL.add(letterRank)
         
-        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
+        this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x - 12, letterRank.y + 16, 36);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
         this.letterRankPath2 = { t: .5, vec: new Phaser.Math.Vector2() };
 
@@ -4933,9 +7080,9 @@ class ScoreScene extends Phaser.Scene {
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
-                x:{min: 0, max: 32},
-                y:{min: 0, max: 68},
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
+                x:{min: 0, max: 16},
+                y:{min: 0, max: 34},
                 anim: 'twinkle01',
                 lifespan: 1000,
             }).setFrequency(500,[1]).setDepth(51);
@@ -4945,9 +7092,9 @@ class ScoreScene extends Phaser.Scene {
             lightColor = goldLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
-                x:{min: 0, max: 32},
-                y:{min: 0, max: 68},
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+                x:{min: 0, max: 16},
+                y:{min: 0, max: 34},
                 anim: 'twinkle02',
                 lifespan: 1000,
             }).setFrequency(1332,[1]).setDepth(51);
@@ -4958,9 +7105,9 @@ class ScoreScene extends Phaser.Scene {
             lightColor = platLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
-            var rankParticles = this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle0Anim", {
-                x:{steps: 8, min: -8, max: 40},
-                y:{steps: 8, min: 8, max: 74},
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5,GRID * 14.5, "twinkle0Anim", {
+                x:{steps: 8, min: 0, max: 24},
+                y:{steps: 8, min: 24.5, max: 65.5},
                 anim: 'twinkle03',
                 color: [0x8fd3ff,0xffffff,0x8ff8e2,0xeaaded], 
                 colorEase: 'quad.out',
@@ -4971,13 +7118,15 @@ class ScoreScene extends Phaser.Scene {
             this.ScoreContainerL.add(rankParticles)
         }
 
-        this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5); //
-        this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5); //
+        this.spotlight = this.lights.addLight(0, 0, 66, lightColor).setIntensity(1.5); //
+        this.spotlight2 = this.lights.addLight(0, 0, 66, lightColor2).setIntensity(1.5); //
         
 
         // #region Atomic Food List
        
         var scoreAtoms = [];
+        var scoreCombos= [];
+        var emptySprite = undefined;
 
         var count = 0;
         
@@ -4988,40 +7137,43 @@ class ScoreScene extends Phaser.Scene {
             let anim;
 
             if (i < 14) {
-                _x = (GRID * (7.2667 - .25)) + (i * 16);
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 8);
                 _y = GRID * 8.75
             }
             else {
-                _x = (-GRID * (2.0667 + .25)) + (i * 16);
-                _y = (GRID * 8.75) + 16;
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
+                _y = (GRID * 8.75) + 8;
             }
 
             switch (true) {
                 case logTime > COMBO_ADD_FLOOR:
-                    anim = "atom01idle";
+                    anim = "atomScore01";
                     if (i != 0) { // First Can't Connect
-                        var rectangle = this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
+                        var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
                         ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
                         this.ScoreContainerL.add(rectangle)
-                        //scoreAtoms.push(rectangle)
+                        scoreCombos.push(rectangle)
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
                     console.log(logTime, "Boost", i);
-                    anim = "atom02idle";
+                    anim = "atomScore02";
+                    scoreCombos.push(emptySprite);
                     break
                 case logTime > SCORE_FLOOR:
                     console.log(logTime, "Boost", i);
-                    anim = "atom03idle";
+                    anim = "atomScore03";
+                    scoreCombos.push(emptySprite);
                     break
                 default:
                     console.log(logTime, "dud", i);
-                    anim = "atom04idle";
+                    anim = "atomScore04";
+                    scoreCombos.push(emptySprite);
                     break
             }
 
-            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickup01Anim'
-            ).play(anim).setDepth(21).setScale(.5).setAlpha(0);
+            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
+            ).play(anim).setDepth(21).setScale(1).setAlpha(0);
             this.ScoreContainerL.add(this.atomScoreIcon)  
             scoreAtoms.push(this.atomScoreIcon)
         }
@@ -5041,11 +7193,15 @@ class ScoreScene extends Phaser.Scene {
                 __frame += 1
                 if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
                     _frame += 1
-                    var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
-                    console.log(__frame)
+                    //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
                     
                     scoreAtoms[_frame-1].setAlpha(1);
-                    ourGame.atomSounds[_index].play()
+                    if (scoreCombos[_frame-1]) {
+                        scoreCombos[_frame-1].setAlpha(1);
+                    }
+
+                    //ourGame.atomSounds[_index].play()
+                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
                 }
                 
                 //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
@@ -5068,7 +7224,7 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL.x -= SCREEN_WIDTH
         this.tweens.add({ //brings left score container into camera frame
             targets: this.ScoreContainerL,
-            x: -GRID * 1,
+            x: -GRID * 2,
             ease: 'Sine.InOut',
             duration: 500,
         });
@@ -5081,7 +7237,7 @@ class ScoreScene extends Phaser.Scene {
         });
         this.tweens.add({
             targets: letterRank,
-            x: GRID * 3.5,
+            x: X_OFFSET + GRID * 3.5,
             ease: 'Sine.InOut',
             duration: 500,
             delay:2500,
@@ -5094,7 +7250,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.tweens.add({
             targets: this.scorePanelLRank,
-            x: GRID * 4.5,
+            x: X_OFFSET + GRID * 4.5,
             ease: 'Sine.InOut',
             duration: 500,
             delay:2500,
@@ -5132,7 +7288,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
 
-        const stageStats = this.add.dom(SCREEN_WIDTH/2 + GRID * 2, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        const stageStats = this.add.dom(SCREEN_WIDTH/2 - X_OFFSET + GRID * 3, (GRID * cardY) + 2, 'div',  Object.assign({}, STYLE_DEFAULT, 
             styleCard, {
             })).setHTML(
                 //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
@@ -5171,7 +7327,7 @@ class ScoreScene extends Phaser.Scene {
                 [${ourGame.scoreHistory.slice().sort().reverse()}]
                 </br>`
                     
-        ).setOrigin(0,0).setVisible(true);
+        ).setOrigin(0,0).setScale(0.5).setVisible(true);
 
 
         
@@ -5204,7 +7360,7 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerR.x += SCREEN_WIDTH//GRID * 1;
         this.tweens.add({
             targets: this.ScoreContainerR,
-            x: -GRID * 1,
+            x: X_OFFSET - GRID * 2,
             ease: 'Sine.InOut',
             duration: 500,
         });
@@ -5224,7 +7380,7 @@ class ScoreScene extends Phaser.Scene {
         this.hashUI = this.add.dom(SCREEN_WIDTH/2, GRID * 23, 'div',  Object.assign({}, STYLE_DEFAULT, {
             width:'335px',
             "fontSize":'18px',
-        })).setOrigin(.5, 0).setAlpha(0);
+        })).setOrigin(.5, 0).setScale(0.5).setAlpha(0);
 
 
     
@@ -5232,7 +7388,7 @@ class ScoreScene extends Phaser.Scene {
         var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
 
-        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
             "font-weight": '400',
             "text-shadow": '#000000 1px 0 6px',
@@ -5240,9 +7396,9 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setText(
                 `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
-        ).setOrigin(0,0).setAlpha(0);
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
         
-        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
             "font-weight": '400',
             "text-shadow": '#000000 1px 0 6px',
@@ -5250,7 +7406,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
-        ).setOrigin(0,0).setAlpha(0);
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         // #region Help Card
         /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
@@ -5262,15 +7418,6 @@ class ScoreScene extends Phaser.Scene {
         ourStartScene.stageHistory.forEach( stageData => {
             totalScore += stageData.calcTotal();
         });
-
-        /*const currentScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '500px',
-            color: COLOR_SCORE,
-            "font-size":'28px',
-            'font-weight': 500,
-        })).setText(
-            `TOTAL SCORE: ${commaInt(totalScore)}`
-        ).setOrigin(0.5,0).setDepth(60);*/
 
         // #endregion
         /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -5321,9 +7468,9 @@ class ScoreScene extends Phaser.Scene {
             var gameOver = false;
 
             if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
-                debugger
-                continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
-                gameOver = true;
+                //debugger
+                //continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
+                //gameOver = true;
                 // Should restart here, with a popup that shows your run score info.
                 // Should be the same screen as the GameOver Screen.
             }
@@ -5335,9 +7482,9 @@ class ScoreScene extends Phaser.Scene {
                 //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
                 //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
                 }
-            )).setText(continue_text).setOrigin(0.5,0).setDepth(25).setInteractive();
+            )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
-
+ 
             this.tweens.add({
                 targets: continueText,
                 alpha: { from: 0, to: 1 },
@@ -5348,22 +7495,34 @@ class ScoreScene extends Phaser.Scene {
               });
 
             const onContinue = function (scene) {
-    
+
+                if (ourGame.stage == 'Tutorial_1') {
+                    ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
+                         Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
+                }
+                //score screen starting arrows
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
+                    ourGame.startingArrowsAnimN2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimN2.play('startArrowIdle');
+                }
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y +1 * GRID)) {
+                    ourGame.startingArrowsAnimS2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimS2.flipY = true;
+                    ourGame.startingArrowsAnimS2.play('startArrowIdle');
+                }
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
+                    ourGame.startingArrowsAnimE2 = ourGame.add.sprite(ourGame.snake.head.x + GRID * 2, ourGame.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimE2.angle = 90;
+                    ourGame.startingArrowsAnimE2.play('startArrowIdle');
+                }
+                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
+                    ourGame.startingArrowsAnimW2 = ourGame.add.sprite(ourGame.snake.head.x - GRID,ourGame.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+                    ourGame.startingArrowsAnimW2.angle = 270;
+                    ourGame.startingArrowsAnimW2.play('startArrowIdle');
+                }
                 
-                ourGame.startingArrowsAnimN.setAlpha(1)
-                ourGame.startingArrowsAnimS.setAlpha(1)
-                ourGame.startingArrowsAnimE.setAlpha(1)
-                ourGame.startingArrowsAnimW.setAlpha(1)
-                
-                ourGame.startingArrowsAnimN.x = ourGame.snake.head.x + GRID * .5
-                ourGame.startingArrowsAnimN.y = ourGame.snake.head.y - GRID
-                ourGame.startingArrowsAnimS.x = ourGame.snake.head.x + GRID * .5
-                ourGame.startingArrowsAnimS.y = ourGame.snake.head.y + GRID * 2
-                ourGame.startingArrowsAnimE.x = ourGame.snake.head.x + GRID * 2
-                ourGame.startingArrowsAnimE.y = ourGame.snake.head.y + GRID * .5
-                ourGame.startingArrowsAnimW.x = ourGame.snake.head.x - GRID
-                ourGame.startingArrowsAnimW.y = ourGame.snake.head.y + GRID * .5
 
                 
                 console.log()
@@ -5385,16 +7544,17 @@ class ScoreScene extends Phaser.Scene {
                     "CompleteStage",
                     extraFields.toString(),
                     );
-                // Event listeners need to be removed manually
+                
+                    // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 ourGame.events.off('spawnBlackholes');
                 
 
-
+                    
                 if (!gameOver) {
-                                    // Go Back Playing To Select New Stage
+                    // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
                     debugger
                     ourGame.gState = GState.START_WAIT;
@@ -5446,14 +7606,14 @@ class ScoreScene extends Phaser.Scene {
         this.spotlight2.x = this.letterRankPath2.vec.x;
         this.spotlight2.y = this.letterRankPath2.vec.y;
 
-
-        /*this.graphics.clear(); //Used to debug where light is
+        /*this.graphics = this.add.graphics();
+        this.graphics.clear(); //Used to debug where light is
         this.graphics.lineStyle(2, 0xffffff, 1);
         this.letterRankCurve.draw(this.graphics, 64);
         this.graphics.fillStyle(0xff0000, 1);
         this.graphics.fillCircle(this.letterRankPath.vec.x, this.letterRankPath.vec.y, 8).setDepth(30);
-        this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);*/
-
+        this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);
+        */
 
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
@@ -5508,6 +7668,7 @@ class ScoreScene extends Phaser.Scene {
                 You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
+            
             if (this.prevZeds + this.difficulty > ourPersist.zeds) {
                 ourPersist.zeds = this.prevZeds + this.difficulty;
                 var zedsObj = calcZedLevel(ourPersist.zeds);
@@ -5712,7 +7873,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             this.input.keyboard.on('keydown-DOWN', function() {
                 selected[0].node.style.color = "white";
-                index = Phaser.Math.Wrap(index + 1, -1, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+                index = Phaser.Math.Wrap(index + 1, 0, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
 
                 selected = playedStages[index];
                 selected[0].node.style.color = COLOR_FOCUS;
@@ -5962,746 +8123,6 @@ class TimeAttackScene extends Phaser.Scene{
 }
 
 
-
-class UIScene extends Phaser.Scene {
-    // #region UIScene
-    constructor () {
-        super({ key: 'UIScene', active: false });
-    }
-    
-    init(props) {
-        //this.score = 0;
-        var { score = 0 } = props
-        this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
-        this.stageStartScore = Math.trunc(score);
-        
-        this.length = 0;
-
-        this.scoreMulti = 0;
-        this.globalFruitCount = 0;
-        this.bonks = 0;
-        this.medals = {};
-        this.zedLevel = 0;
-
-        var {lives = STARTING_ATTEMPTS } = props;
-        this.lives = lives;
-
-        var {startupAnim = true } = props;
-        this.startupAnim = startupAnim
-
-        this.scoreHistory = [];
-
-        // BOOST METER
-        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
-        this.comboCounter = 0;
-
-
-        this.coinSpawnCounter = 100;
-    }
-
-    preload () {
-        //const ourGame = this.scene.get('GameScene');
-        //this.load.json(`${this.stage}-json`, `assets/Tiled/${this.stage}.json`);
-
-        this.load.spritesheet('ui-blocks', 'assets/sprites/hudIconsSheet.png', { frameWidth: GRID, frameHeight: GRID });
-    }
-    
-    create() {
-       this.ourGame = this.scene.get('GameScene');
-       this.ourInputScene = this.scene.get('InputScene');
-       const ourUI = this.ourGame.scene.get('UIScene');
-
-       this.UIScoreContainer = this.make.container(0,0)
-       if (this.startupAnim) {
-        this.UIScoreContainer.setAlpha(0);
-        }
-
-       console.log("Startup animation on?", this.startupAnim);
-
-        
-
-
-
-       // UI Icons
-       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
-
-
-       // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2 + 5,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.4,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
-
-
-       this.mask = this.make.image({ // name is unclear.
-           x: SCREEN_WIDTH/2,
-           y: GRID,
-           key: 'megaAtlas',
-           frame: 'boostMask.png',
-           add: false
-       }).setOrigin(0.5,0.5);
-
-       const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2 -3, GRID).setOrigin(0.5,0.5);
-       boostBar.setDepth(50);
-       boostBar.play('increasing');
-
-       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
-
-       const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
-
-       /*this.chargeUpTween = this.tweens.add({
-            targets: fx1,
-            outerStrength: 16,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: true,
-            loop: 0 
-        });
-        this.chargeUpTween.pause();*/
-
-       // Combo Sprites
-
-       this.comboActive = false; //used to communicate when to activate combo tweens
-
-       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
-       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
-       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
-       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
-       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
-       
-       // #endregion
-
-        
-        //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
-        //stageUUID = this.cache.json.get(`${this.stage}-json`);
-   
-
-        // Store the Current Version in Cookies
-        localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
-
-        
-        
-
-        // Score Text
-        this.scoreUI = this.add.dom(5 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Stage`).setOrigin(0,0);
-        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0);
-
-        this.bestScoreUI = this.add.dom(12, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`Best`).setOrigin(0,0);
-        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.ourGame.bestBase).setOrigin(0,0);
-
-
-
-   
-        
-
-        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        //).setText(`x ${this.lives}`).setOrigin(0,1);
-
-        // Goal UI
-        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        const lengthGoalStyle = {
-            "font-size": '16px',
-            "font-weight": 400,
-            "text-align": 'right',
-        } 
-
-        this.lengthGoalUI = this.add.dom((GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
-        this.lengthGoalUILabel = this.add.dom(GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle));
-        //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
-        //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
- 
-        //snakeBody.scale = .667;
-        //flagGoal.scale = .667;
-        
-        
-        var length = `${this.length}`;
-        if (LENGTH_GOAL != 0) {
-            this.lengthGoalUI.setHTML(
-                `${length.padStart(2, "0")}<br/>
-                <hr style="font-size:3px"/>
-                ${LENGTH_GOAL.toString().padStart(2, "0")}`
-            ).setOrigin(0,0.5)//.setAlpha(0);
-            this.lengthGoalUILabel.setHTML(
-                `Length
-                <br/>
-                Goal`
-            ).setOrigin(0,0.5)//.setAlpha(0);
-        }
-        else {
-            // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
-            this.lengthGoalUI.x = GRID * 27
-        }
-
-        if (this.startupAnim) {
-            this.lengthGoalUI.setAlpha(0)
-            this.lengthGoalUILabel.setAlpha(0)
-        }
-        
-        //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
-
-        // Start Fruit Score Timer
-        if (DEBUG) { console.log("STARTING SCORE TIMER"); }
-
-        this.scoreTimer = this.time.addEvent({
-            delay: MAX_SCORE *100,
-            paused: true
-         });
-
-        var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-
-
-         // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
-            'color': '#FCFFB2',
-            'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
-            'font-size': '22px',
-            'font-weight': '400',
-            'font-family': 'Oxanium',
-            'padding': '2px 7px 0px 0px',
-            })).setHTML(
-                countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0.5);
-
-        //this.coinsUIIcon = this.add.sprite(GRID*21.5, 6,'megaAtlas', 'coinPickup01Anim.png'
-        //).play('coin01idle').setDepth(101).setOrigin(0,0);
-
-        //this.coinsUIIcon.setScale(0.5);
-        
-        this.coinUIText = this.add.dom(GRID*24.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: COLOR_SCORE,
-            'color': 'white',
-            'font-weight': '400',
-            //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
-            'font-size': '22px',
-            'font-family': 'Oxanium',
-            //'padding': '3px 8px 0px 0px',
-        })).setHTML(
-                `${commaInt(this.scene.get("PersistScene").coins)}`
-        ).setOrigin(0,0);
-        
-        //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-        //    `LASTΔ :`
-        //).setOrigin(0,1);
-        //this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-        //    `0 `
-        //).setOrigin(0,1);
-        
-        this.runningScoreUI = this.add.dom(GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `Score`
-        ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1);
-
-        
-        if (DEBUG) {
-            this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
-            this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-            { font: '30px Arial', 
-              fill: '#FFFFFF',
-              fontSize: "32px",
-              width: '38px',
-              "text-align": 'right',
-            });
-        }
-        
-        //  Event: addScore
-        this.ourGame.events.on('addScore', function (fruit) {
-
-            const ourScoreScene = this.scene.get('ScoreScene');
-
-            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
-                color: COLOR_SCORE,
-                'color': '#FCFFB2',
-                'font-weight': '400',
-                'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
-                'font-size': '22px',
-                'font-family': 'Oxanium',
-                'padding': '3px 8px 0px 0px',
-            })).setOrigin(0,0);
-            
-            // Remove score text after a time period.
-            this.time.delayedCall(1000, event => {
-                scoreText.removeElement();
-            }, [], this);
-
-            this.tweens.add({
-                targets: scoreText,
-                alpha: { from: 1, to: 0.0 },
-                y: scoreText.y - 10,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-            
-            
-            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
-            
-            if (timeLeft > BOOST_ADD_FLOOR) {
-                this.energyAmount += 25;
-            }
-            
-            if (timeLeft > SCORE_FLOOR) {
-                this.score += timeLeft;
-                scoreText.setText(`+${timeLeft}`);
-
-                // Record Score for Stats
-                this.scoreHistory.push(timeLeft);
-            } else {
-                this.score += SCORE_FLOOR;
-                scoreText.setText(`+${SCORE_FLOOR}`);
-
-                // Record Score for Stats
-                this.scoreHistory.push(SCORE_FLOOR);
-            }
-
-            // Calc Level Score
-            var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
-            var lastHistory = this.scoreHistory.slice();
-            lastHistory.pop();
-            var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
-            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
-
-            this.runningScore = this.score + calcBonus(baseScore);
-            var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
-
-            //this.deltaScoreUI.setText(
-            //    `LASTΔ : +`
-            //)
-            //this.deltaScoreLabelUI.setText(
-            //    `${deltaScore}`
-            //)
-            
-            /*this.runningScoreUI.setText(
-                `SCORE :`
-            );*/
-            this.runningScoreLabelUI.setText(
-                `${commaInt(this.runningScore.toString())}`
-            );
-            
-            
-
-
-            // Update UI
-
-            this.scoreUI.setText(`Stage`);
-            this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            
-            this.length += 1;
-            this.globalFruitCount += 1; // Run Wide Counter
-
-            var length = `${this.length}`;
-
-            this.bestScoreUI.setText(`Best`);
-            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
-            
-            // Exception for Bonus Levels when the Length Goal = 0
-            if (LENGTH_GOAL != 0) {
-                this.lengthGoalUI.setHTML(
-                    `${length.padStart(2, "0")}<br/>
-                    <hr style="font-size:3px"/>
-                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
-                )
-            }
-            else {
-                this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
-            }
-            
-             // Restart Score Timer
-            if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
-                this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: MAX_SCORE * 100,
-                    paused: false
-                 });   
-            }
-            
-        }, this);
-
-        //  Event: saveScore
-        this.ourGame.events.on('saveScore', function () {
-            const ourScoreScene = this.ourGame.scene.get('ScoreScene');
-            const ourUIScene = this.ourGame.scene.get('UIScene');
-            const ourStartScene = this.scene.get('StartScene');
-
-
-            // Building StageData for Savin
-            var stageData = ourScoreScene.stageData;
-            
-
-            //console.log(stageData.toString());
-
-            var stageFound = false;
-            
-            var stage_score = this.scoreHistory.reduce((a,b) => a + b, 0);
-            
-            // #region Do Unlock Calculation of all Best Logs
-            
-            var historicalLog = [];
-            if (ourStartScene.stageHistory.length > 1) {
-                ourStartScene.stageHistory.forEach( _stage => {
-                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestStageData`));
-                    if (stageBestLog) {
-                        historicalLog = [...historicalLog, ...stageBestLog];
-                    }
-                });
-                
-            }
-        
-            // make this an event?
-            ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
-        
-            // #endregion
-
-
-        }, this);
-
-        this.lastTimeTick = 0;
-        const ourGameScene = this.scene.get('GameScene');
-        // 9-Slice Panels
-        // We recalculate running score so it can be referenced for the 9-slice panel
-        var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
-        this.runningScore = this.score + calcBonus(baseScore);
-        this.scoreDigitLength = this.runningScore.toString().length;
-        
-        this.scorePanel = this.add.nineslice(GRID * .125, 0, 
-            'uiGlassL', 'Glass', 
-            ((96) + (this.scoreDigitLength * 10)), 78, 
-            80, 18, 18, 18);
-        this.scorePanel.setDepth(100).setOrigin(0,0)
-
-        this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
-        this.progressPanel.setDepth(100).setOrigin(0,0)
-        
-
-        this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
-            this.bestScoreUI,this.bestScoreLabelUI,
-            this.runningScoreUI, this.runningScoreLabelUI])
-
-        if (this.startupAnim) {
-            this.progressPanel.setAlpha(0)
-            this.scorePanel.setAlpha(0)
-        }
-
-        const goalText = [
-            'GOAL : COLLECT 28 ATOMS',
-        ];
-        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)*/
-        
-        if (this.startupAnim) {
-            
-            this.time.delayedCall(400, event => {
-                this.panelAppearTween = this.tweens.add({
-                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
-                    alpha: 1,
-                    duration: 300,
-                    ease: 'sine.inout',
-                    yoyo: false,
-                    repeat: 0,
-                });
-            })
-        }
-
-        // dot matrix
-
-        if (this.startupAnim){
-
-            const hsv = Phaser.Display.Color.HSVColorWheel();
-
-            const gw = 32;
-            const gh = 32;
-            const bs = 24;
-
-            const group = this.add.group({
-                key: "megaAtlas",
-                frame: 'portalParticle01.png',
-                quantity: gw * gh,
-                gridAlign: {
-                    width: gw,
-                    height: gh,
-                    cellWidth: bs,
-                    cellHeight: bs,
-                    x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
-                    y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
-                },
-            }).setDepth(103).setAlpha(0);
-
-            const size = gw * gh;
-
-
-            //  set alpha
-            group.getChildren().forEach((child,) => {
-                child = this.make.image({},
-                    false);
-                /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
-                    ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
-                ) {
-                    child.setAlpha(1).setScale(1);
-                }*/
-            });
-
-            this.variations = [
-                [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
-            ];
-            this.getStaggerTween(0, group);
-        }
-    }
-
-    getStaggerTween (i, group)
-    {
-        const stagger = this.variations[i];
-        
-        this.tweens.add({
-            targets: group.getChildren(),
-            scale: [2,0],
-            alpha: [.5,0],
-            ease: 'power2',
-            duration: 800,
-            delay: this.tweens.stagger(...stagger),
-            completeDelay: 1000,
-            repeat: 0,
-            onComplete: () =>
-            {
-                group.getChildren().forEach(child => {
-
-                    child.destroy();
-
-                });
-            }
-        }); 
-    }
-    // #region UI Update
-    update(time) {
-        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        this.scoreDigitLength = this.runningScore.toString().length;
-        this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
-
-        
-        
-        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
-        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
-            // Temp Code for bonus level
-            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
-
-            this.scoreUI.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            this.bestScoreUI.setText(`Best  ${this.score}`);
-
-            this.scene.pause();
-
-            this.scene.start('ScoreScene');
-        }
-        // #endregion
-
-        if (!this.ourGame.checkWinCon() && !this.scoreTimer.paused) {
-            /***
-             * This is out of the Time Tick Loop because otherwise it won't pause 
-             * correctly during portaling. After the timer pauses at the Score Floor
-             *  the countdown timer will go to 0.
-             */
-            var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-    
-            if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
-                this.scoreTimer.paused = true;
-            }
-
-            this.countDown.setText(countDown.toString().padStart(3,"0"));
-        }
-
-        if (timeTick != this.lastTimeTick) {
-            this.lastTimeTick = timeTick;
-
-            if(!this.scoreTimer.paused) {
-                this.coinSpawnCounter -= 1;
-
-                if (this.coinSpawnCounter < 1) {
-                    console.log("COIN TIME YAY. SPAWN a new coin");
-
-                    var validLocations = this.ourGame.validSpawnLocations();
-                    var pos = Phaser.Math.RND.pick(validLocations)
-
-                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(-.125,0.1875).setScale(2);
-
-                    // tween code not working @holden I am not sure what I am missing -James
-                    //this.tweens.add({
-                    //    targets: this.atoms,
-                    //    originY: .125,
-                    //    yoyo: true,
-                    //    ease: 'Sine.easeOutIn',
-                    //    duration: 1000,
-                    //    repeat: -1
-                    //});
-                    
-                    this.ourGame.coins.push(_coin);
-
-                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
-                }
-            }
-        }
-        
-
-
-        if (GState.PLAY === this.ourGame.gState) {
-            if (this.ourInputScene.spaceBar.isDown) {
-                // Has Boost Logic, Then Boost
-                if(this.energyAmount > 1){
-                    this.ourGame.moveInterval = SPEED_SPRINT;
-                    
-                    // Boost Stats
-                    this.ourInputScene.boostTime += 6;
-                    this.mask.setScale(this.energyAmount/100,1);
-                    this.energyAmount -= 1;
-                } else{
-                    //DISSIPATE LIVE ELECTRICITY
-                    this.ourGame.moveInterval = SPEED_WALK;
-                }
-        
-            } else {
-                this.ourGame.moveInterval = SPEED_WALK; // Less is Faster
-                this.mask.setScale(this.energyAmount/100,1);
-                this.energyAmount += .25; // Recharge Boost Slowly
-            }
-        } else if (GState.START_WAIT === this.ourGame.gState) {
-            this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount += 1; // Recharge Boost Slowly
-
-        }
-
-        // Reset Energy if out of bounds.
-        if (this.energyAmount >= 100) {
-            this.energyAmount = 100;}
-        else if(this.energyAmount <= 0) {
-            this.energyAmount = 0;
-        }
-
-        //#endregion Boost Logic
-        
-        // #region Combo Logic
-
-        if (this.comboCounter > 0 && !this.comboActive) {
-            this.comboAppear();
-        }
-        else if (this.comboCounter == 0 && this.comboActive){
-            this.comboFade();
-        }
-        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
-            this.comboFade();
-        }
-    }
-
-    scoreTweenShow(){
-        if (this.UIScoreContainer.y === -20) {
-            console.log('showing')
-            this.tweens.add({
-                targets: this.UIScoreContainer,
-                y: (0),
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-                this.tweens.add({
-                targets: this.scorePanel,
-                height: 78,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-              this.tweens.add({
-                targets: [this.bestScoreLabelUI, this.bestScoreUI],
-                alpha: 1,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-        }
-    }
-    scoreTweenHide(){
-        if (this.UIScoreContainer.y === 0) {
-            console.log('hiding')
-            this.tweens.add({
-                targets: this.UIScoreContainer,
-                y: (-20),
-                ease: 'Sine.InOut',
-                duration: 800,
-                repeat: 0,
-                yoyo: false
-              });
-            this.tweens.add({
-                targets: this.scorePanel,
-                height: 58,
-                ease: 'Sine.InOut',
-                duration: 800,
-                repeat: 0,
-                yoyo: false
-              });
-            this.tweens.add({
-                targets: [this.bestScoreLabelUI, this.bestScoreUI],
-                alpha: 0,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-        }
-    }
-
-    comboBounce(){
-        this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
-            y: { from: GRID * 4, to: GRID * 3 },
-            ease: 'Sine.InOut',
-            duration: 200,
-            repeat: 0,
-            delay: this.tweens.stagger(60),
-            yoyo: true
-            });
-    }
-    comboAppear(){
-        console.log("appearing")
-        this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 300,
-            repeat: 0,
-        });
-        this.comboActive = true;
-        }
-    comboFade(){
-        console.log("fading")
-        this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
-            alpha: { from: 1, to: 0 },
-            ease: 'Sine.InOut',
-            duration: 500,
-            repeat: 0,
-        });
-        this.comboActive = false;
-        this.comboCounter = 0;
-    }
-
-end() {
-
-    }
-    
-}
-
 // #region Input Scene
 class InputScene extends Phaser.Scene {
     
@@ -6862,13 +8283,6 @@ class InputScene extends Phaser.Scene {
             
         }
         /*
-        if (startingArrowState == true){
-            startingArrowState = false;
-            startingArrowsAnimN.setVisible(false)
-            startingArrowsAnimS.setVisible(false)
-            startingArrowsAnimE.setVisible(false)
-            startingArrowsAnimW.setVisible(false)
-        }
     })
 
     this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
@@ -6894,7 +8308,7 @@ class InputScene extends Phaser.Scene {
 
         switch (true) {
             case up:
-                console.log("I'm Facing Up");
+                //console.log("I'm Facing Up");
                 gameScene.snake.head.setTexture('snakeDefault', 6); 
                 gameScene.snake.direction = DIRS.UP
                 break;
@@ -6918,7 +8332,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
 
-            console.log("I'm Moving Up");
+            //console.log("I'm Moving Up");
             
             this.setPLAY(gameScene);
             
@@ -6939,7 +8353,6 @@ class InputScene extends Phaser.Scene {
 
                 
             gameScene.snake.move(gameScene);
-            gameScene.checkPortalAndMove();
             this.turnInputs[key] += 1;
 
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
@@ -6969,7 +8382,6 @@ class InputScene extends Phaser.Scene {
            gameScene.lastMoveTime = gameScene.time.now;
 
            gameScene.snake.move(gameScene);
-           gameScene.checkPortalAndMove();
            this.turnInputs[key] += 1;
 
            this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
@@ -7004,7 +8416,6 @@ class InputScene extends Phaser.Scene {
             this.moveHistory.push([gameScene.snake.head.x, gameScene.snake.head.y]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
 
-            gameScene.checkPortalAndMove();
             this.turnInputs[key] += 1;
             
         }
@@ -7033,7 +8444,6 @@ class InputScene extends Phaser.Scene {
 
             this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            gameScene.checkPortalAndMove();
             this.turnInputs[key] += 1;
         }
 
@@ -7106,6 +8516,20 @@ class InputScene extends Phaser.Scene {
         if (gameScene.startingArrowsAnimW != undefined){
             gameScene.startingArrowsAnimW.setAlpha(0);
         }
+        if (gameScene.startingArrowsAnimN2) {
+            gameScene.startingArrowsAnimN2.setAlpha(0);
+        }
+        if (gameScene.startingArrowsAnimE2) {
+            gameScene.startingArrowsAnimE2.setAlpha(0);
+        }
+        if (gameScene.startingArrowsAnimS2) {
+            gameScene.startingArrowsAnimS2.setAlpha(0);
+        }
+        if (gameScene.startingArrowsAnimW2) {
+            gameScene.startingArrowsAnimW2.setAlpha(0);
+        }
+        
+        
 
 
             //ourInputScene.moveDirection(this, e);
@@ -7142,7 +8566,7 @@ function loadSpriteSheetsAndAnims(scene) {
      *   Thank you samme from Phaser for both solutions!
      */
 
-    const snakeSpriteSheet = scene.textures.addSpriteSheetFromAtlas('snakeDefault', { atlas: 'megaAtlas', frameWidth: 24 ,frameHeight: 24 ,
+    const snakeSpriteSheet = scene.textures.addSpriteSheetFromAtlas('snakeDefault', { atlas: 'megaAtlas', frameWidth: 12 ,frameHeight: 12 ,
         frame: 'snakeSheetDefault.png'
     }); 
     snakeSpriteSheet.setDataSource(
@@ -7154,20 +8578,26 @@ function loadSpriteSheetsAndAnims(scene) {
 
 
     // Sprite Sheets that don't have animations.
-    scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 36 ,frameHeight: 48 ,
+    /*scene.textures.addSpriteSheetFromAtlas('comboLetters', { atlas: 'megaAtlas', frameWidth: 18, frameHeight: 24,
         frame: 'comboLetters.png'
-    });
+    });*/
+
+    scene.textures.addSpriteSheetFromAtlas('ranksSpriteSheet', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 36,
+        frame: 'ranksSpriteSheet.png'
+    })
 
 
     // Sprite Sheets and add Animations
-    scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 48, frameHeight: 48,
-        frame: 'startingArrowsAnim.png'
-    }); scene.anims.create({
+    // Mega Atlas code commented out
+    //scene.textures.addSpriteSheetFromAtlas('startArrow', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
+    //    frame: 'startingArrowsAnim.png'});
+    scene.anims.create({
         key: 'startArrowIdle',
-        frames: scene.anims.generateFrameNumbers('startArrow', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+        frames: scene.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
         frameRate: 16,
         repeat: -1
     });
+
 
     scene.anims.create({
         key: 'tutIdle',
@@ -7186,18 +8616,81 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [ 0,0,0,0,1,2,2,2,2,1]}),
         frameRate: 12,
         repeat: -1
-        });
+    });
     
-    scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 64, frameHeight: 64,
+    /*scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
         frame: 'portalAnim.png'
     }); scene.anims.create({
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
         frameRate: 8,
         repeat: -1
+    });*/
+
+    scene.anims.create({
+        key: 'portalIdle',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'portalForm',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
+        frameRate: 8,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'starIdle',
+        frames: scene.anims.generateFrameNumbers('stars',{ frames: [ 0,1,2,3,4,5,6,7,8]}),
+        frameRate: 4,
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'pWallFlatMiddle',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [6,7,8,9,10,11]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallFlatLeft',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [0,1,2,3,4,5]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallFlatRight',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [12,13,14,15,16,17]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallVertBot',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [18,19,20,21,22,23]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallVertMiddle',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [24,25,26,27,28,29]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'pWallVertTop',
+        frames: scene.anims.generateFrameNumbers('portalWalls',{ frames: [30,31,32,33,34,35]}),
+        frameRate: 8,
+        repeat: -1
+    });
+
+    scene.anims.create({
+        key: 'arrowMenuIdle',
+        frames: scene.anims.generateFrameNumbers('arrowMenu',{ frames: [0,1,2,3,4,5,6,7,8,9]}),
+        frameRate: 8,
+        repeat: -1
     });
     
-    scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
+    scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 16, frameHeight: 16,
         frame: 'UI_ArrowDownAnim.png'
     }); scene.anims.create({
         key: 'downArrowIdle',
@@ -7206,7 +8699,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
     
-    scene.textures.addSpriteSheetFromAtlas('twinkle01Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16,
+    scene.textures.addSpriteSheetFromAtlas('twinkle01Anim', { atlas: 'megaAtlas', frameWidth: 8 ,frameHeight: 8,
         frame: 'twinkle01Anim.png'
     }); scene.anims.create({
         key: 'twinkle01',
@@ -7215,7 +8708,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: 0
     });
     
-    scene.textures.addSpriteSheetFromAtlas('twinkle02Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16 ,
+    scene.textures.addSpriteSheetFromAtlas('twinkle02Anim', { atlas: 'megaAtlas', frameWidth: 8 ,frameHeight: 8 ,
         frame: 'twinkle02Anim.png'
     }); scene.anims.create({
         key: 'twinkle02',
@@ -7224,7 +8717,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: 0
     });
 
-    scene.textures.addSpriteSheetFromAtlas('twinkle03Anim', { atlas: 'megaAtlas', frameWidth: 16 ,frameHeight: 16 ,
+    scene.textures.addSpriteSheetFromAtlas('twinkle03Anim', { atlas: 'megaAtlas', frameWidth: 8 ,frameHeight: 8 ,
         frame: 'twinkle03Anim.png'
     }); scene.anims.create({
         key: 'twinkle03',
@@ -7233,7 +8726,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
     
-    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoosting', { atlas: 'megaAtlas', frameWidth: 28,frameHeight: 28,
+    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoosting', { atlas: 'megaAtlas', frameWidth: 14,frameHeight: 14,
         frame: 'snakeOutlineAnim.png'
     }); scene.anims.create({
         key: 'snakeOutlineAnim',
@@ -7242,7 +8735,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     });
 
-    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoostingSmall', { atlas: 'megaAtlas', frameWidth: 28,frameHeight: 28,
+    scene.textures.addSpriteSheetFromAtlas('snakeOutlineBoostingSmall', { atlas: 'megaAtlas', frameWidth: 14,frameHeight: 14,
         frame: 'snakeOutlineSmallAnim.png'
     }); scene.anims.create({
         key: 'snakeOutlineSmallAnim',
@@ -7251,7 +8744,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
     })
 
-    scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 24,
+    scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 12, frameHeight: 12,
         frame: 'atomicPickup01Anim.png'
     }); scene.anims.create({
       key: 'atom01idle',
@@ -7283,7 +8776,34 @@ function loadSpriteSheetsAndAnims(scene) {
       frameRate: 12,
       delay: 200,
       repeat: 0, // How long is the duration of this animation in milliseconds @ hodlen?
-    })
+    });
+
+    // score scene atoms
+    scene.anims.create({
+      key: 'atomScore01',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
+      frameRate: 12,
+      randomFrame: true,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atomScore02',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
+      frameRate: 8,
+      randomFrame: true,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atomScore03',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
+      frameRate: 6,
+      randomFrame: true,
+      repeat: -1
+    }); scene.anims.create({
+      key: 'atomScore04',
+      frames: scene.anims.generateFrameNumbers('atomicPickupScore',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
+      frameRate: 4,
+      randomFrame: true,
+      repeat: -1
+    });
 
 
 
@@ -7303,7 +8823,7 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: -1
       })
   
-    scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 44 ,frameHeight: 36,
+    scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 22 ,frameHeight: 18,
         frame: 'electronCloudAnim.png'
     }); scene.anims.create({
       key: 'electronIdle',
@@ -7327,6 +8847,43 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: 0,
       }); */
+
+    scene.anims.create({
+    key: 'blackholeForm',
+    frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 0,1,2,3,4,5]}),
+    frameRate: 8,
+    repeat: 0,
+    });
+
+    scene.anims.create({
+    key: 'blackholeIdle',
+    frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 6,7,8,9,10,11]}),
+    frameRate: 12,
+    repeat: -1,
+    });
+
+    scene.anims.create({
+        key: 'blackholeClose',
+        frames: scene.anims.generateFrameNumbers('blackholeAnim',{ frames: [ 5,4,3,2,1]}),
+        frameRate: 8,
+        repeat: 0,
+        hideOnComplete: true
+    });
+
+    scene.anims.create({
+        key: 'extractHoleIdle',
+        frames: scene.anims.generateFrameNumbers('extractHole',{ frames: [ 0,1,2,3,4,5,6,7]}),
+        frameRate: 8,
+        repeat: -1,
+    });
+    scene.anims.create({
+        key: 'extractHoleClose',
+        frames: scene.anims.generateFrameNumbers('extractHole',{ frames: [ 8,9,10,11,12,13,14,15]}),
+        frameRate: 8,
+        repeat: 0,
+        hideOnComplete: true
+    });
+
     scene.anims.create({
     key: 'CapElectronDispersion',
     frames: scene.anims.generateFrameNumbers('CapElectronDispersion',{ frames: [ 0,1,2,3,4,5,6,7,8,9]}),
@@ -7335,7 +8892,7 @@ function loadSpriteSheetsAndAnims(scene) {
     hideOnComplete: true
     });
   
-    scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 256 , frameHeight: 48,
+    scene.textures.addSpriteSheetFromAtlas('boostMeterAnim', { atlas: 'megaAtlas', frameWidth: 128 , frameHeight: 24,
         frame: 'UI_boostMeterAnim.png'
     }); scene.anims.create({
       key: 'increasing',
@@ -7343,9 +8900,11 @@ function loadSpriteSheetsAndAnims(scene) {
       frameRate: 8,
       repeat: -1,
     });
+
+    
   
     //WRAP_BLOCK_ANIMS
-    scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 24,frameHeight: 24,
+    /*scene.textures.addSpriteSheetFromAtlas('wrapBlockAnim', { atlas: 'megaAtlas', frameWidth: 12,frameHeight: 12,
         frame: 'wrapBlockAnim.png'
     }); scene.anims.create({
       key: 'wrapBlock01',
@@ -7394,7 +8953,8 @@ function loadSpriteSheetsAndAnims(scene) {
       frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
       frameRate: 8,
       repeat: -1
-    })
+    })*/
+
 
 
     
@@ -7475,25 +9035,25 @@ var tempHeightDiff = 16;
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     backgroundColor: '#bbbbbb', //'#4488aa'
-    width: 744, 
-    height: 744,// + tempHeightDiff * GRID,
+    width: 640, 
+    height: 360,// + tempHeightDiff * GRID,
     min: {
-        width: 372,
-        height: 372
+        width: 640,
+        height: 360
     },
     snap: {
-        width: 372,
-        height: 372
+        width: 640,
+        height: 360
     },
-    
+    pipeline: { WaveShaderPipeline },
     //renderer: Phaser.AUTO,
     parent: 'phaser-example',
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     //roundPixels: true,
-    pixelArt: true,
+    //pixelArt: false, // if not commented out and set to false, will still override scale settings.
     scale: {
-        //zoom: Phaser.Scale.MAX_ZOOM,
-        mode: Phaser.Scale.FIT,
+        zoom: Phaser.Scale.MAX_ZOOM,
+        //mode: Phaser.Scale.FIT,
     },
     //parent: 'phaser-example',
     physics: {
@@ -7508,16 +9068,24 @@ var config = {
             quality: .1
         }
     },
+    audio: 
+        { 
+            disableWebAudio: false // allows Phaser to use better Web Audio API
+        }, 
+    input: {
+            pauseOnBlur: false // This prevents the game from pausing tabbing out
+        },
     dom: {
         createContainer: true,
     },
+    maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
-    scene: [ StartScene, PersistScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, MainMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TimeAttackScene, TutorialScene]
 };
 
 // #region Screen Settings
 export const SCREEN_WIDTH = config.width;
-export const SCREEN_HEIGHT = 31 * GRID;  config.height // Probably should be named to GAME_SCREEN Height.
+export const SCREEN_HEIGHT = config.height;   // Probably should be named to GAME_SCREEN Height. 29 * GRID
 
 // Edge locations for X and Y
 export const END_X = SCREEN_WIDTH/GRID - 1;

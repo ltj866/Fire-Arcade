@@ -1,8 +1,11 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     DIRS, DEBUG, commaInt,
-    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR
+    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR,
+    X_OFFSET,
+    Y_OFFSET
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
+import { Portal } from './Portal.js';
 
 var Snake = new Phaser.Class({
     initialize:
@@ -12,12 +15,16 @@ var Snake = new Phaser.Class({
     {
         this.body = [];
 
-        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
+        this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
         this.head.setOrigin(0,0).setDepth(48);
+
         
         this.body.unshift(this.head);
 
         this.lastPlayedCombo = 0;
+        this.lastPortal = undefined; // Set
+        this.closestPortal = undefined; // TYPE Portal.
+        
 
 
 
@@ -35,10 +42,12 @@ var Snake = new Phaser.Class({
         }
 
         this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y + SCREEN_HEIGHT/2, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightE = scene.lights.addLight(this.head.x + SCREEN_WIDTH/2, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y - SCREEN_HEIGHT/2, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightW = scene.lights.addLight(this.head.x - SCREEN_WIDTH/2, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y + GRID * 27, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightE = scene.lights.addLight(this.head.x + GRID * 29, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y - GRID * 27, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightW = scene.lights.addLight(this.head.x - GRID * 29, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+
+        this.snakeLights = [this.snakeLight, this.snakeLightN, this.snakeLightE, this.snakeLightS, this.snakeLightW];
     },
     
     // #region Grow
@@ -52,10 +61,8 @@ var Snake = new Phaser.Class({
         
         // Exception for Bonus Levels when the Length Goal = 0
         if (LENGTH_GOAL != 0) {
-            scene.lengthGoalUI.setHTML(
-                `${length.padStart(2, "0")}<br/>
-                <hr style="font-size:3px"/>
-                ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            scene.lengthGoalUI.setText(
+                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
             )
         }
         else {
@@ -85,6 +92,9 @@ var Snake = new Phaser.Class({
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.sprite(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(47).setPipeline('Light2D');
+        //newPart.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
+
+        
         
 
         if (this.body.length > 1){
@@ -110,17 +120,17 @@ var Snake = new Phaser.Class({
         this.snakeLight.x = x + GRID/2;
         this.snakeLight.y = y + GRID/2;
 
-        this.snakeLightN.x = x
-        this.snakeLightN.y = y + (SCREEN_HEIGHT - GRID * 3)
+        this.snakeLightN.x = x;
+        this.snakeLightN.y = y + GRID * 27;
 
-        this.snakeLightE.x = x + SCREEN_WIDTH
-        this.snakeLightE.y = y
+        this.snakeLightE.x = x + GRID * 29;
+        this.snakeLightE.y = y;
 
-        this.snakeLightS.x = x
-        this.snakeLightS.y = y - (SCREEN_HEIGHT - GRID * 3)
+        this.snakeLightS.x = x;
+        this.snakeLightS.y = y - GRID * 27;
 
-        this.snakeLightW.x = x - SCREEN_WIDTH
-        this.snakeLightW.y = y
+        this.snakeLightW.x = x - GRID * 29;
+        this.snakeLightW.y = y;
 
         // wrapping tiles
         scene.map.setLayer(scene.wallVarient);
@@ -137,22 +147,22 @@ var Snake = new Phaser.Class({
         
     if (this.direction === DIRS.LEFT)
         {
-            xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
             ourPersistScene.bgCoords.x -= .25;
         }
         else if (this.direction === DIRS.RIGHT)
         {
-            xN = Phaser.Math.Wrap(this.head.x + GRID, 0, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
             ourPersistScene.bgCoords.x += .25;
         }
         else if (this.direction === DIRS.UP)
         {
-            yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+            yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
             ourPersistScene.bgCoords.y -= .25;
         }
         else if (this.direction === DIRS.DOWN)
         {
-            yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 1 );
+            yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
             ourPersistScene.bgCoords.y += .25;
         }
 
@@ -170,11 +180,6 @@ var Snake = new Phaser.Class({
             }
         }
 
-        var onTile = scene.map.getTileAtWorldXY( this.head.x, this.head.y);
-        if (GState.PLAY === scene.gState && onTile != null && onTile.properties.hasCollision){
-            
-            console.log("Playing Sound now cause I am boss and won.")
-        }
 
         // #region Bonk Ghost Walls
         if (scene.map.getLayer('Ghost-1')) {
@@ -188,10 +193,7 @@ var Snake = new Phaser.Class({
                 }
             }
         }
-        
 
-        
-    
         // #region Intersect Self
         if (GState.PLAY === scene.gState) { //GState.PLAY
             /***
@@ -201,15 +203,15 @@ var Snake = new Phaser.Class({
             var checkBody = this.body.slice(1);
             checkBody.pop();
 
+            var nextHeadGridX = (xN - X_OFFSET) / GRID;
+            var nextHeadGridY = (yN - Y_OFFSET) / GRID;
+
             var portalSafe = false; // Assume not on portal
             checkBody.some(part => {
                 if (part.x === xN && part.y === yN) {
-                    scene.portals.forEach(portal => { 
-                        if(xN === portal.x && yN === portal.y){
-                            portalSafe = true; // Mark on portal
-                        }
-                    });
-                    
+                    if(scene.interactLayer[nextHeadGridX][nextHeadGridY] instanceof Portal){
+                        portalSafe = true; // Mark on portal
+                    }
                     if (!portalSafe && scene.bonkable) {
                         this.bonk(scene);    
                     }  
@@ -217,146 +219,128 @@ var Snake = new Phaser.Class({
             }) 
         }
         // #endregion
-        
 
-        // Make Portal Snake body piece invisible.
+        // Make Portal Snake body piece invisible. 
+        // TODO redo this to check every move for if there is a portal using the interact layer.
+        
+        
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
-                scene.portals.forEach(portal => {
-                    if(this.body[this.body.length -2].x === portal.x && 
-                        this.body[this.body.length -2].y === portal.y)  {
-                        /***
-                         * -2 checks the second to last piece because the tail
-                         *  overlaps otherwise. This looks better.
-                         */
-                        portal.snakePortalingSprite.visible = false;
-                        portal.targetObject.snakePortalingSprite.visible = false;
-                    }
-                });
+            var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
+            var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
+
+            if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
+                var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
+                portal.snakePortalingSprite.visible = false;
+                portal.targetObject.snakePortalingSprite.visible = false;
+            }
+
         }
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
+
+        /**
+         * Interface requirement that all objects in the interative layer 
+         * need an onOver function to work properly.
+         */
+
+        var onGridX = (this.head.x - X_OFFSET) / GRID;
+        var onGridY = (this.head.y - Y_OFFSET) / GRID;
+        //remove decimals to prevent erroring
+        onGridX = Math.round(onGridX);
+        onGridY = Math.round(onGridY);
+
+        if (scene.gState === GState.PLAY && scene.interactLayer[onGridX][onGridY] != "empty") {
+            scene.interactLayer[onGridX][onGridY].onOver(scene);
+        }
+
+
         
-        // Check for Warp Portals
+        // Check for Blackholes
         if (scene.winned) {
+            /**
+             * Okay to not be part of the interact layer because there is only ever 8?
+             */
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
-                if (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y) {
-                    console.log("ITS WARPING TIME to WORLD", index);
+                
+                if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
+                    debugger
+                    console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
                     scene.warpToNext(index);
                 }
+
                 
             }
+            if (scene.extractHole[0]) { //check that there is an extract hole
+                if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
+                    console.log('WOO')
+                    scene.finalScore();
+                }
+            }
+
+        }
+
+        // Update closet portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
+        // Not sure if it should stay that way or not.
+        var checkPortals = [...scene.portals, ...scene.wallPortals]
+
+        if (checkPortals.length > 1) {
+            var testPortal = Phaser.Math.RND.pick(checkPortals);
+            var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
+                testPortal.x, testPortal.y);
+
+            if (this.closestPortal === undefined) {
+                this.closestPortal = testPortal;
+                this.closestPortal.flipX = true;
+                //this.closestPortal.setScale(2);
+
+                //this.closestPortal.targetObject.setScale(2);
+            }
+
+            checkPortals.forEach( portal => {
+
+                this.snakeLights.forEach( light => {
+
+                    var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
+
+                    if (dist > distN) {
+                        dist = distN;
+                        testPortal = portal;
+                    }
+
+                });
+
+            });
+
+            if (this.closestPortal != testPortal) {
+                console.log("New Closest Portal:", testPortal.x, testPortal.y);
+                this.closestPortal.flipX = false;
+                //this.closestPortal.setScale(1);
+                this.closestPortal.targetObject.setScale(1);
+
+                testPortal.flipX = true;
+                //testPortal.setScale(2);
+                testPortal.targetObject.setScale(2);
+                
+                this.closestPortal = testPortal;
+            }
+            
+            //debugger
+            
         }
 
         // #region Coin Collision
-        for (let index = 0; index < scene.coins.length; index++) {
-            var _coin = scene.coins[index];
-            if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
-                console.log("Hit Coin");
-                scene.coinSound.play();
-                //this.snakeCritical = false;
-
-                ourPersistScene.coins += 1;
-                if (ourPersistScene.coins > 0) {
-                    scene.coinsUIIcon.setVisible(true)
-                }
-                scene.coinUIText.setHTML(
-                    `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
-                )
-
-                _coin.destroy();
-                scene.coins.splice(index,1);
-            }
-        }
+        //for (let index = 0; index < scene.coins.length; index++) {
+        //    
+        //}
 
         // #region Food Collision
-        scene.atoms.forEach(_atom => {  
-            if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
-                scene.snakeEating();
-                var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-
-                if(timeSinceFruit > COMBO_ADD_FLOOR){
-                    if (this.lastPlayedCombo > 0) {
-                        scene.comboCounter += 1;
-                        scene.comboBounce();
-                        };
-                    scene.pointSounds[this.lastPlayedCombo].play();       
-                    if (this.lastPlayedCombo < 7) {
-                        this.lastPlayedCombo += 1;
-                    }
-                }
-                else {
-                    this.lastPlayedCombo = 0;
-                    scene.comboCounter = 0;
-                }
-
-                scene.events.emit('addScore', _atom); // Sends to UI Listener 
-                this.grow(scene);
-                // Avoid double _atom getting while in transition
-                _atom.x = 0;
-                _atom.y = 0;
-                _atom.visible = false;
-                //_atom.electrons.visible = false;
-                //_atom.electrons.play("electronIdle");
-                //_atom.electrons.setPosition(0, 0);
-                //_atom.electrons.visible = false;
-            
-                if (scene.moveInterval = SPEED_WALK) {
-                    // Play atom sound
-                    var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
-                    scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
-                } else if (scene.moveInterval = SPEED_SPRINT) {
-                    
-                    // Play sniper sound here.
-                    // There are some moveInterval shenanigans happening here. 
-                    // Need to debug when exactly the move call happens compared to setting the movesInterval.
-                }
-
-                // Moves the eaten atom after a delay including the electron.
-                scene.time.delayedCall(200, function () {
-                    if (scene.gState != GState.TRANSITION) {
-                        _atom.move(scene);
-                        //_atom.play("atom01idle", true);
-                        _atom.visible = true;
-                        //_atom.electrons.visible = true;
-                        //_atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.  
-                    }
-
-                }, [], this);
-
-                //this.electrons.play("electronIdle");
-                // Setting electron framerate here to reset it after slowing in delay 2
-                
-                // Refresh decay on all atoms.
-                //scene.atoms.forEach(__atom => {
-                    //if (__atom.x === 0 && __atom.y === 0) {
-                        // Start decay timer for the eaten Apple now. 
-                        //__atom.startDecay(scene);
-                        // The rest is called after the delay.
-                    //} 
-                    //else {
-                    // For every other atom do everything now
-                    //__atom.play("atom01idle", true);
-                    //__atom.electrons.setVisible(true);
-                    //this.electrons.anims.restart();
-                    //__atom.absorbable = true;
-                    //__atom.startDecay(scene);
-
-                    //__atom.electrons.play("electronIdle", true);
-                    //__atom.electrons.anims.msPerFrame = 66
-                    //}
-
-                //});
-                
-                if (DEBUG) {console.log(                         
-                    "FRUITCOUNT=", scene.fruitCount,
-                    );
-                }
-                return 'valid';
-            }
-        });
+        //scene.atoms.forEach(_atom => {  
+        //    if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
+        //        
+        //});
     },
 
     // #region Bonk()
@@ -394,9 +378,14 @@ var Snake = new Phaser.Class({
             portal.snakePortalingSprite.visible = false;
         });
 
-        
-        scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+        scene.wallPortals.forEach ( portalWallSegment => {
+            portalWallSegment.snakePortalingSprite.visible = false;
 
+        });
+
+        if (ourPersistScene.coins > -1) {
+            scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+        }
     }
 });
 

@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "Portal Snake (demo)",
-    "version": "0.3.40719"
+    "version": "0.3.40802"
   },
   "tauri": {
     "allowlist": {
@@ -58,7 +58,7 @@
         "fullscreen": false,
         "height": 744,
         "resizable": true,
-        "title": "Portal Snake (Demo) ver-0.3.40719",
+        "title": "Portal Snake (Demo) ver-0.3.40802",
         "width": 744
       }
     ]

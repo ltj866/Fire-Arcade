@@ -274,7 +274,7 @@
          "value":"Stage-09"
         }],
  "renderorder":"right-down",
- "tiledversion":"1.10.2",
+ "tiledversion":"1.11.0",
  "tileheight":24,
  "tilesets":[
         {
@@ -289,6 +289,10 @@
          "tilecount":1024,
          "tileheight":24,
          "tilewidth":24
+        }, 
+        {
+         "firstgid":1025,
+         "source":"..\/..\/..\/..\/..\/..\/Fire-Arcade\/games\/Phaser-Snake-Game\/public\/assets\/Tiled\/tileSheetx24.tsx"
         }],
  "tilewidth":24,
  "type":"map",
