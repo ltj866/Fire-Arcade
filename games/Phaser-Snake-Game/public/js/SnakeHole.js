@@ -12,7 +12,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 const IS_DEV = false;
-const ANALYTICS_VERS = "0.3.240802";
+const ANALYTICS_VERS = "0.3.241018";
 const DEV_BRANCH = "dev";
 
 
