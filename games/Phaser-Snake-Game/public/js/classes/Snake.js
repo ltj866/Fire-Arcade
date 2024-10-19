@@ -296,7 +296,12 @@ var Snake = new Phaser.Class({
                 this.closestPortal.flipX = true;
                 //this.closestPortal.setScale(2);
 
-                //this.closestPortal.targetObject.setScale(2);
+                scene.tweens.add({
+                    targets: this.closestPortal.targetObject,
+                    scale: {from: 1, to: 2},
+                    duration: 150,
+                    ease: 'Sine.Out',
+                    });
             }
 
             checkPortals.forEach( portal => {
@@ -305,7 +310,7 @@ var Snake = new Phaser.Class({
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
 
-                    if (dist > distN) {
+                    if (dist > distN - 30) {
                         dist = distN;
                         testPortal = portal;
                     }
@@ -322,8 +327,13 @@ var Snake = new Phaser.Class({
 
                 testPortal.flipX = true;
                 //testPortal.setScale(2);
-                testPortal.targetObject.setScale(2);
-                
+                //testPortal.targetObject.setScale(2);
+                scene.tweens.add({
+                    targets: testPortal.targetObject,
+                    scale: {from: 1, to: 2},
+                    duration: 150,
+                    ease: 'Sine.Out',
+                    });
                 this.closestPortal = testPortal;
             }
             

@@ -2353,6 +2353,17 @@
         "testingRactrack.json#tileSheetx12": {
             "scaleInDock": 2
         },
+        "testingWallPortal-2.json": {
+            "scale": 2.972844827586207,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.07568508046975,
+                "y": 217.3002754820937
+            }
+        },
+        "testingWallPortal-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "testingWallPortal.json#tileSheetx12": {
             "dynamicWrapping": false
         },
