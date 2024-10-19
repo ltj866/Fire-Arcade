@@ -3328,10 +3328,10 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("World_4-3-ii", WOOD);
                 },
                 'swirl-swirl': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", WOOD); // Should this one be harder to unlock?
+                    return ourPersist.checkCompletedRank("World_4-5", WOOD); // Should this one be harder to unlock?
                 },
                 'eye': function () {
-                    return true;
+                    return ourPersist.checkCompletedRank("World_4-4", WOOD);
                 },
                 'plus-plus': function () {
                     return ourPersist.checkCompletedRank("World_10-3", WOOD);
