@@ -17,9 +17,8 @@ var checkRank = function(stageName, targetRank) {
 
 
 /* Template
-    '': function () {
-        return ourPersist.checkCompletedRank("", COPPER);
-    },
+        ['', function () { 
+        return checkRank("", RANKS.WOOD)}],
 */
 
 

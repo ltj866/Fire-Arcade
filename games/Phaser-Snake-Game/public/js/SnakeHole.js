@@ -114,7 +114,7 @@ var updateSumOfBest = function(scene) {
     })
 }
 
-export var BEST_OF_STAGE_DATA = new Map ();
+export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
