@@ -25,7 +25,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -209,6 +209,14 @@ export const RANKS = Object.freeze({
     GOLD: 3,
     PLATINUM: 4,
 });
+
+const RANK_BENCHMARKS = new Map([
+    // Calibrated for use with SpeedBonus
+    [RANKS.WOOD, 0],
+    [RANKS.BRONZE, 2000],
+    [RANKS.SILVER, 5000],
+    [RANKS.GOLD, 10000],
+]);
 
 
 // #region GLOBAL STYLES 
@@ -2681,10 +2689,10 @@ class GameScene extends Phaser.Scene {
 
         
 
-        this.tiledProperties = {};
+        this.tiledProperties = new Map();
 
         this.map.properties.forEach(prop => {
-            this.tiledProperties[prop.name] = prop.value;
+            this.tiledProperties.set(prop.name, prop.value);
         });
         /*this.mapShadow.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
@@ -2694,7 +2702,7 @@ class GameScene extends Phaser.Scene {
         // Loading all Next Stage name to slug to grab from the cache later.
 
         // The first split and join santizes any spaces.
-        this.nextStages = this.tiledProperties.next.split(" ").join("").split(",");
+        this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
         
     
 
@@ -2718,8 +2726,8 @@ class GameScene extends Phaser.Scene {
 
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
-        this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
+        this.stageUUID = this.tiledProperties.get("UUID"); // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.tiledProperties.get("diffBonus"); // TODO: Get them by name and throw errors.
 
         ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
@@ -3112,7 +3120,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
-            if (!this.tiledProperties.dark) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
         
@@ -4042,7 +4050,7 @@ class GameScene extends Phaser.Scene {
 
         this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
-        if (this.tiledProperties.dark) {
+        if (this.tiledProperties.has("dark")) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
@@ -5416,7 +5424,7 @@ class GameScene extends Phaser.Scene {
     }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
-        if (this.tiledProperties.dark) {
+        if (this.tiledProperties.has("dark")) {
             this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
     }
@@ -6211,6 +6219,7 @@ var StageData = new Phaser.Class({
         this.medals = props.medals;
         this.moveCount = props.moveCount;
         this.zedLevel = props.zedLevel;
+        this.sRank = props.sRank;
 
         this.uuid = props.uuid;
         if (this.slug) { this.slug = props.slug }
@@ -6220,7 +6229,7 @@ var StageData = new Phaser.Class({
         this.turnInputs = props.turnInputs;
         this.turns = props.turns;
 
-        this.medianSpeedBonus = 6000;
+        //this.medianSpeedBonus = 6000;
 
     },
 
@@ -6243,16 +6252,16 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
-            case bonusScore > this.medianSpeedBonus * 2:
+            case bonusScore > this.sRank:
                 rank = RANKS.PLATINUM;
                 break;
-            case bonusScore > this.medianSpeedBonus * 1.5:
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.GOLD):
                 rank = RANKS.GOLD;
                 break;
-            case bonusScore > this.medianSpeedBonus:
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.SILVER):
                 rank = RANKS.SILVER;
                 break;
-            case bonusScore > this.medianSpeedBonus * .5:
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.BRONZE):
                 rank = RANKS.BRONZE;
                 break;
             default:
@@ -6363,7 +6372,8 @@ class ScoreScene extends Phaser.Scene {
             stage:ourGame.stage,
             uuid:ourGame.stageUUID,
             zedLevel: calcZedLevel(ourPersist.zeds).level,
-            zeds: ourPersist.zeds
+            zeds: ourPersist.zeds,
+            sRank: parseInt(ourGame.tiledProperties.get("sRank"))
         }
 
 
@@ -6381,8 +6391,8 @@ class ScoreScene extends Phaser.Scene {
         }*/
 
         // For properties that may not exist.
-        if (ourGame.tiledProperties.slug != undefined) {
-            this.stageData.slug = ourGame.tiledProperties.slug;
+        if (ourGame.tiledProperties.has("slug")) {
+            this.stageData.slug = ourGame.tiledProperties.get("slug");
         }
         
         console.log(JSON.stringify(this.stageData));
