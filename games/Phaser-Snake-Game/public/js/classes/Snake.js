@@ -294,12 +294,11 @@ var Snake = new Phaser.Class({
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
                 this.closestPortal.flipX = true;
-                //this.closestPortal.setScale(2);
 
                 scene.tweens.add({
-                    targets: this.closestPortal.targetObject,
-                    scale: {from: 1, to: 2},
-                    duration: 150,
+                    targets: this.closestPortal.targetObject.portalHighlight,
+                    alpha: {from: 1, to: 0},
+                    duration: 98,
                     ease: 'Sine.Out',
                     });
             }
@@ -310,7 +309,7 @@ var Snake = new Phaser.Class({
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
 
-                    if (dist > distN - 30) {
+                    if (dist > distN) {
                         dist = distN;
                         testPortal = portal;
                     }
@@ -321,25 +320,28 @@ var Snake = new Phaser.Class({
 
             if (this.closestPortal != testPortal) {
                 console.log("New Closest Portal:", testPortal.x, testPortal.y);
-                this.closestPortal.flipX = false;
-                //this.closestPortal.setScale(1);
-                this.closestPortal.targetObject.setScale(1);
-                this.closestPortal.targetObject.portalHighlight.alpha = 0;
+                var oldPortal = this.closestPortal;
+                oldPortal.flipX = false;
 
                 testPortal.flipX = true;
-                //testPortal.setScale(2);
-                //testPortal.targetObject.setScale(2);
-                //scene.tweens.add({
-                //    targets: testPortal.targetObject,
-                //    scale: {from: 1, to: 2},
-                //    duration: 150,
-                //    ease: 'Sine.Out',
-                //    });
+
+                scene.tweens.add({
+                    targets: testPortal.targetObject.portalHighlight,
+                    alpha: {from: 0, to: 1},
+                    duration: 98,
+                    ease: 'Sine.Out',
+                    onStart: () =>{
+                        scene.tweens.add({
+                            targets: oldPortal.targetObject.portalHighlight,
+                            alpha: {from: 1, to: 0},
+                            duration: 300,
+                            ease: 'Sine.Out',
+                            });
+                    }
+                    });
                 this.closestPortal = testPortal;
-                testPortal.targetObject.portalHighlight.alpha = 1;
+
             }
-            
-            //debugger
             
         }
 
