@@ -212,10 +212,11 @@ export const RANKS = Object.freeze({
 
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with SpeedBonus
-    [RANKS.WOOD, 0],
-    [RANKS.BRONZE, 2000],
-    [RANKS.SILVER, 5000],
     [RANKS.GOLD, 10000],
+    [RANKS.SILVER, 5000],
+    [RANKS.BRONZE, 2000],
+    [RANKS.WOOD, 0],
+
 ]);
 
 
