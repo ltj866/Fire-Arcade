@@ -114,6 +114,36 @@ var updateSumOfBest = function(scene) {
     })
 }
 
+// SHOULD BE READ ONLY
+var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
+    if (!JSON.parse(localStorage.getItem("playerStats"))) {
+        PLAYER_STATS = {}
+    }
+    var bonks = PLAYER_STATS.bonks ?? 0;
+    var atomsEaten = PLAYER_STATS.atomsEaten ?? 0;
+    var turns = PLAYER_STATS.turns ?? 0;
+
+    PLAYER_STATS.bonks = bonks;
+    PLAYER_STATS.atomsEaten = atomsEaten;
+    PLAYER_STATS.turns = turns;
+
+    PLAYER_STATS.stagesFinished = Math.floor(atomsEaten / 28);
+}
+
+var updatePlayerStats = function (stageData) {
+
+    PLAYER_STATS.bonks += stageData.bonks;
+    PLAYER_STATS.atomsEaten += stageData.foodLog.length;
+    PLAYER_STATS.turns += stageData.turns;
+    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
+
+    localStorage.setItem("playerStats", JSON.stringify(PLAYER_STATS));
+
+    // JSON.stringify(this.stageData)
+
+}
+
+
 export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
 
 export var commaInt = function(int) {
@@ -297,7 +327,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'r-07-10-6'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -6207,8 +6237,7 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(props)
-    {
+    function StageData(props) {
         // this is the order you'll see printed in the console.
         this.stage = props.stage;
 
@@ -6380,8 +6409,8 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
-    
-
+        // Update Stage Data
+        updatePlayerStats(this.stageData);
         
 
         /*for (let index = 0; index < this.stageData.foodLog.length; index++) {
