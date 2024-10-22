@@ -23,6 +23,10 @@ var checkRank = function(stageName, targetRank) {
 
 
 export const STAGE_UNLOCKS = new Map([
+    ['og-plus', function () { 
+        return checkRank("World_2-4", RANKS.GOLD)}],
+    ['railgun', function () { 
+        return checkRank("World_4-4", RANKS.WOOD)}],
     ['two-wide-corridors', function () { 
         return checkRank("World_8-4_Adv_Portaling", RANKS.WOOD)}],
     ['babies-first-wall', function () {
@@ -30,7 +34,7 @@ export const STAGE_UNLOCKS = new Map([
     ['two-wide-corridors', function () {
         return checkRank("World_8-4_Adv_Portaling", RANKS.WOOD);}],
     ['double-back-portals', function () {
-        return checkRank("World_8-3_Adv_Portaling", RANKS.WOOD);
+        return checkRank("World_10-5", RANKS.WOOD);
     }],
     ['easy-wrap', function () {
         return checkRank("World_1-4", RANKS.SILVER);
@@ -54,7 +58,7 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['unidirectional-portals', function () {
-        return checkRank("World_8-2_Adv_Portaling", RANKS.WOOD);
+        return checkRank("World_8-3_Adv_Portaling", RANKS.WOOD);
     }],
     ['hardest----for-now', function () {
         return checkRank("World_4-3-ii", RANKS.WOOD);
@@ -99,7 +103,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank("World_2-4", RANKS.WOOD);
     }],
     ['bidirectional-portals', function () {
-        return checkRank("World_4-4", RANKS.WOOD); 
+        return checkRank("World_8-2_Adv_Portaling", RANKS.WOOD); 
     }],
     ['start', function ( ) { 
         return true
