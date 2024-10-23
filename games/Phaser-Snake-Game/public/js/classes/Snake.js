@@ -361,41 +361,43 @@ var Snake = new Phaser.Class({
     bonk: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
         
-        scene.gState = GState.BONK;
         this.direction = DIRS.STOP;
-        console.log(scene.gState, "BONK" , this.direction);
-
         scene.screenShake();
-        
 
-        if (!scene.winned) {
-            // @Overridable
-            scene.onBonk(); 
+        if (!scene.stopOnBonk) {
+
+            scene.gState = GState.BONK;
+            //console.log(scene.gState, "BONK" , this.direction);
+
+            if (!scene.winned) {
+                // @Overridable
+                scene.onBonk(); 
+            }
+    
+            scene.snakeCrash.play();    
+            // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
+            
+            // If portalling interupted make sure all portal segments are invisible.
+            scene.portals.forEach ( portal => {
+                portal.snakePortalingSprite.visible = false;
+            });
+    
+            scene.wallPortals.forEach ( portalWallSegment => {
+                portalWallSegment.snakePortalingSprite.visible = false;
+    
+            });
+    
+            if (ourPersistScene.coins > -1) {
+                scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+            }
+
+        } else {
+            this.gState = GState.WAIT_FOR_INPUT;
         }
-
-        scene.snakeCrash.play();    
-        // game.scene.scene.restart(); // This doesn't work correctly
-        if (DEBUG) { console.log("DEAD"); }
         
-        scene.bonks += 1;
+        scene.bonks += 1; 
         
-        // Do this when you want to really end the game.
-        //game.destroy();
-        //this.scene.restart();
-
-        // If portalling interupted make sure all portal segments are invisible.
-        scene.portals.forEach ( portal => {
-            portal.snakePortalingSprite.visible = false;
-        });
-
-        scene.wallPortals.forEach ( portalWallSegment => {
-            portalWallSegment.snakePortalingSprite.visible = false;
-
-        });
-
-        if (ourPersistScene.coins > -1) {
-            scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
-        }
     }
 });
 

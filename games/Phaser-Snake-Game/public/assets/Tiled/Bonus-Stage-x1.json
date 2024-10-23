@@ -85,7 +85,7 @@
         {
          "name":"UUID",
          "type":"string",
-         "value":"edb21d2d-e7b9-4e22-8987-8d7b5f479a28"
+         "value":"00000000-0000-0000-0000-000000000000"
         }, 
         {
          "name":"next",

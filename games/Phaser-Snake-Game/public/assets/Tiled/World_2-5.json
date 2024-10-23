@@ -242,12 +242,17 @@
         {
          "name":"diffBonus",
          "type":"int",
-         "value":160
+         "value":100
         }, 
         {
          "name":"next",
          "type":"string",
-         "value":"Stage-06"
+         "value":"end"
+        }, 
+        {
+         "name":"slug",
+         "type":"string",
+         "value":"og-plus"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

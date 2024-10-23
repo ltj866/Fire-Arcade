@@ -44,6 +44,7 @@ export var STAGE_OVERRIDES = new Map([
     ["Bonus-Stage-x1", {
         preFix: function (scene) {
             scene.lengthGoal = 0;
+            scene.stopOnBonk = true;
 
             
 
@@ -69,5 +70,17 @@ export var STAGE_OVERRIDES = new Map([
             this.maxScore = Math.max(this.maxScore - 10, 1);
             
         }
+    }],
+    ["Bonus-Stage-x2", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+            scene.stopOnBonk = true;
+            scene.maxScore = 60;
+            scene.boostCost = 0;
+        },
+        postFix: function (scene) {
+    
+        },
+        
     }],
 ]);

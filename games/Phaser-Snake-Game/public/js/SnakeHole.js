@@ -328,7 +328,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Bonus-Stage-x1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Bonus-Stage-x2'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -2421,6 +2421,7 @@ class GameScene extends Phaser.Scene {
         this.stage = stage;
 
         this.moveInterval = SPEED_WALK;
+        this.boostCost = 6;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -2430,6 +2431,7 @@ class GameScene extends Phaser.Scene {
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         this.spawnCoins = true;
+        this.stopOnBonk = false;
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -6200,7 +6202,7 @@ class GameScene extends Phaser.Scene {
                         ourInputScene.boostTime += 6;
                         //this.boostMask.setScale(this.boostEnergy/1000,1);
 
-                        this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
+                        this.boostEnergy = Math.max(this.boostEnergy - this.boostCost, 0);
                     } 
                 } else{
                     // DISSIPATE LIVE ELECTRICITY
