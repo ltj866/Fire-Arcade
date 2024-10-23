@@ -1000,15 +1000,15 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.75,
-                "y": 161.5
+                "x": 173.5,
+                "y": 161.25
             }
         },
         "World_2-3-new2.json": {
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.99999999999997,
                 "y": 162.16666666666666
             }
         },
@@ -1016,7 +1016,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.91706951726016,
+                "x": 173.91706951726013,
                 "y": 161.8329134608838
             }
         },
@@ -1024,11 +1024,11 @@
             "scaleInDock": 1
         },
         "World_2-3.json": {
-            "scale": 3.8764367816091956,
-            "selectedLayer": 0,
+            "scale": 2.997413793103448,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 49.01408450704225,
-                "y": 162.00444773906597
+                "x": 174.15012942191544,
+                "y": 161.97296519988492
             }
         },
         "World_2-3.json#tileSheetx12": {
@@ -1056,10 +1056,10 @@
         },
         "World_2-5.json": {
             "scale": 2.997413793103448,
-            "selectedLayer": 5,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.15012942191544,
-                "y": 154.96692551049756
+                "y": 154.96692551049753
             }
         },
         "World_2-5.json#tileSheetx12": {
@@ -2562,18 +2562,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "Bonus-Stage-x1.json",
-        "rough-02.json",
+        "World_2-2.json",
+        "World_1-1.json",
         "Bonus-Stage-x3.json",
+        "Bonus-Stage-x4.json",
+        "World_10-3.json",
         "Bonus-Stage-x2.json",
-        "Stage-08.json",
-        "Stage-06.json",
-        "Stage-09.json",
-        "Stage-10.json",
-        "Stage-11.json",
-        "Stage-12.json",
-        "World_2-4.json",
-        "Stage-03zzz.json"
+        "template-10-24.json",
+        "World_1-2.json",
+        "World_1-3.json",
+        "World_1-4 OLD.json",
+        "World_1-4.json",
+        "Wrap_Stage-03.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

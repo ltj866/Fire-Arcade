@@ -24,7 +24,19 @@ var checkRank = function(stageName, targetRank) {
 
 export const STAGE_UNLOCKS = new Map([
     ['og-plus', function () { 
-        return checkRank("World_2-4", RANKS.GOLD)}],
+        var checkLevels = [
+            "World_1-2",
+            "World_1-3",
+            "World_1-4", 
+            "World_2-2", 
+            "World_2-3",
+            "World_2-4",
+        ];
+        var pass = checkLevels.every(stage => {
+            return checkRank(stage, RANKS.GOLD);
+        });
+        return pass}],
+        //return checkRank("World_2-4", RANKS.GOLD)}],
     ['railgun', function () { 
         return checkRank("World_4-4", RANKS.WOOD)}],
     ['two-wide-corridors', function () { 
