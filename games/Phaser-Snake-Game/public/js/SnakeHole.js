@@ -328,7 +328,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Bonus-Stage-x2'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Bonus-Stage-x3'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -2380,7 +2380,7 @@ class GameScene extends Phaser.Scene {
         this.tutorialState = false;
 
         // Arrays for collision detection
-        this.atoms = [];
+        this.atoms = new Set();
         this.foodHistory = [];
         this.walls = [];
         this.portals = [];
@@ -2422,6 +2422,8 @@ class GameScene extends Phaser.Scene {
 
         this.moveInterval = SPEED_WALK;
         this.boostCost = 6;
+        this.speedWalk = SPEED_WALK;
+        this.speedSprint = SPEED_SPRINT;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -2774,7 +2776,8 @@ class GameScene extends Phaser.Scene {
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
         this.stageUUID = this.tiledProperties.get("UUID"); // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.tiledProperties.get("diffBonus") ?? 100; // TODO: Get them by name and throw errors.
-
+        this.atomToSpawn = this.tiledProperties.get("atoms") ?? 5;
+        
         ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
@@ -4000,14 +4003,11 @@ class GameScene extends Phaser.Scene {
         //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
 
 
-  
 
+        for (let index = 1; index <= this.atomToSpawn; index++) {
+            var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
+        }
 
-        var atom1 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom2 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom3 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom4 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom5 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
 
 
         //this.tweens.add({
@@ -4819,11 +4819,11 @@ class GameScene extends Phaser.Scene {
     // #region .screenShake(
     screenShake(){
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-        if (this.moveInterval === SPEED_SPRINT) {
+        if (this.moveInterval === this.speedSprint) {
             this.cameras.main.shake(400, .01);
             ourSpaceBoy.cameras.main.shake(400, .01); //shakes differently than main when referencing different cameras
         }
-        else if (this.moveInterval === SPEED_WALK){
+        else if (this.moveInterval === this.speedWalk){
             this.cameras.main.shake(300, .00625);
             ourSpaceBoy.cameras.main.shake(300, .00625); //above note
         }    
@@ -5505,10 +5505,17 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(SPEED_SPRINT)
+            delay: this.tweens.stagger(this.speedSprint)
         });
 
         return snakeEating
+    }
+    onEat(food) {
+
+        
+        // Moves the eaten atom after a delay including the electron.
+        
+
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
@@ -6195,7 +6202,7 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = SPEED_SPRINT;
+                    this.moveInterval = this.speedSprint;
                     
                     if (!this.winned) {
                         // Boost Stats
@@ -6208,12 +6215,12 @@ class GameScene extends Phaser.Scene {
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
                     this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
-                    this.moveInterval = SPEED_WALK;
+                    this.moveInterval = this.speedWalk;
                 }
         
             } else {
                 //console.log("spacebar not down");
-                this.moveInterval = SPEED_WALK; // Less is Faster
+                this.moveInterval = this.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
                 this.boostEnergy = Math.min(this.boostEnergy + 1, 1000); // Recharge Boost Slowly
             }

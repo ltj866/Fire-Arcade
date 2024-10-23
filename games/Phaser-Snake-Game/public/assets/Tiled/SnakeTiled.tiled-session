@@ -34,7 +34,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.33333333333331,
-                "y": 209.16666666666666
+                "y": 256.5
             }
         },
         "Bonus-Stage-x2.json#tileSheetx12": {
@@ -45,13 +45,27 @@
         },
         "Bonus-Stage-x3.json": {
             "scale": 1.402016129032258,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 372.320966350302,
-                "y": 371.9643370721887
+                "y": 473.24705205637053
             }
         },
+        "Bonus-Stage-x3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "Bonus-Stage-x3.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Bonus-Stage-x4.json": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.33333333333331,
+                "y": 209.16666666666666
+            }
+        },
+        "Bonus-Stage-x4.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "C:/Users/jlhan/OneDrive/Documents/GitHub/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled/tileSheetx12.tsx": {
@@ -821,7 +835,7 @@
         },
         "World_1-1.json": {
             "scale": 2,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 111.5,
                 "y": 165.25
@@ -837,8 +851,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.68012528086064,
-                "y": 135.76904745693474
+                "x": 173.44318104446114,
+                "y": 135.76904745693471
             }
         },
         "World_1-2.json#tileSheetx12": {
@@ -854,7 +868,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 173.9413492560312,
-                "y": 161.87605335387875
+                "y": 161.7084797996822
             }
         },
         "World_1-3.json#tileSheetx12": {
@@ -868,7 +882,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 233.33333333333331,
+                "x": 233.33333333333337,
                 "y": 167.66666666666663
             }
         },
@@ -892,7 +906,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": -55.91883979029075,
-                "y": 161.5959692244842
+                "y": 161.3590249880847
             }
         },
         "World_1-4.json#tileSheetx12": {
@@ -971,8 +985,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 18.666666666666657,
-                "y": 299.33333333333326
+                "x": 18.66666666666663,
+                "y": 299
             }
         },
         "World_2-2.json#tileSheetx12": {
@@ -2549,6 +2563,7 @@
     "property.type": "string",
     "recentFiles": [
         "Bonus-Stage-x1.json",
+        "rough-02.json",
         "Bonus-Stage-x3.json",
         "Bonus-Stage-x2.json",
         "Stage-08.json",
@@ -2558,8 +2573,7 @@
         "Stage-11.json",
         "Stage-12.json",
         "World_2-4.json",
-        "Stage-03zzz.json",
-        "World_2-5.json"
+        "Stage-03zzz.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

@@ -1,4 +1,4 @@
-import { X_OFFSET, Y_OFFSET, GRID, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, commaInt } from "../SnakeHole.js";
 
 export var STAGE_OVERRIDES = new Map([
     ["Tutorial_1", {
@@ -77,6 +77,39 @@ export var STAGE_OVERRIDES = new Map([
             scene.stopOnBonk = true;
             scene.maxScore = 60;
             scene.boostCost = 0;
+        },
+        postFix: function (scene) {
+    
+        },
+        
+    }],
+    ["Bonus-Stage-x3", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+            scene.maxScore = 60;
+            scene.boostCost = 0;
+        },
+        postFix: function (scene) {
+
+            scene.onEat = this.onEat;
+    
+        },
+        onEat: function (food) {
+            this.atoms.delete(food);
+            food.delayTimer.destroy();
+            food.electrons.destroy();
+            food.destroy();
+        }
+        
+    }],
+    ["Bonus-Stage-x4", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+            scene.stopOnBonk = true;
+            scene.maxScore = 60;
+            scene.speedWalk = SPEED_SPRINT;
+            scene.speedSprint = SPEED_WALK;
+            scene.boostCost = 3;
         },
         postFix: function (scene) {
     

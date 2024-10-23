@@ -34,62 +34,63 @@ var Food = new Phaser.Class({
         this.electrons.setPosition(pos.x, pos.y);
         scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
 
-        scene.atoms.push(this);
+        scene.atoms.add(this);
 
         scene.children.add(this); // Shows on screen
     },
 
     onOver: function(scene) {
         scene.snakeEating();
-            var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
-            if(timeSinceFruit > COMBO_ADD_FLOOR){
-                if (scene.snake.lastPlayedCombo > 0) {
-                    scene.comboCounter += 1;
-                    scene.comboBounce();
-                    };
-                scene.pointSounds[scene.snake.lastPlayedCombo].play();       
-                if (scene.snake.lastPlayedCombo < 7) {
-                    scene.snake.lastPlayedCombo += 1;
-                }
+        if(timeSinceFruit > COMBO_ADD_FLOOR){
+            if (scene.snake.lastPlayedCombo > 0) {
+                scene.comboCounter += 1;
+                scene.comboBounce();
+                };
+            scene.pointSounds[scene.snake.lastPlayedCombo].play();       
+            if (scene.snake.lastPlayedCombo < 7) {
+                scene.snake.lastPlayedCombo += 1;
             }
-            else {
-                scene.snake.lastPlayedCombo = 0;
-                scene.comboCounter = 0;
+        }
+        else {
+            scene.snake.lastPlayedCombo = 0;
+            scene.comboCounter = 0;
+        }
+
+        scene.events.emit('addScore', this); 
+        scene.snake.grow(scene);
+        // Avoid double _atom getting while in transition
+        this.visible = false;
+
+    
+        if (scene.moveInterval = SPEED_WALK) {
+            // Play atom sound
+            var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
+            scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
+        } else if (scene.moveInterval = SPEED_SPRINT) {
+            
+            // Play sniper sound here.
+            // There are some moveInterval shenanigans happening here. 
+            // Need to debug when exactly the move call happens compared to setting the movesInterval.
+        }
+
+        // Moves the eaten atom after a delay including the electron.
+        this.delayTimer = scene.time.delayedCall(200, function () {
+            if (scene.gState != GState.TRANSITION) {
+                this.move(scene);
+                this.visible = true;
             }
 
-            scene.events.emit('addScore', this); 
-            scene.snake.grow(scene);
-            // Avoid double _atom getting while in transition
-            this.visible = false;
+        }, [], this);
+
+        scene.onEat(this);
 
         
-            if (scene.moveInterval = SPEED_WALK) {
-                // Play atom sound
-                var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
-                scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
-            } else if (scene.moveInterval = SPEED_SPRINT) {
-                
-                // Play sniper sound here.
-                // There are some moveInterval shenanigans happening here. 
-                // Need to debug when exactly the move call happens compared to setting the movesInterval.
-            }
+        
 
-            // Moves the eaten atom after a delay including the electron.
-            scene.time.delayedCall(200, function () {
-                if (scene.gState != GState.TRANSITION) {
-                    this.move(scene);
-                    this.visible = true;
-                }
 
-            }, [], this);
-
-            
-            if (DEBUG) {console.log(                         
-                "FRUITCOUNT=", scene.fruitCount,
-                );
-            }
-            return 'valid';
+        return 'valid';
     },
     
     
