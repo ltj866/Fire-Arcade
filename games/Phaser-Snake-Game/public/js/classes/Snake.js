@@ -319,7 +319,7 @@ var Snake = new Phaser.Class({
             });
 
             if (this.closestPortal != testPortal) {
-                console.log("New Closest Portal:", testPortal.x, testPortal.y);
+                //console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 var oldPortal = this.closestPortal;
                 oldPortal.flipX = false;
 
@@ -369,12 +369,8 @@ var Snake = new Phaser.Class({
         
 
         if (!scene.winned) {
-            scene.loseCoin();
-            scene.coinsUIIcon.setVisible(false);
-            ourPersistScene.coins += -1;
-            scene.coinUIText.setHTML(
-                `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
-            );
+            // @Overridable
+            scene.onBonk(); 
         }
 
         scene.snakeCrash.play();    
