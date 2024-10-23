@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1696,16 +1696,16 @@ class MainMenuScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-        if (!thisScene.pressedSpace) {
-            thisScene.pressToPlayTween.stop();
-            thisScene.pressToPlay.setAlpha(0)
-            thisScene.pressedSpace = true;
-            titleTween.resume();
-            menuFadeTween.resume();            
-        }
-        else{
-            console.log(menuOptions[menuList[cursorIndex]].call());
-        }
+            if (!thisScene.pressedSpace) {
+                thisScene.pressToPlayTween.stop();
+                thisScene.pressToPlay.setAlpha(0)
+                thisScene.pressedSpace = true;
+                titleTween.resume();
+                menuFadeTween.resume();            
+            }
+            else{
+                console.log(menuOptions[menuList[cursorIndex]].call());
+            }
 
         });
 
@@ -2435,8 +2435,7 @@ class GameScene extends Phaser.Scene {
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
-        this.spawnCoins = true;
-        this.stopOnBonk = false;
+        this.extractMenuOn = false; // set to true to enable extract menu functionality.
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -3008,6 +3007,108 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        // Extract Prompt Objects
+
+        this.extractPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${'Would you like to extract?'.toUpperCase()}`
+        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+
+        //nineSlice
+        this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
+            'uiPanelL', 'Glass', 
+            GRID * 16, GRID * 8, 
+            8, 8, 8, 8);
+        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+
+        this.exMenuOptions = {
+            'YES': function () {
+                // hide the extract prompt
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
+                console.log("YES");
+                ourGameScene.extractMenuOn = false;
+                ourGameScene.finalScore()
+                return true;
+            },
+            'NO': function () {  
+                // stop vortex tween if it's playing
+                if (ourGameScene.vortexTween.isPlaying()) {
+                    ourGameScene.vortexTween.stop()
+                }
+                // reset snake body segments so it can move immediately
+                ourGameScene.snake.body.forEach(segment => {
+                    segment.x = ourGameScene.snake.head.x;
+                    segment.y = ourGameScene.snake.head.y;
+                });
+                // hide the extract prompt
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
+                // show the level labels again
+                ourGameScene.tweens.add({
+                    targets: [...ourGameScene.blackholeLabels, ourGameScene.r3,ourGameScene.extractText],
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Linear',
+                    repeat: 0,
+                    alpha: 1,
+                });
+                ourGameScene.tempStartingArrows();
+                ourGameScene.gState = GState.WAIT_FOR_INPUT;
+                ourGameScene.snake.direction = DIRS.STOP; 
+                ourGameScene.extractMenuOn = false;
+                console.log("NO");
+            },
+            'LOOP TO ORIGIN': function () {
+                // TODO: send to origin
+                console.log("LOOP");
+                ourGameScene.extractMenuOn = false;
+                return true;
+            },
+        }
+
+        this.exMenuList = Object.keys(this.exMenuOptions);
+        this.exCursorIndex = 1;
+        var _textStart = 152;
+        var _spacing = 20;
+        this._menuElements = [];
+        
+        if (this._menuElements.length < 1) {
+            for (let index = 0; index < this.exMenuList.length; index++) {   
+                if (index == 1) {
+                    console.log('adding')
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.exMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.exMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+    
+                this._menuElements.push(textElement);
+                
+            } 
+        }
+
         
         // TODO Move out of here
         // Reserves two rows in the tilesheet for making portal areas.
@@ -3324,6 +3425,10 @@ class GameScene extends Phaser.Scene {
                         this.boostOutlineTail = boostOutline;
                     }
                 }
+
+            }
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
             }
         });
 
@@ -3354,6 +3459,39 @@ class GameScene extends Phaser.Scene {
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.pressedSpaceDuringWait = false;
+        });
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected.node.style.color = "white";
+            }
+
+        });
+
+        this.input.keyboard.on('keydown-UP', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                //console.log(_selected.node)
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected.node.style.color = "white";
+            }
+
         });
 
         
@@ -3407,24 +3545,24 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
                         extractTile.index = -1;
 
-                        var extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        this.extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
                             "font-size": '8px',
                             "baselineX": 1.5,
                             })).setHTML(
                                 'EXTRACT'
                         ).setDepth(50).setAlpha(0);
                         
-                        var r2 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, extractText.width + 8, 14, 0x1a1a1a  
+                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
                         ).setDepth(49).setAlpha(0);
                         //debugger
-                        r2.postFX.addShine(1, .5, 5)
-                        r2.setStrokeStyle(2, 0x4d9be6, 0.75);
+                        this.r3.postFX.addShine(1, .5, 5)
+                        this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                         this.extractHole.push(extractImage);
-                        this.extractLables.push(extractText,r2);
+                        this.extractLables.push(this.extractText,this.r3);
 
                         this.tweens.add({
-                            targets: [r2,extractText],
+                            targets: [this.r3,this.extractText],
                             alpha: {from: 0, to: 1},
                             ease: 'Sine.easeOutIn',
                             duration: 50,
@@ -5092,14 +5230,59 @@ class GameScene extends Phaser.Scene {
         
     }
 
-    finalScore(){
-        const ourStartScene = this.scene.get('StartScene');
+    tempStartingArrows(){
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
+            this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y +1 * GRID)) {
+            this.startingArrowsAnimS2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS2.flipY = true;
+            this.startingArrowsAnimS2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
+            this.startingArrowsAnimE2 = this.add.sprite(this.snake.head.x + GRID * 2, this.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE2.angle = 90;
+            this.startingArrowsAnimE2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
+            this.startingArrowsAnimW2 = this.add.sprite(this.snake.head.x - GRID,this.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW2.angle = 270;
+            this.startingArrowsAnimW2.play('startArrowIdle');
+        }
+    }
+
+    extractPrompt(){
+        const ourGameScene = this.scene.get('GameScene');
+        ourGameScene.extractMenuOn = true;
+
+        // set menu alpha back to 1
+        ourGameScene._menuElements.forEach(textElement =>{
+            console.log(textElement)
+            textElement.setAlpha(1);
+        });
+        this.extractPromptText.setAlpha(1);
+        this.extractPanel.setAlpha(1);
 
         this.gState = GState.TRANSITION;
-
         this.snake.head.setTexture('snakeDefault', 0);
-
         this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+        // hide the level labels
+        this.levelLabelHide = this.tweens.add({
+            targets: [...this.blackholeLabels,ourGameScene.r3,ourGameScene.extractText],
+            yoyo: false,
+            duration: 500,
+            ease: 'Linear',
+            repeat: 0,
+            alpha: 0,
+        });
+ 
+        this._selected = this._menuElements[this.exCursorIndex];
+    }
+
+    finalScore(){
+        const ourStartScene = this.scene.get('StartScene');
 
         this.extractHole[0].play('extractHoleClose');
 
@@ -5188,7 +5371,7 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
-                ourGameScene.warpToMenu(); 
+                ourGameScene.scene.start('MainMenuScene');
             }
             this.input.keyboard.on('keydown-SPACE', function() { 
                 onContinue();
@@ -5485,7 +5668,7 @@ class GameScene extends Phaser.Scene {
 
     vortexIn(target, x, y){
 
-        var vortexTween = this.tweens.add({
+        this.vortexTween = this.tweens.add({
             targets: target, 
             x: x, //this.pathRegroup.vec.x,
             y: y, //this.pathRegroup.vec.y,
@@ -5496,7 +5679,7 @@ class GameScene extends Phaser.Scene {
             delay: this.tweens.stagger(30)
         });
 
-        return vortexTween
+        return this.vortexTween
     }
 
     snakeEating(){
@@ -8506,16 +8689,16 @@ class InputScene extends Phaser.Scene {
             gameScene.startingArrowsAnimW.setAlpha(0);
         }
         if (gameScene.startingArrowsAnimN2) {
-            gameScene.startingArrowsAnimN2.setAlpha(0);
+            gameScene.startingArrowsAnimN2.destroy();
         }
         if (gameScene.startingArrowsAnimE2) {
-            gameScene.startingArrowsAnimE2.setAlpha(0);
+            gameScene.startingArrowsAnimE2.destroy();
         }
         if (gameScene.startingArrowsAnimS2) {
-            gameScene.startingArrowsAnimS2.setAlpha(0);
+            gameScene.startingArrowsAnimS2.destroy();
         }
         if (gameScene.startingArrowsAnimW2) {
-            gameScene.startingArrowsAnimW2.setAlpha(0);
+            gameScene.startingArrowsAnimW2.destroy();
         }
         
         
