@@ -2942,7 +2942,7 @@ class GameScene extends Phaser.Scene {
         //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
         
         this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText('GOAL : Collect 28 Atoms').setOrigin(0.5,0);
+        ).setText('GOAL : Collect 28 Atoms').setOrigin(0.5,0).setAlpha(0);
 
         this.stageText = this.add.dom(-SCREEN_WIDTH, GRID * 7.5, 'div', Object.assign({},STYLE_DEFAULT,{
             'color': '#272727',
@@ -2950,17 +2950,17 @@ class GameScene extends Phaser.Scene {
             'font-weight': '400',
             'padding': '0px 0px 0px 12px'
         })
-        ).setText(`${this.stage}`).setOrigin(0,0);
+        ).setText(`${this.stage}`).setOrigin(0,0).setAlpha(0);
 
         this.r2 = this.add.rectangle(this.stageText.x, this.stageText.y, this.stageText.width - 8, 16, 0xffffff
-        ).setDepth(101).setOrigin(0,0);
+        ).setDepth(101).setOrigin(0,0).setAlpha(0);
         
         
         this.openingGoalPanel = this.add.nineslice(-SCREEN_WIDTH, GRID * 8.25, 
             'uiPanelL', 'Glass', 
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
-        this.openingGoalPanel.setDepth(100).setOrigin(0.475,0);
+        this.openingGoalPanel.setDepth(100).setOrigin(0.475,0).setAlpha(0);
         this.tweens.add({
             targets: [this.openingGoalText, this.openingGoalPanel],
             x: SCREEN_WIDTH/2,
