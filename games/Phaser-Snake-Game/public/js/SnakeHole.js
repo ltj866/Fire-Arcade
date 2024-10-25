@@ -3036,7 +3036,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.extractPanel.setAlpha(0);
                 console.log("YES");
                 ourGameScene.extractMenuOn = false;
-                ourGameScene.finalScore()
+                ourGameScene.finalScore("MainMenuScene", {});
                 return true;
             },
             'NO': function () {  
@@ -3072,8 +3072,20 @@ class GameScene extends Phaser.Scene {
             },
             'LOOP TO ORIGIN': function () {
                 // TODO: send to origin
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
+
+                // Clear for reseting game   
+                ourGameScene.finalScore("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    startupAnim: true,
+                });
                 return true;
             },
         }
@@ -5442,7 +5454,7 @@ class GameScene extends Phaser.Scene {
         this._selected = this._menuElements[this.exCursorIndex];
     }
 
-    finalScore(){
+    finalScore(nextScene, args){
         const ourStartScene = this.scene.get('StartScene');
 
         this.extractHole[0].play('extractHoleClose');
@@ -5539,7 +5551,9 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
-                ourGameScene.scene.start('MainMenuScene');
+                ourGameScene.scene.get("StartScene").stageHistory = [];
+                ourGameScene.scene.get("PersistScene").coins = START_COINS;
+                ourGameScene.scene.start(nextScene, args); 
             }
             this.input.keyboard.on('keydown-SPACE', function() { 
                 onContinue();

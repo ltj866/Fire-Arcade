@@ -23,6 +23,8 @@ var checkRank = function(stageName, targetRank) {
 
 
 export const STAGE_UNLOCKS = new Map([
+    ['dino-tess', function () { 
+        return checkRank("World_4-4", RANKS.WOOD)}],
     ['og-plus', function () { 
         var checkLevels = [
             "World_1-2",
