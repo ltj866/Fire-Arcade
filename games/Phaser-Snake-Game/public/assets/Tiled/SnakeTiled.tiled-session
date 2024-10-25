@@ -9,7 +9,7 @@
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 1,
+            "scaleInDock": 2,
             "scaleInEditor": 2
         },
         ":/automap-tiles.tsx": {
@@ -835,9 +835,9 @@
         },
         "World_1-1.json": {
             "scale": 2,
-            "selectedLayer": 1,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 111.5,
+                "x": 111.25,
                 "y": 165.25
             }
         },
@@ -1067,9 +1067,9 @@
         },
         "World_3-2_Wrap.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 2,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1078,9 +1078,9 @@
         },
         "World_3-3_Wrap.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1091,7 +1091,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 161.8329134608838
             }
         },
@@ -1235,7 +1235,7 @@
             "scale": 2.336781609195402,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.74323659616334,
+                "x": 173.5292670929661,
                 "y": 161.97491392031483
             }
         },
