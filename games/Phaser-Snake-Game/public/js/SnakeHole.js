@@ -2436,6 +2436,7 @@ class GameScene extends Phaser.Scene {
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         this.extractMenuOn = false; // set to true to enable extract menu functionality.
+        this.spawnCoins = true;
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
