@@ -952,7 +952,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 162.30680193368286
             }
         },
@@ -974,7 +974,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 162.30680193368286
             }
         },
@@ -1210,11 +1210,11 @@
             "scaleInDock": 1
         },
         "World_4-5.json": {
-            "scale": 2.997413793103448,
-            "selectedLayer": 3,
+            "scale": 2.688936781609195,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 194.66781708369285,
-                "y": 161.97296519988492
+                "x": 173.86053967405826,
+                "y": 161.95992519369491
             }
         },
         "World_4-5.json#tileSheetx12": {
@@ -1339,7 +1339,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 229.59896507115135
             }
         },
@@ -1348,9 +1348,9 @@
         },
         "World_8-3_Adv_Portaling.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 162.30680193368286
             }
         },
@@ -1386,7 +1386,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 162.30680193368286
             }
         },
@@ -2562,18 +2562,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "World_4-5.json",
+        "World_4-6.json",
         "World_4-4.json",
+        "World_8-2_Adv_Portaling.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_8-5_Adv_Portaling.json",
         "World_2-3.json",
         "World_2-4.json",
         "World_2-5.json",
         "World_3-2_Wrap.json",
         "World_3-3_Wrap.json",
-        "World_3-4_Wrap.json",
-        "World_8-4_Adv_Portaling.json",
-        "World_8-3_Adv_Portaling.json",
-        "World_8-2_Adv_Portaling.json",
-        "World_8-5_Adv_Portaling.json",
-        "World_9-5_Final_Exams.json"
+        "World_3-4_Wrap.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

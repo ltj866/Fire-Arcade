@@ -75,7 +75,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank("World_8-3_Adv_Portaling", RANKS.WOOD);
     }],
     ['hardest----for-now', function () {
-        return checkRank("World_4-3-ii", RANKS.WOOD);
+        return checkRank("World_10-4", RANKS.WOOD);
     }],
     ['swirl-swirl', function () {
         return checkRank("World_4-5", RANKS.WOOD); // Should this one be harder to unlock?
