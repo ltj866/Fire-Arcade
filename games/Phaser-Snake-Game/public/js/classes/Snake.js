@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     DIRS, DEBUG, commaInt,
-    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR,
+    LENGTH_GOAL, PLAYER_STATS, SPEED_SPRINT, COMBO_ADD_FLOOR,
     X_OFFSET,
     Y_OFFSET
 } from "../SnakeHole.js";
@@ -145,25 +145,45 @@ var Snake = new Phaser.Class({
         var yN = this.head.y;
 
         
-    if (this.direction === DIRS.LEFT)
-        {
-            xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
-            ourPersistScene.bgCoords.x -= .25;
-        }
-        else if (this.direction === DIRS.RIGHT)
-        {
-            xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
-            ourPersistScene.bgCoords.x += .25;
-        }
-        else if (this.direction === DIRS.UP)
-        {
-            yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
-            ourPersistScene.bgCoords.y -= .25;
-        }
-        else if (this.direction === DIRS.DOWN)
-        {
-            yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
-            ourPersistScene.bgCoords.y += .25;
+        switch (this.direction) {
+            case DIRS.LEFT:
+                xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                ourPersistScene.bgCoords.x -= .25;
+                if (xN > this.head.x) {
+                    //console.log("I AM WRAPPING LEFT");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+
+            case DIRS.RIGHT:
+                xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                ourPersistScene.bgCoords.x += .25;
+                if (xN < this.head.x) {
+                    //console.log("I AM WRAPPING RIGHT");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+
+            case DIRS.UP:
+                yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                ourPersistScene.bgCoords.y -= .25;
+                if (yN > this.head.y) {
+                    //console.log("I AM WRAPPING UP");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+
+            case DIRS.DOWN:
+                yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                ourPersistScene.bgCoords.y += .25;
+                if (yN < this.head.y) {
+                    //console.log("I AM WRAPPING DOWN");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+                
+            default:
+                break;
         }
 
         
@@ -238,6 +258,7 @@ var Snake = new Phaser.Class({
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
+                 //this.body includes the head I think
                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
 
@@ -276,7 +297,8 @@ var Snake = new Phaser.Class({
             if (scene.extractHole[0]) { //check that there is an extract hole
                 if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
                     console.log('WOO')
-                    scene.finalScore();
+                    //scene.finalScore();
+                    scene.extractPrompt();
                 }
             }
 
@@ -294,9 +316,13 @@ var Snake = new Phaser.Class({
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
                 this.closestPortal.flipX = true;
-                //this.closestPortal.setScale(2);
 
-                //this.closestPortal.targetObject.setScale(2);
+                scene.tweens.add({
+                    targets: this.closestPortal.targetObject.portalHighlight,
+                    alpha: {from: 1, to: 0},
+                    duration: 98,
+                    ease: 'Sine.Out',
+                    });
             }
 
             checkPortals.forEach( portal => {
@@ -315,19 +341,29 @@ var Snake = new Phaser.Class({
             });
 
             if (this.closestPortal != testPortal) {
-                console.log("New Closest Portal:", testPortal.x, testPortal.y);
-                this.closestPortal.flipX = false;
-                //this.closestPortal.setScale(1);
-                this.closestPortal.targetObject.setScale(1);
+                //console.log("New Closest Portal:", testPortal.x, testPortal.y);
+                var oldPortal = this.closestPortal;
+                oldPortal.flipX = false;
 
                 testPortal.flipX = true;
-                //testPortal.setScale(2);
-                testPortal.targetObject.setScale(2);
-                
+
+                scene.tweens.add({
+                    targets: testPortal.targetObject.portalHighlight,
+                    alpha: {from: 0, to: 1},
+                    duration: 98,
+                    ease: 'Sine.Out',
+                    onStart: () =>{
+                        scene.tweens.add({
+                            targets: oldPortal.targetObject.portalHighlight,
+                            alpha: {from: 1, to: 0},
+                            duration: 300,
+                            ease: 'Sine.Out',
+                            });
+                    }
+                    });
                 this.closestPortal = testPortal;
+
             }
-            
-            //debugger
             
         }
 
@@ -347,45 +383,43 @@ var Snake = new Phaser.Class({
     bonk: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
         
-        scene.gState = GState.BONK;
         this.direction = DIRS.STOP;
-        console.log(scene.gState, "BONK" , this.direction);
-
         scene.screenShake();
-        
 
-        if (!scene.winned) {
-            scene.loseCoin();
-            scene.coinsUIIcon.setVisible(false);
-            ourPersistScene.coins += -1;
-            scene.coinUIText.setHTML(
-                `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
-            );
+        if (!scene.stopOnBonk) {
+
+            scene.gState = GState.BONK;
+            //console.log(scene.gState, "BONK" , this.direction);
+
+            if (!scene.winned) {
+                // @Overridable
+                scene.onBonk(); 
+            }
+    
+            scene.snakeCrash.play();    
+            // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
+            
+            // If portalling interupted make sure all portal segments are invisible.
+            scene.portals.forEach ( portal => {
+                portal.snakePortalingSprite.visible = false;
+            });
+    
+            scene.wallPortals.forEach ( portalWallSegment => {
+                portalWallSegment.snakePortalingSprite.visible = false;
+    
+            });
+    
+            if (ourPersistScene.coins > -1) {
+                scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+            }
+
+        } else {
+            this.gState = GState.WAIT_FOR_INPUT;
         }
 
-        scene.snakeCrash.play();    
-        // game.scene.scene.restart(); // This doesn't work correctly
-        if (DEBUG) { console.log("DEAD"); }
+        scene.bonks += 1; 
         
-        scene.bonks += 1;
-        
-        // Do this when you want to really end the game.
-        //game.destroy();
-        //this.scene.restart();
-
-        // If portalling interupted make sure all portal segments are invisible.
-        scene.portals.forEach ( portal => {
-            portal.snakePortalingSprite.visible = false;
-        });
-
-        scene.wallPortals.forEach ( portalWallSegment => {
-            portalWallSegment.snakePortalingSprite.visible = false;
-
-        });
-
-        if (ourPersistScene.coins > -1) {
-            scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
-        }
     }
 });
 

@@ -5,7 +5,10 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import {PORTAL_COLORS} from './const.js';
+import { PORTAL_COLORS } from './const.js';
+import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
+import { STAGE_OVERRIDES } from './data/bonusLevels.js';
+
 
 
 //******************************************************************** */
@@ -95,7 +98,7 @@ var updateSumOfBest = function(scene) {
     let entries = Object.entries(localStorage);
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
-    scene.bestOfStageData = {};
+    BEST_OF_STAGE_DATA = new Map();
 
     entries.forEach(log => {
         var key = log[0].split("-");
@@ -103,7 +106,7 @@ var updateSumOfBest = function(scene) {
             scene.stagesComplete += 1
 
             var levelLog = new StageData(JSON.parse(log[1]));
-            scene.bestOfStageData[levelLog.stage] = levelLog;
+            BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
 
             var _scoreTotal = levelLog.calcTotal();
             scene.sumOfBest += _scoreTotal;
@@ -111,6 +114,41 @@ var updateSumOfBest = function(scene) {
 
     })
 }
+
+// SHOULD BE READ ONLY
+export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
+    if (!JSON.parse(localStorage.getItem("playerStats"))) {
+        PLAYER_STATS = {}
+    }
+    var bonks = PLAYER_STATS.bonks ?? 0;
+    var atomsEaten = PLAYER_STATS.atomsEaten ?? 0;
+    var turns = PLAYER_STATS.turns ?? 0;
+    var wraps = PLAYER_STATS.wraps ?? 0;
+
+    PLAYER_STATS.bonks = bonks;
+    PLAYER_STATS.atomsEaten = atomsEaten;
+    PLAYER_STATS.turns = turns;
+    PLAYER_STATS.wraps = wraps;
+
+    PLAYER_STATS.stagesFinished = Math.floor(atomsEaten / 28);
+}
+
+var updatePlayerStats = function (stageData) {
+
+    
+    PLAYER_STATS.bonks += stageData.bonks;
+    PLAYER_STATS.atomsEaten += stageData.foodLog.length;
+    PLAYER_STATS.turns += stageData.turns;
+    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
+
+    localStorage.setItem("playerStats", JSON.stringify(PLAYER_STATS));
+
+    // JSON.stringify(this.stageData)
+
+}
+
+
+export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -197,6 +235,23 @@ export const DIRS = Object.freeze({
     RIGHT: 4,
     STOP: 0, 
 }); 
+
+export const RANKS = Object.freeze({
+    WOOD: 0,
+    BRONZE: 1,
+    SILVER: 2,
+    GOLD: 3,
+    PLATINUM: 4,
+});
+
+const RANK_BENCHMARKS = new Map([
+    // Calibrated for use with SpeedBonus
+    [RANKS.GOLD, 10000],
+    [RANKS.SILVER, 5000],
+    [RANKS.BRONZE, 2000],
+    [RANKS.WOOD, 0],
+
+]);
 
 
 // #region GLOBAL STYLES 
@@ -783,6 +838,7 @@ class StartScene extends Phaser.Scene {
         //scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim.png', frameWidth: 64, frameHeight: 64 }); 
         //debugger
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('portalHighlights', 'assets/sprites/portalAnimHighlight.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
@@ -1640,16 +1696,16 @@ class MainMenuScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-        if (!thisScene.pressedSpace) {
-            thisScene.pressToPlayTween.stop();
-            thisScene.pressToPlay.setAlpha(0)
-            thisScene.pressedSpace = true;
-            titleTween.resume();
-            menuFadeTween.resume();            
-        }
-        else{
-            console.log(menuOptions[menuList[cursorIndex]].call());
-        }
+            if (!thisScene.pressedSpace) {
+                thisScene.pressToPlayTween.stop();
+                thisScene.pressToPlay.setAlpha(0)
+                thisScene.pressedSpace = true;
+                titleTween.resume();
+                menuFadeTween.resume();            
+            }
+            else{
+                console.log(menuOptions[menuList[cursorIndex]].call());
+            }
 
         });
 
@@ -2057,6 +2113,9 @@ class PersistScene extends Phaser.Scene {
     
     create() {
 
+
+    
+
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
@@ -2192,6 +2251,14 @@ class PersistScene extends Phaser.Scene {
 
     this.graphics = this.add.graphics();
     }
+    loseCoin(){ // 
+        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
+        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        this.coinsUICopy.setGravity(0,400)
+        //TODO add coin flip here
+        //TODO trigger UI coin loader animation here
+    }
 
    /* openingTween(tweenValue){
         this.tweens.addCounter({
@@ -2234,17 +2301,17 @@ class PersistScene extends Phaser.Scene {
         });
     }
 
-    checkCompletedRank = function (targetStageName, rank) {
+    //checkCompletedRank = function (targetStageName, rank) {
 
-        if (this.bestOfStageData[targetStageName] != undefined ) {
-            var resultRank = this.bestOfStageData[targetStageName].stageRank()
-            var bool = resultRank >= rank
-            return  bool;
-        } else {
-            //debugger
-            return false;
-        }
-    }
+    ///    if (this.bestOfStageData[targetStageName] != undefined ) {
+    //        var resultRank = this.bestOfStageData[targetStageName].stageRank()
+    //        var bool = resultRank >= rank
+    //        return  bool;
+    //    } else {
+    //        //debugger
+    //        return false;
+    //    }
+    //}
     
     update(time, delta) {
 
@@ -2316,7 +2383,7 @@ class GameScene extends Phaser.Scene {
         this.tutorialState = false;
 
         // Arrays for collision detection
-        this.atoms = [];
+        this.atoms = new Set();
         this.foodHistory = [];
         this.walls = [];
         this.portals = [];
@@ -2357,6 +2424,9 @@ class GameScene extends Phaser.Scene {
         this.stage = stage;
 
         this.moveInterval = SPEED_WALK;
+        this.boostCost = 6;
+        this.speedWalk = SPEED_WALK;
+        this.speedSprint = SPEED_SPRINT;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -2365,6 +2435,7 @@ class GameScene extends Phaser.Scene {
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
+        this.extractMenuOn = false; // set to true to enable extract menu functionality.
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -2378,6 +2449,8 @@ class GameScene extends Phaser.Scene {
         this.stageStartScore = Math.trunc(score);
 
         this.length = 0;
+        this.lengthGoal = LENGTH_GOAL;
+        this.maxScore = MAX_SCORE;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
@@ -2398,8 +2471,7 @@ class GameScene extends Phaser.Scene {
 
         this.coinSpawnCounter = 100;
 
-
-         
+          
     }
     
     
@@ -2420,6 +2492,11 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        if (STAGE_OVERRIDES.has(this.stage)) {
+            console.log("Running preFix Override on", this.stage);
+            STAGE_OVERRIDES.get(this.stage).preFix(this);
+        }
+
         const ourInputScene = this.scene.get('InputScene');
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
@@ -2433,12 +2510,9 @@ class GameScene extends Phaser.Scene {
         ourPersist.comboCover.setVisible(false);
 
 
-        if (this.stage == 'Tutorial_2') {
-            this.time.delayedCall(5000, () => {
-                this.tutorialPrompt(X_OFFSET + this.helpPanel.width/2 + GRID,
-                     Y_OFFSET + this.helpPanel.height/2 + GRID,2,)
-            })
-        }
+        //if (this.stage == 'Tutorial_2') {
+        //    
+        //}
         if (this.stage == 'Tutorial_3') {
             this.time.delayedCall(5000, () => {
                 this.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - this.helpPanel.width/2 - GRID,
@@ -2470,14 +2544,14 @@ class GameScene extends Phaser.Scene {
         });
 
         //testing game creation logic
-        if (/^Tutorial_[1-2]$/.test(this.stage)) { //checks for Tutorial_1-2
-            this.tutorialState = true;
-            ourPersist.coins = 99;
-        }
-        else if (this.stage == 'Tutorial_3'){
-            this.tutorialState = true;
-            ourPersist.coins = 30;
-        }
+        //if (/^Tutorial_[2]$/.test(this.stage)) { //checks for Tutorial_1-2
+        //    this.tutorialState = true;
+        //    ourPersist.coins = 99;
+        //}
+        //else if (this.stage == 'Tutorial_3'){
+        //    this.tutorialState = true;
+        //    ourPersist.coins = 30;
+        //}
         //test portal walls
         if (this.stage == 'testingFuturistic_x' ) {
             var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
@@ -2665,10 +2739,10 @@ class GameScene extends Phaser.Scene {
 
         
 
-        this.tiledProperties = {};
+        this.tiledProperties = new Map();
 
         this.map.properties.forEach(prop => {
-            this.tiledProperties[prop.name] = prop.value;
+            this.tiledProperties.set(prop.name, prop.value);
         });
         /*this.mapShadow.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
@@ -2678,7 +2752,7 @@ class GameScene extends Phaser.Scene {
         // Loading all Next Stage name to slug to grab from the cache later.
 
         // The first split and join santizes any spaces.
-        this.nextStages = this.tiledProperties.next.split(" ").join("").split(",");
+        this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
         
     
 
@@ -2702,9 +2776,10 @@ class GameScene extends Phaser.Scene {
 
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
-        this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
-
+        this.stageUUID = this.tiledProperties.get("UUID"); // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.tiledProperties.get("diffBonus") ?? 100; // TODO: Get them by name and throw errors.
+        this.atomToSpawn = this.tiledProperties.get("atoms") ?? 5;
+        
         ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
@@ -2867,7 +2942,7 @@ class GameScene extends Phaser.Scene {
         //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
         
         this.openingGoalText = this.add.dom(-SCREEN_WIDTH, GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        ).setText('GOAL : Collect 28 Atoms').setOrigin(0.5,0);
+        ).setText('GOAL : Collect 28 Atoms').setOrigin(0.5,0).setAlpha(0);
 
         this.stageText = this.add.dom(-SCREEN_WIDTH, GRID * 7.5, 'div', Object.assign({},STYLE_DEFAULT,{
             'color': '#272727',
@@ -2875,17 +2950,17 @@ class GameScene extends Phaser.Scene {
             'font-weight': '400',
             'padding': '0px 0px 0px 12px'
         })
-        ).setText(`${this.stage}`).setOrigin(0,0);
+        ).setText(`${this.stage}`).setOrigin(0,0).setAlpha(0);
 
         this.r2 = this.add.rectangle(this.stageText.x, this.stageText.y, this.stageText.width - 8, 16, 0xffffff
-        ).setDepth(101).setOrigin(0,0);
+        ).setDepth(101).setOrigin(0,0).setAlpha(0);
         
         
         this.openingGoalPanel = this.add.nineslice(-SCREEN_WIDTH, GRID * 8.25, 
             'uiPanelL', 'Glass', 
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
-        this.openingGoalPanel.setDepth(100).setOrigin(0.475,0);
+        this.openingGoalPanel.setDepth(100).setOrigin(0.475,0).setAlpha(0);
         this.tweens.add({
             targets: [this.openingGoalText, this.openingGoalPanel],
             x: SCREEN_WIDTH/2,
@@ -2931,6 +3006,120 @@ class GameScene extends Phaser.Scene {
                     });
             }
         });
+
+        // Extract Prompt Objects
+
+        this.extractPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${'Would you like to extract?'.toUpperCase()}`
+        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+
+        //nineSlice
+        this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
+            'uiPanelL', 'Glass', 
+            GRID * 16, GRID * 8, 
+            8, 8, 8, 8);
+        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+
+        this.exMenuOptions = {
+            'YES': function () {
+                // hide the extract prompt
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
+                console.log("YES");
+                ourGameScene.extractMenuOn = false;
+                ourGameScene.finalScore("MainMenuScene", {});
+                return true;
+            },
+            'NO': function () {  
+                // stop vortex tween if it's playing
+                if (ourGameScene.vortexTween.isPlaying()) {
+                    ourGameScene.vortexTween.stop()
+                }
+                // reset snake body segments so it can move immediately
+                ourGameScene.snake.body.forEach(segment => {
+                    segment.x = ourGameScene.snake.head.x;
+                    segment.y = ourGameScene.snake.head.y;
+                });
+                // hide the extract prompt
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
+                // show the level labels again
+                ourGameScene.tweens.add({
+                    targets: [...ourGameScene.blackholeLabels, ourGameScene.r3,ourGameScene.extractText],
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Linear',
+                    repeat: 0,
+                    alpha: 1,
+                });
+                ourGameScene.tempStartingArrows();
+                ourGameScene.gState = GState.WAIT_FOR_INPUT;
+                ourGameScene.snake.direction = DIRS.STOP; 
+                ourGameScene.extractMenuOn = false;
+                console.log("NO");
+            },
+            'LOOP TO ORIGIN': function () {
+                // TODO: send to origin
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
+                console.log("LOOP");
+                ourGameScene.extractMenuOn = false;
+
+                // Clear for reseting game   
+                ourGameScene.finalScore("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    startupAnim: true,
+                });
+                return true;
+            },
+        }
+
+        this.exMenuList = Object.keys(this.exMenuOptions);
+        this.exCursorIndex = 1;
+        var _textStart = 152;
+        var _spacing = 20;
+        this._menuElements = [];
+        
+        if (this._menuElements.length < 1) {
+            for (let index = 0; index < this.exMenuList.length; index++) {   
+                if (index == 1) {
+                    console.log('adding')
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.exMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.exMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+    
+                this._menuElements.push(textElement);
+                
+            } 
+        }
 
         
         // TODO Move out of here
@@ -3096,7 +3285,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
-            if (!this.tiledProperties.dark) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
         
@@ -3191,7 +3380,7 @@ class GameScene extends Phaser.Scene {
 
                 
  
-                if (this.currentScoreTimer() === MAX_SCORE) {
+                if (this.currentScoreTimer() === this.maxScore) {
                     /**
                      * This code is duplicated here to make sure that the electron 
                      * animation is played as soon as you move from the start and wait state.
@@ -3248,6 +3437,10 @@ class GameScene extends Phaser.Scene {
                         this.boostOutlineTail = boostOutline;
                     }
                 }
+
+            }
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
             }
         });
 
@@ -3280,121 +3473,48 @@ class GameScene extends Phaser.Scene {
             this.pressedSpaceDuringWait = false;
         });
 
+        this.input.keyboard.on('keydown-DOWN', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected.node.style.color = "white";
+            }
+
+        });
+
+        this.input.keyboard.on('keydown-UP', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                //console.log(_selected.node)
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected.node.style.color = "white";
+            }
+
+        });
+
         
         this.blackholes = [];
         this.blackholeLabels = [];
         this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
+            
 
             // #region is unlocked?
-            const STAGE_UNLOCKS = {
-                /* Template
-                '': function () {
-                    return ourPersist.checkCompletedRank("", COPPER);
-                },
-                */
-               'two-wide-corridors': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
-                },
-                'double-back-portals': function () {
-                    return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", WOOD);
-                },
-                'easy-wrap': function () {
-                    return ourPersist.checkCompletedRank("World_1-4", SILVER);
-                },
-                'hard-wrap': function () {
-                    return ourPersist.checkCompletedRank("World_3-3_Wrap", WOOD);
-                },
-                'more-blocks': function () {
-                    return ourPersist.checkCompletedRank("World_2-2", WOOD);
-                },
-                'wrap-and-warp': function () {
-                    return ourPersist.checkCompletedRank("World_1-3", WOOD);
-                },
-                'learn-to-wrap': function () {
-                    return true;
-                },
-                'these-are-coins': function () {
-                    return true;
-                },
-                'welcome': function () {
-                    return true;
-                },
-                'unidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", WOOD);
-                },
-                'hardest----for-now': function () {
-                    return ourPersist.checkCompletedRank("World_4-3-ii", WOOD);
-                },
-                'swirl-swirl': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", WOOD); // Should this one be harder to unlock?
-                },
-                'eye': function () {
-                    return true;
-                },
-                'plus-plus': function () {
-                    return ourPersist.checkCompletedRank("World_10-3", WOOD);
-                },
-                'col': function () {
-                    return ourPersist.checkCompletedRank("World_4-3", WOOD);
-                },
-                'its-a-snek': function () {
-                    return ourPersist.checkCompletedRank("World_4-2", WOOD);
-                },
-                'now-a-fourth': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
-                },
-                'horizontal-uturns': function () {
-                    return ourPersist.checkCompletedRank("World_9-4_Final_Exams", WOOD);
-                },
-                'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_9-3_Final_Exams", WOOD); 
-                },
-                'first-medium': function () {
-                    return true;
-                },
-                'lights-out': function () {
-                    return false;
-                },
-                'easy-racer': function () {
-                    debugger
-                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
-                },
-                'hello-ghosts': function () {
-                    return false;
-                },
-                'medium-happy': function () {
-                    debugger
-                    return ourPersist.checkCompletedRank("World_2-4", WOOD);
-                    
-                },
-                'bidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_4-4", WOOD); 
-                },
-                'start': function ( ) { 
-                    return true
-                },
-                'babies-first-wall': function () {
-                    return ourPersist.checkCompletedRank("World_1-1", WOOD);
-                },
-                'horz-rows': function () {
-                    return ourPersist.checkCompletedRank("World_1-2", WOOD);
-                },
-                'first-blocks': function () {
-                    return ourPersist.checkCompletedRank("World_1-4", WOOD);
-                },
-                'medium-wrap': function () {
-                    return ourPersist.checkCompletedRank("World_3-2_Wrap", WOOD)
-                },
-                'dark-precision': function () {
-                    return true
-                },
-                'vert-rows': function () {
-                    return true;
-                }
-
-            }
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
@@ -3437,24 +3557,24 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
                         extractTile.index = -1;
 
-                        var extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        this.extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
                             "font-size": '8px',
                             "baselineX": 1.5,
                             })).setHTML(
                                 'EXTRACT'
                         ).setDepth(50).setAlpha(0);
                         
-                        var r2 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, extractText.width + 8, 14, 0x1a1a1a  
+                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
                         ).setDepth(49).setAlpha(0);
                         //debugger
-                        r2.postFX.addShine(1, .5, 5)
-                        r2.setStrokeStyle(2, 0x4d9be6, 0.75);
+                        this.r3.postFX.addShine(1, .5, 5)
+                        this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                         this.extractHole.push(extractImage);
-                        this.extractLables.push(extractText,r2);
+                        this.extractLables.push(this.extractText,this.r3);
 
                         this.tweens.add({
-                            targets: [r2,extractText],
+                            targets: [this.r3,this.extractText],
                             alpha: {from: 0, to: 1},
                             ease: 'Sine.easeOutIn',
                             duration: 50,
@@ -3476,7 +3596,7 @@ class GameScene extends Phaser.Scene {
                                 
                                 if (propObj.name === 'slug') {
 
-                                    if (STAGE_UNLOCKS[propObj.value] != undefined) {
+                                    if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
                                         tile.index = -1;
                                         // Only removes levels that have unlock slugs.
                                         // Easier to debug which levels don't have slugs formatted correctly.
@@ -3485,13 +3605,13 @@ class GameScene extends Phaser.Scene {
                                     
                                     // Easier to see when debugging with debugger in console.
                                     stageName;
-                                    var temp = STAGE_UNLOCKS[propObj.value];
-                                    var tempEval = STAGE_UNLOCKS[propObj.value].call();
+                                    var temp = STAGE_UNLOCKS.get(propObj.value);
+                                    var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
                                     
                                    
                                     
 
-                                    if (STAGE_UNLOCKS[propObj.value].call()) {
+                                    if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist)) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
                                         console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
@@ -3547,21 +3667,21 @@ class GameScene extends Phaser.Scene {
                                         //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
                                         //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
                                         
-                                        if (ourPersist.bestOfStageData[stageName] != undefined) {
-                                            switch (ourPersist.bestOfStageData[stageName].stageRank()) {
-                                                case WOOD:
+                                        if (BEST_OF_STAGE_DATA.get(stageName) != undefined) {
+                                            switch (BEST_OF_STAGE_DATA.get(stageName).stageRank()) {
+                                                case RANKS.WOOD:
                                                     blackholeImage.setTint(0xB87333);
                                                     break;
-                                                case BRONZE:
+                                                case RANKS.BRONZE:
                                                     blackholeImage.setTint(0xCD7F32);
                                                     break;
-                                                case SILVER:
+                                                case RANKS.SILVER:
                                                     blackholeImage.setTint(0xC0C0C0);
                                                     break;
-                                                case GOLD:
+                                                case RANKS.GOLD:
                                                     blackholeImage.setTint(0xDAA520);
                                                     break;
-                                                case PLATINUM:
+                                                case RANKS.PLATINUM:
                                                     blackholeImage.setTint(0xE5E4E2);
                                                     break;
                                                 default:
@@ -3981,7 +4101,7 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        // #region Play Portals
+        // #region Portals Play
         if (this.portals.length > 0) {
             var sortedPortals = this.portals.toSorted(
                 (a, b) => {
@@ -3991,6 +4111,8 @@ class GameScene extends Phaser.Scene {
     
             sortedPortals.forEach (portal => {
                 portal.play(portal.anim);
+                portal.portalHighlight.playAfterDelay("portalHighlights", 32);
+                portal.portalHighlight.alpha = 0;
             });
             
         }
@@ -4034,14 +4156,11 @@ class GameScene extends Phaser.Scene {
         //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
 
 
-  
 
+        for (let index = 1; index <= this.atomToSpawn; index++) {
+            var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
+        }
 
-        var atom1 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom2 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom3 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom4 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
-        var atom5 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
 
 
         //this.tweens.add({
@@ -4130,7 +4249,7 @@ class GameScene extends Phaser.Scene {
 
         this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
-        if (this.tiledProperties.dark) {
+        if (this.tiledProperties.has("dark")) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
@@ -4353,9 +4472,9 @@ class GameScene extends Phaser.Scene {
         
         
         var length = `${this.length}`;
-        if (LENGTH_GOAL != 0) {
+        if (this.lengthGoal != 0) {
             this.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
+                `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
             ).setOrigin(0,0).setAlpha(1);
             this.lengthGoalUILabel.setText(
             `LENGTH\nGOAL`
@@ -4381,9 +4500,9 @@ class GameScene extends Phaser.Scene {
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
         this.scoreTimer = this.time.addEvent({
-            delay: MAX_SCORE *100,
+            delay: this.maxScore * 100,
             paused: true
-         });
+         }, this);
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         
@@ -4585,7 +4704,7 @@ class GameScene extends Phaser.Scene {
             var lastHistory = this.scoreHistory.slice();
             lastHistory.pop();
             var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
-            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore, "Length:", this.length);
 
             this.runningScore = this.score + calcBonus(baseScore);
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
@@ -4619,11 +4738,11 @@ class GameScene extends Phaser.Scene {
 
             
              // Restart Score Timer
-            if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
+            if (this.length < this.lengthGoal || this.lengthGoal === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: MAX_SCORE * 100,
+                    delay: this.maxScore * 100,
                     paused: false
-                 });   
+                 }, this);   
             }
             
         }, this);
@@ -4801,6 +4920,11 @@ class GameScene extends Phaser.Scene {
             this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
             console.log(this.interactLayer);
+
+            if (STAGE_OVERRIDES.has(this.stage)) {
+                console.log("Running postFix Override on", this.stage);
+                STAGE_OVERRIDES.get(this.stage).postFix(this);
+            }
         
     }
 
@@ -4848,11 +4972,11 @@ class GameScene extends Phaser.Scene {
     // #region .screenShake(
     screenShake(){
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-        if (this.moveInterval === SPEED_SPRINT) {
+        if (this.moveInterval === this.speedSprint) {
             this.cameras.main.shake(400, .01);
             ourSpaceBoy.cameras.main.shake(400, .01); //shakes differently than main when referencing different cameras
         }
-        else if (this.moveInterval === SPEED_WALK){
+        else if (this.moveInterval === this.speedWalk){
             this.cameras.main.shake(300, .00625);
             ourSpaceBoy.cameras.main.shake(300, .00625); //above note
         }    
@@ -5118,14 +5242,59 @@ class GameScene extends Phaser.Scene {
         
     }
 
-    finalScore(){
-        const ourStartScene = this.scene.get('StartScene');
+    tempStartingArrows(){
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
+            this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y +1 * GRID)) {
+            this.startingArrowsAnimS2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS2.flipY = true;
+            this.startingArrowsAnimS2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
+            this.startingArrowsAnimE2 = this.add.sprite(this.snake.head.x + GRID * 2, this.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE2.angle = 90;
+            this.startingArrowsAnimE2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
+            this.startingArrowsAnimW2 = this.add.sprite(this.snake.head.x - GRID,this.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW2.angle = 270;
+            this.startingArrowsAnimW2.play('startArrowIdle');
+        }
+    }
+
+    extractPrompt(){
+        const ourGameScene = this.scene.get('GameScene');
+        ourGameScene.extractMenuOn = true;
+
+        // set menu alpha back to 1
+        ourGameScene._menuElements.forEach(textElement =>{
+            console.log(textElement)
+            textElement.setAlpha(1);
+        });
+        this.extractPromptText.setAlpha(1);
+        this.extractPanel.setAlpha(1);
 
         this.gState = GState.TRANSITION;
-
         this.snake.head.setTexture('snakeDefault', 0);
-
         this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+        // hide the level labels
+        this.levelLabelHide = this.tweens.add({
+            targets: [...this.blackholeLabels,ourGameScene.r3,ourGameScene.extractText],
+            yoyo: false,
+            duration: 500,
+            ease: 'Linear',
+            repeat: 0,
+            alpha: 0,
+        });
+ 
+        this._selected = this._menuElements[this.exCursorIndex];
+    }
+
+    finalScore(nextScene, args){
+        const ourStartScene = this.scene.get('StartScene');
 
         this.extractHole[0].play('extractHoleClose');
 
@@ -5214,7 +5383,9 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
-                ourGameScene.warpToMenu(); 
+                ourGameScene.scene.get("StartScene").stageHistory = [];
+                ourGameScene.scene.get("PersistScene").coins = START_COINS;
+                ourGameScene.scene.start(nextScene, args); 
             }
             this.input.keyboard.on('keydown-SPACE', function() { 
                 onContinue();
@@ -5504,14 +5675,14 @@ class GameScene extends Phaser.Scene {
     }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
-        if (this.tiledProperties.dark) {
+        if (this.tiledProperties.has("dark")) {
             this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
     }
 
     vortexIn(target, x, y){
 
-        var vortexTween = this.tweens.add({
+        this.vortexTween = this.tweens.add({
             targets: target, 
             x: x, //this.pathRegroup.vec.x,
             y: y, //this.pathRegroup.vec.y,
@@ -5522,7 +5693,7 @@ class GameScene extends Phaser.Scene {
             delay: this.tweens.stagger(30)
         });
 
-        return vortexTween
+        return this.vortexTween
     }
 
     snakeEating(){
@@ -5534,28 +5705,42 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(SPEED_SPRINT)
+            delay: this.tweens.stagger(this.speedSprint)
         });
 
         return snakeEating
     }
-    loseCoin(){
-        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-        ourSpaceBoy.coinsUICopy = ourSpaceBoy.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        ourSpaceBoy.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        ourSpaceBoy.coinsUICopy.setGravity(0,400)
-        //TODO add coin flip here
-        //TODO trigger UI coin loader animation here
-    }
+    onEat(food) {
 
+        
+        // Moves the eaten atom after a delay including the electron.
+        
+
+    }
+    onBonk() {
+        var ourPersist = this.scene.get("PersistScene");
+        ourPersist.loseCoin();
+        this.coinsUIIcon.setVisible(false);
+        ourPersist.coins += -1;
+        this.coinUIText.setHTML(
+            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+        );
+    }
     checkWinCon() { // Returns Bool
-        return this.length >= LENGTH_GOAL
+        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
+            return this.length >= this.lengthGoal
+        }
+        
     }
 
     checkLoseCon() {
-        const ourPersist = this.scene.get("PersistScene");
-        return ourPersist.coins < 0;
+        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
+            const ourPersist = this.scene.get("PersistScene");
+            return ourPersist.coins < 0;
+        } else {
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 === 1; 
+        }
+        
     }
 
     nextStage(stageName,camDirection) {
@@ -6076,7 +6261,7 @@ class GameScene extends Phaser.Scene {
         
         
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
-        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
+        if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
 
@@ -6111,7 +6296,7 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1 && !this.tutorialState) {
+                if (this.coinSpawnCounter < 1 && this.spawnCoins) {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
@@ -6152,7 +6337,7 @@ class GameScene extends Phaser.Scene {
             // Update Atom Animation.
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
-                    case MAX_SCORE:  // 120 {}
+                    case this.maxScore:  // 120 {}
                     this.atoms.forEach(atom => {
                         if (atom.anims.currentAnim.key !== 'atom01idle' ||atom.anims.currentAnim.key !== 'atom05spawn') {
                             atom.play("atom01idle");
@@ -6217,25 +6402,25 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = SPEED_SPRINT;
+                    this.moveInterval = this.speedSprint;
                     
                     if (!this.winned) {
                         // Boost Stats
                         ourInputScene.boostTime += 6;
                         //this.boostMask.setScale(this.boostEnergy/1000,1);
 
-                        this.boostEnergy = Math.max(this.boostEnergy - 6, 0);
+                        this.boostEnergy = Math.max(this.boostEnergy - this.boostCost, 0);
                     } 
                 } else{
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
                     this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
-                    this.moveInterval = SPEED_WALK;
+                    this.moveInterval = this.speedWalk;
                 }
         
             } else {
                 //console.log("spacebar not down");
-                this.moveInterval = SPEED_WALK; // Less is Faster
+                this.moveInterval = this.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
                 this.boostEnergy = Math.min(this.boostEnergy + 1, 1000); // Recharge Boost Slowly
             }
@@ -6278,19 +6463,15 @@ class GameScene extends Phaser.Scene {
     
 }
 
-const WOOD = 0;
-const BRONZE = 1;
-const SILVER = 2;
-const GOLD = 3;
-const PLATINUM = 4;
+
+
 
 // #region Stage Data
 var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(props)
-    {
+    function StageData(props) {
         // this is the order you'll see printed in the console.
         this.stage = props.stage;
 
@@ -6302,6 +6483,7 @@ var StageData = new Phaser.Class({
         this.medals = props.medals;
         this.moveCount = props.moveCount;
         this.zedLevel = props.zedLevel;
+        this.sRank = props.sRank;
 
         this.uuid = props.uuid;
         if (this.slug) { this.slug = props.slug }
@@ -6311,7 +6493,7 @@ var StageData = new Phaser.Class({
         this.turnInputs = props.turnInputs;
         this.turns = props.turns;
 
-        this.medianSpeedBonus = 6000;
+        //this.medianSpeedBonus = 6000;
 
     },
 
@@ -6334,20 +6516,20 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
-            case bonusScore > this.medianSpeedBonus * 2:
-                rank = PLATINUM;
+            case bonusScore > this.sRank:
+                rank = RANKS.PLATINUM;
                 break;
-            case bonusScore > this.medianSpeedBonus * 1.5:
-                rank = GOLD;
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.GOLD):
+                rank = RANKS.GOLD;
                 break;
-            case bonusScore > this.medianSpeedBonus:
-                rank = SILVER;
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.SILVER):
+                rank = RANKS.SILVER;
                 break;
-            case bonusScore > this.medianSpeedBonus * .5:
-                rank = BRONZE;
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.BRONZE):
+                rank = RANKS.BRONZE;
                 break;
             default:
-                rank = WOOD;
+                rank = RANKS.WOOD;
         }
         return rank;
         
@@ -6436,8 +6618,8 @@ class ScoreScene extends Phaser.Scene {
         ourGame.countDown.style = style*/
         ourGame.countDown.setHTML('0FF');
 
-        this.ScoreContainerL = this.make.container(0,0)
-        this.ScoreContainerR = this.make.container(0,0)
+        this.ScoreContainerL = this.make.container(0,0);
+        this.ScoreContainerR = this.make.container(0,0);
 
         var stageDataJSON = {
             bonks: ourGame.bonks,
@@ -6454,14 +6636,15 @@ class ScoreScene extends Phaser.Scene {
             stage:ourGame.stage,
             uuid:ourGame.stageUUID,
             zedLevel: calcZedLevel(ourPersist.zeds).level,
-            zeds: ourPersist.zeds
+            zeds: ourPersist.zeds,
+            sRank: parseInt(ourGame.tiledProperties.get("sRank")) // NaN if doesn't exist.
         }
 
 
         this.stageData = new StageData(stageDataJSON);
 
-    
-
+        // Update Stage Data
+        updatePlayerStats(this.stageData);
         
 
         /*for (let index = 0; index < this.stageData.foodLog.length; index++) {
@@ -6472,8 +6655,8 @@ class ScoreScene extends Phaser.Scene {
         }*/
 
         // For properties that may not exist.
-        if (ourGame.tiledProperties.slug != undefined) {
-            this.stageData.slug = ourGame.tiledProperties.slug;
+        if (ourGame.tiledProperties.has("slug")) {
+            this.stageData.slug = ourGame.tiledProperties.get("slug");
         }
         
         console.log(JSON.stringify(this.stageData));
@@ -6522,7 +6705,7 @@ class ScoreScene extends Phaser.Scene {
             });
 
         // Pre Calculate needed values
-        var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
+        var stageAve = this.stageData.calcBase()/this.stageData.foodLog.length;
 
         var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
         var bestLog = new StageData(bestLogJSON);
@@ -6530,6 +6713,9 @@ class ScoreScene extends Phaser.Scene {
         var bestLocal = bestLog.calcBase();
         var bestAve = bestLocal/bestLog.foodLog.length;
 
+
+        // TODO: Don't do it a bonuse level? What do we do with the stage history on bonus levels?
+        // Exclude from the Stage history?
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
@@ -7076,7 +7262,7 @@ class ScoreScene extends Phaser.Scene {
         rank -= 1; //this needs to be set back to rank-1 from being +1'd earlier
 
         // region Particle Emitter
-        if(rank >= SILVER){
+        if(rank >= RANKS.SILVER){
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
@@ -7088,7 +7274,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
-        if(rank === GOLD){
+        if(rank === RANKS.GOLD){
             lightColor = goldLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
@@ -7100,7 +7286,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
-        if(rank === PLATINUM){
+        if(rank === RANKS.PLATINUM){
             
             lightColor = platLightColor
             lightColor2 = goldLightColor
@@ -8517,16 +8703,16 @@ class InputScene extends Phaser.Scene {
             gameScene.startingArrowsAnimW.setAlpha(0);
         }
         if (gameScene.startingArrowsAnimN2) {
-            gameScene.startingArrowsAnimN2.setAlpha(0);
+            gameScene.startingArrowsAnimN2.destroy();
         }
         if (gameScene.startingArrowsAnimE2) {
-            gameScene.startingArrowsAnimE2.setAlpha(0);
+            gameScene.startingArrowsAnimE2.destroy();
         }
         if (gameScene.startingArrowsAnimS2) {
-            gameScene.startingArrowsAnimS2.setAlpha(0);
+            gameScene.startingArrowsAnimS2.destroy();
         }
         if (gameScene.startingArrowsAnimW2) {
-            gameScene.startingArrowsAnimW2.setAlpha(0);
+            gameScene.startingArrowsAnimW2.destroy();
         }
         
         
@@ -8626,6 +8812,18 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1
     });*/
+    scene.anims.create({
+        key: 'portalFormHighlight',
+        frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 6,7,8,9]}),
+        frameRate: 8,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'portalHighlights',
+        frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    });
 
     scene.anims.create({
         key: 'portalIdle',
