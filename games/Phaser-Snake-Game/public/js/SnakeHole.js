@@ -23,7 +23,7 @@ const DEV_BRANCH = "dev";
 const ANALYTICS_ON = true;
 
 
-const GAME_VERSION = '';
+const GAME_VERSION = 'v0.8.10.26.001';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
@@ -60,9 +60,9 @@ export const Y_OFFSET = 72 / 2;
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
-const NO_BONK_BASE = 1000;
+const NO_BONK_BASE = 1200;
 
-const STAGE_TOTAL = 21
+const STAGE_TOTAL = 27;
 
 
 
@@ -100,18 +100,22 @@ var updateSumOfBest = function(scene) {
     scene.sumOfBest = 0;
     BEST_OF_STAGE_DATA = new Map();
 
+    var ignoreSet = new Set(STAGE_OVERRIDES.keys());
+
     entries.forEach(log => {
         var key = log[0].split("-");
         if (key[key.length - 1] === "bestStageData") {
-            scene.stagesComplete += 1
 
-            var levelLog = new StageData(JSON.parse(log[1]));
-            BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
+            var levelLog = new StageData(JSON.parse(log[1]))
+            if (!ignoreSet.has(levelLog.stage)) {
+                scene.stagesComplete += 1
+                BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
 
-            var _scoreTotal = levelLog.calcTotal();
-            scene.sumOfBest += _scoreTotal;
+                var _scoreTotal = levelLog.calcTotal();
+                scene.sumOfBest += _scoreTotal;
+                
+            }   
         }
-
     })
 }
 
@@ -1977,6 +1981,7 @@ class MainMenuScene extends Phaser.Scene {
     }
 }
 
+
 // #region Galaxy Map
 class GalaxyMapScene extends Phaser.Scene {
     constructor () {
@@ -2435,7 +2440,6 @@ class GameScene extends Phaser.Scene {
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
-        this.extractMenuOn = false; // set to true to enable extract menu functionality.
         this.spawnCoins = true;
         
         this.lightMasks = [];
@@ -3008,37 +3012,172 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        // Extract Prompt Objects
+        // #region TAB Menu
+
+        var tabMenuTop = SCREEN_HEIGHT/2 - GRID * 2.5
+
+        this.tabPromptText = this.add.dom(SCREEN_WIDTH / 2, tabMenuTop + GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${this.stage}`
+        ).setOrigin(0.5,0).setScale(0.5).setAlpha(0);
+
+        //nineSlice
+        this.tabPanel = this.add.nineslice(SCREEN_WIDTH/2, tabMenuTop, 
+            'uiPanelL', 'Glass', 
+            GRID * 19 + 1, GRID * 10, 
+            8, 8, 8, 8);
+        this.tabPanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0).setVisible(false);
+
+        this.tabMenuOptions = new Map([
+            ['BACK TO MAIN MENU', function () {
+                // hide the extract prompt
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+                console.log("BACK TO MAIN MENU");
+
+                // Clear for reseting game
+                ourGame.events.off('addScore');
+                ourGame.events.off('spawnBlackholes');
+                
+                ourGameScene.scene.start("MainMenuScene");
+                return true;
+            }],
+            [`RETURN TO STAGE`, function () {  
+                // hide the extract prompt
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+                // show the level labels again 
+                console.log("RETURN TO STAGE");
+            }],
+            ['REDO STAGE (- 1 Coin)', function () {
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+
+                if (ourGameScene.scene.get("PersistScene").coins > 0) {
+
+                    ourGameScene.scene.get("PersistScene").coins -= 1;
+                    ourGameScene.scene.get("PersistScene").loseCoin();
+                    
+                    // Clear for reseting game
+                    ourGame.events.off('addScore');
+                    ourGame.events.off('spawnBlackholes');
+
+                    ourGameScene.scene.restart( {
+                        stage: ourGameScene.stage, 
+                        score: ourGameScene.stageStartScore, 
+                        //lives: this.lives 
+                });
+                }
+
+                
+
+            }],
+            ['RESTART ADVENTURE', function () {
+                // TODO: send to origin
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+
+                // Clear for reseting game
+                ourGame.events.off('addScore');
+                ourGame.events.off('spawnBlackholes');
+                
+                // Restart  
+                ourGameScene.scene.start("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    startupAnim: true,
+                });
+                return true;
+            }],
+        ]);
+
+        var createMenuList = function(scene) {
+
+        };
+        
+        this.tabMenuList = [...this.tabMenuOptions.keys()];
+        this.tabCursorIndex = 1;
+        var _textStart = tabMenuTop + GRID * 3;
+        var _spacing = 20;
+        this.tabMenuElements = [];
+
+        
+        if (this.tabMenuElements.length < 1) {
+            for (let index = 0; index < this.tabMenuList.length; index++) {   
+                if (index === this.tabCursorIndex) {
+                    console.log('adding');
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.tabMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.tabMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+    
+                
+                this.tabMenuElements.push(textElement);
+                
+                
+            } 
+        }
+
+        // #endregion
+        
+        // #region Extract Prompt
 
         this.extractPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
             "fontWeight": 400,
             "color": "white",
         }),
-            `${'Would you like to extract?'.toUpperCase()}`
+            `${'Where would you like to extract?'.toUpperCase()}`
         ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
         //nineSlice
         this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
             'uiPanelL', 'Glass', 
-            GRID * 16, GRID * 8, 
+            GRID * 19 + 1, GRID * 8, 
             8, 8, 8, 8);
-        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setVisible(false);
 
-        this.exMenuOptions = {
-            'YES': function () {
+        this.exMenuOptions = new Map([
+            ['MAIN MENU', function () {
                 // hide the extract prompt
-                ourGameScene._menuElements.forEach(textElement =>{
+                ourGameScene.exMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
-                ourGameScene.extractPanel.setAlpha(0);
+                ourGameScene.extractPanel.setVisible(false);
                 console.log("YES");
-                ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore("MainMenuScene", {});
                 return true;
-            },
-            'NO': function () {  
+            }],
+            [`CANCEL`, function () {  
                 // stop vortex tween if it's playing
                 if (ourGameScene.vortexTween.isPlaying()) {
                     ourGameScene.vortexTween.stop()
@@ -3049,11 +3188,11 @@ class GameScene extends Phaser.Scene {
                     segment.y = ourGameScene.snake.head.y;
                 });
                 // hide the extract prompt
-                ourGameScene._menuElements.forEach(textElement =>{
+                ourGameScene.exMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
-                ourGameScene.extractPanel.setAlpha(0);
+                ourGameScene.extractPanel.setVisible(false);
                 // show the level labels again
                 ourGameScene.tweens.add({
                     targets: [...ourGameScene.blackholeLabels, ourGameScene.r3,ourGameScene.extractText],
@@ -3066,18 +3205,16 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.tempStartingArrows();
                 ourGameScene.gState = GState.WAIT_FOR_INPUT;
                 ourGameScene.snake.direction = DIRS.STOP; 
-                ourGameScene.extractMenuOn = false;
                 console.log("NO");
-            },
-            'LOOP TO ORIGIN': function () {
+            }],
+            ['DIRECT TO ADVENTURE', function () {
                 // TODO: send to origin
-                ourGameScene._menuElements.forEach(textElement =>{
+                ourGameScene.exMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
-                ourGameScene.extractPanel.setAlpha(0);
+                ourGameScene.extractPanel.setVisible(false);
                 console.log("LOOP");
-                ourGameScene.extractMenuOn = false;
 
                 // Clear for reseting game   
                 ourGameScene.finalScore("GameScene", {
@@ -3086,19 +3223,24 @@ class GameScene extends Phaser.Scene {
                     startupAnim: true,
                 });
                 return true;
-            },
-        }
+            }],
+        ]);
 
-        this.exMenuList = Object.keys(this.exMenuOptions);
+        var createMenuList = function(scene) {
+
+        };
+        
+        this.exMenuList = [...this.exMenuOptions.keys()];
         this.exCursorIndex = 1;
         var _textStart = 152;
         var _spacing = 20;
-        this._menuElements = [];
+        this.exMenuElements = [];
+
         
-        if (this._menuElements.length < 1) {
+        if (this.exMenuElements.length < 1) {
             for (let index = 0; index < this.exMenuList.length; index++) {   
-                if (index == 1) {
-                    console.log('adding')
+                if (index === this.exCursorIndex) {
+                    console.log('adding');
                     var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '20px',
                         "fontWeight": 400,
@@ -3117,10 +3259,14 @@ class GameScene extends Phaser.Scene {
                     ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
                 }
     
-                this._menuElements.push(textElement);
+                
+                this.exMenuElements.push(textElement);
+                
                 
             } 
         }
+
+        // #endregion
 
         
         // TODO Move out of here
@@ -3291,26 +3437,6 @@ class GameScene extends Phaser.Scene {
             }
         
 
-
-
-        // Dream wall corners 
-        
-        // Dream walls for Horizontal Wrap
-        for (let index = 2; index < END_Y - 1; index++) {
-            if (!DREAMWALLSKIP.includes(index)) {
-                
-                
-                
-            }
-        }
-
-        // Dream walls for Vertical Wrap
-        for (let index = 1; index < END_X; index++) {
-            
-                
-            
-        
-        }
         
         // Audio
         this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
@@ -3344,7 +3470,8 @@ class GameScene extends Phaser.Scene {
             
             let gState = this.gState;
 
-            if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
+            if ((gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) 
+            && !this.tabPanel.visible) {
                 if(gState === GState.START_WAIT || gState === GState.WAIT_FOR_INPUT){
                     this.lastMoveTime = this.time.now;
                 }
@@ -3440,10 +3567,16 @@ class GameScene extends Phaser.Scene {
                 }
 
             }
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
+            if (this.extractPanel.visible) {
+                var option = ourGameScene.exMenuList[ourGameScene.exCursorIndex];
+                this.exMenuOptions.get(option).call();
             }
-        });
+
+            if (this.tabPanel.visible) {
+                var option = ourGameScene.tabMenuList[ourGameScene.tabCursorIndex];
+                this.tabMenuOptions.get(option).call();
+            }
+        }, this);
 
         this.input.keyboard.on('keyup-SPACE', e => { 
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
@@ -3475,37 +3608,66 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+            if (this.extractPanel.visible) {
+                this.exCursorIndex = Phaser.Math.Wrap(this.exCursorIndex + 1, 0, this.exMenuElements.length);
+                var _selected = this.exMenuElements[this.exCursorIndex];
     
                 // Reset all menu elements to dark grey
-                ourGameScene._menuElements.forEach((element, index) => {
+                this.exMenuElements.forEach((element, index) => {
                     element.node.style.color = "darkgrey";
                 });
                 // Set the selected element to white
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
-                this._selected.node.style.color = "white";
+                _selected = this.exMenuElements[this.exCursorIndex];
+                _selected.node.style.color = "white";
+            } else if (this.tabPanel.visible) {
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "darkgrey";
+
+                this.tabCursorIndex = Phaser.Math.Wrap(this.tabCursorIndex + 1, 0, this.tabMenuElements.length)
+
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "white";
             }
 
-        });
+        }, this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+            if (this.extractPanel.visible) {
+                this.exCursorIndex = Phaser.Math.Wrap(this.exCursorIndex - 1, 0, this.exMenuElements.length);
+                var _selected = this.exMenuElements[this.exCursorIndex];
                 //console.log(_selected.node)
     
                 // Reset all menu elements to dark grey
-                ourGameScene._menuElements.forEach((element, index) => {
+                this.exMenuElements.forEach((element, index) => {
                     element.node.style.color = "darkgrey";
                 });
                 // Set the selected element to white
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
-                this._selected.node.style.color = "white";
+                _selected = this.exMenuElements[this.exCursorIndex];
+                _selected.node.style.color = "white";
+            } else if (this.tabPanel.visible) {
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "darkgrey";
+
+                this.tabCursorIndex = Phaser.Math.Wrap(this.tabCursorIndex - 1, 0, this.tabMenuElements.length)
+
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "white";
             }
 
-        });
+        }, this);
+
+        this.input.keyboard.on('keydown-TAB', function () {
+
+            if (!this.extractPanel.visible){
+                this.tabMenuElements.forEach(textElement =>{
+                    console.log(textElement)
+                    textElement.setAlpha(1);
+                });
+        
+                this.tabPromptText.setAlpha(1);
+                
+                this.tabPanel.setVisible(true);
+
+            }
+            
+
+        }, this);
 
         
         this.blackholes = [];
@@ -5267,15 +5429,15 @@ class GameScene extends Phaser.Scene {
 
     extractPrompt(){
         const ourGameScene = this.scene.get('GameScene');
-        ourGameScene.extractMenuOn = true;
-
+        
         // set menu alpha back to 1
-        ourGameScene._menuElements.forEach(textElement =>{
+        ourGameScene.exMenuElements.forEach(textElement =>{
             console.log(textElement)
             textElement.setAlpha(1);
         });
+
         this.extractPromptText.setAlpha(1);
-        this.extractPanel.setAlpha(1);
+        this.extractPanel.setVisible(true);
 
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
@@ -5291,7 +5453,7 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
  
-        this._selected = this._menuElements[this.exCursorIndex];
+        this._selected = this.exMenuElements[this.exCursorIndex];
     }
 
     finalScore(nextScene, args){
@@ -6570,10 +6732,28 @@ var StageData = new Phaser.Class({
             return 0;
         }
     },
-    
-    cornerBonus() {
-        return Math.ceil(this.cornerTime / 100) * 10;
+
+    comboBonus() {
+        var bestCombo = 0;
+        var comboCounter = 1;
+        this.foodLog.forEach( score => {
+            //debugger
+            if (score > COMBO_ADD_FLOOR) {
+                comboCounter += 1;
+            } else {
+                if (comboCounter > bestCombo) {
+                    bestCombo = comboCounter;
+                    comboCounter = 1;
+                }
+                comboCounter = 1;
+            }
+        });
+        return bestCombo * 100;
     },
+    
+    //cornerBonus() {
+    //    return Math.ceil(this.cornerTime / 100) * 10;
+    //},
 
     boostBonus() {
         return Math.ceil(this.boostFrames / 10) * 5;
@@ -6582,7 +6762,7 @@ var StageData = new Phaser.Class({
     calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
-        return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
+        return _postMult + _bonkBonus + this.comboBonus() + this.boostBonus();
     },
     
 });
@@ -6877,7 +7057,7 @@ class ScoreScene extends Phaser.Scene {
         var _speedbonus = calcBonus(this.stageData.calcBase());
 
         var atomList = this.stageData.foodLog.slice();
-
+        
         var delayStart = 600;
 
         this.tweens.addCounter({
@@ -7091,7 +7271,7 @@ class ScoreScene extends Phaser.Scene {
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `CORNER TIME:
+                `COMBO BONUS:
                 BOOST BONUS:
                 NO-BONK BONUS:`
         ).setOrigin(1,0).setScale(0.5);
@@ -7123,7 +7303,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.tweens.addCounter({
             from: 0,
-            to:  this.stageData.cornerBonus(),
+            to:  this.stageData.comboBonus(),
             duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
@@ -7743,7 +7923,6 @@ class ScoreScene extends Phaser.Scene {
                 if (!gameOver) {
                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
-                    debugger
                     ourGame.gState = GState.START_WAIT;
                     ourGame.bgTween = ourGame.tweens.add({
                         targets: [ourGame.stageBackGround, ourGame.continueBanner],
