@@ -100,7 +100,7 @@ var updateSumOfBest = function(scene) {
     scene.sumOfBest = 0;
     BEST_OF_STAGE_DATA = new Map();
 
-    var ignoreSet = new Set(["Tutorial_1","Tutorial_2", "Tutorial_3", "Bonus-Stage-x1"]);
+    var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
     entries.forEach(log => {
         var key = log[0].split("-");
