@@ -60,7 +60,7 @@ export const Y_OFFSET = 72 / 2;
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
-const NO_BONK_BASE = 1000;
+const NO_BONK_BASE = 1200;
 
 const STAGE_TOTAL = 27;
 
@@ -6574,10 +6574,28 @@ var StageData = new Phaser.Class({
             return 0;
         }
     },
-    
-    cornerBonus() {
-        return Math.ceil(this.cornerTime / 100) * 10;
+
+    comboBonus() {
+        var bestCombo = 0;
+        var comboCounter = 1;
+        this.foodLog.forEach( score => {
+            //debugger
+            if (score > COMBO_ADD_FLOOR) {
+                comboCounter += 1;
+            } else {
+                if (comboCounter > bestCombo) {
+                    bestCombo = comboCounter;
+                    comboCounter = 1;
+                }
+                comboCounter = 1;
+            }
+        });
+        return bestCombo * 100;
     },
+    
+    //cornerBonus() {
+    //    return Math.ceil(this.cornerTime / 100) * 10;
+    //},
 
     boostBonus() {
         return Math.ceil(this.boostFrames / 10) * 5;
@@ -6586,7 +6604,7 @@ var StageData = new Phaser.Class({
     calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
-        return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
+        return _postMult + _bonkBonus + this.comboBonus() + this.boostBonus();
     },
     
 });
@@ -6881,7 +6899,7 @@ class ScoreScene extends Phaser.Scene {
         var _speedbonus = calcBonus(this.stageData.calcBase());
 
         var atomList = this.stageData.foodLog.slice();
-
+        
         var delayStart = 600;
 
         this.tweens.addCounter({
@@ -7095,7 +7113,7 @@ class ScoreScene extends Phaser.Scene {
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `CORNER TIME:
+                `COMBO BONUS:
                 BOOST BONUS:
                 NO-BONK BONUS:`
         ).setOrigin(1,0).setScale(0.5);
@@ -7127,7 +7145,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.tweens.addCounter({
             from: 0,
-            to:  this.stageData.cornerBonus(),
+            to:  this.stageData.comboBonus(),
             duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
