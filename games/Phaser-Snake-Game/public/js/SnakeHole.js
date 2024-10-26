@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -841,6 +841,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('portalHighlights', 'assets/sprites/portalAnimHighlight.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
+        this.load.spritesheet('electronParticleFanfare', 'assets/sprites/electronParticleFanfare.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         //this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
         this.load.image('titleLogo','assets/sprites/UI_titleLogo.png')
@@ -2542,6 +2543,7 @@ class GameScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Sine.Out',
         });
+        
 
         //testing game creation logic
         //if (/^Tutorial_[2]$/.test(this.stage)) { //checks for Tutorial_1-2
@@ -3500,6 +3502,7 @@ class GameScene extends Phaser.Scene {
         this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
 
             // #region is unlocked?
@@ -3508,18 +3511,110 @@ class GameScene extends Phaser.Scene {
                 updateSumOfBest(ourPersist);
 
 
-                //victory stars
+                //victory stars emitter
+                this.electronFanfare = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                    .setDepth(100);
+                this.electronFanfare.play('electronFanfareForm');
 
-                this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
+                this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
+                    speed: { min: -20, max: 20 },
+                    angle: { min: 0, max: 360 },
+                    alpha: { start: 1, end: 0 },
+                    anim: 'starIdle',
+                    lifespan: 1000,
+                    follow: this.electronFanfare,
+                }).setFrequency(150,[1]).setDepth(1);
+                
+                // Store speed values
+                let _walkSpeed = this.speedWalk
+                let _sprintSpeed = this.speedSprint
+
+                // Store initial camera position
+                let initialCameraX = this.cameras.main.scrollX;
+                let initialCameraY = this.cameras.main.scrollY
+                
+                // Slow Motion Tween
+                this.tweens.add({
+                    targets: { value: 1 },
+                    value: 0.2,
+                    duration: 500,
+                    yoyo: true,
+                    ease: 'Sine.easeInOut',
+                    repeat: 0,
+                        onUpdate: (tween) => {
+                            let slowMoValue = tween.getValue();
+                            // Apply the interpolated value to properties
+                            this.tweens.timeScale = slowMoValue;
+                            this.anims.globalTimeScale = slowMoValue;
+                            this.starEmitterFinal.timeScale = slowMoValue;
+                            this.speedWalk = _walkSpeed  / slowMoValue;
+                            this.speedSprint = _sprintSpeed / slowMoValue;
+                            this.cameras.main.zoom = 1 / slowMoValue;
+                            
+                            // Continuously interpolate the camera's position to the snake's head
+                            let targetX = this.snake.head.x - this.cameras.main.width / 2;
+                            let targetY = this.snake.head.y - this.cameras.main.height / 2;
+                            if (slowMoValue <= 0.5) {
+                                this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.snake.head.x - this.cameras.main.width / 2, 0.25);
+                                this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.snake.head.y - this.cameras.main.height / 2, 0.25);
+                            } 
+                            else {
+                                this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.25);
+                                this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.25);
+                            }
+                        },
+                        onComplete: () => {
+                        console.log('Slow motion effect completed');
+                        this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
+                            .setDepth(100);
+                        this.electronFanfare.play('electronFanfareIdle');
+
+                            this.cameras.main.scrollX = 0;
+                            this.cameras.main.scrollY = 0;
+                        }
+                    });
+
+                this.electronFanfare.on('animationcomplete', (animation, frame) => {
+                    if (animation.key === 'electronFanfareForm') {
+                        this.tweens.add({
+                            targets: this.electronFanfare,
+                            x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                            y: ourSpaceBoy.scoreFrame.getCenter().y,
+                            ease: 'Sine.easeInOut',
+                            duration: 1000,
+                            delay: 0,
+                        });
+                        
+                                ourGame.countDown.setHTML('W1N');
+                                ourGame.countDown.x += 4
+                        }
+                        
+                });
+
+                this.electronFanfare.chain(['electronFanfareIdle']);
+
+                
+
+                /*this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
                     x:{min: 0, max: SCREEN_WIDTH},
                     y:{min: 0, max: SCREEN_HEIGHT},
+                    alpha: { start: 1, end: 0 },
                     gravityX: -50,
                     gravityY: 50,
                     anim: 'starIdle',
                     lifespan: 3000,
                 }).setFrequency(300,[1]).setDepth(1);
             
+                // check if stage next is empty -- means it's the final extraction point
 
+                this.starEmitterFinal = this.add.particles(6,6,"starIdle", { 
+                    speed: { min: -20, max: 20 },
+                    angle: { min: 0, max: 360 },
+                    alpha: { start: 1, end: 0 },
+                    anim: 'starIdle',
+                    lifespan: 1000,
+                    follow:this.snake.head,
+                }).setFrequency(150,[1]).setDepth(1);*/
                 
                 
                 
@@ -6000,9 +6095,10 @@ class GameScene extends Phaser.Scene {
             })
 
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
-            this.gState = GState.TRANSITION;
-            this.snake.direction = DIRS.STOP;
-            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+            //this.gState = GState.TRANSITION;
+            //this.snake.direction = DIRS.STOP;
+            //slowmo comment
+            //this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
 
 
             this.events.off('addScore');
@@ -6076,6 +6172,11 @@ class GameScene extends Phaser.Scene {
 
             this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
             this.snakeMaskW.y = this.snake.head.y
+
+            /*if (this.starEmitterFinal) {
+                this.starEmitterFinal.x = this.snake.head.x
+                this.starEmitterFinal.y = this.snake.head.y
+            }*/
 
 
             //Phaser.Math.Between(0, 9);
@@ -6603,6 +6704,10 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
+        //bypass scorescene temporarily for slowmo
+        ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+
+
      
 
         /*var style = {
@@ -6786,7 +6891,7 @@ class ScoreScene extends Phaser.Scene {
         //megaAtlas code reference
         //this.add.image(GRID * 2,GRID * 8,'megaAtlas', 'UI_ScoreScreenBG01.png').setDepth(20).setOrigin(0,0);
         //this.add.image(0,GRID * 26.5,'megaAtlas', 'UI_ScoreScreenBG02.png').setDepth(9).setOrigin(0,0);
-        ourGame.continueBanner = ourGame.add.image(X_OFFSET,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
+        /*ourGame.continueBanner = ourGame.add.image(X_OFFSET,GRID * 26.5,'scoreScreenBG2').setDepth(49.5).setOrigin(0,0).setScale(1);
 
         // Scene Background Color
         ourGame.stageBackGround = ourGame.add.rectangle(X_OFFSET, Y_OFFSET, GRID * 29, GRID * 27, 0x323353, .75);
@@ -6800,7 +6905,7 @@ class ScoreScene extends Phaser.Scene {
             loop: 0,
             duration: 200,
             ease: 'sine.inout'
-        });
+        });*/
 
         this.scoreTimeScale = .25;
 
@@ -7637,6 +7742,31 @@ class ScoreScene extends Phaser.Scene {
             //scoreAtomsTween.timeScale = 1 //doesn't do anything
         });*/
 
+        //TEMP CODE TO BYPASS
+
+        var extraFields = {
+            startingScore: ourScoreScene.stageData.calcTotal(),
+            rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
+        }
+
+        localStorage.setItem("zeds", ourPersist.zeds);
+        gameanalytics.GameAnalytics.addResourceEvent(
+            gameanalytics.EGAResourceFlowType.Source,
+            "zeds",
+            ourScoreScene.difficulty,
+            "Gameplay",
+            "CompleteStage",
+            extraFields.toString(),
+            );
+        
+            // Event listeners need to be removed manually
+        // Better if possible to do this as part of UIScene clean up
+        // As the event is defined there, but this works and its' here. - James
+        ourGame.events.off('addScore');
+        ourGame.events.off('spawnBlackholes');
+        
+        this.scene.stop();
+
 
 
 
@@ -7730,6 +7860,7 @@ class ScoreScene extends Phaser.Scene {
                 ourGame.events.off('addScore');
                 ourGame.events.off('spawnBlackholes');
                 
+                this.scene.stop();
 
                     
                 if (!gameOver) {
@@ -8833,8 +8964,23 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'starIdle',
         frames: scene.anims.generateFrameNumbers('stars',{ frames: [ 0,1,2,3,4,5,6,7,8]}),
-        frameRate: 4,
-        repeat: -1
+        frameRate: 8,
+        repeat: -1,
+        randomFrame: true
+    });
+    scene.anims.create({
+        key: 'electronFanfareForm',
+        frames: scene.anims.generateFrameNumbers('electronParticleFanfare',{ frames: [ 0,1,2,3,4]}),
+        frameRate: 8,
+        repeat: 0,
+        randomFrame: true
+    });
+    scene.anims.create({
+        key: 'electronFanfareIdle',
+        frames: scene.anims.generateFrameNumbers('electronParticleFanfare',{ frames: [ 5,6,7,8,9,10,11,12]}),
+        frameRate: 8,
+        repeat: -1,
+        randomFrame: true
     });
 
     scene.anims.create({

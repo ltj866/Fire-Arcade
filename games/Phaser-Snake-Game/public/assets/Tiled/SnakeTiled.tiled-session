@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_1-1.json",
+    "activeFile": "World_1-4.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -803,8 +803,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.20623680806153,
-                "y": 149.2748689317083
+                "x": 111.60073534418194,
+                "y": 149.0379246953088
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -871,8 +871,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": -55.91883979029075,
-                "y": 161.5959692244842
+                "x": -127.94988765574999,
+                "y": 161.35902498808474
             }
         },
         "World_1-4.json#tileSheetx12": {
@@ -952,7 +952,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 18.666666666666657,
-                "y": 299.33333333333326
+                "y": 298.99999999999994
             }
         },
         "World_2-2.json#tileSheetx12": {
@@ -1946,8 +1946,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 476.25,
-                "y": 144
+                "x": 191,
+                "y": 161.75
             }
         },
         "template-10-24.json#tileSheetx12": {
@@ -2503,13 +2503,17 @@
     "map.lastUsedFormat": "json",
     "openFiles": [
         "template-10-24.json",
-        "World_1-1.json"
+        "World_1-1.json",
+        "World_1-4.json",
+        "World_2-2.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
         "template-10-24.json",
         "World_1-1.json",
+        "World_2-2.json",
+        "World_1-4.json",
         "Dark_Stage-02.json",
         "r07-14-2.json",
         "r07-14.json",
@@ -2517,9 +2521,7 @@
         "r-07-10-5.json",
         "r07-15-01.json",
         "r07-15-03.json",
-        "r07-15-02.json",
-        "r07-15-03-big.json",
-        "r07-15-04.json"
+        "r07-15-02.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
