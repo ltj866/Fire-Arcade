@@ -23,10 +23,10 @@ const DEV_BRANCH = "dev";
 const ANALYTICS_ON = false;
 
 
-const GAME_VERSION = '';
+const GAME_VERSION = 'v0.8.10.26.001';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
