@@ -3537,7 +3537,7 @@ class GameScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: { value: 1 },
                     value: 0.2,
-                    duration: 500,
+                    duration: 667,
                     yoyo: true,
                     ease: 'Sine.easeInOut',
                     repeat: 0,
@@ -3549,7 +3549,7 @@ class GameScene extends Phaser.Scene {
                             this.starEmitterFinal.timeScale = slowMoValue;
                             this.speedWalk = _walkSpeed  / slowMoValue;
                             this.speedSprint = _sprintSpeed / slowMoValue;
-                            this.cameras.main.zoom = 1 / slowMoValue;
+                            this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.15
                             
                             // Continuously interpolate the camera's position to the snake's head
                             let targetX = this.snake.head.x - this.cameras.main.width / 2;
@@ -3580,8 +3580,8 @@ class GameScene extends Phaser.Scene {
                             targets: this.electronFanfare,
                             x: ourSpaceBoy.scoreFrame.getCenter().x -3,
                             y: ourSpaceBoy.scoreFrame.getCenter().y,
-                            ease: 'Sine.easeInOut',
-                            duration: 1000,
+                            ease: 'Sine.easeIn',
+                            duration: 1250,
                             delay: 0,
                         });
                         
