@@ -62,7 +62,7 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 
 const NO_BONK_BASE = 1000;
 
-const STAGE_TOTAL = 21
+const STAGE_TOTAL = 27;
 
 
 
@@ -100,18 +100,22 @@ var updateSumOfBest = function(scene) {
     scene.sumOfBest = 0;
     BEST_OF_STAGE_DATA = new Map();
 
+    var ignoreSet = new Set(["Tutorial_1","Tutorial_2", "Tutorial_3", "Bonus-Stage-x1"]);
+
     entries.forEach(log => {
         var key = log[0].split("-");
         if (key[key.length - 1] === "bestStageData") {
-            scene.stagesComplete += 1
 
-            var levelLog = new StageData(JSON.parse(log[1]));
-            BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
+            var levelLog = new StageData(JSON.parse(log[1]))
+            if (!ignoreSet.has(levelLog.stage)) {
+                scene.stagesComplete += 1
+                BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
 
-            var _scoreTotal = levelLog.calcTotal();
-            scene.sumOfBest += _scoreTotal;
+                var _scoreTotal = levelLog.calcTotal();
+                scene.sumOfBest += _scoreTotal;
+                
+            }   
         }
-
     })
 }
 
