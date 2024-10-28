@@ -3265,7 +3265,7 @@ class GameScene extends Phaser.Scene {
         }
         */
 
-        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
@@ -3532,16 +3532,38 @@ class GameScene extends Phaser.Scene {
                 // Store initial camera position
                 let initialCameraX = this.cameras.main.scrollX;
                 let initialCameraY = this.cameras.main.scrollY
+
+                // Get all game objects in the scene
+                this.children.list.forEach((child) => {
+                    // Check if the child object has a scroll factor property set to 0
+                    if (child.scrollFactorX === 0 && child.scrollFactorY === 0) {
+                        child.setScrollFactor(1);
+                        this.UIScoreContainer.setScrollFactor(1);
+
+                        
+                    }
+                });
+                // Iterate over each child in the container and set the scroll factor to 1
+                this.UIScoreContainer.each((child) => {
+                    child.setScrollFactor(1);
+                });
+                //ourGame.countDown.setScrollFactor(1);
+                ourGame.countDown.setAlpha(0);
+
                 
                 // Slow Motion Tween
                 this.tweens.add({
                     targets: { value: 1 },
                     value: 0.2,
-                    duration: 667,
+                    duration: 750,
                     yoyo: true,
                     ease: 'Sine.easeInOut',
                     repeat: 0,
                         onUpdate: (tween) => {
+                            this.cameras.main.setBounds(0, 0, 240, 320);
+                            ourSpaceBoy.cameras.main.setBounds(0, 0, 240, 320);
+                            ourPersist.cameras.main.setBounds(0, 0, 240, 320);
+
                             let slowMoValue = tween.getValue();
                             // Apply the interpolated value to properties
                             this.tweens.timeScale = slowMoValue;
@@ -3549,28 +3571,52 @@ class GameScene extends Phaser.Scene {
                             this.starEmitterFinal.timeScale = slowMoValue;
                             this.speedWalk = _walkSpeed  / slowMoValue;
                             this.speedSprint = _sprintSpeed / slowMoValue;
-                            this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.15
+                            //this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
+                            //ourSpaceBoy.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
+                            //ourPersist.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
                             
                             // Continuously interpolate the camera's position to the snake's head
                             let targetX = this.snake.head.x - this.cameras.main.width / 2;
                             let targetY = this.snake.head.y - this.cameras.main.height / 2;
                             if (slowMoValue <= 0.5) {
-                                this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.snake.head.x - this.cameras.main.width / 2, 0.25);
-                                this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.snake.head.y - this.cameras.main.height / 2, 0.25);
+                                this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
+                                this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+
+                                ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
+                                ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+
+                                ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
+                                ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
                             } 
                             else {
-                                this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.25);
-                                this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.25);
+                                this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
+                                this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
+
+                                ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
+                                ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
+                                
+                                ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
+                                ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
                             }
                         },
                         onComplete: () => {
-                        console.log('Slow motion effect completed');
-                        this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
-                            .setDepth(100);
-                        this.electronFanfare.play('electronFanfareIdle');
+                            console.log('Slow motion effect completed');
+                            /*this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
+                                .setDepth(100);
+                            this.electronFanfare.play('electronFanfareIdle');*/
 
-                            this.cameras.main.scrollX = 0;
+                            /*this.cameras.main.scrollX = 0;
                             this.cameras.main.scrollY = 0;
+
+                            ourSpaceBoy.cameras.main.scrollX = 0;
+                            ourSpaceBoy.cameras.main.scrollY = 0;
+
+                            ourPersist.cameras.main.scrollX = 0;
+                            ourPersist.cameras.main.scrollY = 0;*/
+                            this.CapSparkFinale = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
+                            .setDepth(100);
+
+                            this.gState = GState.PLAY;
                         }
                     });
 
@@ -3583,6 +3629,11 @@ class GameScene extends Phaser.Scene {
                             ease: 'Sine.easeIn',
                             duration: 1250,
                             delay: 0,
+                            onComplete: () => {
+                                ourGame.countDown.setAlpha(1);
+                                ourGame.countDown.x = X_OFFSET + GRID * 4 - 3;
+                                ourGame.countDown.y = 3;
+                            }
                         });
                         
                                 ourGame.countDown.setHTML('W1N');
@@ -6095,7 +6146,7 @@ class GameScene extends Phaser.Scene {
             })
 
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
-            //this.gState = GState.TRANSITION;
+            this.gState = GState.TRANSITION;
             //this.snake.direction = DIRS.STOP;
             //slowmo comment
             //this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
@@ -9357,6 +9408,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 16,
         repeat: 0
       })
+      scene.anims.create({
+        key: 'CapSparkFinale',
+        frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+        frameRate: 16,
+        repeat: -1
+      });
     scene.anims.create({
         key: 'CapSparkDissipate',
         frames: scene.anims.generateFrameNumbers('UI_CapSpark',{ frames: [ 10,11,12,13,14]}),
