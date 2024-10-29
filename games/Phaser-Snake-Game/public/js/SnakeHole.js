@@ -121,20 +121,29 @@ var updateSumOfBest = function(scene) {
 
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
+    
+    // Load from JSON
     if (!JSON.parse(localStorage.getItem("playerStats"))) {
         PLAYER_STATS = {}
     }
-    var bonks = PLAYER_STATS.bonks ?? 0;
-    var atomsEaten = PLAYER_STATS.atomsEaten ?? 0;
-    var turns = PLAYER_STATS.turns ?? 0;
-    var wraps = PLAYER_STATS.wraps ?? 0;
 
-    PLAYER_STATS.bonks = bonks;
-    PLAYER_STATS.atomsEaten = atomsEaten;
-    PLAYER_STATS.turns = turns;
-    PLAYER_STATS.wraps = wraps;
+    var statsWithDefaults = new Map([
+    ["bonks", PLAYER_STATS.bonks ?? 0],
+    ["atomsEaten", PLAYER_STATS.atomsEaten ?? 0],
+    ["turns", PLAYER_STATS.turns ?? 0],
+    ["wraps", PLAYER_STATS.wraps ?? 0],
+    ["portals", PLAYER_STATS.portals ?? 0],
+    ["globalScore", PLAYER_STATS.globalScore ?? 0],
+    ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
+    ]);
 
-    PLAYER_STATS.stagesFinished = Math.floor(atomsEaten / 28);
+    // Add Saved Values
+    statsWithDefaults.keys().forEach( key => {
+        PLAYER_STATS[key] = statsWithDefaults.get(key);
+    });
+  
+    // Calculate Values
+    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 }
 
 var updatePlayerStats = function (stageData) {
@@ -145,6 +154,8 @@ var updatePlayerStats = function (stageData) {
     PLAYER_STATS.turns += stageData.turns;
     PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 
+    // This includes saving changes that are made directly to PLAYER_STATS object.
+    // Like Wrapping and Portaling etc...
     localStorage.setItem("playerStats", JSON.stringify(PLAYER_STATS));
 
     // JSON.stringify(this.stageData)
@@ -3656,17 +3667,14 @@ class GameScene extends Phaser.Scene {
 
             if (!this.extractPanel.visible){
                 this.tabMenuElements.forEach(textElement =>{
-                    console.log(textElement)
+                    //console.log(textElement)
                     textElement.setAlpha(1);
                 });
         
                 this.tabPromptText.setAlpha(1);
                 
                 this.tabPanel.setVisible(true);
-
             }
-            
-
         }, this);
 
         
@@ -6740,14 +6748,14 @@ var StageData = new Phaser.Class({
             //debugger
             if (score > COMBO_ADD_FLOOR) {
                 comboCounter += 1;
-            } else {
                 if (comboCounter > bestCombo) {
                     bestCombo = comboCounter;
-                    comboCounter = 1;
                 }
+            } else {
                 comboCounter = 1;
             }
         });
+    
         return bestCombo * 100;
     },
     
@@ -6824,6 +6832,23 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
+        // #region Save Stats
+        var _comboCounter = 1;
+        this.stageData.foodLog.forEach( score => {
+            if (score > COMBO_ADD_FLOOR) {
+                _comboCounter += 1;
+            } else {
+                // Convert from 1 index to zero index.
+                PLAYER_STATS.comboHistory[_comboCounter - 1] += 1;
+                _comboCounter = 1;
+            }
+        });
+
+        if (_comboCounter != 1) {
+            // Not Triggered the save in the else clause above
+            PLAYER_STATS.comboHistory[_comboCounter - 1] += 1;
+        }
+
         // Update Stage Data
         updatePlayerStats(this.stageData);
         
@@ -6845,7 +6870,7 @@ class ScoreScene extends Phaser.Scene {
         ourStartScene.stageHistory.push(this.stageData);
     
 
-        // #region Save Best To Local.
+        // #region New Best _L
 
         var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
         if (bestLogRaw) {
