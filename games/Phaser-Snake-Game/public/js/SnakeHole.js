@@ -60,9 +60,9 @@ export const Y_OFFSET = 72 / 2;
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
-const NO_BONK_BASE = 1000;
+const NO_BONK_BASE = 1200;
 
-const STAGE_TOTAL = 21
+const STAGE_TOTAL = 27;
 
 
 
@@ -83,11 +83,6 @@ var calcBonus = function (scoreInput) {
     
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
-}
-
-var showTutorial = function (currentScene, nextScene) {
-    // Stops the current Scene and starts the tutorial one.
-    currentScene.scene.start(nextScene);
 } 
 
 var updateSumOfBest = function(scene) {
@@ -100,18 +95,22 @@ var updateSumOfBest = function(scene) {
     scene.sumOfBest = 0;
     BEST_OF_STAGE_DATA = new Map();
 
+    var ignoreSet = new Set(STAGE_OVERRIDES.keys());
+
     entries.forEach(log => {
         var key = log[0].split("-");
         if (key[key.length - 1] === "bestStageData") {
-            scene.stagesComplete += 1
 
-            var levelLog = new StageData(JSON.parse(log[1]));
-            BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
+            var levelLog = new StageData(JSON.parse(log[1]))
+            if (!ignoreSet.has(levelLog.stage)) {
+                scene.stagesComplete += 1
+                BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
 
-            var _scoreTotal = levelLog.calcTotal();
-            scene.sumOfBest += _scoreTotal;
+                var _scoreTotal = levelLog.calcTotal();
+                scene.sumOfBest += _scoreTotal;
+                
+            }   
         }
-
     })
 }
 
@@ -147,6 +146,57 @@ var updatePlayerStats = function (stageData) {
 
 }
 
+var xpFromZeds = function(zeds) {
+    return zeds * (zeds + 1) / 2
+}
+
+var rollZeds = function(score) {
+    // Would be nice to have some tests in the doc string here using deno.
+    
+    var lowestNum = 4294967295; // Start at Max Int
+    var rolls = score;
+    var previousLowRolls = score;
+    var mostZerosYet = 0;
+
+    var rollHistorySorted = [];
+
+    do {
+        var _intToTest = Phaser.Math.RND.integer(); // Eventually this would be the result of a hash
+
+        if (_intToTest < lowestNum) {
+            lowestNum = _intToTest;
+
+            var leadingZeros = intToBinHash(lowestNum).split('1').reverse().pop();
+            var zedsToAdd = xpFromZeds(leadingZeros.length);
+
+            if (leadingZeros.length > mostZerosYet) {
+                mostZerosYet = leadingZeros.length;
+
+                rollHistorySorted.push(
+                    new Map([
+                    ["zerosAchieved", mostZerosYet], 
+                    ["numberOfRolls", previousLowRolls - rolls], 
+                    ["numberRolled", lowestNum] 
+                    ])
+                );
+                previousLowRolls = rolls;
+            }
+        }
+    
+    rolls-- ;
+    } while (rolls > 0);
+
+    var zedRollResultsMap = new Map([
+        ["rollHistory", rollHistorySorted],
+        ["rollsLeft", previousLowRolls - rolls],
+        ["bestZeros", mostZerosYet],
+        ["zedsEarned", xpFromZeds(mostZerosYet)] 
+    ])
+
+    return zedRollResultsMap;
+
+}
+
 
 export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
 
@@ -172,6 +222,7 @@ const ZED_CONSTANT = 16;
 const ZEDS_LEVEL_SCALAR = 0.02;
 const ZEDS_OVERLEVEL_SCALAR = 0.8;
 var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
+    // Would be nice to put tests here.
 
     let nextLevelZeds;
     let zedsLevel;
@@ -1050,11 +1101,11 @@ class StartScene extends Phaser.Scene {
         //temporarily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
-            console.log("Testing LOCAL STORAGE. Has not played.", );
+            console.log("Testing LOCAL STORAGE => Has not played.", );
 
         } else {
             this.hasPlayedBefore = true;
-            console.log("Testing LOCAL STORAGE Has played.", );
+            console.log("Testing LOCAL STORAGE => Has played.", );
         }
 
 
@@ -1239,43 +1290,8 @@ class StartScene extends Phaser.Scene {
         }
         
 
-
+        console.log(rollZeds(10000));
         
-        // #region Pre-roll Zeds
-
-        /** For James later to calcualte zed level better.
-        console.time("Full Roll");
-
-        var lowestNum = 4294967295; // Start at Max Int
-        //var rolls = this.stageData.calcTotal();
-        var rolls = Phaser.Math.Between(14000,24000);
-        console.log("Rolling for zeds", rolls);
-
-        do {
-        var _nextInt = Phaser.Math.RND.integer();
-
-        if (_nextInt < lowestNum) {
-            lowestNum = _nextInt;
-            
-            // Check for more zeds.
-            var leadingZeros = intToBinHash(lowestNum).split('1').reverse().pop();
-            var zedsToAdd = leadingZeros.length * (leadingZeros.length + 1) / 2
-            console.log("new lowest num:", lowestNum, "Zeros:", leadingZeros.length, (lowestNum >>> 0).toString(2).padStart(32, '0'), "zeds:", zedsToAdd);
-        }
-
-
-        rolls--;
-        } while (rolls > 0);
-        */
-
-
-
-        console.timeEnd("Full Roll");
-
-        // #endregion
-        
-        
-
     }
 
 
@@ -2437,6 +2453,7 @@ class GameScene extends Phaser.Scene {
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
         this.extractMenuOn = false; // set to true to enable extract menu functionality.
+        this.spawnCoins = true;
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -3036,7 +3053,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.extractPanel.setAlpha(0);
                 console.log("YES");
                 ourGameScene.extractMenuOn = false;
-                ourGameScene.finalScore()
+                ourGameScene.finalScore("MainMenuScene", {});
                 return true;
             },
             'NO': function () {  
@@ -3072,8 +3089,20 @@ class GameScene extends Phaser.Scene {
             },
             'LOOP TO ORIGIN': function () {
                 // TODO: send to origin
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
+
+                // Clear for reseting game   
+                ourGameScene.finalScore("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    startupAnim: true,
+                });
                 return true;
             },
         }
@@ -5442,7 +5471,7 @@ class GameScene extends Phaser.Scene {
         this._selected = this._menuElements[this.exCursorIndex];
     }
 
-    finalScore(){
+    finalScore(nextScene, args){
         const ourStartScene = this.scene.get('StartScene');
 
         this.extractHole[0].play('extractHoleClose');
@@ -5539,7 +5568,9 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
-                ourGameScene.scene.start('MainMenuScene');
+                ourGameScene.scene.get("StartScene").stageHistory = [];
+                ourGameScene.scene.get("PersistScene").coins = START_COINS;
+                ourGameScene.scene.start(nextScene, args); 
             }
             this.input.keyboard.on('keydown-SPACE', function() { 
                 onContinue();
@@ -6730,10 +6761,28 @@ var StageData = new Phaser.Class({
             return 0;
         }
     },
-    
-    cornerBonus() {
-        return Math.ceil(this.cornerTime / 100) * 10;
+
+    comboBonus() {
+        var bestCombo = 0;
+        var comboCounter = 1;
+        this.foodLog.forEach( score => {
+            //debugger
+            if (score > COMBO_ADD_FLOOR) {
+                comboCounter += 1;
+            } else {
+                if (comboCounter > bestCombo) {
+                    bestCombo = comboCounter;
+                    comboCounter = 1;
+                }
+                comboCounter = 1;
+            }
+        });
+        return bestCombo * 100;
     },
+    
+    //cornerBonus() {
+    //    return Math.ceil(this.cornerTime / 100) * 10;
+    //},
 
     boostBonus() {
         return Math.ceil(this.boostFrames / 10) * 5;
@@ -6742,7 +6791,7 @@ var StageData = new Phaser.Class({
     calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
-        return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
+        return _postMult + _bonkBonus + this.comboBonus() + this.boostBonus();
     },
     
 });
@@ -7041,7 +7090,7 @@ class ScoreScene extends Phaser.Scene {
         var _speedbonus = calcBonus(this.stageData.calcBase());
 
         var atomList = this.stageData.foodLog.slice();
-
+        
         var delayStart = 600;
 
         this.tweens.addCounter({
@@ -7255,7 +7304,7 @@ class ScoreScene extends Phaser.Scene {
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `CORNER TIME:
+                `COMBO BONUS:
                 BOOST BONUS:
                 NO-BONK BONUS:`
         ).setOrigin(1,0).setScale(0.5);
@@ -7287,7 +7336,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.tweens.addCounter({
             from: 0,
-            to:  this.stageData.cornerBonus(),
+            to:  this.stageData.comboBonus(),
             duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
