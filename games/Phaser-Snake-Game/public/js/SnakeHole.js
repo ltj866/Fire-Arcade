@@ -83,11 +83,6 @@ var calcBonus = function (scoreInput) {
     
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
-}
-
-var showTutorial = function (currentScene, nextScene) {
-    // Stops the current Scene and starts the tutorial one.
-    currentScene.scene.start(nextScene);
 } 
 
 var updateSumOfBest = function(scene) {
@@ -162,6 +157,57 @@ var updatePlayerStats = function (stageData) {
 
 }
 
+var xpFromZeds = function(zeds) {
+    return zeds * (zeds + 1) / 2
+}
+
+var rollZeds = function(score) {
+    // Would be nice to have some tests in the doc string here using deno.
+    
+    var lowestNum = 4294967295; // Start at Max Int
+    var rolls = score;
+    var previousLowRolls = score;
+    var mostZerosYet = 0;
+
+    var rollHistorySorted = [];
+
+    do {
+        var _intToTest = Phaser.Math.RND.integer(); // Eventually this would be the result of a hash
+
+        if (_intToTest < lowestNum) {
+            lowestNum = _intToTest;
+
+            var leadingZeros = intToBinHash(lowestNum).split('1').reverse().pop();
+            var zedsToAdd = xpFromZeds(leadingZeros.length);
+
+            if (leadingZeros.length > mostZerosYet) {
+                mostZerosYet = leadingZeros.length;
+
+                rollHistorySorted.push(
+                    new Map([
+                    ["zerosAchieved", mostZerosYet], 
+                    ["numberOfRolls", previousLowRolls - rolls], 
+                    ["numberRolled", lowestNum] 
+                    ])
+                );
+                previousLowRolls = rolls;
+            }
+        }
+    
+    rolls-- ;
+    } while (rolls > 0);
+
+    var zedRollResultsMap = new Map([
+        ["rollHistory", rollHistorySorted],
+        ["rollsLeft", previousLowRolls - rolls],
+        ["zeros", mostZerosYet],
+        ["zedsEarned", xpFromZeds(mostZerosYet)] 
+    ])
+
+    return zedRollResultsMap;
+
+}
+
 
 export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
 
@@ -187,6 +233,7 @@ const ZED_CONSTANT = 16;
 const ZEDS_LEVEL_SCALAR = 0.02;
 const ZEDS_OVERLEVEL_SCALAR = 0.8;
 var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
+    // Would be nice to put tests here.
 
     let nextLevelZeds;
     let zedsLevel;
@@ -1064,11 +1111,11 @@ class StartScene extends Phaser.Scene {
         //temporarily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
-            console.log("Testing LOCAL STORAGE. Has not played.", );
+            console.log("Testing LOCAL STORAGE => Has not played.", );
 
         } else {
             this.hasPlayedBefore = true;
-            console.log("Testing LOCAL STORAGE Has played.", );
+            console.log("Testing LOCAL STORAGE => Has played.", );
         }
 
 
@@ -1253,43 +1300,8 @@ class StartScene extends Phaser.Scene {
         }
         
 
-
+        console.log(rollZeds(10000));
         
-        // #region Pre-roll Zeds
-
-        /** For James later to calcualte zed level better.
-        console.time("Full Roll");
-
-        var lowestNum = 4294967295; // Start at Max Int
-        //var rolls = this.stageData.calcTotal();
-        var rolls = Phaser.Math.Between(14000,24000);
-        console.log("Rolling for zeds", rolls);
-
-        do {
-        var _nextInt = Phaser.Math.RND.integer();
-
-        if (_nextInt < lowestNum) {
-            lowestNum = _nextInt;
-            
-            // Check for more zeds.
-            var leadingZeros = intToBinHash(lowestNum).split('1').reverse().pop();
-            var zedsToAdd = leadingZeros.length * (leadingZeros.length + 1) / 2
-            console.log("new lowest num:", lowestNum, "Zeros:", leadingZeros.length, (lowestNum >>> 0).toString(2).padStart(32, '0'), "zeds:", zedsToAdd);
-        }
-
-
-        rolls--;
-        } while (rolls > 0);
-        */
-
-
-
-        console.timeEnd("Full Roll");
-
-        // #endregion
-        
-        
-
     }
 
 
