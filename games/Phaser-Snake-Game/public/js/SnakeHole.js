@@ -200,7 +200,7 @@ var rollZeds = function(score) {
     var zedRollResultsMap = new Map([
         ["rollHistory", rollHistorySorted],
         ["rollsLeft", previousLowRolls - rolls],
-        ["zeros", mostZerosYet],
+        ["bestZeros", mostZerosYet],
         ["zedsEarned", xpFromZeds(mostZerosYet)] 
     ])
 
