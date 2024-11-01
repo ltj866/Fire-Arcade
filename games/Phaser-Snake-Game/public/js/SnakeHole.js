@@ -603,11 +603,9 @@ class TutorialScene extends Phaser.Scene {
         
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
-            console.log("Testing LOCAL STORAGE. Has not played.", );
 
         } else {
             this.hasPlayedBefore = true;
-            console.log("Testing LOCAL STORAGE Has played.", );
         }
 
         //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
@@ -836,9 +834,9 @@ class TutorialScene extends Phaser.Scene {
     
         
         this.continueText.on('pointerdown', e => {
-            console.log("I CLICK");
+            //console.log("I CLICK");
             if (this.continueText.visible === true) {
-                console.log("I click and continue");
+                //console.log("I click and continue");
                 onInput(this);
             }
         });
@@ -1299,8 +1297,6 @@ class StartScene extends Phaser.Scene {
             var _lsTotal=0,_xLen,_x;for(_x in localStorage){ if(!localStorage.hasOwnProperty(_x)){continue;} _xLen= ((localStorage[_x].length + _x.length)* 2);_lsTotal+=_xLen; console.log(_x.substr(0,50)+" = "+ (_xLen/1024).toFixed(2)+" KB")};console.log("Total = " + (_lsTotal / 1024).toFixed(2) + " KB");            
         }
         
-
-        console.log(rollZeds(10000));
         
     }
 
@@ -2506,9 +2502,9 @@ class GameScene extends Phaser.Scene {
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
         if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_1-1') {
-            console.log('noplay')
-            console.log(this.stage)
-            this.stage = 'Tutorial_1'
+            
+            this.stage = 'Tutorial_1';
+            console.log('Tutorial Time!', this.stage);
             //this.tutorialState = true;
         }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
@@ -3120,7 +3116,6 @@ class GameScene extends Phaser.Scene {
         if (this._menuElements.length < 1) {
             for (let index = 0; index < this.exMenuList.length; index++) {   
                 if (index == 1) {
-                    console.log('adding')
                     var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '20px',
                         "fontWeight": 400,
@@ -3419,7 +3414,7 @@ class GameScene extends Phaser.Scene {
 
             if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
                 // Update snake facing direction but do not move the snake
-                console.log("Moving Freely");
+                //console.log("Moving Freely");
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -3729,7 +3724,8 @@ class GameScene extends Phaser.Scene {
                     this.extractLables = [];
                     var nextStagesCopy = this.nextStages.slice();
                     
-                    console.log('PORTAL LAYER',this.nextStagePortalLayer);
+                    //console.log('PORTAL LAYER',this.nextStagePortalLayer);
+
                     // Add one extract hole spawn here if it exists.
                     if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
                         var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
@@ -3794,11 +3790,8 @@ class GameScene extends Phaser.Scene {
                                     if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist)) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
-                                        console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
+                                        //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
 
-                                        //var stageText = this.add.text(tile.pixelX + 6 + X_OFFSET, tile.pixelY - GRID + Y_OFFSET,
-                                        //    stageName,{ fontFamily: 'Oxanium', fontSize: 8, color: 'white', baselineX: 1.5 }
-                                        //).setDepth(50).setOrigin(0,0).setAlpha(0);
 
                                         var stageText = this.add.dom(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
                                             "font-size": '8px',
@@ -3809,7 +3802,7 @@ class GameScene extends Phaser.Scene {
                                         
                                         var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 12 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
                                         ).setDepth(49).setAlpha(0);
-                                        //debugger
+
                                         r1.postFX.addShine(1, .5, 5)
                                         r1.setStrokeStyle(2, 0x4d9be6, 0.75);
 
@@ -3894,7 +3887,6 @@ class GameScene extends Phaser.Scene {
                                         // Push false portal so index is correct on warp to next
                                         this.nextStagePortals.push(undefined);
                                     }
-                                    console.log(this.nextStagePortals);
                                      
                                     this.tweens.add({
                                         targets: this.blackholeLabels,
@@ -4011,7 +4003,6 @@ class GameScene extends Phaser.Scene {
                 
             //} 
         //});
-        console.log(wallPortalData);
 
         var portalSpawnDelay = PORTAL_SPAWN_DELAY;
         
@@ -4027,7 +4018,6 @@ class GameScene extends Phaser.Scene {
                     wallDir = "Vert";
                 }
                 
-                console.log(wallDir); 
 
                 // Check for if vertical or horizontal here
             
@@ -4044,7 +4034,6 @@ class GameScene extends Phaser.Scene {
                     var endFrom = wallPortalData[index].pop();
                     var endTo = wallPortalData[index + ROW_DELTA].pop();
                     makePair(this, "pWallVertBot", endFrom, endTo, colorHex, false, portalSpawnDelay);
-                    console.log(wallPortalData);
 
                     //middle
                     wallPortalData[index].forEach(portalTo => {
@@ -4061,7 +4050,6 @@ class GameScene extends Phaser.Scene {
                     var endFrom = wallPortalData[index].pop();
                     var endTo = wallPortalData[index + ROW_DELTA].pop();
                     makePair(this, "pWallFlatRight", endFrom, endTo, colorHex, false, portalSpawnDelay);
-                    console.log(wallPortalData);
 
                     //middle
                     wallPortalData[index].forEach(portalTo => {
@@ -4085,7 +4073,7 @@ class GameScene extends Phaser.Scene {
                 
                 let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
                 let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
-                console.log("Portal Base Logic: FROM TO",_from, _to, index);
+                //console.log("Portal Base Logic: FROM TO",_from, _to, index);
                 makePair(this, "portalForm", _to, _from, colorHex, true, portalSpawnDelay);
 
                 portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
@@ -5101,7 +5089,7 @@ class GameScene extends Phaser.Scene {
             });
             this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
-            console.log(this.interactLayer);
+            //console.log(this.interactLayer);
 
             if (STAGE_OVERRIDES.has(this.stage)) {
                 console.log("Running postFix Override on", this.stage);
@@ -5452,7 +5440,6 @@ class GameScene extends Phaser.Scene {
 
         // set menu alpha back to 1
         ourGameScene._menuElements.forEach(textElement =>{
-            console.log(textElement)
             textElement.setAlpha(1);
         });
         this.extractPromptText.setAlpha(1);
@@ -5633,7 +5620,6 @@ class GameScene extends Phaser.Scene {
  
     warpToNext(nextStageIndex) {
 
-        debugger
         const ourPersist = this.scene.get('PersistScene');
         this.gState = GState.TRANSITION;
 
@@ -6052,7 +6038,7 @@ class GameScene extends Phaser.Scene {
             });
     }
     comboAppear(){
-        console.log("appearing")
+        //console.log("appearing");
         this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
                 this.letterO2, this.letterExplanationPoint], 
@@ -6064,7 +6050,7 @@ class GameScene extends Phaser.Scene {
         this.comboActive = true;
         }
     comboFade(){
-        console.log("fading")
+        //console.log("fading")
         this.tweens.add({
             targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
                 this.letterO2, this.letterExplanationPoint], 
@@ -6181,7 +6167,7 @@ class GameScene extends Phaser.Scene {
                 
                 this.gState = GState.WAIT_FOR_INPUT;
                 this.scoreTimer.paused = true;
-                console.log(this.gState, "WAIT FOR INPUT");
+                //console.log(this.gState, "WAIT FOR INPUT");
             });
         }
         
@@ -6388,7 +6374,7 @@ class GameScene extends Phaser.Scene {
                 }
                 //ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
-                console.log(ourInputScene.moveCount)
+                
 
                 this.snakeCriticalState();
                 
@@ -6462,7 +6448,7 @@ class GameScene extends Phaser.Scene {
 
         
         
-        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
+        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level. // @james do I even need this anymore?
         if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
@@ -6872,7 +6858,6 @@ class ScoreScene extends Phaser.Scene {
                 _comboCounter += 1;
             } else {
                 // Convert from 1 index to zero index.
-                debugger
 
                 if (_comboCounter > 0) {
                     // Signpost problem. You always start with zero combo before you get the first atom
@@ -6883,7 +6868,6 @@ class ScoreScene extends Phaser.Scene {
         });
 
         if (_comboCounter != 1) {
-            debugger
             // Not Triggered the save in the else clause above.
             // Happens when the last atom is part of a combo.
             PLAYER_STATS.comboHistory[_comboCounter - 1] += 1;
@@ -6930,7 +6914,6 @@ class ScoreScene extends Phaser.Scene {
 
             this.stageData.newBest = true;
             
-            debugger
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             //calcSumOfBest(ourStartScene); // Note: This really should be an event.
@@ -7504,14 +7487,13 @@ class ScoreScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
-        console.log("rank", rank)
+        //console.log("rank", rank)
         rank -= 1; //this needs to be set back to rank-1 from being +1'd earlier
 
         // region Particle Emitter
         if(rank >= RANKS.SILVER){
             lightColor = silverLightColor
             lightColor2 = goldLightColor
-            console.log(lightColor)
             var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
                 x:{min: 0, max: 16},
                 y:{min: 0, max: 34},
@@ -7523,7 +7505,6 @@ class ScoreScene extends Phaser.Scene {
         if(rank === RANKS.GOLD){
             lightColor = goldLightColor
             lightColor2 = goldLightColor
-            console.log(lightColor)
             var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 16},
                 y:{min: 0, max: 34},
@@ -7536,7 +7517,6 @@ class ScoreScene extends Phaser.Scene {
             
             lightColor = platLightColor
             lightColor2 = goldLightColor
-            console.log(lightColor)
             var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5,GRID * 14.5, "twinkle0Anim", {
                 x:{steps: 8, min: 0, max: 24},
                 y:{steps: 8, min: 24.5, max: 65.5},
@@ -7588,17 +7568,17 @@ class ScoreScene extends Phaser.Scene {
                     }
                     break
                 case logTime > BOOST_ADD_FLOOR:
-                    console.log(logTime, "Boost", i);
+                    //console.log(logTime, "Boost", i);
                     anim = "atomScore02";
                     scoreCombos.push(emptySprite);
                     break
                 case logTime > SCORE_FLOOR:
-                    console.log(logTime, "Boost", i);
+                    //console.log(logTime, "Boost", i);
                     anim = "atomScore03";
                     scoreCombos.push(emptySprite);
                     break
                 default:
-                    console.log(logTime, "dud", i);
+                    //console.log(logTime, "dud", i);
                     anim = "atomScore04";
                     scoreCombos.push(emptySprite);
                     break
@@ -7692,9 +7672,7 @@ class ScoreScene extends Phaser.Scene {
         // #region Stat Cards (Right Side)
 
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
-        console.log(ourInputScene.cornerTime)
         var boostTimeSec = (ourInputScene.boostTime * 0.01666).toFixed(3)
-        console.log(ourInputScene.boostTime)
         var dateObj = new Date(Math.round(ourInputScene.time.now));
         var hours = dateObj.getUTCHours();
         var minutes = dateObj.getUTCMinutes();
@@ -7982,7 +7960,6 @@ class ScoreScene extends Phaser.Scene {
                 
 
                 
-                console.log()
                 const zedObject = calcZedLevel(ourPersist.zeds)
 
                 var extraFields = {
@@ -8166,7 +8143,6 @@ const ROLL_SPEED = [
     1,1,1,1,
     1,1,1,1,1,1];
 
-console.log("ROLL LENGTH", ROLL_SPEED.length);
 
 
 
@@ -8194,7 +8170,6 @@ class TimeAttackScene extends Phaser.Scene{
         const ourStartScene = this.scene.get('StartScene');
 
 
-        console.log("Time Attack Stage Manager is Live");
         
 
         // First Entry Y Coordinate
@@ -8327,7 +8302,6 @@ class TimeAttackScene extends Phaser.Scene{
             var continueTextUI = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'}).setVisible(false);
             continueTextUI.setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
-            console.log("played Stages", playedStages);
 
             this.input.keyboard.on('keydown-DOWN', function() {
                 selected[0].node.style.color = "white";
@@ -8373,7 +8347,6 @@ class TimeAttackScene extends Phaser.Scene{
 
             };
             
-            console.log("Runscore:", runScore);
 
             stageY = stageY + 4
 
@@ -8812,8 +8785,6 @@ class InputScene extends Phaser.Scene {
                 
             gameScene.snake.move(gameScene);
             this.turnInputs[key] += 1;
-
-            debugger
 
             this.moveHistory.push([(gameScene.snake.head.x - X_OFFSET)/GRID, (gameScene.snake.head.y - Y_OFFSET)/GRID]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means technically you can go as fast as you turn.

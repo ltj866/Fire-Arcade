@@ -272,16 +272,15 @@ var Snake = new Phaser.Class({
                     && scene.length === scene.lengthGoal -1
                  ) {
                     debugger;
-                    console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
+                    //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
 
                  }
                  else{
                     
                     if (scene.interactLayer[__x][__y] instanceof Food) {
-                        console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
+                        //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
 
                     }
-                    console.log('SHIFT POSITION')
                     Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
                  }
                 
@@ -326,7 +325,6 @@ var Snake = new Phaser.Class({
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
                 
                 if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
-                    debugger
                     console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
                     scene.warpToNext(index);
                 }

@@ -57,7 +57,7 @@ var Food = new Phaser.Class({
                 y: _y,
                 duration: 1000,
                 onStart: () =>{
-                    debugger;
+                    //debugger;
                 }
             })
         }

@@ -98,8 +98,6 @@ var Portal = new Phaser.Class({
         var portalSound = scene.portalSounds[0];
         portalSound.play();
 
-        console.log([this.x, this.y], [_x, _y]);
-
         var _tween = scene.tweens.add({
             targets: scene.snake.body[0], 
             x: _x,
