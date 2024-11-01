@@ -428,6 +428,7 @@ var Snake = new Phaser.Class({
         if (!scene.stopOnBonk) {
 
             scene.gState = GState.BONK;
+            scene.scene.get("InputScene").moveHistory.push(["BONK"]);
             //console.log(scene.gState, "BONK" , this.direction);
 
             if (!scene.winned) {

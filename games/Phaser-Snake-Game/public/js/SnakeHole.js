@@ -2727,6 +2727,8 @@ class GameScene extends Phaser.Scene {
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
         //var spawnTile2 = this.mapShadow.findByIndex(9); // Snake Head Index
         this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+        this.scene.get("InputScene").moveHistory.push(["START", spawnTile.x, spawnTile.y]);
+
         spawnTile.index = -1; // Set to empty tile
         //spawnTile2.index = -1; // Set to empty tile
         this.snake = new Snake(this, this.startCoords.x, this.startCoords.y);
@@ -2752,14 +2754,6 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(1500, event => {
             startingBlackhole.play('blackholeClose');
         });
-        
-        
-
-        //moved below to only reference spawn tile from wall layer
-        /*var spawnTile = this.map.findByIndex(9); // Snake Head Index
-        console.log(spawnTile)
-        this.startCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
-        spawnTile.index = -1; // Set to empty tile*/
 
        
 
@@ -6386,7 +6380,13 @@ class GameScene extends Phaser.Scene {
 
                 // Move at last second
                 this.snake.move(this);
-                ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
+                
+                if (ourInputScene.moveHistory[ourInputScene.moveHistory.length - 1][0] === `s${this.moveInterval}` ) {
+                    ourInputScene.moveHistory[ourInputScene.moveHistory.length - 1][1] += 1;
+                } else {
+                    ourInputScene.moveHistory.push([ `s${this.moveInterval}`, 1 ]);
+                }
+                //ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
                 console.log(ourInputScene.moveCount)
 
@@ -8812,6 +8812,8 @@ class InputScene extends Phaser.Scene {
                 
             gameScene.snake.move(gameScene);
             this.turnInputs[key] += 1;
+
+            debugger
 
             this.moveHistory.push([(gameScene.snake.head.x - X_OFFSET)/GRID, (gameScene.snake.head.y - Y_OFFSET)/GRID]);
             gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means technically you can go as fast as you turn.
