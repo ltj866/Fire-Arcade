@@ -40,24 +40,30 @@ var Food = new Phaser.Class({
     },
 
     onOver: function(scene) {
-        scene.snakeEating();
+        if (scene.length < scene.lengthGoal -1) {
+            scene.snakeEating();
+        }
         var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        if (scene.length === scene.lengthGoal -1) {
-            
+        
+        if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup
+
             scene.snake.head.x = scene.snake.previous[0];
             scene.snake.head.y = scene.snake.previous[1];
+            
             //scene.gState = GState.TRANSITION;
             var _x = this.x;
             var _y = this.y;
-            //debugger;
+
             // start slowmo here
             scene.tweens.add({
                 targets: scene.snake.head,
                 x: _x,
                 y: _y,
                 duration: 1000,
-                onStart: () =>{
-                    //debugger;
+                onComplete: () =>{
+                    scene.victoryFanfare();
+                    console.log('tween finished, start electrons')
+                    scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
                 }
             })
         }
