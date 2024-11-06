@@ -16,7 +16,12 @@ var Snake = new Phaser.Class({
         this.body = [];
 
         this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
+        
+        //set snake invisible so it can appear from blackhole
+        this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
+
+        this.previous = [];
 
         
         this.body.unshift(this.head);
@@ -110,7 +115,7 @@ var Snake = new Phaser.Class({
     // #region Move
     move: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
-
+        this.previous = [this.head.x,this.head.y];
     
         // Alias x and y to the current head position
         let x = this.head.x;
@@ -141,12 +146,13 @@ var Snake = new Phaser.Class({
         // Look ahead for bonks
         
 
-        var xN = this.head.x;
-        var yN = this.head.y;
+        let xN;
+        let yN;
 
         
         switch (this.direction) {
             case DIRS.LEFT:
+                yN = this.head.y;
                 xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
                 ourPersistScene.bgCoords.x -= .25;
                 if (xN > this.head.x) {
@@ -156,6 +162,7 @@ var Snake = new Phaser.Class({
                 break;
 
             case DIRS.RIGHT:
+                yN = this.head.y;
                 xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
                 ourPersistScene.bgCoords.x += .25;
                 if (xN < this.head.x) {
@@ -165,6 +172,7 @@ var Snake = new Phaser.Class({
                 break;
 
             case DIRS.UP:
+                xN = this.head.x;
                 yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
                 ourPersistScene.bgCoords.y -= .25;
                 if (yN > this.head.y) {
@@ -174,6 +182,7 @@ var Snake = new Phaser.Class({
                 break;
 
             case DIRS.DOWN:
+                xN = this.head.x;
                 yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
                 ourPersistScene.bgCoords.y += .25;
                 if (yN < this.head.y) {
@@ -183,6 +192,7 @@ var Snake = new Phaser.Class({
                 break;
                 
             default:
+                debugger;
                 break;
         }
 
@@ -244,24 +254,58 @@ var Snake = new Phaser.Class({
         // TODO redo this to check every move for if there is a portal using the interact layer.
         
         
-        if (GState.PLAY === scene.gState && this.body.length > 2) { 
-            var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
-            var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
+        
 
-            if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
-                var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
-                portal.snakePortalingSprite.visible = false;
-                portal.targetObject.snakePortalingSprite.visible = false;
-            }
+        /**
+         * Interface requirement that all objects in the interative layer 
+         * need an onOver function to work properly.
+         */
 
-        }
+        
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
+            var __x = (this.head.x - X_OFFSET) / GRID;
+            var __y = (this.head.y - Y_OFFSET) / GRID;
                  //this.body includes the head I think
-                Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+                 //only happen if snake is on an atom. ++
+                 //only if the atom is the final atom.
+                 //debugger;
+                 if (scene.interactLayer[__x][__y] instanceof Food
+                    && scene.length === scene.lengthGoal -1
+                 ) {
+                    debugger;
+                    //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
+
+                 }
+                 else{
+                    
+                    if (scene.interactLayer[__x][__y] instanceof Food) {
+                        //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
+
+                    }
+                    //console.log('SHIFT POSITION')
+                    Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+                 }
+                
         }
 
+        if (GState.PLAY === scene.gState && this.body.length > 2) { 
+            var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
+            var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
+            if (scene.vortexTween) { //check that vortex tween exists so it doesn't return null
+                if (!scene.vortexTween.isPlaying()) { //check that it's not progress so errors aren't thrown below
+                    if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
+                        var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
+                        portal.snakePortalingSprite.visible = false;
+                        portal.targetObject.snakePortalingSprite.visible = false;
+                    }
+                }
+                
+            }
+            
+
+        }
         /**
          * Interface requirement that all objects in the interative layer 
          * need an onOver function to work properly.
@@ -272,8 +316,11 @@ var Snake = new Phaser.Class({
         //remove decimals to prevent erroring
         onGridX = Math.round(onGridX);
         onGridY = Math.round(onGridY);
+        
 
         if (scene.gState === GState.PLAY && scene.interactLayer[onGridX][onGridY] != "empty") {
+            //debugger;
+            //console.log(scene.interactLayer[onGridX][onGridY] instanceof Food)
             scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
 
@@ -287,7 +334,6 @@ var Snake = new Phaser.Class({
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
                 
                 if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
-                    debugger
                     console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
                     scene.warpToNext(index);
                 }
@@ -389,6 +435,7 @@ var Snake = new Phaser.Class({
         if (!scene.stopOnBonk) {
 
             scene.gState = GState.BONK;
+            scene.scene.get("InputScene").moveHistory.push(["BONK"]);
             //console.log(scene.gState, "BONK" , this.direction);
 
             if (!scene.winned) {
