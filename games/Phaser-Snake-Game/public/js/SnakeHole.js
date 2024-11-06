@@ -28,7 +28,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -39,6 +39,8 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
+
+const NO_EXPERT_MODE = true;
 
 
 // 1 frame is 16.666 milliseconds
@@ -538,7 +540,7 @@ class TutorialScene extends Phaser.Scene {
                     alpha: { from: 0, to: 1 },
                     ease: 'Sine.InOut',
                     duration: 1000,
-                    delay: 1000,
+                    delay: 700,
                     repeat: -1,
                     yoyo: true,
                     onStart: () =>  {
@@ -1356,22 +1358,35 @@ class MainMenuScene extends Phaser.Scene {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
                 
+                if (NO_EXPERT_MODE) {
+                    const mainMenuScene = this.scene.get("MainMenuScene");
 
-                var qMenu = QUICK_MENUS.get("adventure-mode");
+                    if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+                        var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+                        mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+                    } else {
+                        mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
+                    }
 
+                    mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+                    this.scene.stop();
+        
+                } else {
+                    var qMenu = QUICK_MENUS.get("adventure-mode");
+
+                    
+                    mainMenuScene.scene.launch("QuickMenuScene", {
+                        menuOptions: qMenu, 
+                        textPrompt: "MODE SELECTOR",
+                        fromScene: mainMenuScene,
+                        cursorIndex: 0
+                    });
+                    mainMenuScene.scene.bringToTop("QuickMenuScene");
+
+                    mainMenuScene.scene.sleep('MainMenuScene');
+
+                }
                 
-                mainMenuScene.scene.launch("QuickMenuScene", {
-                    menuOptions: qMenu, 
-                    textPrompt: "MODE SELECTOR",
-                    fromScene: mainMenuScene,
-                    cursorIndex: 0
-                });
-                mainMenuScene.scene.bringToTop("QuickMenuScene");
-
-                mainMenuScene.scene.sleep('MainMenuScene');
-
-
-                console.log("I DID IT");
 
 
 
@@ -1654,10 +1669,10 @@ class MainMenuScene extends Phaser.Scene {
                 menuFadeTween.resume();            
             }
             else{
-                menuOptions.get(menuList[cursorIndex]).call();
+                menuOptions.get(menuList[cursorIndex]).call(this);
             }
 
-        });
+        }, this);
 
         
         
@@ -2833,18 +2848,18 @@ class GameScene extends Phaser.Scene {
             "fontWeight": 400,
             "color": "white",
         }),
-            `${'Would you like to extract?'.toUpperCase()}`
+            `${'Where would you like to extract?'.toUpperCase()}`
         ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
         //nineSlice
         this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
             'uiPanelL', 'Glass', 
-            GRID * 16, GRID * 8, 
+            GRID * 18.5, GRID * 8, 
             8, 8, 8, 8);
         this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
 
         this.exMenuOptions = {
-            'YES': function () {
+            'MAIN MENU': function () {
                 // hide the extract prompt
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
@@ -2856,7 +2871,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.finalScore("MainMenuScene", {});
                 return true;
             },
-            'NO': function () {  
+            'CANCEL': function () {  
                 // stop vortex tween if it's playing
                 if (ourGameScene.vortexTween.isPlaying()) {
                     ourGameScene.vortexTween.stop()
@@ -2887,7 +2902,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.extractMenuOn = false;
                 console.log("NO");
             },
-            'LOOP TO ORIGIN': function () {
+            'DIRECT TO ADVENTURE (WORLD 1-1)': function () {
                 // TODO: send to origin
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
