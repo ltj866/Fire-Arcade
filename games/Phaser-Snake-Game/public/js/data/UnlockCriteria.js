@@ -51,7 +51,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank("World_10-5", RANKS.WOOD);
     }],
     ['easy-wrap', function () {
-        return PLAYER_STATS.wraps > 24;
+        return PLAYER_STATS.wraps > 128;
     }],
     ['hard-wrap', function () {
         return checkRank("World_3-3_Wrap", RANKS.WOOD);
