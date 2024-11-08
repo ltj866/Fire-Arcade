@@ -9,7 +9,7 @@
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 2,
+            "scaleInDock": 1,
             "scaleInEditor": 2
         },
         ":/automap-tiles.tsx": {
@@ -637,7 +637,7 @@
             "scale": 2.804032258064516,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 186.160483175151,
+                "x": 186.33879781420768,
                 "y": 185.98216853609432
             }
         },
@@ -649,7 +649,7 @@
             "scale": 2.804032258064516,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 186.160483175151,
+                "x": 186.33879781420768,
                 "y": 185.98216853609432
             }
         },
@@ -1199,7 +1199,7 @@
             "scale": 1.9733024691358025,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 174.07366856964106,
+                "x": 174.07366856964103,
                 "y": 161.4045514976147
             }
         },
@@ -1211,7 +1211,7 @@
         },
         "World_4-5.json": {
             "scale": 2.688936781609195,
-            "selectedLayer": 0,
+            "selectedLayer": -1,
             "viewCenter": {
                 "x": 173.86053967405826,
                 "y": 161.95992519369491
@@ -2573,18 +2573,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "World_1-1.json",
+        "World_1-4.json",
+        "World_2-2.json",
+        "World_2-3-new.json",
+        "World_2-3-new2.json",
+        "World_4-2.json",
+        "World_4-4.json",
         "World_4-5.json",
         "World_4-6.json",
-        "World_4-4.json",
-        "World_8-2_Adv_Portaling.json",
-        "World_8-3_Adv_Portaling.json",
-        "World_8-5_Adv_Portaling.json",
+        "Stage-09.json",
         "World_2-3.json",
-        "World_2-4.json",
-        "World_2-5.json",
-        "World_3-2_Wrap.json",
-        "World_3-3_Wrap.json"
+        "World_1-3.json",
+        "World_1-2.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

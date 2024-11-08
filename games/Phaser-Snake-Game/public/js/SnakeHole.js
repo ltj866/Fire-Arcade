@@ -263,6 +263,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 
 const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
     113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,241,242,243];
+const NO_FOOD_TILE = 481;
 
 //  Direction consts
 const START_SPRINT = 5;
@@ -369,7 +370,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'r-11-07-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -2679,7 +2680,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
         this.wallLayer.forEachTile(tile => {
-            if (tile.index === 481) { // No Food Spawn Tile
+            if (tile.index === NO_FOOD_TILE) { // No Food Spawn Tile
                 tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
             }
         });
@@ -2712,11 +2713,19 @@ class GameScene extends Phaser.Scene {
             this.foodLayer.visible = false;
 
             this.foodLayer.forEachTile(_tile => {
-                if(11 === _tile.index) {
-                    var food = new Food(this, {
-                        x: _tile.x*GRID + X_OFFSET, 
-                        y:_tile.y*GRID + Y_OFFSET
-                    });
+
+                switch (_tile.index) {
+                    case 11:
+                        var food = new Food(this, {
+                            x: _tile.x*GRID + X_OFFSET, 
+                            y:_tile.y*GRID + Y_OFFSET
+                        });
+                        break;
+                    case NO_FOOD_TILE:
+                        this.interactLayer[_tile.x][_tile.y] = _tile.index;
+                
+                    default:
+                        break;
                 }
             })
             this.foodLayer.destroy();
