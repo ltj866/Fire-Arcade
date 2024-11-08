@@ -319,7 +319,7 @@ var Snake = new Phaser.Class({
         
 
         if (scene.gState === GState.PLAY && typeof scene.interactLayer[onGridX][onGridY].onOver === 'function') {
-            // Only call if whatever is there has an onOver function.
+            // Only call if whatever is there has an onOver
             scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
 
