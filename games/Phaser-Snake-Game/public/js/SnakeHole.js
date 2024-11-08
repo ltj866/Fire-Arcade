@@ -6420,7 +6420,7 @@ var StageData = new Phaser.Class({
     },
 
     zedLevelBonus() {
-        return this.zedLevel / 200;
+        return Math.min(this.zedLevel / 1000, 0.099);
     },
 
     medalBonus() {
@@ -6870,13 +6870,13 @@ class ScoreScene extends Phaser.Scene {
         });
         this.tweens.addCounter({
             from: 0,
-            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(1),
+            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(2),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
             delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
-                const value2 = Math.round(tween.getValue());
+                const value2 = tween.getValue().toFixed(1);
                 multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
                     `
                     ZED LVL +${value2}%
@@ -6929,7 +6929,7 @@ class ScoreScene extends Phaser.Scene {
             delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
-                const value = Math.round(tween.getValue());
+                const value = tween.getValue().toFixed(1);
                 multValuesUI1.setHTML(
                     `x ${value}%
                     `
