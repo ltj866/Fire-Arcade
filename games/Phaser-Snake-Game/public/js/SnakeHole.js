@@ -6591,8 +6591,11 @@ class ScoreScene extends Phaser.Scene {
             var bestScoreValue = this.stageData.calcBase()
 
             this.stageData.newBest = true;
+
             
-            localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+            if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
+                localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+            }
             
         }
         else{
@@ -6611,12 +6614,20 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase()/this.stageData.foodLog.length;
 
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
-        var bestLog = new StageData(bestLogJSON);
+        debugger
 
+        if (localStorage.getItem(`${ourGame.stageUUID}-bestStageData`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+
+        } else {
+            // If a test level. Use World 1_1 as a filler to not break UI stuff.
+            var bestLogJSON = JSON.parse(localStorage.getItem(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`))
+        }
+
+        var bestLog = new StageData(bestLogJSON);
+    
         var bestLocal = bestLog.calcBase();
         var bestAve = bestLocal/bestLog.foodLog.length;
-
 
         // TODO: Don't do it a bonuse level? What do we do with the stage history on bonus levels?
         // Exclude from the Stage history?
