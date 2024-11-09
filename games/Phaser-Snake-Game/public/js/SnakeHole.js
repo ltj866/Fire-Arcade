@@ -101,6 +101,27 @@ var updateSumOfBest = function(scene) {
 
     var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
+    scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
+        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}-bestStageData`));
+
+        if (tempJSON) { // False if not played stage before.
+            var _stageData = new StageData(tempJSON);
+            scene.stagesComplete += 1;
+
+            var _scoreTotal = _stageData.calcTotal();
+            scene.sumOfBest += _scoreTotal;
+        }
+        else {
+            var unplayed = scene.scene.get("StartScene").UUID_MAP.get(uuid);
+            
+        }
+    })
+    //STAGE_FILE.forEach(stageName => {
+    //    localStorage.getItem()
+    //
+    //});
+
+    /*
     entries.forEach(log => {
         var key = log[0].split("-");
         if (key[key.length - 1] === "bestStageData") {
@@ -116,6 +137,7 @@ var updateSumOfBest = function(scene) {
             }   
         }
     })
+    */
 }
 
 
@@ -372,7 +394,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'r-11-07-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
