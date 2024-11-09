@@ -66,8 +66,7 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 
 const NO_BONK_BASE = 1200;
 
-const STAGE_TOTAL = 27;
-
+const STAGE_TOTAL = STAGE_FILE.size;
 
 
 
@@ -108,6 +107,8 @@ var updateSumOfBest = function(scene) {
             var _stageData = new StageData(tempJSON);
             scene.stagesComplete += 1;
 
+            BEST_OF_STAGE_DATA.set(_stageData.stage, _stageData);
+
             var _scoreTotal = _stageData.calcTotal();
             scene.sumOfBest += _scoreTotal;
         }
@@ -116,28 +117,6 @@ var updateSumOfBest = function(scene) {
             
         }
     })
-    //STAGE_FILE.forEach(stageName => {
-    //    localStorage.getItem()
-    //
-    //});
-
-    /*
-    entries.forEach(log => {
-        var key = log[0].split("-");
-        if (key[key.length - 1] === "bestStageData") {
-
-            var levelLog = new StageData(JSON.parse(log[1]))
-            if (!ignoreSet.has(levelLog.stage)) {
-                scene.stagesComplete += 1
-                BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
-
-                var _scoreTotal = levelLog.calcTotal();
-                scene.sumOfBest += _scoreTotal;
-                
-            }   
-        }
-    })
-    */
 }
 
 
@@ -6704,7 +6683,7 @@ class ScoreScene extends Phaser.Scene {
             });
 
         // Pre Calculate needed values
-        var stageAve = this.stageData.calcBase()/this.stageData.foodLog.length;
+        var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
         debugger
 
