@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
-import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGE_FILE} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -28,7 +28,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.8.11.07.001';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -117,6 +117,8 @@ var updateSumOfBest = function(scene) {
         }
     })
 }
+
+
 
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
@@ -789,6 +791,7 @@ class StartScene extends Phaser.Scene {
     }
     init() {
         // #region StartScene()
+        this.UUID_MAP = new Map();
         
         
         
@@ -886,6 +889,19 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
 
 
+        // Loads All Stage Properties
+        STAGE_FILE.forEach( stageName => {
+            /***
+             * ${stageName}data is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}data
+             * exclusivley loads the Tiled properties into the global cache.
+             */
+            var cacheName = `${stageName}.properties`;
+            this.load.json(cacheName, `/assets/Tiled/${stageName}.json`, 'properties');
+            //debugger
+
+        });
+
         // Audio
         this.load.setPath('assets/audio');
 
@@ -921,8 +937,6 @@ class StartScene extends Phaser.Scene {
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
-
-
 
         // #region Preloading Events
         this.load.on('progress', function (value) {
@@ -1018,6 +1032,60 @@ class StartScene extends Phaser.Scene {
             this.hasPlayedBefore = true;
             console.log("Testing LOCAL STORAGE => Has played.", );
         }
+
+
+        // Get the Map of UUIDs
+
+        STAGE_FILE.forEach( stageName => {
+            
+            var cacheName = `${stageName}.properties`;
+            var stageCache = this.cache.json.get(cacheName);
+
+            stageCache.forEach( probObj => {
+                if (probObj.name === "UUID") {
+                    this.UUID_MAP.set(probObj.value, stageName )
+                }
+            });
+        });
+
+
+
+        // Syncing UUIDs with real stage names
+        // Keeps unlock chain working when we change stage names.
+        // and lets users keep their high score.
+
+        let entries = Object.entries(localStorage);
+
+        entries.forEach(log => {
+            var key = log[0].split("-");
+            if (key[key.length - 1] === "bestStageData") {
+
+                var uuidString = log[0].slice(0, -14);
+                var correctStage = this.UUID_MAP.get(uuidString);
+                var localJSON = JSON.parse(log[1]);
+
+                if (correctStage === undefined) {
+                    // Stage in History is not currently playable.
+                    console.log(`Unused Stage: ${localJSON.stage} in Local Storage with UUID ${localJSON.uuid} is not in game.`)
+                    
+                } else {
+                
+                console.log();
+                    if (localJSON.stage != correctStage) {
+                        var logJSON = JSON.parse(localStorage.getItem(`${uuidString}-bestStageData`));
+                        var stageDataLog = new StageData(logJSON);
+                        
+                        // Update Stage Name
+                        stageDataLog.stage = correctStage;
+                        
+                        // Save New 
+                        localStorage.setItem(`${uuidString}-bestStageData`, JSON.stringify(stageDataLog));
+                    }
+                }                       
+            }
+        });
+    
+    
 
 
 
@@ -2620,6 +2688,7 @@ class GameScene extends Phaser.Scene {
         
     
 
+        // TODO: CAN BE REMOVED ONCE ALL IS LOADED IN THE BEGINNING
         this.nextStages.forEach( stageName => {
             /***
              * ${stageName}data is to avoid overloading the json object storage that already
@@ -2629,6 +2698,7 @@ class GameScene extends Phaser.Scene {
             this.load.json(`${stageName}data`, `assets/Tiled/${stageName}.json`, 'properties');
 
         });
+        
 
         
 
