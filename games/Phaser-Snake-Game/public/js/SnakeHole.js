@@ -79,7 +79,7 @@ const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
-const RANK_NUM_1 = 400865;
+const RANK_NUM_1 = 409162;
 const RANK_AMOUNT = 1000;
 const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
 
