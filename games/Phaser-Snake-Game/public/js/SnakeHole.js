@@ -28,7 +28,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.8.11.07.001';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -79,8 +79,26 @@ const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
+const RANK_NUM_1 = 400865;
+const RANK_AMOUNT = 1000;
+const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
 
 // #region Utils Functions
+
+var calcSumOfBestRank = function (sumOfBest) {
+    var testVal = 0;
+    var counter = 0;
+    // Later use actual distribution data.
+    // The best player is number one until we have more than 10,000 people playing.
+    // We could do 1000 instead of 100 in the meantime.
+    do {
+        testVal += RANK_STEP;
+        counter += 1;
+    } while (testVal < sumOfBest);
+
+    return Math.max(RANK_AMOUNT - counter, 1) 
+}
+
 
 var calcBonus = function (scoreInput) {
     
@@ -7115,8 +7133,9 @@ class ScoreScene extends Phaser.Scene {
                 letterRank.setAlpha(1)
                 //stageScoreUI.setAlpha(1)
                 //this.scorePanelLRank.setAlpha(1)
-                this.sumOfBestUI.setAlpha(1)
-                this.stagesCompleteUI.setAlpha(1)
+                this.sumOfBestUI.setAlpha(1);
+                this.stagesCompleteUI.setAlpha(1);
+                this.playerRankUI.setAlpha(1);
                 },
             onUpdate: tween =>
             {
@@ -7536,6 +7555,16 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
+
+        this.playerRankUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 23.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-weight": '400',
+            "text-shadow": '#000000 1px 0 6px',
+            //"font-style": 'italic',
+            //"font-weight": 'bold',
+            })).setHTML(
+                `BEST OF RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${calcSumOfBestRank(ourPersist.sumOfBest)}</span>`
         ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         // #region Help Card
