@@ -3421,22 +3421,31 @@ class GameScene extends Phaser.Scene {
 
         });
 
+        this.tabDown = false;
         this.input.keyboard.on('keydown-TAB', function() {
-            const ourQuickMenu = this.scene.get('QuickMenuScene');
-            const ourScoreScene = this.scene.get('ScoreScene');
-            if (!this.scene.isActive(ourScoreScene)){
-                this.scene.launch("QuickMenuScene", {
-                    menuOptions: QUICK_MENUS.get("tab-menu"), 
-                    textPrompt: "Quick Menu",
-                    fromScene: this,
-                    cursorIndex: 0
-                });
-                this.scene.bringToTop("QuickMenuScene");
-                // make sure tab only blurs background if quick menu is NOT up
-                if (!this.scene.isActive(ourQuickMenu)) {
-                    this.backgroundBlur(true);
+            if (!this.tabDown) {
+                this.tabDown = true;
+                const ourQuickMenu = this.scene.get('QuickMenuScene');
+                const ourScoreScene = this.scene.get('ScoreScene');
+                if (!this.scene.isActive(ourScoreScene)){
+                    this.scene.launch("QuickMenuScene", {
+                        menuOptions: QUICK_MENUS.get("tab-menu"), 
+                        textPrompt: "Quick Menu",
+                        fromScene: this,
+                        cursorIndex: 0
+                    });
+                    this.scene.bringToTop("QuickMenuScene");
+                    // make sure tab only blurs background if quick menu is NOT up
+                    if (!this.scene.isActive(ourQuickMenu)) {
+                        this.backgroundBlur(true);
+                    }
                 }
             }
+        }, this);
+        
+        this.input.keyboard.on('keyup-TAB', e => {
+            this.tabDown = false; 
+            debugger
         }, this);
 
         
