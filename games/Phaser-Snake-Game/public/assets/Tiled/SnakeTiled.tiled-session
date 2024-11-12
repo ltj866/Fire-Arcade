@@ -1425,7 +1425,7 @@
         },
         "World_8-2_Adv_Portaling.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 135.53210322053516,
                 "y": 229.59896507115135
@@ -1627,6 +1627,17 @@
             "scaleInDock": 1
         },
         "Wrap_Stage-xx.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "archive-World_1-1-max-combo-record.json": {
+            "scale": 2.451436781609195,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.1835658187786,
+                "y": 162.14980658773885
+            }
+        },
+        "archive-World_1-1-max-combo-record.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "r-07-10-2.json": {

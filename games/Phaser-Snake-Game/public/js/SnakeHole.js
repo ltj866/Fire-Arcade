@@ -4928,6 +4928,7 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    // #region .Fanfare(
     victoryFanfare(){
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
@@ -5208,6 +5209,7 @@ class GameScene extends Phaser.Scene {
     }
 
 
+    // #region .gameOver(
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
 
@@ -5274,7 +5276,6 @@ class GameScene extends Phaser.Scene {
 
         
     }
-
     tempStartingArrows(){
         if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
             this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
@@ -5297,6 +5298,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    // #region .extractPrompt(
     extractPrompt(){
         const ourGameScene = this.scene.get('GameScene');
         ourGameScene.extractMenuOn = true;
@@ -5325,6 +5327,7 @@ class GameScene extends Phaser.Scene {
         this._selected = this._menuElements[this.exCursorIndex];
     }
 
+    // #region .finalScore(
     finalScore(nextScene, args){
         const ourStartScene = this.scene.get('StartScene');
         const spaceBoy = this.scene.get("SpaceBoyScene");
@@ -5345,6 +5348,7 @@ class GameScene extends Phaser.Scene {
         var extractCode = "";
         var extractRankSum = 0;
         var xOffset = 36;
+        var finalWindowTop = Y_OFFSET + GRID * 8.5;
         var extractHistory = [];
 
         for (let index = 0; index < spaceBoy.stageHistory.length; index++) {
@@ -5437,7 +5441,7 @@ class GameScene extends Phaser.Scene {
 
             var _x = SCREEN_WIDTH/2 - GRID * 6.5 + index * xOffset;
             
-            const bestRank = this.add.sprite(_x ,GRID * 18.0, "ranksSpriteSheet", bestExtract[index][0]
+            const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
             ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
             
         }
@@ -5445,7 +5449,7 @@ class GameScene extends Phaser.Scene {
 
         var bestExtractRank = bestSum / bestExtract.length; 
 
-        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.0, "ranksSpriteSheet", Math.floor(bestExtractRank)
+        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
         ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
 
 
@@ -5479,7 +5483,7 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         //nineSlice
-        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, Y_OFFSET + GRID * 8.5, 
+        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, finalWindowTop, 
             'uiPanelL', 'Glass', 
             GRID * 17, GRID * 12, 
             8, 8, 8, 8);
@@ -5487,13 +5491,13 @@ class GameScene extends Phaser.Scene {
 
 
         //FINAL SCORE LABEL
-        const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, finalWindowTop + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
                 `FINAL SCORE:`
         ).setOrigin(1,0).setScale(0.5);
 
-        const bestRanksLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 21.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const bestRanksLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, finalWindowTop + GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
                 `BEST EXTRACTION`
@@ -5508,7 +5512,7 @@ class GameScene extends Phaser.Scene {
         const formattedScore = _totalScore.toLocaleString();
 
         //FINAL SCORE VALUE
-        const finalScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const finalScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, finalWindowTop + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
                 `${formattedScore}`
