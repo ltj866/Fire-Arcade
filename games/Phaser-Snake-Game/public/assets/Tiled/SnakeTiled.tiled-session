@@ -2739,7 +2739,7 @@
     "openFiles": [
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "World_10-4.json",
         "World_0-1.json",
