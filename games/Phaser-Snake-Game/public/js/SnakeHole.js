@@ -79,11 +79,12 @@ const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
-const RANK_NUM_1 = 412505;
+const RANK_NUM_1 = 534888;
 /* Rank 1 History
 412505 - James 11/9
+534,888 = James 11/12
 */
-const RANK_AMOUNT = 1000;
+const RANK_AMOUNT = 100;
 const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
 
 // #region Utils Functions
@@ -7662,8 +7663,8 @@ class ScoreScene extends Phaser.Scene {
             "text-shadow": '#000000 1px 0 6px',
             //"font-style": 'italic',
             //"font-weight": 'bold',
-            })).setHTML(
-                `BEST OF RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${calcSumOfBestRank(ourPersist.sumOfBest)}</span>`
+            })).setHTML( // % ‰ ‱
+                `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${calcSumOfBestRank(ourPersist.sumOfBest)}%</span>`
         ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         // #region Help Card
