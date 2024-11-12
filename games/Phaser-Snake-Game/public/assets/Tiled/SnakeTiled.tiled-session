@@ -1745,6 +1745,53 @@
         "r-11-10-1.json#tileSheetx12": {
             "scaleInDock": 1
         },
+        "r-11-12-1.json": {
+            "scale": 2.451436781609195,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.1835658187786,
+                "y": 162.14980658773885
+            }
+        },
+        "r-11-12-1.json#tileSheetx12": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "r-11-12-2.json": {
+            "scale": 2.451436781609195,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.1835658187786,
+                "y": 162.14980658773885
+            }
+        },
+        "r-11-12-2.json#tileSheetx12": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "r-11-12-3.json": {
+            "scale": 2.451436781609195,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.1835658187786,
+                "y": 162.14980658773885
+            }
+        },
+        "r-11-12-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-12-4.json": {
+            "scale": 2.451436781609195,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.1835658187786,
+                "y": 162.14980658773885
+            }
+        },
+        "r-11-12-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "r07-14-2.json": {
             "scale": 2.688936781609195,
             "selectedLayer": 0,
@@ -1799,7 +1846,7 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 909,
+                "x": 910,
                 "y": 901
             }
         },
@@ -1822,8 +1869,8 @@
             "scale": 2.804032258064516,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 186.33879781420768,
-                "y": 236.62352602818527
+                "x": 186.51711245326433,
+                "y": 287.26488352027616
             }
         },
         "r07-15-04.json#tileSheetx24": {
@@ -1834,7 +1881,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 176.33333333333334,
+                "x": 176,
                 "y": 221
             }
         },
@@ -1846,7 +1893,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 173.77639959772043,
-                "y": 507.4379818974187
+                "y": -2.451391216895729
             }
         },
         "r09-16-2b.json#tileSheetx12": {
@@ -1856,7 +1903,7 @@
             "scale": 2.104154727793696,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.17920610063328,
+                "x": 174.4168312112753,
                 "y": 161.8227003472459
             }
         },
@@ -1867,7 +1914,7 @@
             "scale": 2.104154727793696,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.41683121127528,
+                "x": 174.4168312112753,
                 "y": 161.8227003472459
             }
         },
@@ -1878,7 +1925,7 @@
             "scale": 2.104154727793696,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.17920610063328,
+                "x": 174.4168312112753,
                 "y": 161.8227003472459
             }
         },
@@ -1889,7 +1936,7 @@
             "scale": 2.104154727793696,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.17920610063328,
+                "x": 174.4168312112753,
                 "y": 229.30823176959223
             }
         },
@@ -1900,7 +1947,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.4431810444611,
                 "y": 161.3590249880847
             }
         },
@@ -1911,8 +1958,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 170.75,
-                "y": 330.25
+                "x": 170.5,
+                "y": 401.25
             }
         },
         "r09-16.json#tileSheetx12": {
@@ -2692,20 +2739,20 @@
     "openFiles": [
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "string",
+    "property.type": "bool",
     "recentFiles": [
-        "r-11-10-1.json",
-        "World_1-4 OLD.json",
-        "World_2-4.json",
-        "World_1-3.json",
-        "World_2-3-old.json",
-        "World_2-3-new2.json",
-        "World_2-3-new.json",
-        "World_2-3.json",
-        "World_2-1.json",
-        "warp-draft-01.json",
-        "World_1-1.json",
-        "World_0-1.json"
+        "World_10-4.json",
+        "World_0-1.json",
+        "archive-World_1-1-max-combo-record.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_8-2_Adv_Portaling.json",
+        "World_9-4_Final_Exams.json",
+        "World_9-3_Final_Exams.json",
+        "World_9-2_Final_Exams.json",
+        "World_8-4_Adv_Portaling.json",
+        "r09-16-4.json",
+        "r09-16-3.json",
+        "r09-16-2b.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
