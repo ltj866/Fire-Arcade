@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
-import { STAGE_UNLOCKS, STAGE_FILE} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -66,7 +66,7 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 
 const NO_BONK_BASE = 1200;
 
-const STAGE_TOTAL = STAGE_FILE.size;
+const STAGE_TOTAL = STAGES.size;
 
 
 
@@ -394,7 +394,8 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -912,10 +913,10 @@ class StartScene extends Phaser.Scene {
 
 
         // Loads All Stage Properties
-        STAGE_FILE.forEach( stageName => {
+        STAGES.forEach( stageName => {
             /***
-             * ${stageName}data is to avoid overloading the json object storage that already
-             * has the Stage Name in it from loading the level. ${stageName}data
+             * ${stageName}.properties is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}.properties
              * exclusivley loads the Tiled properties into the global cache.
              */
             var cacheName = `${stageName}.properties`;
@@ -1058,7 +1059,7 @@ class StartScene extends Phaser.Scene {
 
         // Get the Map of UUIDs
 
-        STAGE_FILE.forEach( stageName => {
+        STAGES.forEach( stageName => {
             
             var cacheName = `${stageName}.properties`;
             var stageCache = this.cache.json.get(cacheName);
@@ -1452,7 +1453,7 @@ class MainMenuScene extends Phaser.Scene {
                 if (NO_EXPERT_MODE) {
                     const mainMenuScene = this.scene.get("MainMenuScene");
 
-                    if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+                    if (localStorage.hasOwnProperty(`${START_UUID}-bestStageData`)) {
                         var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                         mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
                     } else {
@@ -2708,27 +2709,6 @@ class GameScene extends Phaser.Scene {
         // The first split and join santizes any spaces.
         this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
         
-    
-
-        // TODO: CAN BE REMOVED ONCE ALL IS LOADED IN THE BEGINNING
-        this.nextStages.forEach( stageName => {
-            /***
-             * ${stageName}data is to avoid overloading the json object storage that already
-             * has the Stage Name in it from loading the level. ${stageName}data
-             * exclusivley loads the Tiled properties into the global cache.
-             */
-            this.load.json(`${stageName}data`, `assets/Tiled/${stageName}.json`, 'properties');
-
-        });
-        
-
-        
-
-        
-        this.load.start(); // Loader doesn't start on its own outside of the preload function.
-        this.load.on('complete', function () {
-            console.log('Loaded all the json properties for NextStages');
-        });
 
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
@@ -3465,8 +3445,10 @@ class GameScene extends Phaser.Scene {
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
-                            var stageName = nextStagesCopy.shift();
-                            var dataName = `${stageName}data`;
+                            
+
+                            var stageName = STAGES.get(nextStagesCopy.shift()); 
+                            var dataName = `${stageName}.properties`;
                             var data = this.cache.json.get(dataName);
                         
                             data.forEach( propObj => {
@@ -4190,9 +4172,7 @@ class GameScene extends Phaser.Scene {
         
        // #endregion
 
-        
-        //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
-        //stageUUID = this.cache.json.get(`${this.stage}-json`);
+
    
 
         // Store the Current Version in Cookies
@@ -4948,6 +4928,7 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    // #region .Fanfare(
     victoryFanfare(){
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
@@ -5228,6 +5209,7 @@ class GameScene extends Phaser.Scene {
     }
 
 
+    // #region .gameOver(
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
 
@@ -5294,7 +5276,6 @@ class GameScene extends Phaser.Scene {
 
         
     }
-
     tempStartingArrows(){
         if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
             this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
@@ -5317,6 +5298,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    // #region .extractPrompt(
     extractPrompt(){
         const ourGameScene = this.scene.get('GameScene');
         ourGameScene.extractMenuOn = true;
@@ -5345,8 +5327,133 @@ class GameScene extends Phaser.Scene {
         this._selected = this._menuElements[this.exCursorIndex];
     }
 
+    // #region .finalScore(
     finalScore(nextScene, args){
         const ourStartScene = this.scene.get('StartScene');
+        const spaceBoy = this.scene.get("SpaceBoyScene");
+
+
+        //style
+        const finalScoreStyle = {
+            color: "white",
+            //"text-shadow": "2px 2px 4px #000000",
+            "font-size":'22px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
+
+
+        var scoreCount = 0;
+        var extractCode = "";
+        var extractRankSum = 0;
+        var xOffset = 36;
+        var finalWindowTop = Y_OFFSET + GRID * 8.5;
+        var extractHistory = [];
+
+        for (let index = 0; index < spaceBoy.stageHistory.length; index++) {
+            var id = spaceBoy.stageHistory[index].getID();
+            var _rank = spaceBoy.stageHistory[index].stageRank();
+            scoreCount += spaceBoy.stageHistory[index].calcTotal();
+            extractRankSum += _rank;
+            if (extractCode.length === 0) {
+                extractCode = id
+            } else {
+                extractCode = extractCode + "_" + id;
+            }
+
+            var record = [
+                _rank,
+                id,
+                Math.round(scoreCount)];
+
+            extractHistory.push(record);
+
+            var _x = SCREEN_WIDTH/2 - GRID * 6.5 + index * xOffset;
+
+            const stageRank = this.add.sprite(_x ,GRID * 14.0, "ranksSpriteSheet", _rank
+            ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
+
+            var stageID = this.add.dom(_x, GRID * 17, 'div', Object.assign({}, STYLE_DEFAULT,
+                finalScoreStyle, {
+                })).setHTML(
+                    `${id}`
+            ).setOrigin(0.5,0).setScale(0.5);
+            
+        }
+
+
+        var _x = SCREEN_WIDTH/2 - GRID * 6.5 + (spaceBoy.stageHistory.length) * xOffset;
+
+        var extractRank = extractRankSum / spaceBoy.stageHistory.length; 
+
+        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 14.0, "ranksSpriteSheet", Math.floor(extractRank)
+        ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
+
+        var finalText = this.add.dom(_x + GRID * .5, GRID * 17, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `RANK`
+        ).setOrigin(0.5,0).setScale(0.5);
+
+        if (!localStorage.getItem("extractRanks")) {
+            // if There is none
+            var bestExtractions = new Map()
+            bestExtractions.set(extractCode, [...extractHistory])
+
+        } else {
+            var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
+
+            if (bestExtractions.has(extractCode)) {
+                var prevBest = bestExtractions.get(extractCode);
+                var prevSum = 0;
+
+                prevBest.forEach( record => {
+                    prevSum += record[0];
+                })
+
+                if (prevSum < extractRankSum) {
+                    debugger
+                    console.log("NEW EXRACT RANKING");
+                    
+                    bestExtractions.set(extractCode, [...extractHistory]);  
+                }
+
+            } else {
+                bestExtractions.set(extractCode, [...extractHistory]);
+            }
+        }
+
+        const tempArray = Array.from(bestExtractions.entries());
+        const jsonString = JSON.stringify(tempArray);
+
+        // Stringify the array
+        localStorage.setItem("extractRanks", jsonString);
+
+
+        // Show Best Ranks
+        var bestExtract = bestExtractions.get(extractCode);
+        var bestSum = 0;
+
+        for (let index = 0; index < bestExtract.length; index++) {
+
+            bestSum += bestExtract[index][0];
+
+            var _x = SCREEN_WIDTH/2 - GRID * 6.5 + index * xOffset;
+            
+            const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+            ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
+            
+        }
+        var _x = SCREEN_WIDTH/2 - GRID * 6.5 + (bestExtract.length) * xOffset;
+
+        var bestExtractRank = bestSum / bestExtract.length; 
+
+        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
+        ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
+
+
+
 
         this.extractHole[0].play('extractHoleClose');
 
@@ -5361,15 +5468,7 @@ class GameScene extends Phaser.Scene {
         });
         
 
-        //style
-        const finalScoreStyle = {
-            color: "white",
-            //"text-shadow": "2px 2px 4px #000000",
-            "font-size":'22px',
-            "font-weight": 400,
-            "text-align": 'right',
-            "white-space": 'pre-line'
-        }
+
 
         //EXTRACTION COMPLETE
         this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -5384,25 +5483,25 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         //nineSlice
-        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, Y_OFFSET + GRID * 13.5, 
+        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, finalWindowTop, 
             'uiPanelL', 'Glass', 
-            GRID * 17, GRID * 10, 
+            GRID * 17, GRID * 12, 
             8, 8, 8, 8);
-        this.finalScorePanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0);
+        this.finalScorePanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0);
 
 
         //FINAL SCORE LABEL
-        const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, finalWindowTop + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
-                `FINAL SCORE:
-                
-                
-                
-                TOTAL TIME:
-                TOTAL BONKS:
-                BOOST TIME:`
+                `FINAL SCORE:`
         ).setOrigin(1,0).setScale(0.5);
+
+        const bestRanksLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, finalWindowTop + GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `BEST EXTRACTION`
+        ).setOrigin(0.5,0).setScale(0.5);
         
         var _totalScore = 0
 
@@ -5413,7 +5512,7 @@ class GameScene extends Phaser.Scene {
         const formattedScore = _totalScore.toLocaleString();
 
         //FINAL SCORE VALUE
-        const finalScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const finalScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, finalWindowTop + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
                 `${formattedScore}`
@@ -5656,7 +5755,6 @@ class GameScene extends Phaser.Scene {
                 }
             },
             onComplete: () =>{
-                debugger
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -5672,8 +5770,7 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.In',
                     delay: 500,
                     onComplete: () =>{
-                        debugger
-                        this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                        this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
                     }
                 });
             }
@@ -5724,9 +5821,6 @@ class GameScene extends Phaser.Scene {
                 zoom: 1 //switched to 1 from 10 to quickly remove it. nextStage() needs to run from somewhere else once removed.
                 });
             cameraZoomTween.on('complete', ()=>{
-                
-                
-                //this.nextStage(this.nextStages[nextStageIndex]);
             })
             
         });
@@ -6468,6 +6562,10 @@ var StageData = new Phaser.Class({
 
     },
 
+    getID() {
+        return this.stage.split("_")[1]; // Contents After World
+    },
+
     toString(){
         return `${this.stage}`;
     },
@@ -6706,14 +6804,12 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        debugger
-
         if (localStorage.getItem(`${ourGame.stageUUID}-bestStageData`)) {
             var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
 
         } else {
-            // If a test level. Use World 1_1 as a filler to not break UI stuff.
-            var bestLogJSON = JSON.parse(localStorage.getItem(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`))
+            // If a test level. Use World 0_1 as a filler to not break UI stuff.
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${START_UUID}-bestStageData`))
         }
 
         var bestLog = new StageData(bestLogJSON);
@@ -7755,7 +7851,6 @@ class ScoreScene extends Phaser.Scene {
                 if (!gameOver) {
                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
-                    debugger
                     ourGame.gState = GState.START_WAIT;
                     ourGame.bgTween = ourGame.tweens.add({
                         targets: [ourGame.stageBackGround, ourGame.continueBanner],
