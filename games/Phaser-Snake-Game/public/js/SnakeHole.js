@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
-import { STAGE_UNLOCKS, STAGE_FILE} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -66,7 +66,7 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 
 const NO_BONK_BASE = 1200;
 
-const STAGE_TOTAL = STAGE_FILE.size;
+const STAGE_TOTAL = STAGES.size;
 
 
 
@@ -394,7 +394,8 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -912,10 +913,10 @@ class StartScene extends Phaser.Scene {
 
 
         // Loads All Stage Properties
-        STAGE_FILE.forEach( stageName => {
+        STAGES.forEach( stageName => {
             /***
-             * ${stageName}data is to avoid overloading the json object storage that already
-             * has the Stage Name in it from loading the level. ${stageName}data
+             * ${stageName}.properties is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}.properties
              * exclusivley loads the Tiled properties into the global cache.
              */
             var cacheName = `${stageName}.properties`;
@@ -1058,7 +1059,7 @@ class StartScene extends Phaser.Scene {
 
         // Get the Map of UUIDs
 
-        STAGE_FILE.forEach( stageName => {
+        STAGES.forEach( stageName => {
             
             var cacheName = `${stageName}.properties`;
             var stageCache = this.cache.json.get(cacheName);
@@ -1452,7 +1453,7 @@ class MainMenuScene extends Phaser.Scene {
                 if (NO_EXPERT_MODE) {
                     const mainMenuScene = this.scene.get("MainMenuScene");
 
-                    if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+                    if (localStorage.hasOwnProperty(`${START_UUID}-bestStageData`)) {
                         var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                         mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
                     } else {
@@ -2708,27 +2709,6 @@ class GameScene extends Phaser.Scene {
         // The first split and join santizes any spaces.
         this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
         
-    
-
-        // TODO: CAN BE REMOVED ONCE ALL IS LOADED IN THE BEGINNING
-        this.nextStages.forEach( stageName => {
-            /***
-             * ${stageName}data is to avoid overloading the json object storage that already
-             * has the Stage Name in it from loading the level. ${stageName}data
-             * exclusivley loads the Tiled properties into the global cache.
-             */
-            this.load.json(`${stageName}data`, `assets/Tiled/${stageName}.json`, 'properties');
-
-        });
-        
-
-        
-
-        
-        this.load.start(); // Loader doesn't start on its own outside of the preload function.
-        this.load.on('complete', function () {
-            console.log('Loaded all the json properties for NextStages');
-        });
 
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
@@ -3465,8 +3445,10 @@ class GameScene extends Phaser.Scene {
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
-                            var stageName = nextStagesCopy.shift();
-                            var dataName = `${stageName}data`;
+                            
+
+                            var stageName = STAGES.get(nextStagesCopy.shift()); 
+                            var dataName = `${stageName}.properties`;
                             var data = this.cache.json.get(dataName);
                         
                             data.forEach( propObj => {
@@ -4190,9 +4172,7 @@ class GameScene extends Phaser.Scene {
         
        // #endregion
 
-        
-        //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
-        //stageUUID = this.cache.json.get(`${this.stage}-json`);
+
    
 
         // Store the Current Version in Cookies
@@ -5786,7 +5766,7 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.In',
                     delay: 500,
                     onComplete: () =>{
-                        this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                        this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
                     }
                 });
             }
@@ -5837,9 +5817,6 @@ class GameScene extends Phaser.Scene {
                 zoom: 1 //switched to 1 from 10 to quickly remove it. nextStage() needs to run from somewhere else once removed.
                 });
             cameraZoomTween.on('complete', ()=>{
-                
-                
-                //this.nextStage(this.nextStages[nextStageIndex]);
             })
             
         });
@@ -6827,8 +6804,8 @@ class ScoreScene extends Phaser.Scene {
             var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
 
         } else {
-            // If a test level. Use World 1_1 as a filler to not break UI stuff.
-            var bestLogJSON = JSON.parse(localStorage.getItem(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`))
+            // If a test level. Use World 0_1 as a filler to not break UI stuff.
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${START_UUID}-bestStageData`))
         }
 
         var bestLog = new StageData(bestLogJSON);
