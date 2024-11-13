@@ -40,7 +40,6 @@ export const TRACKS = new Map([
     [164, "let-164_11-10.m4a"],
     [172, "let-172_11-10.m4a"],
     [174, "let-174_11-10.m4a"],
-    [175, "let-175_11-10.m4a"],
     [176, "let-176_11-10.m4a"],
     [177, "let-177_11-10.m4a"],
     [182, "let-182_11-10.m4a"],
@@ -49,7 +48,7 @@ export const TRACKS = new Map([
 ])
 // Game over [149, "let-149-game-over_11-10"],
 
-// Low Health Music
+// Low Health Music [175, "let-175_11-10.m4a"],
 
 export const PORTAL_TILE_RULES = { // TODO Move out of here
     321:99,
