@@ -1823,13 +1823,6 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
-                
-                var ourSpaceBoy = this.scene.get("SpaceBoyScene");
-        
-                ourSpaceBoy.music = this.sound.add(`track_${149}`);
-                //music.on('complete', listener);
-                //music.play();
-                ourSpaceBoy.music.play();
 
 
                 mainMenuScene.pressToPlayTween.stop();
