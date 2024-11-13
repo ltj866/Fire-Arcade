@@ -2872,7 +2872,12 @@ class GameScene extends Phaser.Scene {
              * has the Stage Name in it from loading the level. ${stageName}data
              * exclusivley loads the Tiled properties into the global cache.
              */
-            this.load.json(`${stageName}.properties`, `assets/Tiled/${stageName}.json`, 'properties');
+
+            // Only do for stages not loaded from STAGES on the first pass.
+            if (STAGES.get(stageName) === undefined) {
+                this.load.json(`${stageName}.properties`, `assets/Tiled/${stageName}.json`, 'properties');
+            }
+            
 
         });
         
@@ -6383,6 +6388,7 @@ class GameScene extends Phaser.Scene {
             this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
             this.events.off('addScore');
             this.events.off('spawnBlackholes');
+            this.scene.get("InputScene").scene.restart();
             this.gameOver();
 
         }
@@ -8040,6 +8046,7 @@ class ScoreScene extends Phaser.Scene {
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 ourGame.events.off('spawnBlackholes');
+                ourGame.scene.get("InputScene").scene.restart();
 
 
                 ourGame.backgroundBlur(false);

@@ -16,6 +16,7 @@ export var QUICK_MENUS = new Map([
         }],
         ["Classic", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
+            ourGameScene.scene.get("InputScene").restart();
 
             if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
                 var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
@@ -50,6 +51,7 @@ export var QUICK_MENUS = new Map([
                 // Clear for reseting game
                 ourGameScene.events.off('addScore');
                 ourGameScene.events.off('spawnBlackholes');
+                ourGameScene.scene.get("InputScene").scene.restart();
 
                 var previous = ourGameScene.scene.get("SpaceBoyScene").stageHistory.pop();
                 if (previous != undefined) {
@@ -73,11 +75,13 @@ export var QUICK_MENUS = new Map([
         }],
         ['BACK TO MAIN MENU', function () {
             const ourGameScene = this.scene.get("GameScene");
-
+            
             console.log("BACK TO MAIN MENU");
             // Clear for reseting game
+
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
+            ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.scene.start("MainMenuScene");
             ourGameScene.backgroundBlur(false);
@@ -92,6 +96,7 @@ export var QUICK_MENUS = new Map([
             // Clear for reseting game
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
+            ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.backgroundBlur(false);
             // Restart  
