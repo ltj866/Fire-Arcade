@@ -808,7 +808,6 @@ class TutorialScene extends Phaser.Scene {
     }
 }
 
-// #region StartScene
 class StartScene extends Phaser.Scene {
     constructor () {
         super({key: 'StartScene', active: true});
@@ -844,7 +843,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
         this.load.spritesheet('electronParticleFanfare', 'assets/sprites/electronParticleFanfare.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
-        this.load.image('titleLogo','assets/sprites/UI_titleLogo.png')
+        this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
@@ -861,7 +860,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-        this.load.spritesheet('blackholeAnim', '/assets/sprites/blackholeAnim.png',{ frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('blackholeAnim', '/assets/sprites/blackHoleAnim.png',{ frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('extractHole', '/assets/sprites/extractHole.png',{ frameWidth: 64, frameHeight: 64 });
 
         // GameUI
