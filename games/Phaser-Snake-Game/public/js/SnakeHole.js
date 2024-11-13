@@ -2634,7 +2634,7 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
-        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_1-1') {
+        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_0-1') {
             
             this.stage = 'Tutorial_1';
             console.log('Tutorial Time!', this.stage);
@@ -2744,6 +2744,8 @@ class GameScene extends Phaser.Scene {
         else{
             ourPersist.fx.hue(0)
         }
+
+
 
 
 
@@ -2862,6 +2864,26 @@ class GameScene extends Phaser.Scene {
 
         // The first split and join santizes any spaces.
         this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
+        
+        // TODO: This is kept in for loading the tutorial levels.
+        this.nextStages.forEach( stageName => {
+            /***
+             * ${stageName}data is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}data
+             * exclusivley loads the Tiled properties into the global cache.
+             */
+            this.load.json(`${stageName}.properties`, `assets/Tiled/${stageName}.json`, 'properties');
+
+        });
+        
+
+        
+
+        
+        this.load.start(); // Loader doesn't start on its own outside of the preload function.
+        this.load.on('complete', function () {
+            console.log('Loaded all the json properties for NextStages');
+        });
         
 
 
@@ -3621,9 +3643,13 @@ class GameScene extends Phaser.Scene {
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
+                        
                             
-
-                            var stageName = STAGES.get(nextStagesCopy.shift()); 
+                            var stageRaw = nextStagesCopy.shift();
+                            var stageName = STAGES.get(stageRaw);
+                            if (stageName === undefined) { // Catches levels that are not in STAGES
+                                stageName = stageRaw;
+                            } 
                             var dataName = `${stageName}.properties`;
                             var data = this.cache.json.get(dataName);
                         
@@ -5933,7 +5959,15 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.In',
                     delay: 500,
                     onComplete: () =>{
-                        this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                        var nextStageRaw = this.nextStages[nextStageIndex];
+                        if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
+
+                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                            
+                        } else {
+                            this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                        }
+                        
                     }
                 });
             }
