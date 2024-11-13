@@ -5,7 +5,7 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
+import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
 import { STAGE_UNLOCKS, STAGES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
@@ -927,7 +927,7 @@ class StartScene extends Phaser.Scene {
 
         });
 
-        // Audio
+        // #region Load Audio
         this.load.setPath('assets/audio');
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
@@ -962,6 +962,20 @@ class StartScene extends Phaser.Scene {
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
+
+        // #region Load Music
+        this.load.setPath('assets/music/project-files');
+
+        TRACKS.keys().forEach( trackID => {
+            var track = `track_${trackID}`;
+            var path = TRACKS.get(trackID);
+            this.load.audio(track, [path]);
+        })
+
+        // Game Over Sound
+        this.load.audio(`track_${149}`, "let-149-game-over_11-10.m4a")
+
+        
 
         // #region Preloading Events
         this.load.on('progress', function (value) {
@@ -1226,6 +1240,9 @@ class StartScene extends Phaser.Scene {
 
     onInput() {
         // #region SCORE DEBUG
+
+
+
         if (SCORE_SCENE_DEBUG) {
                 
 
@@ -1806,6 +1823,15 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
+                
+                var ourSpaceBoy = this.scene.get("SpaceBoyScene");
+        
+                ourSpaceBoy.music = this.sound.add(`track_${149}`);
+                //music.on('complete', listener);
+                //music.play();
+                ourSpaceBoy.music.play();
+
+
                 mainMenuScene.pressToPlayTween.stop();
                 mainMenuScene.pressToPlay.setAlpha(0)
                 mainMenuScene.pressedSpace = true;
