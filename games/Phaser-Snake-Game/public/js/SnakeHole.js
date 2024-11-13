@@ -446,6 +446,13 @@ class SpaceBoyScene extends Phaser.Scene {
     init() {
         this.stageHistory = [];
         this.globalFoodLog = [];
+
+        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        this.startTrack = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${this.startTrack}`,{
+            volume: 0.33
+        });
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
@@ -465,30 +472,49 @@ class SpaceBoyScene extends Phaser.Scene {
         this.trackID = this.add.bitmapText(columnX - GRID - 6, GRID * 7, 'mainFont', `000`, 16
         ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTint(0xF0F0F0);
         this.trackID.setDepth(80);
+        this.trackID.setText(this.startTrack);
 
         const playButton = this.add.sprite(columnX , GRID * 7, 'mediaButtons', 2
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
-        playButton.setTint(0xFFFFFF);
+        
         
         playButton.on('pointerdown', () => {
             this.music.play();
+            playButton.setTintFill(0xCFFF04);
         }, this);
     
-        const stopButton = this.add.sprite(columnX , GRID * 8.5, 'mediaButtons', 3
+        const pauseButton = this.add.sprite(columnX , GRID * 8.5, 'mediaButtons', 3
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
-        stopButton.on('pointerdown', () => {
-            this.music.stop();
+        pauseButton.on('pointerdown', () => {
+            if (this.music.isPlaying) {
+                    pauseButton.setTintFill(0x8B0000);
+                    this.music.pause();
+            }  else {
+
+                if (pauseButton.tint === 0x8B0000) {
+                    this.music.resume();
+                    pauseButton.setTintFill(0x000000);
+                }
+            }
         }, this);
 
         const nextButton = this.add.sprite(columnX , GRID * 10, 'mediaButtons', 1
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         nextButton.on('pointerdown', () => {
-            if (this.music != undefined) {
-                this.music.stop();
-                this.nextSong();  
-            }
+            nextButton.setTintFill(0xCFFF04)
+            this.music.stop();
+            this.nextSong();  
+        }, this);
+
+        this.input.on('pointerup', function(pointer){
+            playButton.setTintFill(0x000000);
+            nextButton.setTintFill(0x000000);
             
+        }, this);
+
+        this.music.on('pause', () => {
+            pauseButton.setTintFill(0x8B0000);
         }, this);
 
         
@@ -498,14 +524,6 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     startMusic () {
 
-        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
-        var track = this.shuffledTracks.pop();
-
-        this.music = this.sound.add(`track_${track}`,{
-            volume: 0.33
-        });
-
-        this.trackID.setText(track);
 
         
         
@@ -1092,6 +1110,8 @@ class StartScene extends Phaser.Scene {
             game.sound.resumeAll();
             //console.log('All sounds resumed:', game.sound.sounds);
         });
+
+        this.pauseOnBlur = true;
         
         
 
