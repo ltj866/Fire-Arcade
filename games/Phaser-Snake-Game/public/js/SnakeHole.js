@@ -441,7 +441,7 @@ class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
 // #region SpaceBoyScene
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
-        super({key: 'SpaceBoyScene', active: true});
+        super({key: 'SpaceBoyScene', active: false});
     }
     init() {
         this.stageHistory = [];
@@ -449,8 +449,8 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
-        setOrigin(0,0).setDepth(51).setAlpha(0);
+        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight'
+        ).setOrigin(0,0).setDepth(51).setAlpha(0);
 
         this.tweens.add({
             targets: this.spaceBoyLight,
@@ -459,6 +459,84 @@ class SpaceBoyScene extends Phaser.Scene {
             ease: 'Sine.Out',
             delay: 500,
             });
+
+        var columnX = X_OFFSET - GRID * 7;
+
+        this.trackID = this.add.bitmapText(columnX - GRID - 6, GRID * 7, 'mainFont', `000`, 16
+        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTint(0xF0F0F0);
+        this.trackID.setDepth(80);
+
+        const playButton = this.add.sprite(columnX , GRID * 7, 'mediaButtons', 2
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        playButton.setTint(0xFFFFFF);
+        
+        playButton.on('pointerdown', () => {
+            this.music.play();
+        }, this);
+    
+        const stopButton = this.add.sprite(columnX , GRID * 8.5, 'mediaButtons', 3
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        
+        stopButton.on('pointerdown', () => {
+            this.music.stop();
+        }, this);
+
+        const nextButton = this.add.sprite(columnX , GRID * 10, 'mediaButtons', 1
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        nextButton.on('pointerdown', () => {
+            if (this.music != undefined) {
+                this.music.stop();
+                this.nextSong();  
+            }
+            
+        }, this);
+
+        
+
+        
+
+    }
+    startMusic () {
+
+        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        var track = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${track}`,{
+            volume: 0.33
+        });
+
+        this.trackID.setText(track);
+
+        
+        
+        //music.on('complete', listener);
+        
+        //music.play();
+        this.music.play();
+        this.music.on('complete', () => {
+            this.nextSong();
+        }, this);
+
+    }
+    nextSong () {
+
+        if (this.shuffledTracks.length != 0) {
+        } else {
+            this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        }
+
+        var track = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${track}`,{
+            volume: 0.33
+        });
+
+        this.music.play();
+        this.music.on('complete', () => {
+            this.nextSong();
+        }, this); 
+        
+        this.trackID.setText(track);
 
     }
 }
@@ -846,6 +924,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -972,8 +1051,11 @@ class StartScene extends Phaser.Scene {
             this.load.audio(track, [path]);
         })
 
-        // Game Over Sound
-        this.load.audio(`track_${149}`, "let-149-game-over_11-10.m4a")
+        // Game Over Song
+        this.load.audio(`track_${149}`, "let-149-game-over_11-10.m4a");
+
+        // Red Alert Song
+        this.load.audio(`track_${175}`, "let-175_11-10.m4a");
 
         
 
@@ -1823,6 +1905,7 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
+                this.scene.get("SpaceBoyScene").startMusic();
 
 
                 mainMenuScene.pressToPlayTween.stop();
@@ -4276,14 +4359,14 @@ class GameScene extends Phaser.Scene {
 
         // Score Text SET INVISIBLE
         this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
-            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,16)
-            .setOrigin(0,0).setScale(.5).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setScrollFactor(0).setTint(0x1f211b);
 
         this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,16)
-            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,16)
-            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
 
