@@ -140,6 +140,8 @@ var updateSumOfBest = function(scene) {
             
         }
     })
+
+    scene.lastSumofBest
 }
 
 
@@ -2333,6 +2335,10 @@ class PersistScene extends Phaser.Scene {
         this.sumOfBest = 0;
         this.stagesComplete = 0;
         this.coins = START_COINS;
+
+        this.prevSumOfBest = 0;
+        this.prevStagesComplete = 0;
+        this.prevPlayerRank = 0;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -2435,6 +2441,11 @@ class PersistScene extends Phaser.Scene {
     
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
+
+    this.prevSumOfBest = this.sumOfBest;
+    this.prevStagesComplete = this.stagesComplete;
+    this.prevPlayerRank = calcSumOfBestRank(this.sumOfBest);
+
 
     const styleBottomText = {
         "font-size": '12px',
@@ -7858,16 +7869,39 @@ class ScoreScene extends Phaser.Scene {
     
         updateSumOfBest(ourPersist);
         var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
+        var newRank = calcSumOfBestRank(ourPersist.sumOfBest)
+        
+        if (ourPersist.prevStagesComplete < ourPersist.stagesComplete) {
+            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
+        } else {
+            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
+        }
 
+        if (ourPersist.prevSumOfBest < ourPersist.sumOfBest) {
+            var bestIncrease = ourPersist.sumOfBest - ourPersist.prevSumOfBest;
+            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
+        } else {
+            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
+        }
 
+        if (ourPersist.prevPlayerRank > newRank) {
+            debugger
+            var rankIncrease = ourPersist.prevPlayerRank - newRank;
+            var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
+        } else {
+            debugger
+            var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
+        }
+
+        
         this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
             "font-weight": '400',
             "text-shadow": '#000000 1px 0 6px',
             //"font-style": 'italic',
             //"font-weight": 'bold',
-            })).setText(
-                `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
+            })).setHTML(
+                stageCompleteContents
         ).setOrigin(0,0).setScale(0.5).setAlpha(0);
         
         this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -7877,7 +7911,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-style": 'italic',
             //"font-weight": 'bold',
             })).setHTML(
-                `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
+                sumBestContent
         ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         this.playerRankUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 23.25, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -7887,7 +7921,7 @@ class ScoreScene extends Phaser.Scene {
             //"font-style": 'italic',
             //"font-weight": 'bold',
             })).setHTML( // % ‰ ‱
-                `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${calcSumOfBestRank(ourPersist.sumOfBest)}%</span>`
+                rankContent
         ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         // #region Help Card
@@ -7962,6 +7996,10 @@ class ScoreScene extends Phaser.Scene {
         //ourGame.events.off('spawnBlackholes');
         
         //this.scene.stop();
+
+        ourPersist.prevSumOfBest = ourPersist.sumOfBest;
+        ourPersist.prevStagesComplete = ourPersist.stagesComplete;
+        ourPersist.prevPlayerRank = calcSumOfBestRank(ourPersist.sumOfBest);
 
 
 
