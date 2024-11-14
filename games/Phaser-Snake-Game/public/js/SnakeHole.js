@@ -1556,11 +1556,8 @@ class QuickMenuScene extends Phaser.Scene {
                 this.scene.sleep("QuickMenuScene");
             }
 
-            
-
             ourGame.scene.pause();
             ourGame.scene.setVisible(false);
-            debugger
             //this.scene.sleep("QuickMenuScene");
             //this.scene.sleep();
             
