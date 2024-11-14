@@ -6890,7 +6890,7 @@ var StageData = new Phaser.Class({
         return bestCombo * 100;
     },
     boostBonus() {
-        return Math.ceil(this.boostFrames / 10) * 5;
+        return Math.ceil(this.boostFrames / 10) * 6;
     },
     
     calcTotal() {
@@ -7885,11 +7885,10 @@ class ScoreScene extends Phaser.Scene {
         }
 
         if (ourPersist.prevPlayerRank > newRank) {
-            debugger
+
             var rankIncrease = ourPersist.prevPlayerRank - newRank;
             var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
         } else {
-            debugger
             var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
         }
 
