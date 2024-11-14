@@ -3746,7 +3746,8 @@ class GameScene extends Phaser.Scene {
                 this.tabDown = true;
                 const ourQuickMenu = this.scene.get('QuickMenuScene');
                 const ourScoreScene = this.scene.get('ScoreScene');
-                if (!this.scene.isActive(ourScoreScene)){
+                
+                if (!this.scene.isActive(ourScoreScene) && !this.scene.isActive('StageCodex')){
                     this.scene.launch("QuickMenuScene", {
                         menuOptions: QUICK_MENUS.get("tab-menu"), 
                         textPrompt: "Quick Menu",
@@ -7275,18 +7276,27 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTimeScale = .25;
 
         //STAGE CLEAR
-        this.time.delayedCall(100, () => {
-            this.add.dom(SCREEN_WIDTH/2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
-                "text-shadow": "4px 4px 0px #000000",
-                "font-size": '32px',
-                'font-weight': 400,
-                'text-align': 'center',
-                'text-transform': 'uppercase',
-                "font-family": '"Press Start 2P", system-ui',
-            })).setHTML(
-                `${this.stageData.stage} CLEAR`
-            ).setOrigin(0.5, 0).setScale(.5);
-        });
+        this.add.dom(X_OFFSET + GRID * 2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size": '32px',
+            'font-weight': 400,
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            "white-space": 'pre-line'
+        })).setHTML(
+            this.stageData.stage
+        ).setOrigin(0, 0).setScale(.5);
+
+        this.add.dom(X_OFFSET + GRID * 24, GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "text-shadow": "4px 4px 0px #000000",
+            "font-size": '20px',
+            'font-weight': 400,
+            'text-transform': 'uppercase',
+            "font-family": '"Press Start 2P", system-ui',
+            "white-space": 'pre-line'
+        })).setHTML(//✔
+            `CLEAR`
+        ).setOrigin(1, 0).setScale(.5);
         
 
         
