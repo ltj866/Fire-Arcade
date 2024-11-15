@@ -1945,7 +1945,7 @@ class MainMenuScene extends Phaser.Scene {
                 
                 
                 this.scene.get("StartScene").UUID_MAP.size;
-                if (BEST_OF_CLASSIC.size > 25 && EXPERT_CHOICE) { // EXPERT_CHOICE
+                if (BEST_OF_CLASSIC.size < 20 && EXPERT_CHOICE) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get("adventure-mode");
 
                     mainMenuScene.scene.launch("QuickMenuScene", {
@@ -8231,7 +8231,7 @@ class ScoreScene extends Phaser.Scene {
                 prevSumOfBest = ourPersist.prevSumOfBestExpert;
                 prevPlayerRank = ourPersist.prevPlayerRankExpert;
 
-                totalLevels = Math.min(ourPersist.stagesCompleteExpert + Math.ceil(ourPersist.stagesCompleteExpert / 4), STAGE_TOTAL);
+                totalLevels = BEST_OF_CLASSIC.size;
                 newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
                 stagesComplete = ourPersist.stagesCompleteExpert;
                 sumOfBest = ourPersist.sumOfBestExpert;
