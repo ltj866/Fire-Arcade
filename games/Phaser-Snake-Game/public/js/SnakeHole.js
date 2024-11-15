@@ -6491,7 +6491,7 @@ class GameScene extends Phaser.Scene {
             lives: this.lives, 
             startupAnim: false,
             camDirection: this.camDirection,
-            mode: ourPersist.mode,
+            mode: this.scene.get("PersistScene").mode,
         });
         ourInputScene.scene.restart();
 
