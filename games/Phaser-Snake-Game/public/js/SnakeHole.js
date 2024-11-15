@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -44,7 +44,8 @@ const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
     stage:"World_0-1"
 }
-const NO_EXPERT_MODE = true;
+const DEBUG_FORCE_EXPERT = false;
+const EXPERT_CHOICE = true;
 
 
 // 1 frame is 16.666 milliseconds
@@ -121,31 +122,73 @@ var updateSumOfBest = function(scene) {
      *  That is used to check if a black hole should be spawned to a new level.
      */
     let entries = Object.entries(localStorage);
-    scene.stagesComplete = 0;
-    scene.sumOfBest = 0;
-    BEST_OF_STAGE_DATA = new Map();
+    scene.stagesCompleteClassic = 0;
+    scene.stagesCompleteExpert = 0;
+    scene.stagesCompleteAll = 0;
+
+    scene.sumOfBestClassic = 0;
+    scene.sumOfBestExpert = 0;
+    scene.sumOfBestAll = 0;
+
+    BEST_OF_ALL = new Map();
+    BEST_OF_CLASSIC = new Map ();
+    BEST_OF_EXPERT = new Map ();
 
     var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
     scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
-        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}-bestStageData`));
+        var tempJSONClassic = JSON.parse(localStorage.getItem(`${uuid}_best-Classic`));
+        var tempJSONExpert = JSON.parse(localStorage.getItem(`${uuid}_best-Expert`));
 
-        if (tempJSON) { // False if not played stage before.
-            var _stageData = new StageData(tempJSON);
-            scene.stagesComplete += 1;
+        // TODO: Check both and take the highest value.
+        // TODO: Make Sure the codex pulls from this data, but score screen best and unlock best do not pull from here.
+        var _scoreTotalClassic;
+        if (tempJSONClassic) { // False if not played stage before.
+            var _stageDataClassic = new StageData(tempJSONClassic);
+            scene.stagesCompleteClassic += 1;
 
-            BEST_OF_STAGE_DATA.set(_stageData.stage, _stageData);
+            BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
 
-            var _scoreTotal = _stageData.calcTotal();
-            scene.sumOfBest += _scoreTotal;
+            _scoreTotalClassic = _stageDataClassic.calcTotal();
+            scene.sumOfBestClassic += _scoreTotalClassic;
         }
         else {
-            var unplayed = scene.scene.get("StartScene").UUID_MAP.get(uuid);
+            _scoreTotalClassic = 0;
             
         }
-    })
 
-    scene.lastSumofBest
+        var _scoreTotalExpert;
+        if (tempJSONExpert) {
+            var _stageDataExpert = new StageData(tempJSONExpert);
+            scene.stagesCompleteExpert += 1;
+
+            BEST_OF_EXPERT.set(_stageDataExpert.stage, _stageDataExpert);
+
+            _scoreTotalExpert = _stageDataExpert.calcTotal();
+            scene.sumOfBestExpert += _scoreTotalExpert;
+        } else {
+            _scoreTotalExpert = 0
+        }
+        
+        switch (true) {
+            case _scoreTotalClassic - _scoreTotalExpert === 0:
+                // Never played in both modes
+                // Do Nothing
+                break;
+            case _scoreTotalExpert > _scoreTotalClassic:
+                scene.sumOfBestAll += _scoreTotalExpert;
+                scene.stagesCompleteAll += 1;
+                BEST_OF_ALL.set(_stageDataExpert.stage, _stageDataExpert);
+                break;
+        
+            default:
+                scene.sumOfBestAll += _scoreTotalClassic;
+                scene.stagesCompleteAll += 1;
+                BEST_OF_ALL.set(_stageDataClassic.stage, _stageDataClassic);
+                break;
+        }
+
+    })
 }
 
 
@@ -238,13 +281,13 @@ var rollZeds = function(score) {
         ["bestZeros", mostZerosYet],
         ["zedsEarned", xpFromZeds(mostZerosYet)] 
     ])
-
     return zedRollResultsMap;
-
 }
 
 
-export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
+export var BEST_OF_ALL = new Map (); // STAGE DATA TYPE
+export var BEST_OF_CLASSIC = new Map ();
+export var BEST_OF_EXPERT = new Map ();
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -404,7 +447,7 @@ export const GState = Object.freeze({
 
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
-const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
+export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -849,6 +892,8 @@ class TutorialScene extends Phaser.Scene {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
+                    mode: scene.scene.get("PersistScene").mode
+
                 });
 
                 // Clear for reseting game
@@ -1205,10 +1250,11 @@ class StartScene extends Phaser.Scene {
         let entries = Object.entries(localStorage);
 
         entries.forEach(log => {
-            var key = log[0].split("-");
-            if (key[key.length - 1] === "bestStageData") {
+            var logKeySplit = log[0].split("_");
+            var keyCheck = logKeySplit[1];
+            if (keyCheck === "best-Classic" || keyCheck === "best-Expert") {
 
-                var uuidString = log[0].slice(0, -14);
+                var uuidString = logKeySplit[0];
                 var correctStage = this.UUID_MAP.get(uuidString);
                 var localJSON = JSON.parse(log[1]);
 
@@ -1220,14 +1266,14 @@ class StartScene extends Phaser.Scene {
                 
                 console.log();
                     if (localJSON.stage != correctStage) {
-                        var logJSON = JSON.parse(localStorage.getItem(`${uuidString}-bestStageData`));
+                        var logJSON = JSON.parse(localStorage.getItem(`${uuidString}_${keyCheck}`));
                         var stageDataLog = new StageData(logJSON);
                         
                         // Update Stage Name
                         stageDataLog.stage = correctStage;
                         
                         // Save New 
-                        localStorage.setItem(`${uuidString}-bestStageData`, JSON.stringify(stageDataLog));
+                        localStorage.setItem(`${uuidString}_${keyCheck}`, JSON.stringify(stageDataLog));
                     }
                 }                       
             }
@@ -1359,27 +1405,6 @@ class StartScene extends Phaser.Scene {
 
     onInput() {
         // #region SCORE DEBUG
-
-
-
-        if (SCORE_SCENE_DEBUG) {
-                
-
-            var ourGame = this.scene.get("GameScene");
-            var ourInput = this.scene.get("InputScene");
-            this.scene.start('ScoreScene');
-        }
-        else {
-                                            
-            this.scene.setVisible(false);
-            //this.scene.get("UIScene").setVisible(false);
-            
-            //this.scene.launch('UIScene');
-            this.scene.launch('GameScene');
-            //var ourGameScene = this.scene.get("GameScene");
-            //console.log(e)
-        }
-        this.scene.stop();
     }
     end() {
 
@@ -1648,7 +1673,7 @@ class StageCodex extends Phaser.Scene {
             8, 8, 8, 8);
         topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
 
-        var bestText = `Best of Codex - Sum of Best = ${commaInt(ourPersist.sumOfBest.toFixed(0))}`;
+        var bestText = `Best of Codex - Sum of Best = ${commaInt(ourPersist.sumOfBestAll.toFixed(0))}`;
 
         var titleText = this.add.dom(topLeft, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
@@ -1661,14 +1686,14 @@ class StageCodex extends Phaser.Scene {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
-            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBest)}%`
+            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
         ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
         var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
-            `STAGES: ${ourPersist.stagesComplete}`
+            `STAGES: ${ourPersist.stagesCompleteAll}`
         ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
         //codexContainer.add([titleText, playerRank, stages]);
@@ -1676,7 +1701,7 @@ class StageCodex extends Phaser.Scene {
 
         var _index = 0;
         
-        BEST_OF_STAGE_DATA.values().forEach( bestOf => {
+        BEST_OF_ALL.values().forEach( bestOf => {
             //debugger
             var topY = rowY + nextRow * stageNumber;
             const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
@@ -1918,23 +1943,11 @@ class MainMenuScene extends Phaser.Scene {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
                 
-                if (NO_EXPERT_MODE) {
-                    const mainMenuScene = this.scene.get("MainMenuScene");
-
-                    if (localStorage.hasOwnProperty(`${START_UUID}-bestStageData`)) {
-                        var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-                        mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
-                    } else {
-                        mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
-                    }
-
-                    mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
-                    this.scene.stop();
-        
-                } else {
+                
+                this.scene.get("StartScene").UUID_MAP.size;
+                if (BEST_OF_CLASSIC.size > 25 && EXPERT_CHOICE) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get("adventure-mode");
 
-                    
                     mainMenuScene.scene.launch("QuickMenuScene", {
                         menuOptions: qMenu, 
                         textPrompt: "MODE SELECTOR",
@@ -1944,7 +1957,8 @@ class MainMenuScene extends Phaser.Scene {
                     mainMenuScene.scene.bringToTop("QuickMenuScene");
 
                     mainMenuScene.scene.sleep('MainMenuScene');
-
+                } else {
+                    QUICK_MENUS.get("adventure-mode").get("Classic").call(this);
                 }
                 
 
@@ -2629,13 +2643,7 @@ class PersistScene extends Phaser.Scene {
 
     init() {
         this.zeds = 0;
-        this.sumOfBest = 0;
-        this.stagesComplete = 0;
         this.coins = START_COINS;
-
-        this.prevSumOfBest = 0;
-        this.prevStagesComplete = 0;
-        this.prevPlayerRank = 0;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -2739,9 +2747,13 @@ class PersistScene extends Phaser.Scene {
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
 
-    this.prevSumOfBest = this.sumOfBest;
-    this.prevStagesComplete = this.stagesComplete;
-    this.prevPlayerRank = calcSumOfBestRank(this.sumOfBest);
+    this.prevSumOfBestClassic = this.sumOfBestClassic;
+    this.prevStagesCompleteClassic = this.stagesCompleteClassic;
+    this.prevPlayerRankClassic = calcSumOfBestRank(this.sumOfBestClassic);
+
+    this.prevSumOfBestExpert = this.sumOfBestExpert;
+    this.prevStagesCompleteExpert = this.stagesCompleteExpert;
+    this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
 
 
     const styleBottomText = {
@@ -2867,6 +2879,12 @@ class GameScene extends Phaser.Scene {
 
         // Game State Bools
         this.tutorialState = false;
+
+        if (!DEBUG_FORCE_EXPERT) {
+            this.mode = props.mode; // This forces a fail if you forget to call. It is safer that way.
+        } else {
+            this.mode = "Expert";
+        }
 
         // Arrays for collision detection
         this.atoms = new Set();
@@ -3507,6 +3525,7 @@ class GameScene extends Phaser.Scene {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
+                    mode: ourPersist.mode,
                 });
                 return true;
             },
@@ -4000,11 +4019,12 @@ class GameScene extends Phaser.Scene {
                                     // Easier to see when debugging with debugger in console.
                                     stageName;
                                     var temp = STAGE_UNLOCKS.get(propObj.value);
-                                    var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
+                                    //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
                                     
                                    
                                     
 
+                                    //debugger
                                     if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist)) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
@@ -4058,8 +4078,8 @@ class GameScene extends Phaser.Scene {
                                         //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
                                         //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
                                         
-                                        if (BEST_OF_STAGE_DATA.get(stageName) != undefined) {
-                                            switch (BEST_OF_STAGE_DATA.get(stageName).stageRank()) {
+                                        if (BEST_OF_ALL.get(stageName) != undefined) {
+                                            switch (BEST_OF_ALL.get(stageName).stageRank()) {
                                                 case RANKS.WOOD:
                                                     blackholeImage.setTint(0xB87333);
                                                     break;
@@ -4474,7 +4494,7 @@ class GameScene extends Phaser.Scene {
 
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${this.mode}`));       
 
         if (bestLogJSON) {
             // is false if best log has never existed
@@ -5919,62 +5939,64 @@ class GameScene extends Phaser.Scene {
                 `RANK`
         ).setOrigin(0.5,0).setScale(0.5);
 
-        if (!localStorage.getItem("extractRanks")) {
-            // if There is none
-            var bestExtractions = new Map()
-            bestExtractions.set(extractCode, [...extractHistory])
-
-        } else {
-            var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
-
-            if (bestExtractions.has(extractCode)) {
-                var prevBest = bestExtractions.get(extractCode);
-                var prevSum = 0;
-
-                prevBest.forEach( record => {
-                    prevSum += record[0];
-                })
-
-                if (prevSum < extractRankSum) {
-                    debugger
-                    console.log("NEW EXRACT RANKING");
-                    
-                    bestExtractions.set(extractCode, [...extractHistory]);  
-                }
+        if (this.mode === "Expert") {
+            
+            if (!localStorage.getItem("extractRanks")) {
+                // if There is none
+                var bestExtractions = new Map()
+                bestExtractions.set(extractCode, [...extractHistory])
 
             } else {
-                bestExtractions.set(extractCode, [...extractHistory]);
+                var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
+
+                if (bestExtractions.has(extractCode)) {
+                    var prevBest = bestExtractions.get(extractCode);
+                    var prevSum = 0;
+
+                    prevBest.forEach( record => {
+                        prevSum += record[0];
+                    })
+
+                    if (prevSum < extractRankSum) {
+                        console.log("NEW EXRACT RANKING");
+                        
+                        bestExtractions.set(extractCode, [...extractHistory]);  
+                    }
+
+                } else {
+                    bestExtractions.set(extractCode, [...extractHistory]);
+                }
             }
-        }
 
-        const tempArray = Array.from(bestExtractions.entries());
-        const jsonString = JSON.stringify(tempArray);
+            const tempArray = Array.from(bestExtractions.entries());
+            const jsonString = JSON.stringify(tempArray);
 
-        // Stringify the array
-        localStorage.setItem("extractRanks", jsonString);
+            // Stringify the array
+            localStorage.setItem("extractRanks", jsonString);
 
 
-        // Show Best Ranks
-        var bestExtract = bestExtractions.get(extractCode);
-        var bestSum = 0;
+            // Show Best Ranks
+            var bestExtract = bestExtractions.get(extractCode);
+            var bestSum = 0;
 
-        for (let index = 0; index < bestExtract.length; index++) {
+            for (let index = 0; index < bestExtract.length; index++) {
 
-            bestSum += bestExtract[index][0];
+                bestSum += bestExtract[index][0];
 
-            var _x = windowCenterX - GRID * 6.5 + index * xOffset;
-            
-            const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+                var _x = windowCenterX - GRID * 6.5 + index * xOffset;
+                
+                const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+                ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
+                
+            }
+
+            var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
+
+            var bestExtractRank = bestSum / bestExtract.length; 
+
+            var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
             ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
-            
         }
-
-        var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
-
-        var bestExtractRank = bestSum / bestExtract.length; 
-
-        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
-        ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
 
 
         this.extractHole[0].play('extractHoleClose');
@@ -6022,7 +6044,7 @@ class GameScene extends Phaser.Scene {
         const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
-                `BEST EXTRACTION`
+                `EXTRACTION TRACKER - ONLY ON EXPERT`
         ).setOrigin(0.5,0).setScale(0.5);
         
         var _totalScore = 0
@@ -6468,7 +6490,8 @@ class GameScene extends Phaser.Scene {
             score: this.nextScore, 
             lives: this.lives, 
             startupAnim: false,
-            camDirection: this.camDirection
+            camDirection: this.camDirection,
+            mode: ourPersist.mode,
         });
         ourInputScene.scene.restart();
 
@@ -6632,6 +6655,7 @@ class GameScene extends Phaser.Scene {
 
 
         // #region Hold Reset
+        // TODO SHOULD BE CHANGED TO UNDOING BLACK HOLE TWEENS
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME 
             && this.pressedSpaceDuringWait 
             && this.gState === GState.WAIT_FOR_INPUT
@@ -6639,11 +6663,11 @@ class GameScene extends Phaser.Scene {
         ) {
                 console.log("SPACE LONG ENOUGH BRO");
  
-                this.events.off('addScore');
+                //this.events.off('addScore');
 
  
                 this.lives -= 1;
-                this.scene.restart( { score: this.stageStartScore, lives: this.lives });
+                //this.scene.restart( { score: this.stageStartScore, lives: this.lives, });
         }
 
         
@@ -6938,7 +6962,7 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1 && this.spawnCoins) {
+                if (this.coinSpawnCounter < 1 && this.spawnCoins && this.mode === "Classic") {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
@@ -7071,6 +7095,7 @@ var StageData = new Phaser.Class({
     function StageData(props) {
         // this is the order you'll see printed in the console.
         this.stage = props.stage;
+        this.mode = props.mode;
 
         this.bonks = props.bonks;
         this.boostFrames = props.boostFrames;
@@ -7117,7 +7142,7 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
-            case bonusScore > this.sRank:
+            case this.sRank != null && bonusScore > this.sRank:
                 rank = RANKS.PLATINUM;
                 break;
             case bonusScore > RANK_BENCHMARKS.get(RANKS.GOLD):
@@ -7250,6 +7275,7 @@ class ScoreScene extends Phaser.Scene {
             turnInputs: ourInputScene.turnInputs,
             turns: ourInputScene.turns,
             stage:ourGame.stage,
+            mode:ourGame.mode,
             uuid:ourGame.stageUUID,
             zedLevel: calcZedLevel(ourPersist.zeds).level,
             zeds: ourPersist.zeds,
@@ -7296,7 +7322,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Save Best To Local.
 
-        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`));
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
@@ -7310,18 +7336,14 @@ class ScoreScene extends Phaser.Scene {
         if (currentLocal > bestLocal) {
             console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
             bestLocal = currentLocal;
-            var bestScoreValue = this.stageData.calcBase()
 
             this.stageData.newBest = true;
 
             
             if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
-                localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+                localStorage.setItem(`${ourGame.stageUUID}_best-${ourGame.mode}`, JSON.stringify(this.stageData));
             }
             
-        }
-        else{
-            bestScoreValue = 0;
         }
 
         // #endregion
@@ -7336,12 +7358,12 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        if (localStorage.getItem(`${ourGame.stageUUID}-bestStageData`)) {
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        if (localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`));
 
         } else {
             // If a test level. Use World 0_1 as a filler to not break UI stuff.
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${START_UUID}-bestStageData`))
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${START_UUID}_best-Classic`))
         }
 
         var bestLog = new StageData(bestLogJSON);
@@ -7768,15 +7790,22 @@ class ScoreScene extends Phaser.Scene {
             duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
-            onComplete: () =>
-                {
+            onComplete: () => {
                 letterRank.setAlpha(1)
                 //stageScoreUI.setAlpha(1)
                 //this.scorePanelLRank.setAlpha(1)
+                this.bestOfModeUI.setAlpha(1);
                 this.sumOfBestUI.setAlpha(1);
                 this.stagesCompleteUI.setAlpha(1);
                 this.playerRankUI.setAlpha(1);
-                },
+
+                if(ourGame.mode === "Expert") {
+                    ourPersist.coins += this.stageData.stageRank();
+                    ourGame.coinUIText.setHTML(
+                        `${commaInt(ourPersist.coins).padStart(2, '0')}`
+                    )
+                }
+            },
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
@@ -8104,9 +8133,11 @@ class ScoreScene extends Phaser.Scene {
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
                 <hr/>
 
+                MODE: <span style = "float: right">${bestLog.mode}</span>
                 BASE SCORE: <span style = "float: right">${_baseScore}</span>
                 SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
                 </br>
+
 
                 BEST SCORE: <span style = "float: right">${bestLog.calcTotal()}</span>
                 </br>
@@ -8174,30 +8205,83 @@ class ScoreScene extends Phaser.Scene {
 
     
         updateSumOfBest(ourPersist);
-        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
-        var newRank = calcSumOfBestRank(ourPersist.sumOfBest)
+        var prevStagesComplete;
+        var prevSumOfBest;
+        var prevPlayerRank;
+
+        var totalLevels;
+        var newRank;
+        var stagesComplete;
+        var sumOfBest;
+
+        switch (ourGame.mode) {
+            case "Classic":
+                prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                prevPlayerRank = ourPersist.prevPlayerRankClassic;
+
+                totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+                stagesComplete = ourPersist.stagesCompleteClassic;
+                sumOfBest = ourPersist.sumOfBestClassic;
+                
+                break;
+            case "Expert":
+                prevStagesComplete = ourPersist.prevStagesCompleteExpert;
+                prevSumOfBest = ourPersist.prevSumOfBestExpert;
+                prevPlayerRank = ourPersist.prevPlayerRankExpert;
+
+                totalLevels = Math.min(ourPersist.stagesCompleteExpert + Math.ceil(ourPersist.stagesCompleteExpert / 4), STAGE_TOTAL);
+                newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
+                stagesComplete = ourPersist.stagesCompleteExpert;
+                sumOfBest = ourPersist.sumOfBestExpert;
+                
+                break;
         
-        if (ourPersist.prevStagesComplete < ourPersist.stagesComplete) {
-            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
-        } else {
-            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
+            default:
+                // Leave this one. Something is wrong if this triggers.
+                debugger 
+                break;
         }
 
-        if (ourPersist.prevSumOfBest < ourPersist.sumOfBest) {
-            var bestIncrease = ourPersist.sumOfBest - ourPersist.prevSumOfBest;
-            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
+        
+        var bestOfTitle;
+        if (ourGame.mode === "Expert") {
+            bestOfTitle = `Best of ${ourGame.mode}`
         } else {
-            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
+            bestOfTitle = ``;
+        }
+        
+        if (prevStagesComplete < stagesComplete) {
+            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
+        } else {
+            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels}`
         }
 
-        if (ourPersist.prevPlayerRank > newRank) {
+        if (prevSumOfBest < sumOfBest) {
+            var bestIncrease = sumOfBest - prevSumOfBest;
+            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
+        } else {
+            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span>`
+        }
 
-            var rankIncrease = ourPersist.prevPlayerRank - newRank;
+        if (prevPlayerRank > newRank) {
+
+            var rankIncrease = prevPlayerRank - newRank;
             var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
         } else {
             var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
         }
 
+        this.bestOfModeUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-weight": '400',
+            "text-shadow": '#000000 1px 0 6px',
+            //"font-style": 'italic',
+            //"font-weight": 'bold',
+            })).setHTML(
+                bestOfTitle
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
         
         this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
@@ -8302,9 +8386,13 @@ class ScoreScene extends Phaser.Scene {
         
         //this.scene.stop();
 
-        ourPersist.prevSumOfBest = ourPersist.sumOfBest;
-        ourPersist.prevStagesComplete = ourPersist.stagesComplete;
-        ourPersist.prevPlayerRank = calcSumOfBestRank(ourPersist.sumOfBest);
+        ourPersist.prevSumOfBestClassic = ourPersist.sumOfBestClassic;
+        ourPersist.prevStagesCompleteClassic = ourPersist.stagesCompleteClassic;
+        ourPersist.prevPlayerRankClassic = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+
+        ourPersist.prevSumOfBestExpert = ourPersist.sumOfBestExpert;
+        ourPersist.prevStagesCompleteExpert = ourPersist.stagesCompleteExpert;
+        ourPersist.prevPlayerRankExpert = calcSumOfBestRank(ourPersist.sumOfBestExpert);
 
 
 
