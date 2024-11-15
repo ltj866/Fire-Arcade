@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
-import { STAGE_UNLOCKS, STAGES} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -1542,9 +1542,6 @@ class QuickMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-LEFT', e => {
 
             const ourGame = this.scene.get("GameScene");
-            //const ourStageCodex = this.scene.get("StageCodex");
-            //this.cameras.main.scrollX -= SCREEN_WIDTH;
-            //this.cameras.main.scrollX -= SCREEN_WIDTH;
 
             if (!this.scene.isSleeping("StageCodex")) {
                 this.scene.sleep("QuickMenuScene");
@@ -1558,9 +1555,30 @@ class QuickMenuScene extends Phaser.Scene {
 
             ourGame.scene.pause();
             ourGame.scene.setVisible(false);
-            //this.scene.sleep("QuickMenuScene");
-            //this.scene.sleep();
             
+            /***
+             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+             * DON't USE UNLESS YOU FIGURE THAT OUT
+             * //this.scene.sleep('GameScene');
+             */
+        }, this);
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+
+            const ourGame = this.scene.get("GameScene");
+
+            if (!this.scene.isSleeping('ExtractTracker')) {
+                this.scene.sleep("QuickMenuScene");
+                this.scene.launch('ExtractTracker', {
+                    stage: this.scene.get("GameScene").stage
+                });
+            } else {
+                this.scene.wake('ExtractTracker');
+                this.scene.sleep("QuickMenuScene");
+            }
+
+            ourGame.scene.pause();
+            ourGame.scene.setVisible(false);
             
             /***
              * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
@@ -1576,8 +1594,34 @@ class QuickMenuScene extends Phaser.Scene {
 
     }
 }
+// #region Extract Tracker
 
-// #region World Codex
+class ExtractTracker extends Phaser.Scene {
+    constructor () {
+        super({key: 'ExtractTracker', active: false});
+    }
+    init() {
+
+    }
+    create() {
+        
+        this.input.keyboard.on('keydown-LEFT', e => {
+            //this.cameras.main.scrollX += SCREEN_WIDTH;
+            //this.cameras.main.scrollX += SCREEN_WIDTH;
+            const game = this.scene.get("GameScene");
+            game.scene.resume();
+            game.scene.setVisible(true);
+
+            this.scene.wake('QuickMenuScene');
+            this.scene.sleep('ExtractTracker');
+            
+        }, this);
+
+    }
+
+}
+
+// #region Stage Codex
 class StageCodex extends Phaser.Scene {
     
     constructor () {
@@ -5838,7 +5882,7 @@ class GameScene extends Phaser.Scene {
             if (extractCode.length === 0) {
                 extractCode = id
             } else {
-                extractCode = extractCode + "_" + id;
+                extractCode = extractCode + "|" + id;
             }
 
             var record = [
@@ -9502,7 +9546,7 @@ var config = {
         MainMenuScene, QuickMenuScene, GalaxyMapScene, 
         PersistScene, SpaceBoyScene, GameScene, 
         InputScene, ScoreScene, TutorialScene,
-        StageCodex]
+        StageCodex, ExtractTracker]
 };
 
 // #region Screen Settings
