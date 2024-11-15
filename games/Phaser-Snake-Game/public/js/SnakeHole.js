@@ -207,6 +207,8 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
         ["portals", PLAYER_STATS.portals ?? 0],
         ["globalScore", PLAYER_STATS.globalScore ?? 0],
         ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
+        ["totalCoinsCollected", PLAYER_STATS.totalCoinsCollected ?? 0],
+        ["expertCoinsNotSpawned", PLAYER_STATS.expertCoinsNotSpawned ?? 0]
     ]);
 
     // Add Saved Values
@@ -6962,21 +6964,32 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1 && this.spawnCoins && this.mode === "Classic") {
-                    console.log("COIN TIME YAY. SPAWN a new coin");
-
-                    var validLocations = this.validSpawnLocations();
-                    var pos = Phaser.Math.RND.pick(validLocations);
-
-                    var _coin = new Coin(this, this.coinsArray, pos.x, pos.y);
-                    this.interactLayer[(pos.x - X_OFFSET)/GRID][(pos.y - Y_OFFSET)/GRID] = _coin;
-                    
-                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
-
-
-                    
-                    this.coinsArray.push(_coin);
-
+                if (this.coinSpawnCounter < 1) {
+                    if (this.spawnCoins) {
+                        switch (this.mode) {
+                            case "Classic":
+                                console.log("COIN TIME YAY. SPAWN a new coin");
+                                var validLocations = this.validSpawnLocations();
+                                var pos = Phaser.Math.RND.pick(validLocations);
+        
+                                var _coin = new Coin(this, this.coinsArray, pos.x, pos.y);
+                                this.interactLayer[(pos.x - X_OFFSET)/GRID][(pos.y - Y_OFFSET)/GRID] = _coin;
+                                
+                                _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+        
+                                this.coinsArray.push(_coin);
+                                
+                                break;
+                            case "Expert":
+                                console.log("Coins Skipped On Expert");
+                                PLAYER_STATS.expertCoinsNotSpawned += 1;
+                                
+                                break;
+                        
+                            default:
+                                break;
+                        }
+                    }
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
             }
