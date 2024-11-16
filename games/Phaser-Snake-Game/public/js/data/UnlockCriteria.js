@@ -125,10 +125,8 @@ export const STAGE_UNLOCKS = new Map([
         //return checkRank.call(this,["World_2-4", RANKS.GOLD)}],
     ['railgun', function () { 
         return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
-    ['two-wide-corridors', function () { 
-        return checkRank.call(this,STAGES.get("8-3"), RANKS.WOOD)}],
     ['two-wide-corridors', function () {
-        return checkRank.call(this,STAGES.get("8-3"), RANKS.WOOD);}],
+        return checkRank.call(this,STAGES.get("8-4"), RANKS.WOOD);}],
     ['double-back-portals', function () {
         return checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD);
     }],
@@ -175,7 +173,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank.call(this,STAGES.get("4-1"), RANKS.WOOD);
     }],
     ['now-a-fourth', function () {
-        return checkRank.call(this,STAGES.get("8-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("8-4"), RANKS.WOOD);
     }],
     ['horizontal-uturns', function () {
         return checkRank.call(this,STAGES.get("9-3"), RANKS.WOOD);

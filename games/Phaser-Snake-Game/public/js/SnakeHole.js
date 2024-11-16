@@ -1974,10 +1974,18 @@ class StageCodex extends Phaser.Scene {
             })
 
 
+            debugger
             var selected = this.yMap.get(args.stage);
 
             
-            
+            if (selected === undefined) { // Haven't beaten level yet
+                var stage = args.stage;
+                do {
+                    stage = stage.slice(0,-1) + `${Number(stage.slice(-1) - 1)}`
+                    var selected = this.yMap.get(stage);
+                } while (selected === undefined);
+            }
+
             var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
             
 

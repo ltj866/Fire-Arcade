@@ -98,6 +98,7 @@ export var QUICK_MENUS = new Map([
         }],
         ['BACK TO MAIN MENU', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourPersist = this.scene.get("PersistScene");
             
             console.log("BACK TO MAIN MENU");
             // Clear for reseting game
@@ -113,6 +114,7 @@ export var QUICK_MENUS = new Map([
         }],
         ['RESTART ADVENTURE', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourPersist = this.scene.get("PersistScene");
             // TODO: send to origin
 
 
@@ -127,6 +129,7 @@ export var QUICK_MENUS = new Map([
                 stage: START_STAGE,
                 score: 0,
                 startupAnim: true,
+                mode: ourPersist.mode
             });
 
             this.scene.stop(); 
