@@ -60,6 +60,9 @@ export const STAGES = new Map([
     ["4-4", "World_4-4"],
     ["4-5", "World_4-5"],
     ["5-1", "World_5-1_Racing"],
+    ["5-2", "World_5-2_Racing"],
+    ["5-3", "World_5-3_Racing"],
+    ["5-4", "World_5-4_Racing"],
     ["8-1", "World_8-1_Adv_Portaling"],
     ["8-2", "World_8-2_Adv_Portaling"],
     ["8-3", "World_8-3_Adv_Portaling"],
@@ -80,7 +83,8 @@ export const EXTRACT_CODES = [
     "0-1|3-1|3-2|3-3",
     "0-1|4-1|4-2|4-3",
     "0-1|4-1|4-4|4-5",
-    "0-1|5-1",
+    "0-1|5-1|5-2|5-3",
+    "0-1|5-1|5-2|5-4",
     "0-1|8-1|8-2|8-4",
     "0-1|8-1|8-3|8-4",
     "0-1|8-1|8-2|8-5",
@@ -96,6 +100,21 @@ export const EXTRACT_CODES = [
 
 
 export const STAGE_UNLOCKS = new Map([
+    ['long-racer', function () { 
+        return checkRank.call(this,STAGES.get("5-1"), RANKS.WOOD)}],
+    ['tri-racer', function () { 
+        return checkRank.call(this,STAGES.get("5-2"), RANKS.WOOD)}],
+    ['hard-racer', function () { 
+        var checkLevels = [
+            STAGES.get("5-1"),
+            STAGES.get("5-2"),
+            STAGES.get("5-3"),
+        ];
+        var pass = checkLevels.every(stage => {
+            return checkRank.call(this,stage, RANKS.GOLD);
+        });
+
+        return pass}],
     ['you-portal-turn-now', function () { 
         var checkLevels = [
             STAGES.get("8-1"),

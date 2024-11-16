@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1566,53 +1566,64 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
         }, this);
 
-        this.input.keyboard.on('keydown-LEFT', e => {
+        if (qMenuArgs.sideScene) {
+            //menu arrows
+            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-            const ourGame = this.scene.get("GameScene");
+            this.input.keyboard.on('keydown-LEFT', e => {
 
-            if (!this.scene.isSleeping("StageCodex")) {
-                this.scene.sleep("QuickMenuScene");
-                this.scene.launch('StageCodex', {
-                    stage: this.scene.get("GameScene").stage
-                });
-            } else {
-                this.scene.wake("StageCodex");
-                this.scene.sleep("QuickMenuScene");
-            }
-
-            ourGame.scene.pause();
-            ourGame.scene.setVisible(false);
+                const ourGame = this.scene.get("GameScene");
+    
+                if (!this.scene.isSleeping("StageCodex")) {
+                    this.scene.sleep("QuickMenuScene");
+                    this.scene.launch('StageCodex', {
+                        stage: this.scene.get("GameScene").stage
+                    });
+                } else {
+                    this.scene.wake("StageCodex");
+                    this.scene.sleep("QuickMenuScene");
+                }
+    
+                ourGame.scene.pause();
+                ourGame.scene.setVisible(false);
+                
+                /***
+                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+                 * DON't USE UNLESS YOU FIGURE THAT OUT
+                 * //this.scene.sleep('GameScene');
+                 */
+            }, this);
+    
+            this.input.keyboard.on('keydown-RIGHT', e => {
+    
+                const ourGame = this.scene.get("GameScene");
+    
+                if (!this.scene.isSleeping('ExtractTracker')) {
+                    this.scene.sleep("QuickMenuScene");
+                    this.scene.launch('ExtractTracker', {
+                        stage: this.scene.get("GameScene").stage
+                    });
+                } else {
+                    this.scene.wake('ExtractTracker');
+                    this.scene.sleep("QuickMenuScene");
+                }
+    
+                ourGame.scene.pause();
+                ourGame.scene.setVisible(false);
+                
+                /***
+                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+                 * DON't USE UNLESS YOU FIGURE THAT OUT
+                 * //this.scene.sleep('GameScene');
+                 */
+            }, this);
             
-            /***
-             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-             * DON't USE UNLESS YOU FIGURE THAT OUT
-             * //this.scene.sleep('GameScene');
-             */
-        }, this);
+        }
 
-        this.input.keyboard.on('keydown-RIGHT', e => {
-
-            const ourGame = this.scene.get("GameScene");
-
-            if (!this.scene.isSleeping('ExtractTracker')) {
-                this.scene.sleep("QuickMenuScene");
-                this.scene.launch('ExtractTracker', {
-                    stage: this.scene.get("GameScene").stage
-                });
-            } else {
-                this.scene.wake('ExtractTracker');
-                this.scene.sleep("QuickMenuScene");
-            }
-
-            ourGame.scene.pause();
-            ourGame.scene.setVisible(false);
-            
-            /***
-             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-             * DON't USE UNLESS YOU FIGURE THAT OUT
-             * //this.scene.sleep('GameScene');
-             */
-        }, this);
+        
 
         
 
@@ -1828,6 +1839,9 @@ class ExtractTracker extends Phaser.Scene {
         
         
         
+        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+            
         this.input.keyboard.on('keydown-LEFT', e => {
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
@@ -2038,6 +2052,9 @@ class StageCodex extends Phaser.Scene {
             }, this);               
         }
 
+        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+
         this.input.keyboard.on('keydown-RIGHT', e => {
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
@@ -2158,7 +2175,8 @@ class MainMenuScene extends Phaser.Scene {
                         menuOptions: qMenu, 
                         textPrompt: "MODE SELECTOR",
                         fromScene: mainMenuScene,
-                        cursorIndex: 0
+                        cursorIndex: 0,
+                        sideScenes: false
                     });
                     mainMenuScene.scene.bringToTop("QuickMenuScene");
 
@@ -4115,7 +4133,8 @@ class GameScene extends Phaser.Scene {
                         menuOptions: QUICK_MENUS.get("tab-menu"), 
                         textPrompt: "Quick Menu",
                         fromScene: this,
-                        cursorIndex: 0
+                        cursorIndex: 0,
+                        sideScene:true
                     });
                     this.scene.bringToTop("QuickMenuScene");
                     // make sure tab only blurs background if quick menu is NOT up
