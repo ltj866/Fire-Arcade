@@ -336,6 +336,12 @@ var Snake = new Phaser.Class({
                 
                 if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
                     console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
+                    scene.portals.forEach(portal => {
+                        portal.portalHighlight.visible = false;
+                    });
+                    
+                    //portal.snakePortalingSprite.visible = false;
+                    //portal.targetObject.snakePortalingSprite.visible = false;
                     scene.warpToNext(index);
                 }
 
