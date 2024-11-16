@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -360,10 +360,12 @@ export const RANKS = Object.freeze({
     SILVER: 2,
     GOLD: 3,
     PLATINUM: 4,
+    GRAND_MASTER: 5
 });
 
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with SpeedBonus
+    [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
     [RANKS.GOLD, 10000],
     [RANKS.SILVER, 5000],
     [RANKS.BRONZE, 2000],
@@ -434,7 +436,8 @@ var SOUND_RANK = [
     ['rankC', [ 'rankD.ogg', 'rankD.mp3' ]],
     ['rankB', [ 'rankB.ogg', 'rankB.mp3' ]],
     ['rankA', [ 'rankB.ogg', 'rankB.mp3' ]],
-    ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]]
+    ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]],
+    ['rankGM', [ 'chime01.ogg', 'chime01.mp3']] // TO REPLACE
 ]
 
 export const GState = Object.freeze({ 
@@ -4320,6 +4323,9 @@ class GameScene extends Phaser.Scene {
                                                 case RANKS.PLATINUM:
                                                     blackholeImage.setTint(0xE5E4E2);
                                                     break;
+                                                case RANKS.GRAND_MASTER:
+                                                    blackholeImage.setTint(0xE5E4E2);
+                                                    break;
                                                 default:
                                                     // here is if you have never played a level before
                                                     blackholeImage.setTint(0xFFFFFF);    
@@ -4959,7 +4965,7 @@ class GameScene extends Phaser.Scene {
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
         
-        
+        var textTint = 0xE7EADE // 0x1f211b
 
         // Score Text SET INVISIBLE
         this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
@@ -5102,6 +5108,7 @@ class GameScene extends Phaser.Scene {
         //this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
         //    `0 `
         //).setOrigin(0,1);
+        
         
         /*this.runningScoreUI = this.add.dom(X_OFFSET + GRID * 23.75, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE, { color: '0x1f211b' })).setText(
             `Score`
@@ -7404,6 +7411,14 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
+            case Math.min(...this.foodLog.slice(1,-1)) > RANK_BENCHMARKS.get(RANKS.GRAND_MASTER):
+                if (this.foodLog.length === 28) {
+                    rank = RANKS.GRAND_MASTER
+                } else {
+                    // Nice for testing and not accidentally getting FULL COMBO
+                    rank = RANKS.BRONZE;
+                }
+                break
             case this.sRank != null && bonusScore > this.sRank:
                 rank = RANKS.PLATINUM;
                 break;
@@ -8200,6 +8215,9 @@ class ScoreScene extends Phaser.Scene {
                 gravityY: -5,
             }).setFrequency(667,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
+        }
+        if (rank === RANKS.GRAND_MASTER) {
+            //
         }
 
         this.spotlight = this.lights.addLight(0, 0, 66, lightColor).setIntensity(1.5); //
