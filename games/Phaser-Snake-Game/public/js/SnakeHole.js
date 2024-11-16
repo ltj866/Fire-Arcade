@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4161,17 +4161,12 @@ class GameScene extends Phaser.Scene {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
-
             // #region is unlocked?
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
 
 
-                
-                
-                
-                
                 const BLACK_HOLE_START_TILE_INDEX = 641;
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
@@ -4192,14 +4187,12 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
                         extractTile.index = -1;
 
-                        this.extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
-                            "font-size": '8px',
-                            "baselineX": 1.5,
-                            })).setHTML(
-                                'EXTRACT'
-                        ).setDepth(50).setAlpha(0);
+                        this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                            "EXTRACT!", 
+                            16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(1);
                         
-                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
+                        
+                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 11 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 22, 0x1a1a1a  
                         ).setDepth(49).setAlpha(0);
                         //debugger
                         this.r3.postFX.addShine(1, .5, 5)
@@ -4259,14 +4252,16 @@ class GameScene extends Phaser.Scene {
                                         //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
 
 
-                                        var stageText = this.add.dom(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
-                                            "font-size": '8px',
-                                            "baselineX": 1.5,
-                                            })).setHTML(
-                                                stageName
-                                        ).setDepth(50).setAlpha(0);
+                                        //this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                                        //    "EXTRACT", 
+                                        //    16).setDepth(50).setAlpha(0);
+
+                                        var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
+                                            stageName.replaceAll("_", " ").toUpperCase(),
+                                            16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(.5);
+                                    
                                         
-                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 12 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
+                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
                                         ).setDepth(49).setAlpha(0);
 
                                         r1.postFX.addShine(1, .5, 5)
@@ -7713,18 +7708,23 @@ class ScoreScene extends Phaser.Scene {
 
         this.scoreTimeScale = .25;
 
-        //STAGE CLEAR
-        this.add.dom(X_OFFSET + GRID * 2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        //STAGE CLEAR X_OFFSET + GRID * 2
+        this.add.dom(SCREEN_WIDTH / 2, GRID * 5.8, 'div', Object.assign({}, STYLE_DEFAULT, {
+            
             "text-shadow": "4px 4px 0px #000000",
             "font-size": '32px',
             'font-weight': 400,
             'text-transform': 'uppercase',
+            "line-height": '125%',
             "font-family": '"Press Start 2P", system-ui',
+            "min-width": "500px",
+            "textAlign": 'center',
             "white-space": 'pre-line'
         })).setHTML(
-            this.stageData.stage
-        ).setOrigin(0, 0).setScale(.5);
+            (this.stageData.stage.replaceAll("_", " ") + " CLEAR")
+        ).setOrigin(0.5, 0.5).setScale(.5);
 
+        /*
         this.add.dom(X_OFFSET + GRID * 24, GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "4px 4px 0px #000000",
             "font-size": '20px',
@@ -7735,6 +7735,7 @@ class ScoreScene extends Phaser.Scene {
         })).setHTML(//✔
             `CLEAR`
         ).setOrigin(1, 0).setScale(.5);
+        */
         
 
         
