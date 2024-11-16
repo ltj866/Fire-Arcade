@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Tutorial_3.json",
+    "activeFile": "World_8-3_Adv_Portaling.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1414,7 +1414,7 @@
         },
         "World_8-1_Adv_Portaling.json": {
             "scale": 2.451436781609195,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 174.1835658187786,
                 "y": 162.14980658773885
@@ -1510,7 +1510,7 @@
             "scale": 2.997413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 85.07333908541844,
+                "x": 85.07333908541845,
                 "y": 161.97296519988492
             }
         },
@@ -2739,7 +2739,15 @@
     "openFiles": [
         "Tutorial_1.json",
         "Tutorial_2.json",
-        "Tutorial_3.json"
+        "Tutorial_3.json",
+        "World_0-1.json",
+        "World_1-2.json",
+        "World_1-1.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
+        "World_8-3_Adv_Portaling.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
@@ -2747,15 +2755,15 @@
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
-        "World_10-4.json",
         "World_0-1.json",
-        "archive-World_1-1-max-combo-record.json",
+        "World_1-2.json",
+        "World_1-1.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
         "World_8-3_Adv_Portaling.json",
-        "World_8-2_Adv_Portaling.json",
-        "World_9-4_Final_Exams.json",
-        "World_9-3_Final_Exams.json",
-        "World_9-2_Final_Exams.json",
-        "World_8-4_Adv_Portaling.json"
+        "World_8-5_Adv_Portaling.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
