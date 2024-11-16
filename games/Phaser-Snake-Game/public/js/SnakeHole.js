@@ -6260,7 +6260,7 @@ class GameScene extends Phaser.Scene {
                 `FINAL SCORE:`
         ).setOrigin(1,0).setScale(0.5);
 
-        if (bestExtractions.get(extractCode) != "Classic Clear") {
+        if (bestExtractions.get(extractCode) != "Classic Clear" && bestExtractions.size > 0) {
             const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT,
                 finalScoreStyle, {
                 })).setHTML(
