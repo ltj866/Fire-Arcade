@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1648,6 +1648,7 @@ class ExtractTracker extends Phaser.Scene {
             var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")));
 
             
+            
             EXTRACT_CODES.forEach ( extractKey => {
 
                 if (bestExtractions.has(extractKey)) {
@@ -1753,73 +1754,78 @@ class ExtractTracker extends Phaser.Scene {
 
             });
 
+            var selected = this.yMap.get([...this.yMap.keys()][0]);
+            var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+
+
+            this.tweens.add({
+                targets: trackerContainer,
+                y: containerToY,
+                ease: 'Sine.InOut',
+                duration: 500,
+                onComplete: () => {
+                    selected.title.setTintFill(COLOR_FOCUS_HEX);
+                    selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                }
+            }, this);
+
+
+            this.input.keyboard.on('keydown-UP', e => {
+
+                selected.title.clearTint();
+                selected.scoreText.clearTint();
+                
+                var safeIndex = Math.max(selected.index - 1, 0);
+                
+                var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                selected = this.yMap.get(nextSelect);
+                
+                containerToY = selected.conY * -1 + nextRow;
+                this.tweens.add({
+                    targets: trackerContainer,
+                    y: containerToY,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                    onComplete: () => {
+                        selected.title.setTintFill(COLOR_FOCUS_HEX);
+                        selected.title.setTintFill(COLOR_FOCUS_HEX);
+                        selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                    }
+                }, this);
+            }, this);
+
+            this.input.keyboard.on('keydown-DOWN', e => {
+
+                selected.title.clearTint();
+                selected.scoreText.clearTint();
+
+                var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
+                
+                var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                selected = this.yMap.get(nextSelect);
+                
+                containerToY = selected.conY * -1 + nextRow;
+                this.tweens.add({
+                    targets: trackerContainer,
+                    y: containerToY,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                    onComplete: () => {
+                        selected.title.setTintFill(COLOR_FOCUS_HEX);
+                        selected.title.setTintFill(COLOR_FOCUS_HEX);
+                        selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                    }
+                }, this);
+            }, this);
+
         } else {
+            const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFont',
+                `COMPLETE 1 EXTRACTION\n\nBEFORE TRACKING IS ENABLED`
+                ,16).setOrigin(0,0).setScale(1);
             // Display something if they have not yet done an extraction on
         }
 
-        var selected = this.yMap.get([...this.yMap.keys()][0]);
-        var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
-
-
-        this.tweens.add({
-            targets: trackerContainer,
-            y: containerToY,
-            ease: 'Sine.InOut',
-            duration: 500,
-            onComplete: () => {
-                selected.title.setTintFill(COLOR_FOCUS_HEX);
-                selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
-            }
-        }, this);
-
-
-        this.input.keyboard.on('keydown-UP', e => {
-
-            selected.title.clearTint();
-            selected.scoreText.clearTint();
-            
-            var safeIndex = Math.max(selected.index - 1, 0);
-            
-            var nextSelect = ([...this.yMap.keys()][safeIndex]);
-            selected = this.yMap.get(nextSelect);
-            
-            containerToY = selected.conY * -1 + nextRow;
-            this.tweens.add({
-                targets: trackerContainer,
-                y: containerToY,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: () => {
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
-                }
-            }, this);
-        }, this);
-
-        this.input.keyboard.on('keydown-DOWN', e => {
-
-            selected.title.clearTint();
-            selected.scoreText.clearTint();
-
-            var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
-            
-            var nextSelect = ([...this.yMap.keys()][safeIndex]);
-            selected = this.yMap.get(nextSelect);
-            
-            containerToY = selected.conY * -1 + nextRow;
-            this.tweens.add({
-                targets: trackerContainer,
-                y: containerToY,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: () => {
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
-                }
-            }, this);
-        }, this);
+        
         
         
         this.input.keyboard.on('keydown-LEFT', e => {
@@ -6178,27 +6184,31 @@ class GameScene extends Phaser.Scene {
             localStorage.setItem("extractRanks", jsonString);
 
 
-            // Show Best Ranks
-            var bestExtract = bestExtractions.get(extractCode);
-            var bestSum = 0;
+            if (bestExtractions.get(extractCode) != "Classic Clear") {
+                // Show Best Ranks
+                var bestExtract = bestExtractions.get(extractCode);
+                var bestSum = 0;
 
-            for (let index = 0; index < bestExtract.length; index++) {
+                for (let index = 0; index < bestExtract.length; index++) {
 
-                bestSum += bestExtract[index][0];
+                    bestSum += bestExtract[index][0];
 
-                var _x = windowCenterX - GRID * 6.5 + index * xOffset;
-                
-                const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+                    var _x = windowCenterX - GRID * 6.5 + index * xOffset;
+                    
+                    const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+                    ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
+                    
+                }
+
+                var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
+
+                var bestExtractRank = bestSum / bestExtract.length; 
+
+                var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
                 ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
                 
             }
-
-            var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
-
-            var bestExtractRank = bestSum / bestExtract.length; 
-
-            var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
-            ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
+            
         
 
 
