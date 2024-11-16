@@ -360,10 +360,12 @@ export const RANKS = Object.freeze({
     SILVER: 2,
     GOLD: 3,
     PLATINUM: 4,
+    GRAND_MASTER: 5
 });
 
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with SpeedBonus
+    [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
     [RANKS.GOLD, 10000],
     [RANKS.SILVER, 5000],
     [RANKS.BRONZE, 2000],
@@ -434,7 +436,8 @@ var SOUND_RANK = [
     ['rankC', [ 'rankD.ogg', 'rankD.mp3' ]],
     ['rankB', [ 'rankB.ogg', 'rankB.mp3' ]],
     ['rankA', [ 'rankB.ogg', 'rankB.mp3' ]],
-    ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]]
+    ['rankS', [ 'rankS.ogg', 'rankS.mp3' ]],
+    ['rankGM', [ 'chime01.ogg', 'chime01.mp3']] // TO REPLACE
 ]
 
 export const GState = Object.freeze({ 
@@ -4158,17 +4161,12 @@ class GameScene extends Phaser.Scene {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
-
             // #region is unlocked?
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
 
 
-                
-                
-                
-                
                 const BLACK_HOLE_START_TILE_INDEX = 641;
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
@@ -4189,14 +4187,12 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
                         extractTile.index = -1;
 
-                        this.extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
-                            "font-size": '8px',
-                            "baselineX": 1.5,
-                            })).setHTML(
-                                'EXTRACT'
-                        ).setDepth(50).setAlpha(0);
+                        this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                            "EXTRACT!", 
+                            16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(1);
                         
-                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
+                        
+                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 11 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 22, 0x1a1a1a  
                         ).setDepth(49).setAlpha(0);
                         //debugger
                         this.r3.postFX.addShine(1, .5, 5)
@@ -4256,14 +4252,16 @@ class GameScene extends Phaser.Scene {
                                         //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
 
 
-                                        var stageText = this.add.dom(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
-                                            "font-size": '8px',
-                                            "baselineX": 1.5,
-                                            })).setHTML(
-                                                stageName
-                                        ).setDepth(50).setAlpha(0);
+                                        //this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                                        //    "EXTRACT", 
+                                        //    16).setDepth(50).setAlpha(0);
+
+                                        var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
+                                            stageName.replaceAll("_", " ").toUpperCase(),
+                                            16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(.5);
+                                    
                                         
-                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 12 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
+                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
                                         ).setDepth(49).setAlpha(0);
 
                                         r1.postFX.addShine(1, .5, 5)
@@ -4318,6 +4316,9 @@ class GameScene extends Phaser.Scene {
                                                     blackholeImage.setTint(0xDAA520);
                                                     break;
                                                 case RANKS.PLATINUM:
+                                                    blackholeImage.setTint(0xE5E4E2);
+                                                    break;
+                                                case RANKS.GRAND_MASTER:
                                                     blackholeImage.setTint(0xE5E4E2);
                                                     break;
                                                 default:
@@ -4959,7 +4960,7 @@ class GameScene extends Phaser.Scene {
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
         
-        
+        var textTint = 0xE7EADE // 0x1f211b
 
         // Score Text SET INVISIBLE
         this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
@@ -5102,6 +5103,7 @@ class GameScene extends Phaser.Scene {
         //this.deltaScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
         //    `0 `
         //).setOrigin(0,1);
+        
         
         /*this.runningScoreUI = this.add.dom(X_OFFSET + GRID * 23.75, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE, { color: '0x1f211b' })).setText(
             `Score`
@@ -7404,6 +7406,14 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
+            case Math.min(...this.foodLog.slice(1,-1)) > RANK_BENCHMARKS.get(RANKS.GRAND_MASTER):
+                if (this.foodLog.length === 28) {
+                    rank = RANKS.GRAND_MASTER
+                } else {
+                    // Nice for testing and not accidentally getting FULL COMBO
+                    rank = RANKS.BRONZE;
+                }
+                break
             case this.sRank != null && bonusScore > this.sRank:
                 rank = RANKS.PLATINUM;
                 break;
@@ -7698,18 +7708,23 @@ class ScoreScene extends Phaser.Scene {
 
         this.scoreTimeScale = .25;
 
-        //STAGE CLEAR
-        this.add.dom(X_OFFSET + GRID * 2, GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        //STAGE CLEAR X_OFFSET + GRID * 2
+        this.add.dom(SCREEN_WIDTH / 2, GRID * 5.8, 'div', Object.assign({}, STYLE_DEFAULT, {
+            
             "text-shadow": "4px 4px 0px #000000",
             "font-size": '32px',
             'font-weight': 400,
             'text-transform': 'uppercase',
+            "line-height": '125%',
             "font-family": '"Press Start 2P", system-ui',
+            "min-width": "500px",
+            "textAlign": 'center',
             "white-space": 'pre-line'
         })).setHTML(
-            this.stageData.stage
-        ).setOrigin(0, 0).setScale(.5);
+            (this.stageData.stage.replaceAll("_", " ") + " CLEAR")
+        ).setOrigin(0.5, 0.5).setScale(.5);
 
+        /*
         this.add.dom(X_OFFSET + GRID * 24, GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "4px 4px 0px #000000",
             "font-size": '20px',
@@ -7720,6 +7735,7 @@ class ScoreScene extends Phaser.Scene {
         })).setHTML(//✔
             `CLEAR`
         ).setOrigin(1, 0).setScale(.5);
+        */
         
 
         
@@ -8200,6 +8216,9 @@ class ScoreScene extends Phaser.Scene {
                 gravityY: -5,
             }).setFrequency(667,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
+        }
+        if (rank === RANKS.GRAND_MASTER) {
+            //
         }
 
         this.spotlight = this.lights.addLight(0, 0, 66, lightColor).setIntensity(1.5); //
