@@ -1722,7 +1722,7 @@ class ExtractTracker extends Phaser.Scene {
                     if (bestExtract === "Classic Clear") {
                         bestScoreTitle.x -= GRID * 2.5;
                         bestScore.x -= GRID * 2.5;
-                        bestScoreTitle.setText("CLASSIC");
+                        bestScoreTitle.setText("");
                         bestScore.setText("CLEAR");
                         
                     }
@@ -1898,140 +1898,142 @@ class StageCodex extends Phaser.Scene {
         
 
         var _index = 0;
+
+        if (BEST_OF_ALL.size > 0 ) {
         
-        BEST_OF_ALL.values().forEach( bestOf => {
-            //debugger
-            var topY = rowY + nextRow * stageNumber;
-            const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
-            ).setOrigin(0,0);
-
-            const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
-            ).setOrigin(0,0).setScale(0.5);
-
-            const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, topY + 21, 'mainFont',`SPEED BONUS: ${commaInt(bestOf.calcBonus())} =>`,16
-            ).setOrigin(1,0).setScale(0.5);
-
-            const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
-            ).setOrigin(1,0).setScale(0.5);
-
-            const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
-            ).setDepth(80).setOrigin(0,0).setScale(1);
-
-            codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
-
-            this.yMap.set(bestOf.stage, {
-                stageTitle:bestOf.stage, 
-                x: topLeft,
-                conY: nextRow * stageNumber,
-                index: _index,
-                title: stageTitle
-            })
-
-
-            var foodIndex = 0;
-            var foodSpace = 11;
-            bestOf.foodLog.forEach( foodScore => {
-                var _y;
-                if (foodIndex < 28 ) { // Wraps Food Under
-                    _y = rowY + 34 + (nextRow * stageNumber);
-                } else {
-                    _y = rowY + 34 + (nextRow * stageNumber);
-                }
-                var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
-                ).setOrigin(0,0).setDepth(70).setScale(.75);
-
-                switch (true) {
-                    case foodScore > BOOST_ADD_FLOOR:
-                        _atom.play('atom01idle');
-                        break;
-
-                    case foodScore > 60:
-                        _atom.play('atom02idle');
-                        break;
-                    
-                    case foodScore > 1:
-                        _atom.play('atom03idle');
-                        break;
-                    
-                    case foodScore > 60:
-                        break;
-                
-                    default:
-                        _atom.play("atom04idle");
-                        break;
-                }
-
-                codexContainer.add(_atom);
-                
-                
-                foodIndex += 1;
-            })
-
-            _index += 1;
-            stageNumber += 1;
-        })
-
-
-        var selected = this.yMap.get(args.stage);
-
-        
-        
-        var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
-        
-
-        this.tweens.add({
-            targets: codexContainer,
-            y: containerToY,
-            ease: 'Sine.InOut',
-            duration: 500,
-            onComplete: () => {
+            BEST_OF_ALL.values().forEach( bestOf => {
                 //debugger
-                selected.title.setTintFill(COLOR_FOCUS_HEX);
-            }
-        }, this);
+                var topY = rowY + nextRow * stageNumber;
+                const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
+                ).setOrigin(0,0);
 
-        this.input.keyboard.on('keydown-UP', e => {
+                const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
+                ).setOrigin(0,0).setScale(0.5);
 
-            selected.title.clearTint()
+                const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, topY + 21, 'mainFont',`SPEED BONUS: ${commaInt(bestOf.calcBonus())} =>`,16
+                ).setOrigin(1,0).setScale(0.5);
+
+                const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
+                ).setOrigin(1,0).setScale(0.5);
+
+                const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
+                ).setDepth(80).setOrigin(0,0).setScale(1);
+
+                codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
+
+                this.yMap.set(bestOf.stage, {
+                    stageTitle:bestOf.stage, 
+                    x: topLeft,
+                    conY: nextRow * stageNumber,
+                    index: _index,
+                    title: stageTitle
+                })
+
+
+                var foodIndex = 0;
+                var foodSpace = 11;
+                bestOf.foodLog.forEach( foodScore => {
+                    var _y;
+                    if (foodIndex < 28 ) { // Wraps Food Under
+                        _y = rowY + 34 + (nextRow * stageNumber);
+                    } else {
+                        _y = rowY + 34 + (nextRow * stageNumber);
+                    }
+                    var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
+                    ).setOrigin(0,0).setDepth(70).setScale(.75);
+
+                    switch (true) {
+                        case foodScore > BOOST_ADD_FLOOR:
+                            _atom.play('atom01idle');
+                            break;
+
+                        case foodScore > 60:
+                            _atom.play('atom02idle');
+                            break;
+                        
+                        case foodScore > 1:
+                            _atom.play('atom03idle');
+                            break;
+                        
+                        case foodScore > 60:
+                            break;
+                    
+                        default:
+                            _atom.play("atom04idle");
+                            break;
+                    }
+
+                    codexContainer.add(_atom);
+                    
+                    
+                    foodIndex += 1;
+                })
+
+                _index += 1;
+                stageNumber += 1;
+            })
+
+
+            var selected = this.yMap.get(args.stage);
+
             
-            var safeIndex = Math.max(selected.index - 1, 0);
             
-            var nextSelect = ([...this.yMap.keys()][safeIndex]);
-            selected = this.yMap.get(nextSelect);
+            var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
             
-            containerToY = selected.conY * -1 + nextRow;
+
             this.tweens.add({
                 targets: codexContainer,
                 y: containerToY,
                 ease: 'Sine.InOut',
                 duration: 500,
                 onComplete: () => {
+                    //debugger
                     selected.title.setTintFill(COLOR_FOCUS_HEX);
                 }
             }, this);
-        }, this);
 
-        this.input.keyboard.on('keydown-DOWN', e => {
+            this.input.keyboard.on('keydown-UP', e => {
 
-            selected.title.clearTint()
-
-            var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
-            
-            var nextSelect = ([...this.yMap.keys()][safeIndex]);
-            selected = this.yMap.get(nextSelect);
-            
-            containerToY = selected.conY * -1 + nextRow;
-            this.tweens.add({
-                targets: codexContainer,
-                y: containerToY,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: () => {
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                }
+                selected.title.clearTint()
+                
+                var safeIndex = Math.max(selected.index - 1, 0);
+                
+                var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                selected = this.yMap.get(nextSelect);
+                
+                containerToY = selected.conY * -1 + nextRow;
+                this.tweens.add({
+                    targets: codexContainer,
+                    y: containerToY,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                    onComplete: () => {
+                        selected.title.setTintFill(COLOR_FOCUS_HEX);
+                    }
+                }, this);
             }, this);
-        }, this);
 
+            this.input.keyboard.on('keydown-DOWN', e => {
+
+                selected.title.clearTint()
+
+                var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
+                
+                var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                selected = this.yMap.get(nextSelect);
+                
+                containerToY = selected.conY * -1 + nextRow;
+                this.tweens.add({
+                    targets: codexContainer,
+                    y: containerToY,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                    onComplete: () => {
+                        selected.title.setTintFill(COLOR_FOCUS_HEX);
+                    }
+                }, this);
+            }, this);               
+        }
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             //this.cameras.main.scrollX += SCREEN_WIDTH;
@@ -2044,7 +2046,6 @@ class StageCodex extends Phaser.Scene {
             this.scene.sleep('StageCodex');
             
         }, this);
-
     }
 }
 
@@ -6137,77 +6138,82 @@ class GameScene extends Phaser.Scene {
                 `RANK`
         ).setOrigin(0.5,0).setScale(0.5);
             
-            if (!localStorage.getItem("extractRanks")) {
-                // if There is none
-                var bestExtractions = new Map()
-                bestExtractions.set(extractCode, "Classic Clear");
+        if (!localStorage.getItem("extractRanks") && EXTRACT_CODES.includes(extractCode)) {
+            // if There is none
+            var bestExtractions = new Map();
+            bestExtractions.set(extractCode, "Classic Clear");
 
-            } else {
-                var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
-                    
-                if (bestExtractions.has(extractCode)) {
-                    if (this.mode === "Expert") {
-                        if (bestExtractions.get(extractCode) != "Classic Clear") {
-                            var prevBest = bestExtractions.get(extractCode);
-                            var prevSum = 0;
-                            prevBest.forEach( record => {
-                                prevSum += record[0];
-                            })
-                            if (prevSum < extractRankSum) {
-                                console.log("NEW EXRACT RANKING");   
-                                bestExtractions.set(extractCode, [...extractHistory]);  
-                            }
-                        } else {
-                            console.log("FIRST EXPERT RANKING CLEAR"); 
-                            bestExtractions.set(extractCode, [...extractHistory]);
-                        }
-                    }
-                } else {
-                    switch (this.mode) {
-                        case "Classic":
-                            bestExtractions.set(extractCode, "Classic Clear");
-                            break;
-                        case "Expert":
-                            bestExtractions.set(extractCode, [...extractHistory]);
-                            break;
-                        default:
-                            break;
-                    }     
-                }
+        } else {
+            var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
                 
+            if (bestExtractions.has(extractCode)) {
+                if (this.mode === "Expert") {
+                    if (bestExtractions.get(extractCode) != "Classic Clear") {
+                        var prevBest = bestExtractions.get(extractCode);
+                        var prevSum = 0;
+                        prevBest.forEach( record => {
+                            prevSum += record[0];
+                        })
+                        if (prevSum < extractRankSum) {
+                            console.log("NEW EXRACT RANKING");   
+                            bestExtractions.set(extractCode, [...extractHistory]);  
+                        }
+                    } else {
+                        console.log("FIRST EXPERT RANKING CLEAR"); 
+                        bestExtractions.set(extractCode, [...extractHistory]);
+                    }
+                }
+            } else {
+                switch (this.mode) {
+                    case "Classic":
+                        if (EXTRACT_CODES.includes(extractCode)) {
+                            bestExtractions.set(extractCode, "Classic Clear");
+                        }
+                        break;
+                    case "Expert":
+                        bestExtractions.set(extractCode, [...extractHistory]);
+                        break;
+                    default:
+                        break;
+                }     
             }
+            
+        }
 
+        if (bestExtractions.size > 0) {
             const tempArray = Array.from(bestExtractions.entries());
             const jsonString = JSON.stringify(tempArray);
 
             // Stringify the array
-            localStorage.setItem("extractRanks", jsonString);
+            localStorage.setItem("extractRanks", jsonString);    
+        }
+        
 
 
-            if (bestExtractions.get(extractCode) != "Classic Clear") {
-                // Show Best Ranks
-                var bestExtract = bestExtractions.get(extractCode);
-                var bestSum = 0;
+        if (bestExtractions.get(extractCode) != "Classic Clear" && EXTRACT_CODES.includes(extractCode)) {
+            // Show Best Ranks
+            var bestExtract = bestExtractions.get(extractCode);
+            var bestSum = 0;
 
-                for (let index = 0; index < bestExtract.length; index++) {
+            for (let index = 0; index < bestExtract.length; index++) {
 
-                    bestSum += bestExtract[index][0];
+                bestSum += bestExtract[index][0];
 
-                    var _x = windowCenterX - GRID * 6.5 + index * xOffset;
-                    
-                    const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
-                    ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
-                    
-                }
-
-                var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
-
-                var bestExtractRank = bestSum / bestExtract.length; 
-
-                var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
+                var _x = windowCenterX - GRID * 6.5 + index * xOffset;
+                
+                const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
                 ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
                 
             }
+
+            var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
+
+            var bestExtractRank = bestSum / bestExtract.length; 
+
+            var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
+            ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
+            
+        }
             
         
 
@@ -6254,12 +6260,16 @@ class GameScene extends Phaser.Scene {
                 `FINAL SCORE:`
         ).setOrigin(1,0).setScale(0.5);
 
-        const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT,
-            finalScoreStyle, {
-            })).setHTML(
-                `BEST EXTRACTION TRACKER
-                 AVAILABLE ON EXPERT`
-        ).setOrigin(0.5,0).setScale(0.5);
+        if (bestExtractions.get(extractCode) != "Classic Clear") {
+            const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT,
+                finalScoreStyle, {
+                })).setHTML(
+                    `BEST EXTRACTION TRACKER
+                     AVAILABLE ON EXPERT`
+            ).setOrigin(0.5,0).setScale(0.5);
+        }
+
+        
         
         var _totalScore = 0
 
