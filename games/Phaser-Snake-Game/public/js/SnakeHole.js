@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
-import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -1974,16 +1974,11 @@ class StageCodex extends Phaser.Scene {
             })
 
 
-            debugger
             var selected = this.yMap.get(args.stage);
 
             
             if (selected === undefined) { // Haven't beaten level yet
-                var stage = args.stage;
-                do {
-                    stage = stage.slice(0,-1) + `${Number(stage.slice(-1) - 1)}`
-                    var selected = this.yMap.get(stage);
-                } while (selected === undefined);
+                var selected = this.yMap.get(ourPersist.prevStage);
             }
 
             var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
@@ -2152,7 +2147,11 @@ class MainMenuScene extends Phaser.Scene {
                 
                 
                 this.scene.get("StartScene").UUID_MAP.size;
-                if (BEST_OF_CLASSIC.size > 20 && EXPERT_CHOICE) { // EXPERT_CHOICE
+                
+                if (EXPERT_CHOICE
+                    && checkRank.call(this,STAGES.get("9-4"), RANKS.WOOD)
+                    && checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD)
+                ) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get("adventure-mode");
 
                     mainMenuScene.scene.launch("QuickMenuScene", {
@@ -6137,6 +6136,8 @@ class GameScene extends Phaser.Scene {
 
         var extractRank = extractRankSum / spaceBoy.stageHistory.length; 
 
+        spaceBoy.stageHistory = []; // Empty Now
+
         var finalRank = this.add.sprite(_x + GRID * .5,GRID * 14.0, "ranksSpriteSheet", Math.floor(extractRank)
         ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
 
@@ -6324,7 +6325,6 @@ class GameScene extends Phaser.Scene {
                 if (ourGameScene.CapSparkFinale) {
                     ourGameScene.CapSparkFinale.setAlpha(0);
                 }
-                ourGameScene.scene.get("SpaceBoyScene").stageHistory = [];
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
             }
@@ -7552,6 +7552,7 @@ class ScoreScene extends Phaser.Scene {
 
         // Update Stage Data
         updatePlayerStats(this.stageData);
+        ourPersist.prevStage = this.stageData.stage;
 
         // For properties that may not exist.
         if (ourGame.tiledProperties.has("slug")) {

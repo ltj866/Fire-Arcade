@@ -5,7 +5,7 @@ import { BEST_OF_ALL} from "../SnakeHole.js"
 
 
 
-var checkRank = function(stageName, targetRank) {
+export var checkRank = function(stageName, targetRank) {
     // Only unlock on expert if you unlocked in classic.
     // But progress Expert just like you progress classic.
     switch (this.scene.get("GameScene").mode) {
