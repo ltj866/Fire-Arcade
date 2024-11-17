@@ -893,6 +893,10 @@ class TutorialScene extends Phaser.Scene {
 
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
+                // Clear for reseting game
+                scene.scene.get("SpaceBoyScene").stageHistory = [];
+                scene.scene.get("PersistScene").coins = START_COINS;
+
                 // @Holden add transition to nextScene here.
                 scene.scene.start("GameScene", {
                     stage: START_STAGE,
@@ -900,12 +904,7 @@ class TutorialScene extends Phaser.Scene {
                     startupAnim: true,
                     mode: scene.scene.get("PersistScene").mode
 
-                });
-
-                // Clear for reseting game
-                scene.scene.get("SpaceBoyScene").stageHistory = [];
-                scene.scene.get("PersistScene").coins = START_COINS;
-                
+                });      
             }
 
             else {
@@ -4336,7 +4335,6 @@ class GameScene extends Phaser.Scene {
                                         }
 
                                         if (this.stage === "World_0-1") {
-                                            debugger
                                             switch (true) {
                                                 case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("1-1")) {
@@ -7649,7 +7647,10 @@ class ScoreScene extends Phaser.Scene {
         
         console.log(JSON.stringify(this.stageData));
 
-        this.scene.get("SpaceBoyScene").stageHistory.push(this.stageData);
+
+
+        var tempStageHistory = [...this.scene.get("SpaceBoyScene").stageHistory, this.stageData];
+        console.log("STAGE HISTORY: MID SCORE SCREEN.", this.scene.get("SpaceBoyScene").stageHistory, this.stageData);
     
 
         // #region Save Best To Local.
@@ -8661,7 +8662,8 @@ class ScoreScene extends Phaser.Scene {
 
         var totalScore = 0;
 
-        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
+
+        tempStageHistory.forEach( stageData => {
             totalScore += stageData.calcTotal();
         });
 
@@ -8680,7 +8682,7 @@ class ScoreScene extends Phaser.Scene {
         var sumOfBase = 0;
         var _histLog = [];
         
-        this.scene.get("SpaceBoyScene").stageHistory.forEach( _stage => {
+        tempStageHistory.forEach( _stage => {
             _histLog = [ ..._histLog, ..._stage.foodLog];
             sumOfBase += _stage.calcBase();
             ourGame.nextScore += _stage.calcTotal();
@@ -8743,14 +8745,6 @@ class ScoreScene extends Phaser.Scene {
             var continue_text = '[SPACE TO CONTINUE]';
 
             var gameOver = false;
-
-            if (this.scene.get("SpaceBoyScene").stageHistory.length >= GAME_LENGTH) {
-                //debugger
-                //continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
-                //gameOver = true;
-                // Should restart here, with a popup that shows your run score info.
-                // Should be the same screen as the GameOver Screen.
-            }
             
             var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.25,'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize":'32px',

@@ -342,6 +342,7 @@ var Snake = new Phaser.Class({
                     
                     //portal.snakePortalingSprite.visible = false;
                     //portal.targetObject.snakePortalingSprite.visible = false;
+                    scene.scene.get("SpaceBoyScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
                     scene.warpToNext(index);
                 }
 
@@ -351,6 +352,7 @@ var Snake = new Phaser.Class({
                 if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
                     console.log('WOO')
                     //scene.finalScore();
+                    scene.scene.get("SpaceBoyScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
                     scene.extractPrompt();
                 }
             }
