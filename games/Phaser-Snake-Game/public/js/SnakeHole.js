@@ -4339,26 +4339,26 @@ class GameScene extends Phaser.Scene {
                                             debugger
                                             switch (true) {
                                                 case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
-                                                    if (stageName === this, STAGES.get("1-1")) {
+                                                    if (stageName === STAGES.get("1-1")) {
                                                         //blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                         
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
-                                                    if (stageName === this, STAGES.get("2-1")) {
+                                                    if (stageName === STAGES.get("2-1")) {
                                                         //blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
-                                                    if (stageName === this, STAGES.get("4-1")) {
+                                                    if (stageName === STAGES.get("4-1")) {
                                                         //blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
-                                                    if (stageName === this, STAGES.get("8-1")) {
+                                                    if (stageName === STAGES.get("8-1")) {
                                                         //blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
