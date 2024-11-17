@@ -874,7 +874,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.9170695172602,
+                "x": 174.15401375365968,
                 "y": 161.8329134608838
             }
         },
@@ -1019,24 +1019,26 @@
             "scale": 2.451436781609195,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.1835658187786,
+                "x": 173.9796037979135,
                 "y": 162.14980658773885
             }
         },
         "World_2-1.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "World_2-2.json": {
-            "scale": 1.5,
+            "scale": 2.8363505747126436,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 18,
-                "y": 299
+                "x": 173.99118585684616,
+                "y": 162.0039511676207
             }
         },
         "World_2-2.json#tileSheetx12": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "World_2-2.json#tileSheetx24": {
             "scaleInDock": 1
@@ -1069,11 +1071,11 @@
             "scaleInDock": 1
         },
         "World_2-3.json": {
-            "scale": 2.997413793103448,
-            "selectedLayer": 1,
+            "scale": 2.8363505747126436,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.15012942191544,
-                "y": 161.97296519988492
+                "x": 173.99118585684616,
+                "y": 162.0039511676207
             }
         },
         "World_2-3.json#tileSheetx12": {
@@ -1312,7 +1314,7 @@
         },
         "World_5-2_Racing.json": {
             "scale": 2.336781609195402,
-            "selectedLayer": 4,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 173.5292670929661,
                 "y": 161.97491392031483
@@ -2800,6 +2802,7 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "tileSheetx12.tsx",
         "r10-19-2-4x4.tmj",
         "r-10-17.json",
         "r10-19.tmj",
@@ -2810,8 +2813,7 @@
         "rough-05-03.json",
         "rough-05-02.json",
         "rough-05-04.json",
-        "rough-05-04b.json",
-        "r09-16-2.json"
+        "rough-05-04b.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
