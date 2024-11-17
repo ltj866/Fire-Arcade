@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -396,6 +396,7 @@ const COLOR_SCORE = "yellow";
 const COLOR_FOCUS = "fuchsia";
 const COLOR_FOCUS_HEX = 0xFF00FF;
 const COLOR_BONUS = "limegreen";
+const COLOR_BONUS_HEX = 0x32CD32;
 const COLOR_TERTIARY = "goldenrod";
 
 
@@ -4273,6 +4274,10 @@ class GameScene extends Phaser.Scene {
                                         ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
 
 
+                                        
+
+                                        
+
 
 
                                         //extractImage.playAfterRepeat('extractHoleClose');
@@ -4328,6 +4333,52 @@ class GameScene extends Phaser.Scene {
                                             }
                                         } else {
                                             blackholeImage.setTint(0xFFFFFF);
+                                        }
+
+                                        if (this.stage === "World_0-1") {
+                                            debugger
+                                            switch (true) {
+                                                case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
+                                                    if (stageName === this, STAGES.get("1-1")) {
+                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                        
+                                                    }
+                                                    break;
+                                                case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
+                                                    if (stageName === this, STAGES.get("2-1")) {
+                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                    }
+                                                    break;
+                                                case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
+                                                    if (stageName === this, STAGES.get("4-1")) {
+                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                    }
+                                                    break;
+                                                case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
+                                                    if (stageName === this, STAGES.get("8-1")) {
+                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                    }
+                                                    break;
+                                                case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
+                                                    if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
+                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                    }
+                                                    if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
+                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                    }     
+                                                
+                                                    break;
+                                            
+                                                default:
+                                                    break;
+                                            }
+                                            
                                         }
                                         
                                         this.nextStagePortals.push(blackholeImage);
