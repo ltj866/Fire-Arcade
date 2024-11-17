@@ -6973,6 +6973,12 @@ class GameScene extends Phaser.Scene {
                 atom.electrons.visible = false;
             })
 
+            var checkList = [...this.portals, ...this.wallPortals];
+            checkList.forEach(portal => {
+                portal.snakePortalingSprite.visible = false;
+            })
+
+
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
             this.gState = GState.TRANSITION;
             this.snake.direction = DIRS.STOP;

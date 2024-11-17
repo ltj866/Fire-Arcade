@@ -890,7 +890,7 @@
             "scale": 2.983764367816092,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.94134925603117,
+                "x": 173.7737757018346,
                 "y": 161.7084797996822
             }
         },
@@ -2800,18 +2800,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "Racing_Stage-test02.json",
-        "Racing_Stage-test.json",
-        "Racing_Stage-06_test.json",
-        "Racing_Stage-04_Dark.json",
-        "Racing_Stage-02.json",
-        "testingx01.json",
-        "testing13.json",
-        "testingAztec.json",
-        "World_10-2.json",
-        "World_0-1.json",
-        "World_2-4.json",
-        "World_8-1_Adv_Portaling.json"
+        "r10-19-2-4x4.tmj",
+        "r-10-17.json",
+        "r10-19.tmj",
+        "rough-03.json",
+        "rough-02.json",
+        "rough-04.json",
+        "rough-05.json",
+        "rough-05-03.json",
+        "rough-05-02.json",
+        "rough-05-04.json",
+        "rough-05-04b.json",
+        "r09-16-2.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
