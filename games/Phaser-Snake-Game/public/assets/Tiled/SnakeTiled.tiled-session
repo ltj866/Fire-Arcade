@@ -1086,11 +1086,11 @@
             "scaleInDock": 1
         },
         "World_2-4.json": {
-            "scale": 2.997413793103448,
-            "selectedLayer": 0,
+            "scale": 2.8363505747126436,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 159.6376186367558,
-                "y": 161.97296519988492
+                "x": 173.99118585684616,
+                "y": 162.0039511676207
             }
         },
         "World_2-4.json#tileSheetx12": {
@@ -2802,18 +2802,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "tileSheetx12.tsx",
-        "r10-19-2-4x4.tmj",
-        "r-10-17.json",
-        "r10-19.tmj",
-        "rough-03.json",
-        "rough-02.json",
-        "rough-04.json",
-        "rough-05.json",
-        "rough-05-03.json",
-        "rough-05-02.json",
-        "rough-05-04.json",
-        "rough-05-04b.json"
+        "World_2-1.json",
+        "World_2-4.json",
+        "World_2-3.json",
+        "World_2-2.json",
+        "r10-19-grapple.json",
+        "World_0-1.json",
+        "World_4-3.json",
+        "World_4-4.json",
+        "World_4-2.json",
+        "World_1-3.json",
+        "World_5-3_Racing.json",
+        "World_5-2_Racing.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
