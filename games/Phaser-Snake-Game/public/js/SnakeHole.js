@@ -6157,7 +6157,7 @@ class GameScene extends Phaser.Scene {
 
         var extractRank = extractRankSum / spaceBoy.stageHistory.length; 
 
-        spaceBoy.stageHistory = []; // Empty Now
+        
 
         var finalRank = this.add.sprite(_x + GRID * .5,GRID * 14.0, "ranksSpriteSheet", Math.floor(extractRank)
         ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
@@ -6315,6 +6315,8 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 `${formattedScore}`
         ).setOrigin(0,0).setScale(0.5);
+
+        spaceBoy.stageHistory = []; // Empty Now
 
         //PRESS SPACE TO CONTINUE TEXT
         // Give a few seconds before a player can hit continue
