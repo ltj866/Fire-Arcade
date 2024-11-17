@@ -2800,7 +2800,7 @@
         "World_8-3_Adv_Portaling.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "World_2-1.json",
         "World_2-4.json",

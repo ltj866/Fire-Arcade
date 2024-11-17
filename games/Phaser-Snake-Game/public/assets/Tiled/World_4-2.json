@@ -164,6 +164,11 @@
          "value":"75d73868-1ae7-4704-b8d6-7f65f1a71892"
         }, 
         {
+         "name":"atoms",
+         "type":"string",
+         "value":"6"
+        }, 
+        {
          "name":"diffBonus",
          "type":"int",
          "value":100
