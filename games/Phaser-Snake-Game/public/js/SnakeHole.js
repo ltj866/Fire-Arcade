@@ -2464,7 +2464,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
 
-                if (!this.scene.get("SpaceBoyScene").music.isPlaying) {
+                if (!this.scene.get("SpaceBoyScene").music.isPlaying && !this.scene.get("SpaceBoyScene").music.isPaused) {
                     this.scene.get("SpaceBoyScene").startMusic();
                 } 
 
@@ -4338,36 +4338,36 @@ class GameScene extends Phaser.Scene {
                                             switch (true) {
                                                 case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("1-1")) {
-                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                         
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("2-1")) {
-                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("4-1")) {
-                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("8-1")) {
-                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
                                                     break;
                                                 case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
-                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }
                                                     if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
-                                                        //blackholeImage.postFX.addShine(1, .5, 5);
+                                                        blackholeImage.postFX.addShine(1, .5, 5);
                                                         blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                     }     
                                                 
