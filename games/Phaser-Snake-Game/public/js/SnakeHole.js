@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -661,40 +661,9 @@ class SpaceBoyScene extends Phaser.Scene {
             pauseButton.setTintFill(0x8B0000);
         }, this);
 
+        
 
-        // Initialize delay interval and index
-        var delay = 250;
-        var index = 1;
-
-        var spawnDisc = function() {
-        if (index <= 32){
-            
-            // TOP SPAWN
-            //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
-            var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
-                shape: {
-                    type: 'polygon',
-                    radius: 3.5,
-                    sides: 4,
-                },
-                //slop:0.8,
-            }).setDepth(49);
-            //plinkoDisc.setCircle(3.33);
-            plinkoDisc.setBounce(0.0);
-            plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.005);
-            plinkoDisc.setFixedRotation();
-            //if (index > 32) {
-            //    plinkoDisc.setAlpha(0);
-            //}
-            //.setCollisionGroup(categoryA);
-            //plinkoDisc.setCollidesWith(categoryB);
-            //plinkoDisc.setSensor(true);
-            index++;
-            this.time.delayedCall(delay,spawnDisc, [], this);
-            }
-        };
-        spawnDisc.call(this);
+        this.spawnPlinkos(2);
 
 
         /*this.plinkoDisc = this.matter.add.sprite(GRID * 6.5, GRID * 8, 'plinkoDisc',1);
@@ -728,6 +697,33 @@ class SpaceBoyScene extends Phaser.Scene {
         // Enable collision between the plinkoDisc and the tubes
         //this.matter.add.collider(this.plinkoDisc, tubes);
 
+    }
+    spawnPlinkos (number) {
+        if (number > 0){
+            var delay = 250;
+            
+            // TOP SPAWN
+            //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
+            var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
+                shape: {
+                    type: 'polygon',
+                    radius: 3.5,
+                    sides: 4,
+                },
+                //slop:0.8,
+            }).setDepth(49);
+            //plinkoDisc.setCircle(3.33);
+            plinkoDisc.setBounce(0.0);
+            plinkoDisc.setFriction(0.000);
+            plinkoDisc.setFrictionAir(0.005);
+            plinkoDisc.setFixedRotation();
+
+            number--;
+            this.time.delayedCall(delay, this.spawnPlinkos, [number], this);
+        } else {
+            return
+        }
+    
     }
         
 
@@ -8195,7 +8191,7 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var frameTime = 16.667
+        var frameTime = 16.667;
 
         var _baseScore = this.stageData.calcBase();
         var _speedbonus = calcBonus(this.stageData.calcBase());
@@ -9172,7 +9168,22 @@ class ScoreScene extends Phaser.Scene {
                 
 
                 
-                const zedObject = calcZedLevel(ourPersist.zeds)
+                console.log("ZedRolling");
+                var rollResults = rollZeds(currentLocal);
+
+                console.log("RollResults:", rollResults);
+                console.log("RollsLeft:", rollResults.get("rollsLeft"), ); // Rolls after the last zero best zero
+                ourPersist.zeds += rollResults.get("zedsEarned");
+                ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
+
+                const zedObject = calcZedLevel(ourPersist.zeds);
+                ourPersist.zedsUI.setHTML(
+                    `<span style ="color: limegreen;
+                    font-size: 14px;
+                    border: limegreen solid 1px;
+                    border-radius: 5px;
+                    padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
+                );
 
                 var extraFields = {
                     level: zedObject.level,
@@ -9263,78 +9274,6 @@ class ScoreScene extends Phaser.Scene {
         this.graphics.fillCircle(this.letterRankPath.vec.x, this.letterRankPath.vec.y, 8).setDepth(30);
         this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);
         */
-
-        if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
-            this.lastRollTime = time;
-            
-            //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
-
-            //var i = 31;
-
-            if (this.bestHashInt) {
-                var leadingZeros = intToBinHash(this.bestHashInt).split('1').reverse().pop()
-                 
-                this.difficulty = leadingZeros.length;
-            }
-            else {
-                var leadingZeros = "";
-                this.difficulty = 1;
-            }
-
-            // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
-            // Which is a 50% chance.
-
-
-            var temp = 2**this.difficulty
-            var innerRollNum = Math.ceil(2**this.difficulty/10)
-            
-            
-            
-            for (let index = innerRollNum; index > 0 ; index--) {
-                
-                
-
-                var roll = Phaser.Math.RND.integer();
-                if (roll < this.bestHashInt) {
-                    this.bestHashInt = roll;
-                }
-
-                if (this.foodLogSeed.slice(-1) < 1) {
-                    break;
-                }
-
-                this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
-            }
-
-            // #region HashUI Update
-
-            this.rollSpeed = Math.max(1, 20 - this.difficulty);
-
-            this.hashUI.setHTML(
-                `Rolling for Zeds (${this.foodLogSeed.slice(-1)})<br/> 
-                <span style="color:limegreen;text-decoration:underline;">${leadingZeros}</span><span style="color:limegreen">1</span>${intToBinHash(roll).slice(this.difficulty + 1)}<br/>
-                You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
-            );
-
-            
-            if (this.prevZeds + this.difficulty > ourPersist.zeds) {
-                ourPersist.zeds = this.prevZeds + this.difficulty;
-                var zedsObj = calcZedLevel(ourPersist.zeds);
-
-                ourPersist.zedsUI.setHTML(
-                    `<span style ="color: limegreen;
-                    font-size: 16px;
-                    border: limegreen solid 1px;
-                    border-radius: 5px;
-                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} To Next Level.</span>`
-                );
-            }
-
-            //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
-
-            
-
-        }
     }
 
     end() {
