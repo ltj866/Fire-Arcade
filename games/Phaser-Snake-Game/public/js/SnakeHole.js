@@ -520,7 +520,7 @@ class SpaceBoyScene extends Phaser.Scene {
     create() {
         var matterJSON = this.cache.json.get('collisionData');
 
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51); 
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52); 
 
         this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(50);
         this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
@@ -615,8 +615,8 @@ class SpaceBoyScene extends Phaser.Scene {
             //{ x: GRID * 7.8, y: GRID * 10, width: 2, height: 255, angle: 0, originX: 0, originY:1  },
 
 
-            //{ x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
-            //{ x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
+            { x: GRID * 7.1, y: GRID * 13.8, width: 1, height: 184, angle: 0 },
+            { x: GRID * 7.9, y: GRID * 13.8, width: 1, height: 184, angle: 0 },
             
             // Leftmost horizontal platforms
             //{ x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
@@ -667,17 +667,26 @@ class SpaceBoyScene extends Phaser.Scene {
         var index = 1;
 
         var spawnDisc = function() {
-        if (index < 42){
+        if (index <= 32){
             
-            var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * (8 + 12), 'plinkoDisc').setDepth(49);
-            plinkoDisc.setCircle(3.333);
+            // TOP SPAWN
+            //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
+            var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
+                shape: {
+                    type: 'polygon',
+                    radius: 3.5,
+                    sides: 4,
+                },
+                //slop:0.8,
+            }).setDepth(49);
+            //plinkoDisc.setCircle(3.33);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.000);
+            plinkoDisc.setFrictionAir(0.005);
             plinkoDisc.setFixedRotation();
-            if (index > 32) {
-                plinkoDisc.setAlpha(0);
-            }
+            //if (index > 32) {
+            //    plinkoDisc.setAlpha(0);
+            //}
             //.setCollisionGroup(categoryA);
             //plinkoDisc.setCollidesWith(categoryB);
             //plinkoDisc.setSensor(true);
@@ -10300,7 +10309,14 @@ var config = {
         { default: 'matter',
              matter: { 
                 debug: false,
-                 gravity: { y: 2 }
+                gravity: { y: 1 },
+                positionIterations: 6, //6
+                velocityIterations: 4, //4
+                constraintIterations: 2, //2
+                timing: {
+                    timestamp: 0,
+                    timeScale: 1, //1
+                },
             }
         },
     fx: {
