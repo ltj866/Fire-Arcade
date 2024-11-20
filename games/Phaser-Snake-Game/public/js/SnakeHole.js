@@ -2158,8 +2158,21 @@ class StageCodex extends Phaser.Scene {
                 const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
                 ).setOrigin(1,0).setScale(0.5);
 
-                const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
-                ).setDepth(80).setOrigin(0,0).setScale(1);
+                var _rank = bestOf.stageRank();
+                debugger
+
+                
+
+                if (_rank != 5) {
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
+                    ).setDepth(80).setOrigin(0,0).setScale(1);
+                    
+                } else {
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", 4
+                    ).setDepth(80).setOrigin(0,0).setScale(1);
+                    rankIcon.setTintFill(COLOR_BONUS_HEX);
+                }
+
 
                 codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
 
@@ -8527,11 +8540,19 @@ class ScoreScene extends Phaser.Scene {
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
         
-        let rank = this.stageData.stageRank() + 1; // FileNames start at 01.png
+        let rank = this.stageData.stageRank(); // FileNames start at 01.png
         //rank = 4; // Temp override.
+        if (rank != 5) {
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank
+            ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+
+        } else {
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", 4
+            ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+            letterRank.setTintFill(COLOR_BONUS_HEX);
+        }
         
-        var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank -1
-        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+        
 
         this.ScoreContainerL.add(letterRank)
         
