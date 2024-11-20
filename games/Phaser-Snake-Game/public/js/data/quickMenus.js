@@ -62,6 +62,7 @@ export var QUICK_MENUS = new Map([
         }],
         ['REDO STAGE (- 1 Coin)', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             const ourPersist = this.scene.get("PersistScene");
 
 
@@ -92,6 +93,9 @@ export var QUICK_MENUS = new Map([
                     mode: ourPersist.mode
                     //lives: this.lives 
                 });
+                ourSpaceBoy.shiftLight1.setAlpha(0);
+                ourSpaceBoy.shiftLight2.setAlpha(0);
+                ourSpaceBoy.shiftLight3.setAlpha(0);
             }
 
             this.scene.get("StageCodex").scene.stop();
@@ -101,6 +105,8 @@ export var QUICK_MENUS = new Map([
         }],
         ['BACK TO MAIN MENU', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+
             const ourPersist = this.scene.get("PersistScene");
             
             console.log("BACK TO MAIN MENU");
@@ -115,11 +121,15 @@ export var QUICK_MENUS = new Map([
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
+            ourSpaceBoy.shiftLight1.setAlpha(0);
+            ourSpaceBoy.shiftLight2.setAlpha(0);
+            ourSpaceBoy.shiftLight3.setAlpha(0);
             this.scene.stop(); 
             return true;
         }],
         ['RESTART ADVENTURE', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             const ourPersist = this.scene.get("PersistScene");
             // TODO: send to origin
 
@@ -140,6 +150,10 @@ export var QUICK_MENUS = new Map([
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
+            ourSpaceBoy.shiftLight1.setAlpha(0);
+            ourSpaceBoy.shiftLight2.setAlpha(0);
+            ourSpaceBoy.shiftLight3.setAlpha(0);
+
             this.scene.stop(); 
             return true;
         }],
