@@ -549,7 +549,7 @@ class SpaceBoyScene extends Phaser.Scene {
              'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
         
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
-        setOrigin(0,0).setDepth(51).setAlpha(0);
+        setOrigin(0,0).setDepth(102).setAlpha(0);
 
         this.tweens.add({
             targets: this.spaceBoyLight,
@@ -2493,7 +2493,7 @@ class MainMenuScene extends Phaser.Scene {
                         menuOptions: qMenu, 
                         textPrompt: "MODE SELECTOR",
                         fromScene: mainMenuScene,
-                        cursorIndex: 0,
+                        cursorIndex: 1,
                         sideScenes: false
                     });
                     mainMenuScene.scene.bringToTop("QuickMenuScene");
@@ -6857,6 +6857,8 @@ class GameScene extends Phaser.Scene {
         
     }
     gameSceneCleanup(){
+        // TODO: event listener cleanup here
+        // scene blur removal
         if (this.electronFanfare) {
             this.electronFanfare.setAlpha(0);
         }
