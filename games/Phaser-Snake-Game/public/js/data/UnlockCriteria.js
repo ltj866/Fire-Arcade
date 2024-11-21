@@ -41,16 +41,29 @@ export var checkRank = function(stageName, targetRank) {
             } else {
                 //debugger
                 return false;
-            }
-    
-            
+            } 
             break;
     
         default:
             break;
     }
-    
-    
+}
+
+export var checkCanExtract = function(stageID) {
+    var checkEnds = [];
+    EXTRACT_CODES.forEach(path => {
+        if (path.includes(stageID)) {
+            
+            var splitPath = path.split("|");
+            checkEnds.push(splitPath[splitPath.length - 1]);
+        }
+    })
+
+    var hasPath = checkEnds.some(endID => {
+        return BEST_OF_ALL.has(STAGES.get(endID))
+    });
+
+    return hasPath;
 
 }
 

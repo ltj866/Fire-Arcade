@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
-import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3329,7 +3329,10 @@ class PersistScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     }
     loseCoin(){ // 
-        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png',
+            {
+                frictionAir:.1
+            }
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
         var randomVec2 = new Phaser.Math.Vector2(Phaser.Math.Between(-2,1),Phaser.Math.Between(-2,5))
         this.coinsUICopy.applyForce(randomVec2)
@@ -4566,12 +4569,22 @@ class GameScene extends Phaser.Scene {
                                     stageName;
                                     var temp = STAGE_UNLOCKS.get(propObj.value);
                                     //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
+
+                                    var stageID = stageName.split("_")[1];
+                                    var hasPath = checkCanExtract(stageID);
                                     
+                                    
+                                    var spawnOn;
+                                    if (!hasPath && this.mode === "Expert") {
+                                        spawnOn = false;
+                                    } else {
+                                        spawnOn = true;
+                                    }
                                    
                                     
 
                                     //debugger
-                                    if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist)) {
+                                    if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
                                         //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
@@ -9276,9 +9289,10 @@ class ScoreScene extends Phaser.Scene {
                 var rollResults = rollZeds(currentLocal);
 
                 console.log("RollResults:", rollResults);
-                console.log("RollsLeft:", rollResults.get("rollsLeft"), ); // Rolls after the last zero best zero
+                console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
                 ourPersist.zeds += rollResults.get("zedsEarned");
                 ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
+                //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
                 const zedObject = calcZedLevel(ourPersist.zeds);
                 ourPersist.zedsUI.setHTML(
