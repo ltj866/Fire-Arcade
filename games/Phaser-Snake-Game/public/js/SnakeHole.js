@@ -4583,7 +4583,7 @@ class GameScene extends Phaser.Scene {
 
                                         var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
                                             stageName.replaceAll("_", " ").toUpperCase(),
-                                            16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(.5);
+                                            8).setOrigin(0.5,0.5).setDepth(50).setAlpha(0);
                                     
                                         
                                         var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
@@ -5388,15 +5388,15 @@ class GameScene extends Phaser.Scene {
         var textTint = 0xE7EADE // 0x1f211b
 
         // Score Text SET INVISIBLE
-        this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
-            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,16)
-            .setOrigin(0,0).setScale(0.5).setScrollFactor(0).setTint(0x1f211b);
+        this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,8)
+            .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,8)
+            .setOrigin(0,0).setScrollFactor(0).setTint(0x1f211b);
 
-        this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,16)
-            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,16)
-            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,8)
+            .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,8)
+            .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
 
@@ -5419,9 +5419,9 @@ class GameScene extends Phaser.Scene {
                     //this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3, 'mainFont', `${commaInt(this.score.toString())}`, 16)
             //.setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
-        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 33.25), 4, 'mainFont', ``, 16).setScale(.5)
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 33.25), 4, 'mainFont', ``, 8)
         .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.lengthGoalUILabel = this.add.bitmapText(X_OFFSET + GRID * 30.25, 4, 'mainFont', ``, 16).setScale(.5)
+        this.lengthGoalUILabel = this.add.bitmapText(X_OFFSET + GRID * 30.25, 4, 'mainFont', ``, 8)
         .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
@@ -5533,15 +5533,14 @@ class GameScene extends Phaser.Scene {
         /*this.runningScoreUI = this.add.dom(X_OFFSET + GRID * 23.75, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE, { color: '0x1f211b' })).setText(
             `Score`
         ).setOrigin(0,1).setScale(.5).setAlpha(1).setScrollFactor(0);*/
-        this.runningScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 - 2, 'mainFont', 'SCORE', 16)
+        this.runningScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 - 2, 'mainFont', 'SCORE', 8)
             .setOrigin(0, 1)
-            .setScale(0.5)
             .setAlpha(1)
             .setScrollFactor(0)
             .setTint(0x1f211b)
             .setDepth(100);
-        this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3 -2, 'mainFont', `${commaInt(this.score.toString())}`, 16)
-            .setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
+        this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3 -2, 'mainFont', `${commaInt(this.score.toString())}`, 8)
+            .setOrigin(0,1).setTint(0x1f211b).setScrollFactor(0);
 
         
         if (DEBUG) {
