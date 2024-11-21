@@ -6814,10 +6814,8 @@ class GameScene extends Phaser.Scene {
                 onContinue();
             });
         }, [], this);
+        this.gameSceneCleanup()
 
-
-
-        
     }
 
     warpToMenu(){
@@ -6857,6 +6855,14 @@ class GameScene extends Phaser.Scene {
         });
         
         
+    }
+    gameSceneCleanup(){
+        if (this.electronFanfare) {
+            this.electronFanfare.setAlpha(0);
+        }
+        if (this.CapSparkFinale) {
+            this.CapSparkFinale.destroy();
+        }
     }
     
  
