@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -733,6 +733,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
     startMusic () {
         //music.on('complete', listener);
+        this.music = this.sound.add(`track_86`,{
+            volume: 0.2
+        });
         
         //music.play();
         this.music.play();
@@ -1072,10 +1075,15 @@ class TutorialScene extends Phaser.Scene {
         });
 
         const onInput = function (scene) {
+            const spaceBoy = scene.scene.get("SpaceBoyScene");
             if (scene.continueText.visible === true) {
                 // Clear for reseting game
-                scene.scene.get("SpaceBoyScene").stageHistory = [];
+                spaceBoy.stageHistory = [];
                 scene.scene.get("PersistScene").coins = START_COINS;
+
+
+                spaceBoy.music.pause();
+                scene.scene.get("SpaceBoyScene").nextSong();
 
                 // @Holden add transition to nextScene here.
                 scene.scene.start("GameScene", {
@@ -1316,6 +1324,9 @@ class StartScene extends Phaser.Scene {
             var path = TRACKS.get(trackID);
             this.load.audio(track, [path]);
         })
+
+        // Game Over Song
+        this.load.audio(`track_${86}`, "let-86_11_20-start.m4a");
 
         // Game Over Song
         this.load.audio(`track_${149}`, "let-149-game-over_11-10.m4a");
