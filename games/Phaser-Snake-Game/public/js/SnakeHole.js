@@ -387,6 +387,12 @@ export const MODES = Object.freeze({
     OVERALL: 3
 })
 
+const MODE_TEXT = new Map([
+    [MODES.CLASSIC, "Classic"],
+    [MODES.EXPERT, "Expert"],
+
+]);
+
 const SAFE_MIN_WIDTH = "550px"
 // #region GLOBAL STYLES 
 export const STYLE_DEFAULT = {
@@ -1868,12 +1874,30 @@ class ExtractTracker extends Phaser.Scene {
 
         var trackerContainer = this.make.container(0, 0);
 
+        var letterCounter = [0,0,0,0,0,0];
+
         
         if (localStorage.getItem("extractRanks")) {
             var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")));
 
-            
-            
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, Y_OFFSET + GRID * 6, 
+                'uiPanelL', 'Glass', 
+                GRID * 24.5, GRID * 4, 
+                8, 8, 8, 8);
+            topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+
+            var pathsDiscovered = this.add.dom(X_OFFSET + GRID * 26, Y_OFFSET + GRID * 9 + 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 200,
+            }),
+                `PATHS COMPLETE:${0}`
+            ).setOrigin(1,1).setScale(0.5).setAlpha(1);
+
+
+
+            var overallScore = 0;
+            var rankSum = 0;
+            var rankCount = 0;
             EXTRACT_CODES.forEach ( extractKey => {
 
                 if (bestExtractions.has(extractKey)) {
@@ -1918,6 +1942,10 @@ class ExtractTracker extends Phaser.Scene {
                             
                             const bestRank = this.add.sprite(_x , rowY, "ranksSpriteSheet", _rank
                             ).setDepth(80).setOrigin(0.5,0).setScale(0.5);
+
+                            letterCounter[_rank] += 1;
+                            rankSum += _rank + 1; // 1 more so D's count as 1
+                            rankCount += 1;
     
                             const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`,16
                             ).setOrigin(0.5,0).setScale(0.75);
@@ -1930,8 +1958,12 @@ class ExtractTracker extends Phaser.Scene {
     
                         var bestExtractRank = bestSum / bestExtract.length;
         
-                        const finalRank = this.add.sprite(_x + GRID * .5, rowY - 2, "ranksSpriteSheet", Math.floor(bestExtractRank)
+                        var finalRankValue = Math.floor(bestExtractRank);
+                        const finalRank = this.add.sprite(_x + GRID * .5, rowY - 2, "ranksSpriteSheet", Math.floor(finalRankValue)
                         ).setDepth(80).setOrigin(0.5,0).setScale(1);
+                        letterCounter[finalRankValue] += 1;
+                        rankSum += finalRankValue + 1; // 1 more so D's count as 1
+                        rankCount += 1;
 
                         trackerContainer.add([finalRank]);
 
@@ -1940,8 +1972,12 @@ class ExtractTracker extends Phaser.Scene {
                     var bestScoreTitle = this.add.bitmapText(_x + GRID * 2, rowY, 'mainFont', "SCORE", 16
                     ).setOrigin(0,0).setScale(0.75);
 
+                    
+                    var scoreValue = bestExtract[bestExtract.length - 1][2];
+                    
+                    
                     var bestScore = this.add.bitmapText(_x + GRID * 2, rowY + 15, 'mainFont',
-                        commaInt(bestExtract[bestExtract.length - 1][2]),
+                        commaInt(scoreValue),
                     16).setOrigin(0,0).setScale(1);
 
                     if (bestExtract === "Classic Clear") {
@@ -1950,6 +1986,8 @@ class ExtractTracker extends Phaser.Scene {
                         bestScoreTitle.setText("");
                         bestScore.setText("CLEAR");
                         
+                    } else {
+                        overallScore += scoreValue;
                     }
 
                     trackerContainer.add([bestScoreTitle, bestScore]);
@@ -1978,6 +2016,47 @@ class ExtractTracker extends Phaser.Scene {
                 
 
             });
+
+            
+            pathsDiscovered.setText(`PATHS DISCOVERED: ${this.yMap.size}`);
+
+            var hasLetter = letterCounter.some(rank => rank != 0);
+
+            if (hasLetter) {
+                var sumOfExtracts = this.add.dom(X_OFFSET + GRID * 26, Y_OFFSET + GRID * 6 + 8, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                }),
+                    `OVERALL SCORE: ${commaInt(overallScore)}`
+                ).setOrigin(1,0).setScale(0.5).setAlpha(1);
+                console.log(letterCounter);
+
+                var _x = X_OFFSET + GRID * 3 + 6;
+                var _offset = GRID + 8;
+
+                for (let index = 0; index < letterCounter.length - 1; index++) {
+                    const rankSprite = this.add.sprite(_x + _offset * index, Y_OFFSET + GRID * 6 + 8, "ranksSpriteSheet", index 
+                    ).setDepth(80).setOrigin(0,0).setScale(0.5);
+
+                    const rankCount = this.add.dom(_x + _offset * index, Y_OFFSET + GRID * 8 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '24px',
+                        "fontWeight": 400,
+                    }),
+                        letterCounter[index]
+                    ).setDepth(80).setOrigin(0,0).setScale(0.5);
+                     
+                }
+
+                var rankCount = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 200,
+                }),
+                    `MEDAL COUNT: ${rankCount} — RANK SCORE: ${rankSum}`
+                ).setOrigin(0,0).setScale(0.5).setAlpha(1);
+
+            }
+
+            
 
             var selected = this.yMap.get([...this.yMap.keys()][0]);
             var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
@@ -2098,14 +2177,13 @@ class StageCodex extends Phaser.Scene {
         var stagesCompleteDisplay;
         var categoryText;
 
-        var playerRank = this.add.dom(SCREEN_WIDTH / 2, rowY - 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var playerRank = this.add.dom(topLeft, rowY - 5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
-            "fontWeight": 400,
-            "color": COLOR_BONUS,
-            "min-width": SAFE_MIN_WIDTH 
+            "fontWeight": 200,
+            "color": COLOR_BONUS, 
         }),
             `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
-        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
         if (!checkExpertUnlocked.call(this)) {
             bestOfDisplay = BEST_OF_ALL;
@@ -5144,7 +5222,7 @@ class GameScene extends Phaser.Scene {
 
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${this.mode}`));       
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${MODE_TEXT.get(this.mode)}`));       
 
         if (bestLogJSON) {
             // is false if best log has never existed
@@ -8161,7 +8239,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Save Best To Local.
 
-        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`));
+        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`));
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
@@ -8180,7 +8258,7 @@ class ScoreScene extends Phaser.Scene {
 
             
             if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
-                localStorage.setItem(`${ourGame.stageUUID}_best-${ourGame.mode}`, JSON.stringify(this.stageData));
+                localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`, JSON.stringify(this.stageData));
             }
             
         }
@@ -8197,8 +8275,8 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        if (localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`)) {
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`));
+        if (localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`));
 
         } else {
             // If a test level. Use World 0_1 as a filler to not break UI stuff.
