@@ -2144,12 +2144,16 @@ class StageCodex extends Phaser.Scene {
             categoryText
         ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-        var playerRank = this.add.dom(topLeft, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            `Player Rank: TOP ${calcSumOfBestRank(sumOfBestDisplay)}%`
-        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+        if (args.category === "Overall") {
+            var playerRank = this.add.dom(topLeft, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+                "color": COLOR_BONUS
+            }),
+                `Player Rank: TOP ${calcSumOfBestRank(sumOfBestDisplay)}%`
+            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+
+        }
 
         var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
