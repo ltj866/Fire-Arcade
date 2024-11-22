@@ -380,7 +380,14 @@ const RANK_BENCHMARKS = new Map([
 
 ]);
 
+export const MODES = Object.freeze({
+    CLASSIC: 0,
+    EXPERT: 1,
+    HADCORE: 2,
+    OVERALL: 3
+})
 
+const SAFE_MIN_WIDTH = "550px"
 // #region GLOBAL STYLES 
 export const STYLE_DEFAULT = {
     color: 'white',
@@ -2091,6 +2098,15 @@ class StageCodex extends Phaser.Scene {
         var stagesCompleteDisplay;
         var categoryText;
 
+        var playerRank = this.add.dom(SCREEN_WIDTH / 2, rowY - 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": COLOR_BONUS,
+            "min-width": SAFE_MIN_WIDTH 
+        }),
+            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
+        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
         if (!checkExpertUnlocked.call(this)) {
             bestOfDisplay = BEST_OF_ALL;
             sumOfBestDisplay = ourPersist.sumOfBestAll;
@@ -2099,19 +2115,19 @@ class StageCodex extends Phaser.Scene {
             
         } else {
             switch (args.category) {
-                case "Classic":
+                case MODES.CLASSIC:
                     bestOfDisplay = BEST_OF_CLASSIC;
                     sumOfBestDisplay = ourPersist.sumOfBestClassic;
                     stagesCompleteDisplay = ourPersist.stagesCompleteClassic;
                     categoryText = "Classic";
                     break;
-                case "Expert":
+                case MODES.EXPERT:
                     bestOfDisplay = BEST_OF_EXPERT;
                     sumOfBestDisplay = ourPersist.sumOfBestExpert;
                     stagesCompleteDisplay = ourPersist.stagesCompleteExpert;
                     categoryText = "Expert";
                     break;
-                case "Overall":
+                case MODES.OVERALL:
                     bestOfDisplay = BEST_OF_ALL;
                     sumOfBestDisplay = ourPersist.sumOfBestAll;
                     stagesCompleteDisplay = ourPersist.stagesCompleteAll;
@@ -2144,16 +2160,6 @@ class StageCodex extends Phaser.Scene {
             categoryText
         ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-        if (args.category === "Overall") {
-            var playerRank = this.add.dom(topLeft, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-                "fontSize": '24px',
-                "fontWeight": 400,
-                "color": COLOR_BONUS
-            }),
-                `Player Rank: TOP ${calcSumOfBestRank(sumOfBestDisplay)}%`
-            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
-
-        }
 
         var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
@@ -2185,7 +2191,6 @@ class StageCodex extends Phaser.Scene {
                 ).setOrigin(1,0).setScale(0.5);
 
                 var _rank = bestOf.stageRank();
-                debugger
 
                 
 
@@ -2322,76 +2327,93 @@ class StageCodex extends Phaser.Scene {
         var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuR.play('arrowMenuIdle').setAlpha(1);
 
-        if (!checkExpertUnlocked.call(this)) {
-            // Default
-            this.input.keyboard.on('keydown-RIGHT', e => {
-                const game = this.scene.get("GameScene");
-                game.scene.resume();
-                game.scene.setVisible(true);
+        // Default
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            const game = this.scene.get("GameScene");
+            game.scene.resume();
+            game.scene.setVisible(true);
 
-                this.scene.wake('QuickMenuScene');
-                this.scene.sleep('StageCodex');
-                
-                }, this
-            );
+            this.scene.wake('QuickMenuScene');
+            this.scene.sleep('StageCodex');
+            
+            }, this
+        );
+
+        if (!checkExpertUnlocked.call(this)) {
+            // Haven't unlocked Expert Mode
+            
         } else {
 
             switch (args.category) {
-                case "Classic":
+                case MODES.CLASSIC:
                     var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+                    arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                            this.scene.restart({
-                                stage: this.scene.get("GameScene").stage,
-                                category: "Overall"
-                            });
-                        }, this
-                    );
 
-                    this.input.keyboard.on('keydown-RIGHT', e => {
-                        const game = this.scene.get("GameScene");
-                        game.scene.resume();
-                        game.scene.setVisible(true);
-        
-                        this.scene.wake('QuickMenuScene');
-                        this.scene.sleep('StageCodex');
-                        
-                        }, this
-                    );
-                    break;
-
-                case "Expert":
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category: "Overall"
-                        });
-                        }, this
-                    );
-                    this.input.keyboard.on('keydown-RIGHT', e => {
-                        const game = this.scene.get("GameScene");
-                        game.scene.resume();
-                        game.scene.setVisible(true);
-        
-                        this.scene.wake('QuickMenuScene');
-                        this.scene.sleep('StageCodex');
-                        
-                        }, this
-                    );
+                    var _nextCat;
+                    if (!args.prevOverall) {
+                        _nextCat = MODES.OVERALL;
+                    } else {
+                        _nextCat = MODES.EXPERT;
+                    }
                     
-                    break;
-
-                case "Overall":
-                    this.input.keyboard.on('keydown-RIGHT', e => {
+                    this.input.keyboard.on('keydown-LEFT', e => {
                         this.scene.restart({
                             stage: this.scene.get("GameScene").stage,
-                            category: this.scene.get("GameScene").mode
+                            category:_nextCat 
                         });
                         }, this
                     );
+
+                    break;
+
+                case MODES.EXPERT:
+                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                    arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+                    
+                    var _nextCat;
+                    if (!args.prevOverall) {
+                        _nextCat = MODES.OVERALL;
+                    } else {
+                        _nextCat = MODES.CLASSIC;
+                    }
+                    
+                    this.input.keyboard.on('keydown-LEFT', e => {
+                        this.scene.restart({
+                            stage: this.scene.get("GameScene").stage,
+                            category:_nextCat 
+                        });
+                        }, this
+                    );
+
+                    break;
+
+                case MODES.OVERALL:
+                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+
+                    debugger
+                        var nextCat;
+                    switch (this.scene.get("GameScene").mode) {
+                        case MODES.CLASSIC:
+                            nextCat = MODES.EXPERT;
+                            break;
+                        case MODES.EXPERT:
+                            nextCat = MODES.CLASSIC;
+                            break;
+                    
+                        default:
+                            break;
+                    }
+                
+                    this.input.keyboard.on('keydown-LEFT', e => {
+                        debugger
+                        this.scene.restart({
+                            stage: this.scene.get("GameScene").stage,
+                            category: nextCat,
+                            prevOverall: true
+                        });
+                    }, this);
                     
                     break;
             
@@ -3445,7 +3467,7 @@ class GameScene extends Phaser.Scene {
         if (!DEBUG_FORCE_EXPERT) {
             this.mode = props.mode; // Default Case
         } else {
-            this.mode = "Expert";
+            this.mode = MODES.EXPERT;
         }
 
         // Arrays for collision detection
@@ -4590,7 +4612,7 @@ class GameScene extends Phaser.Scene {
                                     
                                     
                                     var spawnOn;
-                                    if (!hasPath && this.mode === "Expert") {
+                                    if (!hasPath && this.mode === MODES.EXPERT) {
                                         spawnOn = false;
                                     } else {
                                         spawnOn = true;
@@ -4687,7 +4709,7 @@ class GameScene extends Phaser.Scene {
                                             blackholeImage.setTint(0xFFFFFF);
                                         }
 
-                                        if (this.stage === "World_0-1" && this.mode === "Classic") {
+                                        if (this.stage === "World_0-1" && this.mode === MODES.CLASSIC) {
                                             switch (true) {
                                                 case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("1-1")) {
@@ -6493,7 +6515,7 @@ class GameScene extends Phaser.Scene {
                 "fontSize":'32px',
                 "font-family": '"Press Start 2P", system-ui',
                 "text-shadow": "4px 4px 0px #000000",
-                "min-width": "550px",
+                "min-width": SAFE_MIN_WIDTH ,
                 "textAlign": 'center'
                 }
             )).setText(_continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
@@ -6659,7 +6681,7 @@ class GameScene extends Phaser.Scene {
             var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
                 
             if (bestExtractions.has(extractCode)) {
-                if (this.mode === "Expert") {
+                if (this.mode === MODES.EXPERT) {
                     if (bestExtractions.get(extractCode) != "Classic Clear") {
                         var prevBest = bestExtractions.get(extractCode);
                         var prevSum = 0;
@@ -6677,12 +6699,12 @@ class GameScene extends Phaser.Scene {
                 }
             } else {
                 switch (this.mode) {
-                    case "Classic":
+                    case MODES.CLASSIC:
                         if (EXTRACT_CODES.includes(extractCode)) {
                             bestExtractions.set(extractCode, "Classic Clear");
                         }
                         break;
-                    case "Expert":
+                    case MODES.EXPERT:
                         bestExtractions.set(extractCode, [...extractHistory]);
                         break;
                     default:
@@ -7758,7 +7780,7 @@ class GameScene extends Phaser.Scene {
                 if (this.coinSpawnCounter < 1) {
                     if (this.spawnCoins) {
                         switch (this.mode) {
-                            case "Classic":
+                            case MODES.CLASSIC:
                                 console.log("COIN TIME YAY. SPAWN a new coin");
                                 var validLocations = this.validSpawnLocations();
                                 var pos = Phaser.Math.RND.pick(validLocations);
@@ -7771,7 +7793,7 @@ class GameScene extends Phaser.Scene {
                                 this.coinsArray.push(_coin);
                                 
                                 break;
-                            case "Expert":
+                            case MODES.EXPERT:
                                 console.log("Coins Skipped On Expert");
                                 PLAYER_STATS.expertCoinsNotSpawned += 1;
                                 
@@ -8261,7 +8283,7 @@ class ScoreScene extends Phaser.Scene {
             'text-transform': 'uppercase',
             "line-height": '125%',
             "font-family": '"Press Start 2P", system-ui',
-            "min-width": "550px",
+            "min-width": SAFE_MIN_WIDTH,
             "textAlign": 'center',
             "white-space": 'pre-line'
         })).setHTML(
@@ -8622,7 +8644,7 @@ class ScoreScene extends Phaser.Scene {
                 this.stagesCompleteUI.setAlpha(1);
                 this.playerRankUI.setAlpha(1);
 
-                if(ourGame.mode === "Expert") {
+                if(ourGame.mode === MODES.EXPERT) {
                     ourPersist.coins += this.stageData.stageRank();
                     ourGame.coinUIText.setHTML(
                         `${commaInt(ourPersist.coins).padStart(2, '0')}`
@@ -9049,7 +9071,7 @@ class ScoreScene extends Phaser.Scene {
         var sumOfBest;
 
         switch (ourGame.mode) {
-            case "Classic":
+            case MODES.CLASSIC:
                 prevStagesComplete = ourPersist.prevStagesCompleteClassic;
                 prevSumOfBest = ourPersist.prevSumOfBestClassic;
                 prevPlayerRank = ourPersist.prevPlayerRankClassic;
@@ -9060,7 +9082,7 @@ class ScoreScene extends Phaser.Scene {
                 sumOfBest = ourPersist.sumOfBestClassic;
                 
                 break;
-            case "Expert":
+            case MODES.EXPERT:
                 prevStagesComplete = ourPersist.prevStagesCompleteExpert;
                 prevSumOfBest = ourPersist.prevSumOfBestExpert;
                 prevPlayerRank = ourPersist.prevPlayerRankExpert;
@@ -9080,8 +9102,8 @@ class ScoreScene extends Phaser.Scene {
 
         
         var bestOfTitle;
-        if (ourGame.mode === "Expert") {
-            bestOfTitle = `Best of ${ourGame.mode}`
+        if (ourGame.mode === MODES.EXPERT) {
+            bestOfTitle = `Best of Expert`
         } else {
             bestOfTitle = ``;
         }
