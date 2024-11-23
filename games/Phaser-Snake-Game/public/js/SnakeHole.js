@@ -6806,6 +6806,7 @@ class GameScene extends Phaser.Scene {
 
     // #region .extractPrompt(
     extractPrompt(){
+
         const ourGameScene = this.scene.get('GameScene');
         ourGameScene.extractMenuOn = true;
 
@@ -6940,6 +6941,7 @@ class GameScene extends Phaser.Scene {
                         bestExtractions.set(extractCode, [...extractHistory]);
                         break;
                     default:
+                        debugger // Safety Break. Do not remove.
                         break;
                 }     
             }
