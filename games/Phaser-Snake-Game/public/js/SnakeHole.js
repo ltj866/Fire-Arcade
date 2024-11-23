@@ -496,13 +496,13 @@ export const GState = Object.freeze({
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
-const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed3";
+const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const TUTORIAL_UUIDS = [
     "e80aad2f-f24a-4619-b525-7dc3af65ed33",
     "72cb50a1-6f72-4569-9bd5-ab3b23a87ea2",
-    "4c577a41-07a0-4aea-923e-d33c36893027e"
+    "4c577a41-07a0-4aea-923e-d33c36893027"
 ];
 
 const START_COINS = 4;
