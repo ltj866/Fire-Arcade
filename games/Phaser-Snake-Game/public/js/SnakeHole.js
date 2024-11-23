@@ -3748,8 +3748,7 @@ class GameScene extends Phaser.Scene {
         const ourTutorialScene = this.scene.get('TutorialScene');
         var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
         if (tutorialData === null && this.stage === 'World_0-1') {
-            this.stage = 'Tutorial_1';
-            this.mode = MODES.TUTORIAL;
+            this.stage = 'Tutorial_1'; // Remeber Override!
             console.log('Tutorial Time!', this.stage);
         }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
