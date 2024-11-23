@@ -539,6 +539,10 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(50);
         this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
+        this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
+        this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
+            "SHIP LOG", 
+            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
         //this.plinkoBoard = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', null,
             //{
             //shape: matterJSON.plinkoBoard,}).setOrigin(0,0).setDepth(50);
@@ -3323,13 +3327,11 @@ class PersistScene extends Phaser.Scene {
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
     
     
-    this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
-        "SHIP LOG", 
-        8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
+    
 
     this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
     
-    this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(51);
+    
 
     //waveshader
     //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
@@ -7049,7 +7051,7 @@ class GameScene extends Phaser.Scene {
             ourSpaceBoy.scene.restart();
         }
         if (cleanupType === 'full') {
-            ourPersist.mapProgressPanelText.setText('SHIP LOG')
+            ourSpaceBoy.mapProgressPanelText.setText('SHIP LOG')
             ourSpaceBoy.panelArray.forEach( stageData => {
                 stageData.destroy();
             });

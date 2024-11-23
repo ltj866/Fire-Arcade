@@ -17,11 +17,12 @@ export var QUICK_MENUS = new Map([
         ["Classic", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
             const ourGame = this.scene.get("GameScene");
-
             const ourPersist = this.scene.get("PersistScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+
             ourPersist.mode = MODES.CLASSIC;
 
-            ourPersist.mapProgressPanelText.setText('ADVENTURE')
+            ourSpaceBoy.mapProgressPanelText.setText('ADVENTURE')
 
             this.scene.get("InputScene").scene.restart();
 
@@ -39,11 +40,12 @@ export var QUICK_MENUS = new Map([
         ["Expert", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
             const ourGame = this.scene.get("GameScene");
-
             const ourPersist = this.scene.get("PersistScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+           
             ourPersist.mode = MODES.EXPERT;
 
-            ourPersist.mapProgressPanelText.setText('ADV. EXP')
+            ourSpaceBoy.mapProgressPanelText.setText('ADV. EXP')
 
             this.scene.get("InputScene").scene.restart();
 
