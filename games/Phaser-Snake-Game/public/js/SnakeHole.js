@@ -135,14 +135,17 @@ var updateSumOfBest = function(scene) {
     scene.stagesCompleteClassic = 0;
     scene.stagesCompleteExpert = 0;
     scene.stagesCompleteAll = 0;
+    scene.stagesCompleteTut = 0;
 
     scene.sumOfBestClassic = 0;
     scene.sumOfBestExpert = 0;
     scene.sumOfBestAll = 0;
+    scene.sumOfBestTut = 0;
 
     BEST_OF_ALL = new Map();
     BEST_OF_CLASSIC = new Map ();
     BEST_OF_EXPERT = new Map ();
+    BEST_OF_TUTORIAL = new Map ();
 
     var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
@@ -199,6 +202,18 @@ var updateSumOfBest = function(scene) {
         }
 
     })
+
+    TUTORIAL_UUIDS.forEach( uuid => {
+        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}_best-Tutorial`));
+        if (tempJSON != null) {
+            var _stageDataTut = new StageData(tempJSON);
+            scene.stagesCompleteTut += 1;
+
+            BEST_OF_TUTORIAL.set(_stageDataTut.stage, _stageDataTut);
+
+            scene.sumOfBestTut += _stageDataTut.calcTotal();  
+        }
+    });
 }
 
 
@@ -300,6 +315,7 @@ var rollZeds = function(score) {
 export var BEST_OF_ALL = new Map (); // STAGE DATA TYPE
 export var BEST_OF_CLASSIC = new Map ();
 export var BEST_OF_EXPERT = new Map ();
+var BEST_OF_TUTORIAL = new Map ();
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -384,19 +400,19 @@ const RANK_BENCHMARKS = new Map([
 ]);
 
 export const MODES = Object.freeze({
-    CLASSIC: 0,
-    EXPERT: 1,
-    HADCORE: 2,
-    OVERALL: 3,
-    GAUNTLET: 4
+    TUTORIAL: 0,
+    CLASSIC: 1,
+    EXPERT: 2,
+    HADCORE: 3,
+    OVERALL: 4,
+    GAUNTLET: 5
 })
 
 const MODE_LOCAL = new Map([
     [MODES.CLASSIC, "Classic"],
     [MODES.GAUNTLET, "Classic"], // Use classic stage data
     [MODES.EXPERT, "Expert"],
-    
-
+    [MODES.TUTORIAL, "Tutorial"]
 ]);
 
 const SAFE_MIN_WIDTH = "550px"
@@ -482,6 +498,12 @@ export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in t
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed3";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
+
+const TUTORIAL_UUIDS = [
+    "e80aad2f-f24a-4619-b525-7dc3af65ed33",
+    "72cb50a1-6f72-4569-9bd5-ab3b23a87ea2",
+    "4c577a41-07a0-4aea-923e-d33c36893027e"
+];
 
 const START_COINS = 4;
 
@@ -2191,6 +2213,12 @@ class StageCodex extends Phaser.Scene {
             
         } else {
             switch (args.category) {
+                case MODES.TUTORIAL:
+                    bestOfDisplay = BEST_OF_TUTORIAL;
+                    sumOfBestDisplay = ourPersist.sumOfBestTut;
+                    stagesCompleteDisplay = ourPersist.stagesCompleteTut;
+                    categoryText = "Tutorial";
+                    break;
                 case MODES.CLASSIC:
                     bestOfDisplay = BEST_OF_CLASSIC;
                     sumOfBestDisplay = ourPersist.sumOfBestClassic;
@@ -3476,6 +3504,12 @@ class PersistScene extends Phaser.Scene {
     this.prevStagesCompleteExpert = this.stagesCompleteExpert;
     this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
 
+    this.prevSumOfBestTut = this.sumOfBestTut;
+    this.prevStagesCompleteTut = this.stagesCompleteTut;
+    this.prevPlayerRankTut = calcSumOfBestRank(this.sumOfBestTut);
+
+    
+
 
         
     //this.mapProgressPanelText.setTint(0xffffff); // Set the tint to white to prepare for inversion
@@ -3712,9 +3746,10 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
-        var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Classic`);
+        var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
         if (tutorialData === null && this.stage === 'World_0-1') {
             this.stage = 'Tutorial_1';
+            this.mode = MODES.TUTORIAL;
             console.log('Tutorial Time!', this.stage);
         }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
@@ -4696,7 +4731,7 @@ class GameScene extends Phaser.Scene {
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
                 switch (true) {
-                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT:
+                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
                         if (this.map.getLayer('Next')) {
                             this.nextStagePortalLayer.visible = true;
                             
@@ -7319,7 +7354,7 @@ class GameScene extends Phaser.Scene {
                     delay: 500,
                     onComplete: () =>{
                         switch (true) {
-                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT:
+                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
                                 var nextStageRaw = this.nextStages[nextStageIndex];
                                 if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
         
@@ -9316,7 +9351,9 @@ class ScoreScene extends Phaser.Scene {
         var modeScoreContainer = this.add.container();
 
         switch (true) {
-            case ourGame.mode === MODES.CLASSIC || ourGame.mode === MODES.EXPERT:
+            case ourGame.mode === MODES.CLASSIC 
+                || ourGame.mode === MODES.EXPERT
+                || ourGame.mode === MODES.TUTORIAL:
                 // #region Adventure
                 var prevStagesComplete;
                 var prevSumOfBest;
@@ -9349,7 +9386,18 @@ class ScoreScene extends Phaser.Scene {
                         stagesComplete = ourPersist.stagesCompleteExpert;
                         sumOfBest = ourPersist.sumOfBestExpert;
                         break;
-                
+                    
+                    case MODES.TUTORIAL:
+                        prevStagesComplete = ourPersist.prevStagesCompleteTut;
+                        prevSumOfBest = ourPersist.prevSumOfBestTut;
+                        prevPlayerRank = ourPersist.prevPlayerRankTut;
+
+                        totalLevels = Math.min(ourPersist.stagesCompleteTut + Math.ceil(ourPersist.stagesCompleteTut / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestTut);
+                        stagesComplete = ourPersist.stagesCompleteTut;
+                        sumOfBest = ourPersist.sumOfBestTut;
+                        break
+                    
                     default:
                         // Leave this one as a safety trigger
                         debugger 
@@ -9522,7 +9570,9 @@ class ScoreScene extends Phaser.Scene {
         ourPersist.prevStagesCompleteExpert = ourPersist.stagesCompleteExpert;
         ourPersist.prevPlayerRankExpert = calcSumOfBestRank(ourPersist.sumOfBestExpert);
 
-
+        ourPersist.prevSumOfBestTut = ourPersist.sumOfBestTut;
+        ourPersist.prevStagesCompleteTut = ourPersist.stagesCompleteTut;
+        ourPersist.prevPlayerRankTut = calcSumOfBestRank(ourPersist.sumOfBestTut);
 
 
         // Give a few seconds before a player can hit continue
