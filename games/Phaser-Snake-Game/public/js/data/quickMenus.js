@@ -140,6 +140,7 @@ export var QUICK_MENUS = new Map([
 
             // Clear for reseting game
             ourGameScene.gameSceneCleanup();
+            ourPersist.stageHistory = [];
             
             ourGameScene.backgroundBlur(false);
             
