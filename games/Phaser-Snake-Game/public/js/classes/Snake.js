@@ -1,4 +1,4 @@
-import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
+import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState, updatePlayerStats,
     DIRS, DEBUG, commaInt,
     LENGTH_GOAL, PLAYER_STATS, SPEED_SPRINT, COMBO_ADD_FLOOR,
     X_OFFSET,
@@ -285,6 +285,7 @@ var Snake = new Phaser.Class({
          */
 
         
+        
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
@@ -312,6 +313,8 @@ var Snake = new Phaser.Class({
                  }
                 
         }
+
+    
 
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
             
@@ -366,6 +369,7 @@ var Snake = new Phaser.Class({
                     //portal.snakePortalingSprite.visible = false;
                     //portal.targetObject.snakePortalingSprite.visible = false;
                     scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                    updatePlayerStats()
                     scene.warpToNext(index);
                 }
 

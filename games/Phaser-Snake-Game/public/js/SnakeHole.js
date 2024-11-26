@@ -234,7 +234,8 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
         ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
         ["totalCoinsCollected", PLAYER_STATS.totalCoinsCollected ?? 0],
         ["expertCoinsNotSpawned", PLAYER_STATS.expertCoinsNotSpawned ?? 0],
-        ["atomsOverAte", PLAYER_STATS.overEat ?? 0]
+        ["atomsOverEaten", PLAYER_STATS.atomsOverEaten ?? 0],
+        ["longestBody", PLAYER_STATS.longestBody ?? 0],
     ]);
 
     // Add Saved Values
@@ -246,14 +247,27 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 }
 
-var updatePlayerStats = function (stageData) {
+export var updatePlayerStats = function (stageData) {
 
     
-    PLAYER_STATS.bonks += stageData.bonks;
-    PLAYER_STATS.atomsEaten += stageData.foodLog.length;
-    PLAYER_STATS.turns += stageData.turns;
-    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 
+    var oldKeyList = ["atomsOverAte",
+    "globalStore",
+    "overEat"]
+
+    oldKeyList.forEach( key => {
+        if (key in PLAYER_STATS) {
+            delete PLAYER_STATS[key];
+        }
+    });
+
+    if (stageData) {
+        PLAYER_STATS.bonks += stageData.bonks;
+        PLAYER_STATS.atomsEaten += stageData.foodLog.length;
+        PLAYER_STATS.turns += stageData.turns;
+        PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);  
+    }
+    
     // This also saves changes not listed here that
     // are made directly to PLAYER_STATS object.
     // Like Wrapping and Portaling etc...
