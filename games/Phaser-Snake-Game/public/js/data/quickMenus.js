@@ -118,7 +118,7 @@ export var QUICK_MENUS = new Map([
             
             ourGameScene.gameSceneCleanup();
             
-            ourPersist.comboCover.setVisible(true);
+            //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
             debugger
             ourGameScene.gameSceneCleanup();

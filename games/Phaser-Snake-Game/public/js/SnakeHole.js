@@ -936,6 +936,95 @@ class PinballDisplayScene extends Phaser.Scene {
     init() {
     }
     create() {
+        //const ourGame = this.scene.get("GameScene");
+
+        // pinball display/combo cover
+        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+        .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+        this.comboCoverReady = this.add.sprite(GRID * 15, 2, 'UI_comboReady', 0
+        ).setOrigin(1,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
+
+        this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
+        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
+
+        // combo letters
+        this.letterC = this.make.image({
+            x: X_OFFSET + GRID * 0 - GRID * 4 -6,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 0,
+            add: false,
+            alpha: 0,
+            });
+        this.letterO = this.make.image({
+            x: X_OFFSET + GRID * 1.25 - GRID * 4 -5,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 1,
+            add: false,
+            alpha: 0,
+        });
+        this.letterM = this.make.image({
+            x: X_OFFSET + GRID * 2.75 - GRID * 4 -4,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 2,
+            add: false,
+            alpha: 0,
+        });
+        this.letterB = this.make.image({
+            x: X_OFFSET + GRID * 4 - GRID * 4 -3,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 3,
+            add: false,
+            alpha: 0,
+        });
+        this.letterO2 = this.make.image({
+            x: X_OFFSET + GRID * 5.25 - GRID * 4 -2,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 1,
+            add: false,
+            alpha: 0,
+        });
+        this.letterExplanationPoint = this.make.image({
+            x: X_OFFSET + GRID * 6 - GRID * 4 -1,
+            y:  GRID * 1.25,
+            key: 'comboLetters',
+            frame: 4,
+            add: false,
+            alpha: 0,
+        });
+        
+
+        this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
+        ).setOrigin(0.0,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
+
+
+        
+
+
+
+        this.comboMasks = []
+        this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
+            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake,
+             this.comboCoverBONK,this.comboCoverReady)
+
+        this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
+        this.comboMasksContainer.add(this.comboMasks);
+
+        this.comboMasksContainer.setVisible(false);
+
+
+        this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
+
+        this.comboCover.mask.invertAlpha = true;
+        
+        // despite happening after the combo cover objects are created, 
+        // there's still a frame where the snake can be seen before its tween starts
+        // but only after resetting back to main menu
+        //ourPersist.comboCover.setVisible(false);
     }
 }
 
@@ -1557,9 +1646,12 @@ class StartScene extends Phaser.Scene {
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
+        this.scene.launch('PinballDisplayScene');
         this.scene.launch('SpaceBoyScene');
         this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
+        
+        
         
         //temporaily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
@@ -3509,9 +3601,9 @@ class PersistScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(0x111111);
     this.add.image(SCREEN_WIDTH/2 - 1,GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
-    this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
-        .setOrigin(0.0,0.0).setDepth(11);
-    this.comboCover.setScrollFactor(0);
+    //this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+    //    .setOrigin(0.0,0.0).setDepth(11);
+    //this.comboCover.setScrollFactor(0);
     this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
     
@@ -3875,6 +3967,7 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
+        const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
@@ -4004,6 +4097,32 @@ class GameScene extends Phaser.Scene {
             startingBlackhole.play('blackholeClose');
         });
 
+        // show snake pan across pinball display
+        if (this.stage == START_STAGE) {
+            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
+            this.tweens.add({
+                targets: ourPinball.comboCoverSnake,
+                x: {from: ourPinball.comboCoverSnake.x - 132,to:ourPinball.comboCoverSnake.x + 0},
+                duration: 500,
+                ease: 'sine.inout',
+                yoyo: false,
+                delay: 0,
+                repeat: 0,
+                onComplete: () => {
+                    ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 0)
+                }
+            });  
+        } 
+        // fade in 'READY?' for pinball display
+        this.tweens.add({
+            targets: ourPinball.comboCoverReady,
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'sine.inout',
+            yoyo: false,
+            delay: 0,
+            repeat: 0,
+        });
        
 
        
@@ -5568,125 +5687,16 @@ class GameScene extends Phaser.Scene {
        this.letterX = this.add.sprite(X_OFFSET + GRID * 7 - GRID * 4,GRID * 1.25,"comboLetters", 5).setDepth(51).setAlpha(0);
        */
 
-       this.letterC = this.make.image({
-        x: X_OFFSET + GRID * 0 - GRID * 4 -6,
-        y:  GRID * 1.25,
-        key: 'comboLetters',
-        frame: 0,
-        add: false,
-        alpha: 0,
-        });
-        this.letterO = this.make.image({
-            x: X_OFFSET + GRID * 1.25 - GRID * 4 -5,
-            y:  GRID * 1.25,
-            key: 'comboLetters',
-            frame: 1,
-            add: false,
-            alpha: 0,
-        });
-        this.letterM = this.make.image({
-            x: X_OFFSET + GRID * 2.75 - GRID * 4 -4,
-            y:  GRID * 1.25,
-            key: 'comboLetters',
-            frame: 2,
-            add: false,
-            alpha: 0,
-        });
-        this.letterB = this.make.image({
-            x: X_OFFSET + GRID * 4 - GRID * 4 -3,
-            y:  GRID * 1.25,
-            key: 'comboLetters',
-            frame: 3,
-            add: false,
-            alpha: 0,
-        });
-        this.letterO2 = this.make.image({
-            x: X_OFFSET + GRID * 5.25 - GRID * 4 -2,
-            y:  GRID * 1.25,
-            key: 'comboLetters',
-            frame: 1,
-            add: false,
-            alpha: 0,
-        });
-        this.letterExplanationPoint = this.make.image({
-            x: X_OFFSET + GRID * 6 - GRID * 4 -1,
-            y:  GRID * 1.25,
-            key: 'comboLetters',
-            frame: 4,
-            add: false,
-            alpha: 0,
-        });
+       
         
         
-        // pinball display/combo cover
-        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
-        .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
-        this.comboCoverReady = this.add.sprite(GRID * 15, 2, 'UI_comboReady', 0
-        ).setOrigin(1,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
-
-        this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
-        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
-        // show snake pan across pinball display
-        if (ourGame.stage == START_STAGE) {
-            ourGame.comboCoverSnake.setTexture('UI_comboSnake', 1)
-            this.tweens.add({
-                targets: ourGame.comboCoverSnake,
-                x: {from: ourGame.comboCoverSnake.x - 132,to:ourGame.comboCoverSnake.x + 0},
-                duration: 500,
-                ease: 'sine.inout',
-                yoyo: false,
-                delay: 0,
-                repeat: 0,
-                onComplete: () => {
-                    ourGame.comboCoverSnake.setTexture('UI_comboSnake', 0)
-                }
-            });  
-        } 
-        // fade in 'READY?'
-        this.tweens.add({
-            targets: ourGame.comboCoverReady,
-            alpha: {from: 0, to: 1},
-            duration: 500,
-            ease: 'sine.inout',
-            yoyo: false,
-            delay: 0,
-            repeat: 0,
-        });  
         
-
-        this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
-        ).setOrigin(0.0,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
-
-
-        
-
-
-
-        this.comboMasks = []
-        this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
-            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake,
-             this.comboCoverBONK,this.comboCoverReady)
-
-        this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
-        this.comboMasksContainer.add(this.comboMasks);
-
-        this.comboMasksContainer.setVisible(false);
-
-
-        this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
-
-        this.comboCover.mask.invertAlpha = true;
-        
-        // despite happening after the combo cover objects are created, 
-        // there's still a frame where the snake can be seen before its tween starts
-        // but only after resetting back to main menu
-        ourPersist.comboCover.setVisible(false);
 
         
 
         
 
-        //this.comboMasksContainer.setScrollFactor(0);
+
         
        // #endregion
 
@@ -6736,10 +6746,11 @@ class GameScene extends Phaser.Scene {
     // #region .gameOver(
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
+        const ourPinball = this.scene.get("PinballDisplayScene");
         this.scene.get('SpaceBoyScene').nextSong(`track_149`);
         var ourGame = this.scene.get("GameScene");
         
-        ourGame.comboCoverSnake.setTexture('UI_comboSnake', 6)
+        ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 6)
 
         //style
         const finalScoreStyle = {
@@ -7202,10 +7213,14 @@ class GameScene extends Phaser.Scene {
 
         const ourPersist = this.scene.get('PersistScene');
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
+        const ourPinball = this.scene.get("PinballDisplayScene");
         this.gState = GState.TRANSITION;
 
         this.scoreTweenShow();
         this.snake.head.setTexture('snakeDefault', 0);
+        this.goFadeOut = false;
+        ourPinball.comboCoverReady.setOrigin(1.0,0)
+        ourPinball.comboCoverReady.setTexture('UI_comboReady')
 
         if (this.helpPanel) {
             this.tweens.add({
@@ -7374,7 +7389,7 @@ class GameScene extends Phaser.Scene {
                                     this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
                                 }
                                 //setting this to visible is less noticible than leaving it blank for a frame
-                                ourPersist.comboCover.setVisible(true);
+                                //.comboCover.setVisible(true);
                                 break;
                             case this.mode === MODES.GAUNTLET:
                                 var nextStageID = ourPersist.gauntlet.shift();
@@ -7498,6 +7513,7 @@ class GameScene extends Phaser.Scene {
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
         var ourGame = this.scene.get("GameScene");
+        const ourPinball = this.scene.get("PinballDisplayScene");
         ourPersist.loseCoin();
         this.coinsUIIcon.setVisible(false);
         ourPersist.coins += -1;
@@ -7505,20 +7521,20 @@ class GameScene extends Phaser.Scene {
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
         );
         
-        ourGame.comboCoverSnake.setTexture('UI_comboSnake', 5)
+        ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 5)
         
-        this.comboCoverBONK.setAlpha(1);
+        ourPinball.comboCoverBONK.setAlpha(1);
         
         this.UI_bonkTween = this.tweens.add({
-            targets: ourGame.comboCoverBONK, 
-            x: {from: ourGame.comboCoverBONK.x ,to:ourGame.comboCoverBONK.x - 240},
+            targets: ourPinball.comboCoverBONK, 
+            x: {from: ourPinball.comboCoverBONK.x ,to:ourPinball.comboCoverBONK.x - 240},
             yoyo: false,
             duration: 1600,
             ease: 'Linear',
             delay: 0,
             onComplete: () =>{
-                this.comboCoverBONK.x = GRID * 17.5
-                this.comboCoverBONK.setAlpha(0);
+                ourPinball.comboCoverBONK.x = GRID * 17.5
+                ourPinball.comboCoverBONK.setAlpha(0);
             },
         }); 
 
@@ -7911,13 +7927,14 @@ class GameScene extends Phaser.Scene {
             
             if (this.gState === GState.PLAY) {
                 var ourGame = this.scene.get("GameScene");
+                const ourPinball = this.scene.get("PinballDisplayScene");
                 // fade out 'GO!'
                 if (!ourGame.goFadeOut) {
-                    this.comboCoverReady.setTexture('UI_comboGo');
-                    this.comboCoverReady.setOrigin(1.5,0)
+                    ourPinball.comboCoverReady.setTexture('UI_comboGo');
+                    ourPinball.comboCoverReady.setOrigin(1.5,0)
                     ourGame.goFadeOut = true;
                     this.tweens.add({
-                        targets: ourGame.comboCoverReady,
+                        targets: ourPinball.comboCoverReady,
                         alpha: 0,
                         duration: 500,
                         ease: 'sine.inout',
@@ -9918,6 +9935,7 @@ class InputScene extends Phaser.Scene {
 
 
     moveUp(gameScene, key) {
+        const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
 
@@ -9928,7 +9946,7 @@ class InputScene extends Phaser.Scene {
                 // At anytime you can update the direction of the snake.
             gameScene.snake.head.setTexture('snakeDefault', 6);
             gameScene.snake.direction = DIRS.UP;
-            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 4)
+            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 4)
             
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
             this.turns += 1;
@@ -9953,6 +9971,7 @@ class InputScene extends Phaser.Scene {
     }
 
     moveDown(gameScene, key) {
+        const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
            
@@ -9960,7 +9979,7 @@ class InputScene extends Phaser.Scene {
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 7);
             gameScene.snake.direction = DIRS.DOWN;
-            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 3)
+            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 3)
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -9984,6 +10003,7 @@ class InputScene extends Phaser.Scene {
     }
 
     moveLeft(gameScene, key) {
+        const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
             
@@ -9991,7 +10011,7 @@ class InputScene extends Phaser.Scene {
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
             gameScene.snake.direction = DIRS.LEFT;
-            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 2)
+            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 2)
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -10015,13 +10035,14 @@ class InputScene extends Phaser.Scene {
     }
 
     moveRight(gameScene, key) {
+        const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);
             gameScene.snake.direction = DIRS.RIGHT;
-            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 1)
+            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
