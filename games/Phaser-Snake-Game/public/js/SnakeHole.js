@@ -564,15 +564,7 @@ class SpaceBoyScene extends Phaser.Scene {
         super({key: 'SpaceBoyScene', active: false});
     }
     init() {
-        this.globalFoodLog = [];
         this.navLog = [];
-
-        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
-        this.startTrack = this.shuffledTracks.pop();
-
-        this.music = this.sound.add(`track_${this.startTrack}`,{
-            volume: 0.33
-        });
     }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
@@ -611,16 +603,6 @@ class SpaceBoyScene extends Phaser.Scene {
             delay: 500,
             });
 
-        var columnX = X_OFFSET + GRID * 36;
-
-        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
-        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
-        this.trackID.setDepth(80);
-        this.trackID.setText(this.startTrack);
-
-        const loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
-        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
-
 
         switch (persist.mode) {
             case MODES.CLASSIC:
@@ -638,50 +620,6 @@ class SpaceBoyScene extends Phaser.Scene {
                 this.mapProgressPanelText.setText("SHIP LOG");
                 break;
         }
-
-        
-        
-        
-        loopButton.on('pointerdown', () => {
-            this.music.play();
-            loopButton.setFrame(5);
-        }, this);
-    
-        const pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
-        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
-        
-        pauseButton.on('pointerdown', () => {
-            if (this.music.isPlaying) {
-                    pauseButton.setFrame(1);
-                    this.music.pause();
-            }  else {
-
-                    pauseButton.setFrame(0);
-                    this.music.resume();
-                    //pauseButton.setTintFill(0x000000);
-                
-            }
-        }, this);
-
-        const nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
-        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
-        nextButton.on('pointerdown', () => {
-            nextButton.setFrame(3);
-            this.music.stop();
-            this.nextSong();
-        }, this);
-
-        this.input.on('pointerup', function(pointer){
-            loopButton.setFrame(4);
-            nextButton.setFrame(2);
-            
-        }, this);
-
-        
-        this.music.on('pause', () => {
-            //pauseButton.setTintFill(0x8B0000);
-        }, this);
-
 
     }
     setLog(currentStage) {
@@ -729,7 +667,76 @@ class SpaceBoyScene extends Phaser.Scene {
         this.navLog.push(stageText, stageOutLine);
 
     }  
-    startMusic () {
+
+}
+
+class MusicPlayerScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'MusicPlayerScene', active: false});
+    }
+    init() {
+        this.hasStarted = false;
+
+        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        this.startTrack = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${this.startTrack}`,{
+            volume: 0.33
+        });
+    }
+    create() {
+
+        
+        var columnX = X_OFFSET + GRID * 36;
+        
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
+        this.trackID.setDepth(80);
+        this.trackID.setText(this.startTrack);
+
+        const loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        
+        loopButton.on('pointerdown', () => {
+            this.music.play();
+            loopButton.setFrame(5);
+        }, this);
+    
+        const pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        
+        pauseButton.on('pointerdown', () => {
+            if (this.music.isPlaying) {
+                    pauseButton.setFrame(1);
+                    this.music.pause();
+            }  else {
+
+                    pauseButton.setFrame(0);
+                    this.music.resume();
+                    //pauseButton.setTintFill(0x000000);
+                
+            }
+        }, this);
+
+        const nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        nextButton.on('pointerdown', () => {
+            nextButton.setFrame(3);
+            this.music.stop();
+            this.nextSong();
+        }, this);
+
+        this.input.on('pointerup', function(pointer){
+            loopButton.setFrame(4);
+            nextButton.setFrame(2);
+            
+        }, this);
+        
+        this.music.on('pause', () => {
+            //pauseButton.setTintFill(0x8B0000);
+        }, this);
+    }
+    startMusic() {
         //music.on('complete', listener);
         this.music = this.sound.add(`track_86`,{
             volume: 0.2
@@ -743,8 +750,6 @@ class SpaceBoyScene extends Phaser.Scene {
 
     }
     nextSong (songID) {
-        
-
         switch (songID) {
             case `track_149`: // Game Over Song
                 this.music.stop();
@@ -793,16 +798,6 @@ class SpaceBoyScene extends Phaser.Scene {
                 break;
         }
 
-    }
-}
-
-class MusicPlayerScene extends Phaser.Scene {
-    constructor () {
-        super({key: 'MusicPlayerScene', active: false});
-    }
-    init() {
-    }
-    create() {
     }
 }
 
@@ -980,7 +975,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                     sides: 4,
                 },
                 //slop:0.8,
-            }).setDepth(49);
+            }).setDepth(40);
             //plinkoDisc.setCircle(3.33);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
@@ -1266,8 +1261,8 @@ class TutorialScene extends Phaser.Scene {
                 scene.scene.get("PersistScene").coins = START_COINS;
 
 
-                spaceBoy.music.pause();
-                scene.scene.get("SpaceBoyScene").nextSong();
+                scene.scene.get("MusicPlayerScene").music.pause();
+                scene.scene.get("MusicPlayerScene").nextSong();
 
                 // @Holden add transition to nextScene here.
                 scene.scene.start("GameScene", {
@@ -1604,9 +1599,10 @@ class StartScene extends Phaser.Scene {
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
-        this.scene.launch('PinballDisplayScene');
         this.scene.launch('PlinkoMachineScene');
+        this.scene.launch('PinballDisplayScene');
         this.scene.launch('SpaceBoyScene');
+        this.scene.launch('MusicPlayerScene');
         this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
         
@@ -3138,8 +3134,8 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
 
-                if (!this.scene.get("SpaceBoyScene").music.isPlaying && !this.scene.get("SpaceBoyScene").music.isPaused) {
-                    this.scene.get("SpaceBoyScene").startMusic();
+                if (!this.scene.get("MusicPlayerScene").hasStarted) {
+                    this.scene.get("MusicPlayerScene").startMusic();
                 } 
 
                 mainMenuScene.pressToPlayTween.stop();
@@ -9471,7 +9467,6 @@ class ScoreScene extends Phaser.Scene {
 
         });
 
-        this.scene.get("SpaceBoyScene").globalFoodLog = _histLog;
 
         if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
             localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
