@@ -82,11 +82,11 @@ export var QUICK_MENUS = new Map([
                 //ourGameScene.events.off('spawnBlackholes');
                 //ourGameScene.scene.get("InputScene").scene.restart();
 
-                var previous = ourGameScene.scene.get("SpaceBoyScene").stageHistory.pop();
+                var previous = ourGameScene.scene.get("PersistScene").stageHistory.pop();
                 if (previous != undefined) {
                     if (ourGameScene.stage != previous.stage) {
                         // Put It back
-                        ourGameScene.scene.get("SpaceBoyScene").stageHistory.push(previous);
+                        ourGameScene.scene.get("PersistScene").stageHistory.push(previous);
                     } else {
                         // Leave it out so you can run it again.
                     }
