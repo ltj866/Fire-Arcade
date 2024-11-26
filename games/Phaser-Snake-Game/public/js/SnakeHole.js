@@ -3943,8 +3943,6 @@ class GameScene extends Phaser.Scene {
         
 
         
-        
-        this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
 
@@ -6206,51 +6204,6 @@ class GameScene extends Phaser.Scene {
     // #region .snakeCriticalState(
     snakeCriticalState(){
         const coins = this.scene.get("PersistScene").coins;
-        if (coins === 0 && this.snakeCritical === false){
-            this.scene.get("SpaceBoyScene").nextSong(`track_175`);
-            this.snakeCriticalTween = this.tweens.addCounter({
-                from: 255,
-                to: 0,
-                yoyo: true,
-                duration: 500,
-                ease: 'Linear',
-                repeat: -1,
-                onUpdate: tween =>{
-                    const value = Math.floor(tween.getValue());
-                    const color1 = Phaser.Display.Color.RGBToString(200, value, value);
-                    this.coinUIText.node.style.color = color1;
-                    this.snake.body.forEach((part) => {
-                        part.setTint(Phaser.Display.Color.GetColor(200, value, value));
-                    })
-                }
-            });
-            this.snakeCritical = true
-
-        }
-        else if (coins > 0 && this.snakeCritical === true){ //null check
-            if (this.snakeCriticalTween != null){
-                this.snakeCriticalTween.destroy();
-            }
-            this.scene.get("SpaceBoyScene").music.stop();
-            this.scene.get("SpaceBoyScene").nextSong();
-            this.snakeCriticalTween = this.tweens.addCounter({
-                from: this.snakeCriticalTween.getValue(),
-                to: 255,
-                yoyo: false,
-                duration: 500,
-                ease: 'Linear',
-                repeat: 0,
-                onUpdate: tween =>{
-                    const value = Math.floor(tween.getValue());
-                    const color1 = Phaser.Display.Color.RGBToString(255, value, value);
-                    this.coinUIText.node.style.color = color1;
-                    this.snake.body.forEach((part) => {
-                        part.setTint(Phaser.Display.Color.GetColor(255, value, value));
-                    })
-                }
-            });
-            this.snakeCritical = false
-        }
     }
 
     transitionVisual () {
@@ -6707,7 +6660,7 @@ class GameScene extends Phaser.Scene {
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
         const ourPinball = this.scene.get("PinballDisplayScene");
-        this.scene.get('SpaceBoyScene').nextSong(`track_149`);
+        this.scene.get('MusicPlayerScene').nextSong(`track_149`);
         var ourGame = this.scene.get("GameScene");
         
         ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 6)
@@ -6763,7 +6716,7 @@ class GameScene extends Phaser.Scene {
             });
 
             const onContinue = function () {
-                ourGameScene.scene.get("SpaceBoyScene").nextSong();
+                ourGameScene.scene.get("MusicPlayerScene").nextSong();
                 ourGameScene.scene.start('MainMenuScene');
             }
             onContinue.bind(this);
