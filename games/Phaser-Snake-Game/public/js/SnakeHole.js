@@ -747,6 +747,8 @@ class MusicPlayerScene extends Phaser.Scene {
         this.music.on('complete', () => {
             this.nextSong();
         }, this);
+        
+        this.hasStarted = true;
 
     }
     nextSong (songID) {

@@ -37,7 +37,7 @@ var Snake = new Phaser.Class({
                 //scene.coinUIText.node.style.color = color1;
                 this.body.forEach((part) => {
                     part.setTint(Phaser.Display.Color.GetColor(200, value, value));
-                })
+                });
             }
         });
 
