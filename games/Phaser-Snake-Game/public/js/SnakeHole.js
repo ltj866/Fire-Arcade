@@ -2843,6 +2843,8 @@ class MainMenuScene extends Phaser.Scene {
 
                             this.scene.get("InputScene").scene.restart();
 
+                            this.scene.get("PersistScene").stageHistory = [];
+
                             // Launch Game Here
                             var startID = ourPersist.gauntlet.shift();
                             //debugger
@@ -6397,8 +6399,27 @@ class GameScene extends Phaser.Scene {
         // Start slowMoValCopy at 1 (default time scale). It's copied to preserve its value outside the tween
         var slowMoValCopy = 1;
 
+        var finalFanfare = false;
 
-        if (!this.nextStagePortalLayer.findByIndex(616)){ //check if we're on last stage -- using placeholder code, right now always defaults to true
+        switch (true) {
+            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                if (this.nextStagePortalLayer.findByIndex(616)){
+                    finalFanfare = true;
+                }
+                break;
+            case this.mode === MODES.GAUNTLET:
+                if (ourPersist.gauntlet.length === 0) {
+                    finalFanfare = true;
+                }
+                break;
+        
+            default:
+                debugger // Saftey Break. Don't remove.
+                break;
+        }
+
+
+        if (!finalFanfare){
             //normal ending
             // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
             this.slowMoTween = this.tweens.add({
@@ -6439,6 +6460,7 @@ class GameScene extends Phaser.Scene {
         else{
             //fanfare ending
             // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
+            this.snake.bodyVisualTween.pause();
             console.log('should rainbow right now fr')
             this.slowMoTween = this.tweens.add({
                 targets: { value: 1 },
