@@ -998,6 +998,8 @@ class TutorialScene extends Phaser.Scene {
     }
     create(tutorialPanels) {
 
+        this.scene.bringToTop('MusicPlayerScene');
+
         // AUDIO
         this.pop02 = this.sound.add('pop02');
 
@@ -1605,6 +1607,9 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('MusicPlayerScene');
         this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
+        
+        this.scene.bringToTop('SpaceBoyScene');
+        this.scene.bringToTop('MusicPlayerScene');
         
         
         
