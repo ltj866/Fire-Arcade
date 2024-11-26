@@ -26,6 +26,10 @@ var Snake = new Phaser.Class({
         
         this.body.unshift(this.head);
 
+        //if (coins 0) {
+        //    
+        //}
+
         this.lastPlayedCombo = 0;
         this.lastPortal = undefined; // Set
         this.closestPortal = undefined; // TYPE Portal.
@@ -441,6 +445,10 @@ var Snake = new Phaser.Class({
         
         this.direction = DIRS.STOP;
         scene.screenShake();
+
+        if (ourPersistScene.coins === 0) {
+            // tween.
+        }
 
         if (!scene.stopOnBonk) {
 

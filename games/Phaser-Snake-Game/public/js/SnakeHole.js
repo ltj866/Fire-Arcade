@@ -7185,15 +7185,16 @@ class GameScene extends Phaser.Scene {
             log = null;
         }
 
+    }
+    gameSceneFullCleanup() {
+        // Put end of run clean up loop.
+        //while (ourSpaceBoy.navLog.length > 0) {
+        //    var log = ourSpaceBoy.navLog.pop();
+        //    log.destroy();
+        //    log = null;
+        //}
 
-        /*
-        if (cleanupType === 'half') {
-        }
-        if (cleanupType === 'restart') {
-        }
-        if (cleanupType === 'full') {
-        }*/
-
+        this.gameSceneCleanup();
     }
     
  
