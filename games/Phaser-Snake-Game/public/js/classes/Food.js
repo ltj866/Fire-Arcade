@@ -113,6 +113,11 @@ var Food = new Phaser.Class({
         }, [], this);
 
         scene.onEat(this);
+        if (scene.snake.body.length > 29) {
+            PLAYER_STATS.overEat += 1;
+            
+        }
+
 
         
         

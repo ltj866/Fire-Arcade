@@ -233,7 +233,8 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
         ["globalScore", PLAYER_STATS.globalScore ?? 0],
         ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
         ["totalCoinsCollected", PLAYER_STATS.totalCoinsCollected ?? 0],
-        ["expertCoinsNotSpawned", PLAYER_STATS.expertCoinsNotSpawned ?? 0]
+        ["expertCoinsNotSpawned", PLAYER_STATS.expertCoinsNotSpawned ?? 0],
+        ["atomsOverAte", PLAYER_STATS.overEat ?? 0]
     ]);
 
     // Add Saved Values
@@ -5871,7 +5872,9 @@ class GameScene extends Phaser.Scene {
               });
             
             
-            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+            PLAYER_STATS.globalScore += timeLeft;
             
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
