@@ -218,7 +218,58 @@ var updateSumOfBest = function(scene) {
     });
 }
 
+var tempSumOfBest = function(stageData) {
+    /***
+     *  This most important thing this function does is update the bestOfStageData object.
+     *  That is used to check if a black hole should be spawned to a new level.
+     */
+    let entries = Object.entries(localStorage);
 
+    var sumOfBest;
+
+    var ignoreSet = new Set(STAGE_OVERRIDES.keys());
+
+    scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
+        var tempJSONClassic = JSON.parse(localStorage.getItem(`${uuid}_best-Classic`));
+        var tempJSONExpert = JSON.parse(localStorage.getItem(`${uuid}_best-Expert`));
+
+        // TODO: Check both and take the highest value.
+        // TODO: Make Sure the codex pulls from this data, but score screen best and unlock best do not pull from here.
+        var _scoreTotalClassic;
+        if (tempJSONClassic) { // False if not played stage before.
+            _stageDataClassic = new StageData(tempJSONClassic);
+            _scoreTotalClassic = _stageDataClassic.calcTotal();
+        }
+        else {
+            _scoreTotalClassic = 0;   
+        }
+
+        var _scoreTotalExpert
+        if (tempJSONExpert) {
+            _stageDataExpert = new StageData(tempJSONExpert);
+            _scoreTotalExpert = _stageDataExpert.calcTotal();
+    
+        } else {
+            _scoreTotalExpert = 0;
+        }
+
+        var _currentStageTotal;
+        if (_stageDataClassic.stage === stageData.stage) {
+            debugger
+            _currentStageTotal = stageData.calcTotal();
+        } else {
+            _currentStageTotal = 0;
+        }
+
+        var scoreToAdd = Math.max(_scoreTotalClassic, _scoreTotalExpert,  _currentStageTotal);
+
+        sumOfBest += scoreToAdd;
+        
+
+    });
+
+    return sumOfBest;
+}
 
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
@@ -9029,7 +9080,7 @@ class ScoreScene extends Phaser.Scene {
                 "text-shadow": '#000000 1px 0 6px',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `STAGE SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
+                `FINAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
         ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
 
         
@@ -9470,16 +9521,16 @@ class ScoreScene extends Phaser.Scene {
                         sumOfBest = ourPersist.sumOfBestTut;
                         break
                     case MODES.PRACTICE:
-                            prevStagesComplete = ourPersist.prevStagesCompleteClassic;
-                            prevSumOfBest = ourPersist.prevSumOfBestClassic;
-                            prevPlayerRank = ourPersist.prevPlayerRankClassic;
-    
-                            // This shouldn't update in practice? Because it doesn't save.
-                            totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
-                            newRank = prevPlayerRank;
-                            stagesComplete = prevStagesComplete;
-                            sumOfBest = prevSumOfBest;
-                            break
+                        prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                        prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                        prevPlayerRank = ourPersist.prevPlayerRankClassic;
+
+                        // Show temporary + if you had done it in Classic or Expert.
+                        totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+                        stagesComplete = ourPersist.stagesCompleteClassic;
+                        sumOfBest = tempSumOfBest(ourGame.stage);
+                        break
                     
                     default:
                         // Leave this one as a safety trigger
