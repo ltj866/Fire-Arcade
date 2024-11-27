@@ -418,12 +418,22 @@ const RANK_BENCHMARKS = new Map([
 
 export const MODES = Object.freeze({
     TUTORIAL: 0,
-    CLASSIC: 1,
-    EXPERT: 2,
-    HARDCORE: 3,
-    GAUNTLET: 4,
-    PRACTICE: 5
-})
+    PRACTICE: 1,
+    ADVENTURE: 2,
+    CLASSIC: 3,
+    EXPERT: 4,
+    HARDCORE: 5,
+    GAUNTLET: 6,
+});
+
+export const MODES_TEXT = new Map([
+    [MODES.PRACTICE, "Practice"],
+    [MODES.CLASSIC, "Adventure"],
+    [MODES.EXPERT, "Adventure"],
+    [MODES.GAUNTLET, "Gauntlet"],
+
+]);
+
 
 const MODE_LOCAL = new Map([
     [MODES.CLASSIC, "Classic"],
@@ -2865,7 +2875,6 @@ class MainMenuScene extends Phaser.Scene {
                     
                 });
                 mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
-                debugger
                 mainMenuScene.scene.get("PersistScene").coins = 12;
                 mainMenuScene.scene.sleep('MainMenuScene');
                 return true;
@@ -2878,7 +2887,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.scene.get("StartScene").UUID_MAP.size;
                 
                 if (EXPERT_CHOICE && checkExpertUnlocked.call(this)) { // EXPERT_CHOICE
-                    var qMenu = QUICK_MENUS.get("adventure-mode");
+                    var qMenu = QUICK_MENUS.get(`adventure-mode`);
 
                     mainMenuScene.scene.launch("QuickMenuScene", {
                         menuOptions: qMenu, 
@@ -2928,6 +2937,7 @@ class MainMenuScene extends Phaser.Scene {
                         menuVal = function () {
                             ourPersist.mode = MODES.GAUNTLET;
                             ourPersist.coins = val.startingCoins;
+                            ourPersist.gauntletKey = key;
                             ourPersist.gauntlet = val.stages.split("|");
                             ourPersist.gauntletSize = ourPersist.gauntlet.length;
                             ourSpaceBoy.mapProgressPanelText.setText(key);
@@ -4900,8 +4910,8 @@ class GameScene extends Phaser.Scene {
                 
                 if (!this.scene.isActive(ourScoreScene) && !this.scene.isActive('StageCodex')){
                     this.scene.launch("QuickMenuScene", {
-                        menuOptions: QUICK_MENUS.get("tab-menu"), 
-                        textPrompt: "Quick Menu",
+                        menuOptions: QUICK_MENUS.get(`tab-menu-${MODES_TEXT.get(this.mode)}`), 
+                        textPrompt: `Quick Menu - ${MODES_TEXT.get(this.mode)}`,
                         fromScene: this,
                         cursorIndex: 0,
                         sideScene:true
