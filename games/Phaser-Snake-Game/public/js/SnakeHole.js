@@ -218,48 +218,44 @@ var updateSumOfBest = function(scene) {
     });
 }
 
-var tempSumOfBest = function(stageData) {
-    /***
-     *  This most important thing this function does is update the bestOfStageData object.
-     *  That is used to check if a black hole should be spawned to a new level.
-     */
-    let entries = Object.entries(localStorage);
-
-    var sumOfBest;
-
-    var ignoreSet = new Set(STAGE_OVERRIDES.keys());
+var tempSumOfBest = function(scene, stageData) {
+    var sumOfBest = 0;
 
     scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
         var tempJSONClassic = JSON.parse(localStorage.getItem(`${uuid}_best-Classic`));
         var tempJSONExpert = JSON.parse(localStorage.getItem(`${uuid}_best-Expert`));
 
-        // TODO: Check both and take the highest value.
-        // TODO: Make Sure the codex pulls from this data, but score screen best and unlock best do not pull from here.
         var _scoreTotalClassic;
+        var _currentStageTotal;
         if (tempJSONClassic) { // False if not played stage before.
-            _stageDataClassic = new StageData(tempJSONClassic);
+            var _stageDataClassic = new StageData(tempJSONClassic);
             _scoreTotalClassic = _stageDataClassic.calcTotal();
+
+
+            
+            if (_stageDataClassic.stage === stageData.stage) {
+                debugger
+                _currentStageTotal = stageData.calcTotal();
+            } else {
+                _currentStageTotal = 0;
+            }
+
         }
         else {
-            _scoreTotalClassic = 0;   
+            _scoreTotalClassic = 0; 
+            _currentStageTotal = 0;  
         }
 
         var _scoreTotalExpert
         if (tempJSONExpert) {
-            _stageDataExpert = new StageData(tempJSONExpert);
+            var _stageDataExpert = new StageData(tempJSONExpert);
             _scoreTotalExpert = _stageDataExpert.calcTotal();
     
         } else {
             _scoreTotalExpert = 0;
         }
 
-        var _currentStageTotal;
-        if (_stageDataClassic.stage === stageData.stage) {
-            debugger
-            _currentStageTotal = stageData.calcTotal();
-        } else {
-            _currentStageTotal = 0;
-        }
+        
 
         var scoreToAdd = Math.max(_scoreTotalClassic, _scoreTotalExpert,  _currentStageTotal);
 
@@ -9529,7 +9525,7 @@ class ScoreScene extends Phaser.Scene {
                         totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
                         newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
                         stagesComplete = ourPersist.stagesCompleteClassic;
-                        sumOfBest = tempSumOfBest(ourGame.stage);
+                        sumOfBest = tempSumOfBest(ourGame, this.stageData);
                         break
                     
                     default:
