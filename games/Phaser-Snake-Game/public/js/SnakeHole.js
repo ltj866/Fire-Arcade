@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -6525,55 +6525,6 @@ class GameScene extends Phaser.Scene {
         }    
     }
 
-    // #region .snakeCriticalState(
-    snakeCriticalState(){
-        const coins = this.scene.get("PersistScene").coins;
-        if (coins === 0 && this.snakeCritical === false){
-            this.scene.get("MusicPlayerScene").nextSong(`track_175`);
-            this.snakeCriticalTween = this.tweens.addCounter({
-                from: 255,
-                to: 0,
-                yoyo: true,
-                duration: 500,
-                ease: 'Linear',
-                repeat: -1,
-                onUpdate: tween =>{
-                    const value = Math.floor(tween.getValue());
-                    const color1 = Phaser.Display.Color.RGBToString(200, value, value);
-                    this.coinUIText.node.style.color = color1;
-                    this.snake.body.forEach((part) => {
-                        part.setTint(Phaser.Display.Color.GetColor(200, value, value));
-                    })
-                }
-            });
-            this.snakeCritical = true
-
-        }
-        else if (coins > 0 && this.snakeCritical === true){ //null check
-            if (this.snakeCriticalTween != null){
-                this.snakeCriticalTween.destroy();
-            }
-            this.scene.get("MusicPlayerScene").music.stop();
-            this.scene.get("MusicPlayerScene").nextSong();
-            this.snakeCriticalTween = this.tweens.addCounter({
-                from: this.snakeCriticalTween.getValue(),
-                to: 255,
-                yoyo: false,
-                duration: 500,
-                ease: 'Linear',
-                repeat: 0,
-                onUpdate: tween =>{
-                    const value = Math.floor(tween.getValue());
-                    const color1 = Phaser.Display.Color.RGBToString(255, value, value);
-                    this.coinUIText.node.style.color = color1;
-                    this.snake.body.forEach((part) => {
-                        part.setTint(Phaser.Display.Color.GetColor(255, value, value));
-                    })
-                }
-            });
-            this.snakeCritical = false
-        }
-    }
 
     transitionVisual () {
         
@@ -8157,10 +8108,6 @@ class GameScene extends Phaser.Scene {
             }
         }*/
 
-        this.snakeCriticalState(); // TODO: This should only be called once when the snake bonks
-        // Then it should be toggled off in coin.js when onOver iff the snake is in a critical state.
-        // It is out of the loop now so it works as soon as the coin is lost even when in bonked state.
-        
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
