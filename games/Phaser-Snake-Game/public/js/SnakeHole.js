@@ -475,9 +475,10 @@ export const MODES = Object.freeze({
 
 export const MODES_TEXT = new Map([
     [MODES.PRACTICE, "Practice"],
-    [MODES.CLASSIC, "Adventure"],
-    [MODES.EXPERT, "Adventure"],
+    [MODES.CLASSIC, "Classic"],
+    [MODES.EXPERT, "Expert"],
     [MODES.GAUNTLET, "Gauntlet"],
+    [MODES.TUTORIAL, "Classic"],
 
 ]);
 
@@ -2598,7 +2599,7 @@ class StageCodex extends Phaser.Scene {
         var displayList = codexArgs.displayList ?? ["Overall", "Classic", "Expert"];
         var displayIndex = codexArgs.displayIndex ?? 0;
 
-        var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageID;
+        var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageMemory;
 
         var displayCategory = displayList[displayIndex];
         var originScene = codexArgs.originScene;
@@ -2838,7 +2839,7 @@ class StageCodex extends Phaser.Scene {
                 if (safeIndex != -1) {
                     var nextSelect = ([...this.yMap.keys()][safeIndex]);
                     selected = this.yMap.get(nextSelect);
-                    ourPersist.prevCodexStageID = nextSelect;
+                    ourPersist.prevCodexStageMemory = nextSelect;
                     
                     containerToY = selected.conY * -1 + nextRow;
                     this.tweens.add({
@@ -2878,7 +2879,7 @@ class StageCodex extends Phaser.Scene {
      
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
-                ourPersist.prevCodexStageID = nextSelect;
+                ourPersist.prevCodexStageMemory = nextSelect;
                 
                 containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
@@ -3848,7 +3849,9 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.coins = START_COINS;
         this.stageHistory = [];
-        this.prevCodexStageID = START_STAGE;
+        this.prevCodexStageMemory = START_STAGE;
+        this.prevStage = START_STAGE;
+        this.prevRank = 0;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -7471,6 +7474,8 @@ class GameScene extends Phaser.Scene {
         //}
         this.gameSceneCleanup();
 
+        this.scene.get("PersistScene").prevRank = 0;
+
         // reset music player
         if (!this.scene.get("MusicPlayerScene").playerPaused) {
             this.scene.get("MusicPlayerScene").pauseButton.setFrame(0);
@@ -7845,7 +7850,8 @@ class GameScene extends Phaser.Scene {
 
     nextStage(stageName, camDirection) {
         const ourInputScene = this.scene.get("InputScene");
-        this.camDirection = camDirection
+        this.camDirection = camDirection;
+        this.scene.get("PersistScene").prevStage = this.stage;
 
         this.scene.restart( { 
             stage: stageName, 
@@ -8702,7 +8708,7 @@ class ScoreScene extends Phaser.Scene {
 
         // Update Stage Data
         updatePlayerStats(this.stageData);
-        ourPersist.prevStage = this.stageData.stage;
+        //ourPersist.prevStage = this.stageData.stage;
 
         // For properties that may not exist.
         if (ourGame.tiledProperties.has("slug")) {
@@ -9203,10 +9209,21 @@ class ScoreScene extends Phaser.Scene {
                 });
 
                 if(ourGame.mode === MODES.EXPERT) {
-                    ourPersist.coins += this.stageData.stageRank();
-                    ourGame.coinUIText.setHTML(
-                        `${commaInt(ourPersist.coins).padStart(2, '0')}`
-                    )
+
+                    var currentRank = this.stageData.stageRank();
+
+                    var rankDiff = currentRank - this.scene.get("PersistScene").prevRank;
+
+                    debugger
+                    if (rankDiff > 0) {
+                        ourPersist.coins += rankDiff;
+                        // TO DO. Better Visual this is happening would be nice. Like tween up the value.
+                        ourGame.coinUIText.setHTML(
+                            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+                        )
+                        this.scene.get("PersistScene").prevRank = currentRank; 
+                    }
+                    
                 }
             },
             onUpdate: tween =>
