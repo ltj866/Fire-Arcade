@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -9260,7 +9260,7 @@ class ScoreScene extends Phaser.Scene {
                     "text-shadow": '#000000 1px 0 6px',
                 })).setHTML(
                     //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                    `Current Best: ${commaInt(bestScore)}`
+                    `Saved Best*: ${commaInt(bestScore)}`
             ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
             
             const historicalDiff = this.add.dom(SCREEN_WIDTH/2, GRID * 24.10, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -9739,7 +9739,7 @@ class ScoreScene extends Phaser.Scene {
                         bestOfTitle = `Best of Expert`
                         break;
                     case MODES.PRACTICE:
-                        bestOfTitle = `Practicing! Score Not Saved.`
+                        bestOfTitle = `*Practicing! Score Not Saved`
                         break;
                     default:
                         bestOfTitle = ``;
@@ -9769,9 +9769,9 @@ class ScoreScene extends Phaser.Scene {
 
                 this.bestOfModeUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
                     "fontSize":'20px',
-                    "font-weight": '400',
+                    //"font-weight": '400',
                     "text-shadow": '#000000 1px 0 6px',
-                    //"font-style": 'italic',
+                    "font-style": 'italic',
                     //"font-weight": 'bold',
                     })).setHTML(
                         bestOfTitle
