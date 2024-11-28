@@ -453,6 +453,15 @@ export const RANKS = Object.freeze({
     GRAND_MASTER: 5
 });
 
+const RANK_LETTERS = new Map([
+    [RANKS.WOOD, "D"],
+    [RANKS.BRONZE, "C"],
+    [RANKS.SILVER, "B"],
+    [RANKS.GOLD, "A"],
+    [RANKS.PLATINUM, "S"],
+    [RANKS.GRAND_MASTER, "PS"]
+]);
+
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with SpeedBonus
     [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
@@ -720,7 +729,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 
                 var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
                 'mainFont', 
-                   `${stageData.stage.split("_")[1]}`, 
+                   `${stageData.stage.split("_")[1]} ${RANK_LETTERS.get(stageData.stageRank())}`, 
                8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
                this.navLog.push(_stageText);
