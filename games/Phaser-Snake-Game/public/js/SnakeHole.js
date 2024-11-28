@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -219,6 +219,7 @@ var updateSumOfBest = function(scene) {
 }
 
 var tempSumOfBest = function(scene, stageData) {
+    // Dont think this logic works correctly. Should check if you want to use it.
     var sumOfBest = 0;
 
     scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
@@ -234,7 +235,6 @@ var tempSumOfBest = function(scene, stageData) {
 
             
             if (_stageDataClassic.stage === stageData.stage) {
-                debugger
                 _currentStageTotal = stageData.calcTotal();
             } else {
                 _currentStageTotal = 0;
@@ -9223,7 +9223,7 @@ class ScoreScene extends Phaser.Scene {
             
         });
 
-        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -9234,6 +9234,48 @@ class ScoreScene extends Phaser.Scene {
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `FINAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
         ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+
+        if (ourGame.mode === MODES.PRACTICE) {
+            // Show difference in best run to this run.
+
+            var current = Math.floor(this.stageData.calcTotal());
+            var bestScore = Math.floor(BEST_OF_ALL.get(this.stageData.stage).calcTotal())
+
+            var deltaColor;
+            var prefix;
+            if (current > bestScore) {
+                deltaColor = COLOR_BONUS;
+                prefix = "+";
+            } else {
+                deltaColor = COLOR_FOCUS;
+                prefix = "";
+            }
+            
+
+
+            const historicalBest = this.add.dom(SCREEN_WIDTH/2, GRID * 23.35, 'div', Object.assign({}, STYLE_DEFAULT,
+                {
+                    "font-size": "16px",
+                    "font-weight": '400',
+                    "text-align": 'right',
+                    "text-shadow": '#000000 1px 0 6px',
+                })).setHTML(
+                    //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                    `Current Best: ${commaInt(bestScore)}`
+            ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+            
+            const historicalDiff = this.add.dom(SCREEN_WIDTH/2, GRID * 24.10, 'div', Object.assign({}, STYLE_DEFAULT,
+                {
+                    "color": deltaColor,
+                    "font-size": "16px",
+                    "font-weight": '400',
+                    "text-align": 'right',
+                    "text-shadow": '#000000 1px 0 6px',
+                })).setHTML(
+                    //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                    `${prefix}${commaInt(current - bestScore)}`
+            ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+        }
 
         
         this.ScoreContainerL.add(
@@ -9681,7 +9723,7 @@ class ScoreScene extends Phaser.Scene {
                         totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
                         newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
                         stagesComplete = ourPersist.stagesCompleteClassic;
-                        sumOfBest = tempSumOfBest(ourGame, this.stageData);
+                        sumOfBest = ourPersist.prevSumOfBestClassic;
                         break
                     
                     default:
