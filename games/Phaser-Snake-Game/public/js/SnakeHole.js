@@ -853,15 +853,14 @@ class MusicPlayerScene extends Phaser.Scene {
 
                 
         });
+        // Buttons
+        var columnX = X_OFFSET + GRID * 36 + 1;
 
         this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
 
-        // Buttons
-        var columnX = X_OFFSET + GRID * 36 + 1;
-        
         // Loop Button
         this.loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
