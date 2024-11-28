@@ -753,7 +753,7 @@ class MusicPlayerScene extends Phaser.Scene {
         super({key: 'MusicPlayerScene', active: false});
     }
     init() {
-        this.hasStarted = false;
+        this.startedOnce = false;
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -977,11 +977,17 @@ class MusicPlayerScene extends Phaser.Scene {
              // check that a song isn't already playing so we don't add more than 1
             // when looping back to the main menu
             if (!this.music.isPlaying && !this.playerPaused) {
-                console.log('music playing from startMusic()')
-                this.music = this.sound.add(`track_86`,{
-                    volume: 0.2
-                });
-                this.music.play();
+                if (!this.startedOnce) {
+                    console.log('music playing from startMusic()')
+                    this.music = this.sound.add(`track_86`,{
+                        volume: 0.2
+                    });
+                    this.music.play();
+                    
+                } else {
+                    this.nextSong();
+                }
+                
             }
         //}
 
