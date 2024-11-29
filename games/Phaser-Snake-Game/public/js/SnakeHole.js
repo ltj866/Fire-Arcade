@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -7672,52 +7672,53 @@ class GameScene extends Phaser.Scene {
             },
             onComplete: () =>{
                 
-                this.nextStagePortals.forEach( blackholeImage=> {
-                    if (blackholeImage != undefined) {
-                        blackholeImage.play('blackholeClose')
-                        ourPersist.bgCoords.x += camDirection.y/2;
-                        ourPersist.bgCoords.y += camDirection.x/2;
-                    }
-                });
-                var cameraPanTween = this.tweens.add({
-                    targets: this.cameras.main,
-                    scrollX: camDirection.y * 10,
-                    scrollY: camDirection.x * 10,
-                    duration: 1000,
-                    ease: 'Sine.In',
-                    delay: 500,
-                    onComplete: () =>{
-                        switch (true) {
-                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
-                                var nextStageRaw = this.nextStages[nextStageIndex];
-                                if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
-        
-                                    this.nextStage(this.nextStages[nextStageIndex], camDirection);
-                                    
-                                } else {
-                                    this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
-                                }
-                                //setting this to visible is less noticible than leaving it blank for a frame
-                                //.comboCover.setVisible(true);
-                                break;
-                            case this.mode === MODES.GAUNTLET:
-                                var nextStageID = ourPersist.gauntlet.shift();
-                                this.nextStage(STAGES.get(nextStageID), camDirection);
-                                // TODO Save best Gauntlet score to localData also SAVE on GAMEOVER
-                                // TODO HANDLE GAUNTLET IN SCORE SCREEN
-                            
-                                break;
-                            case this.mode === MODES.PRACTICE:
-                                this.nextStage(this.stage, camDirection);
-                                break;
-                            default:
-                                debugger // Leave for safety break
-                                break;
-                        }
-                        this.gameSceneCleanup();
 
-                    }
-                });
+            }
+        });
+
+        this.nextStagePortals.forEach( blackholeImage=> {
+            if (blackholeImage != undefined) {
+                blackholeImage.play('blackholeClose')
+                ourPersist.bgCoords.x += camDirection.y/2;
+                ourPersist.bgCoords.y += camDirection.x/2;
+            }
+        });
+        var cameraPanTween = this.tweens.add({
+            targets: this.cameras.main,
+            scrollX: camDirection.y * 10,
+            scrollY: camDirection.x * 10,
+            duration: 1000,
+            ease: 'Sine.In',
+            delay: 500,
+            onComplete: () =>{
+                switch (true) {
+                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                        var nextStageRaw = this.nextStages[nextStageIndex];
+                        if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
+    
+                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                            
+                        } else {
+                            this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                        }
+                        //setting this to visible is less noticible than leaving it blank for a frame
+                        //.comboCover.setVisible(true);
+                        break;
+                    case this.mode === MODES.GAUNTLET:
+                        var nextStageID = ourPersist.gauntlet.shift();
+                        this.nextStage(STAGES.get(nextStageID), camDirection);
+                        // TODO Save best Gauntlet score to localData also SAVE on GAMEOVER
+                        // TODO HANDLE GAUNTLET IN SCORE SCREEN
+                    
+                        break;
+                    case this.mode === MODES.PRACTICE:
+                        this.nextStage(this.stage, camDirection);
+                        break;
+                    default:
+                        debugger // Leave for safety break
+                        break;
+                }
+                this.gameSceneCleanup();
             }
         });
 
