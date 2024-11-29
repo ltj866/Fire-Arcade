@@ -6925,31 +6925,34 @@ class GameScene extends Phaser.Scene {
                         this.gState = GState.PLAY;
                 }
             });
-            // atomic comet
-            ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            ourSpaceBoy.atomComet.play('atomCometSpawn');
-            ourSpaceBoy.atomComet.chain(['atomCometIdle']);
+
+            // check for extractHole so it doesn't fanfare in gauntlet and other modes
+            if (this.extractHole) {
+                // atomic comet
+                ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                .setDepth(100);
+                ourSpaceBoy.atomComet.play('atomCometSpawn');
+                ourSpaceBoy.atomComet.chain(['atomCometIdle']);
 
 
-            // rainbow electronFanfare
-            ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            ourSpaceBoy.electronFanfare.play('electronFanfareForm');
-            
+                // rainbow electronFanfare
+                ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                .setDepth(100);
+                ourSpaceBoy.electronFanfare.play('electronFanfareForm');
+                
 
-            // emit stars from electronFanfare
-            this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
-                speed: { min: -20, max: 20 },
-                angle: { min: 0, max: 360 },
-                alpha: { start: 1, end: 0 },
-                anim: 'starIdle',
-                lifespan: 1000,
-                follow: ourSpaceBoy.electronFanfare,
-            }).setFrequency(150,[1]).setDepth(1);
+                // emit stars from electronFanfare
+                this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
+                    speed: { min: -20, max: 20 },
+                    angle: { min: 0, max: 360 },
+                    alpha: { start: 1, end: 0 },
+                    anim: 'starIdle',
+                    lifespan: 1000,
+                    follow: ourSpaceBoy.electronFanfare,
+                }).setFrequency(150,[1]).setDepth(1);
 
-            ourGame.countDown.setAlpha(0);
-        }
+                ourGame.countDown.setAlpha(0);
+            }
 
         this.tweens.add({ //slower one-off snakeEating tween
             targets: this.snake.body, 
@@ -6989,7 +6992,11 @@ class GameScene extends Phaser.Scene {
             });
 
             ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
+            }
         }
+            
+
+            
 
         
 
@@ -7455,7 +7462,7 @@ class GameScene extends Phaser.Scene {
         
     }
     gameSceneCleanup(){
-        // TODO: event listener cleanup here
+        // TODO: finish event listener cleanup here
         // scene blur removal
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
         const ourGameScene = this.scene.get('GameScene');
@@ -7464,6 +7471,14 @@ class GameScene extends Phaser.Scene {
         ourGameScene.events.off('addScore');
         ourGameScene.events.off('spawnBlackholes');
         ourGameScene.scene.get("InputScene").scene.restart();
+
+        if (ourSpaceBoy.electronFanfare) {
+            
+            ourSpaceBoy.electronFanfare.destroy();
+        }
+        if (ourSpaceBoy.CapSparkFinale) {
+            ourSpaceBoy.CapSparkFinale.destroy();
+        }
 
         while (ourSpaceBoy.navLog.length > 0) {
             var log = ourSpaceBoy.navLog.pop();
