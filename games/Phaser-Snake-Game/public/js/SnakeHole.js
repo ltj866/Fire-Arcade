@@ -1684,6 +1684,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('atomicPickupUISmall', 'assets/sprites/atomicPickupUISmall.png', { frameWidth: 9, frameHeight: 9 });
         this.load.spritesheet('atomicPickupComet', 'assets/sprites/atomicPickupComet.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
@@ -2776,26 +2777,26 @@ class StageCodex extends Phaser.Scene {
                         _y = rowY + 34 + (nextRow * stageNumber);
                     }
                     var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
-                    ).setOrigin(0,0).setDepth(70).setScale(.75);
+                    ).setOrigin(0,0).setDepth(70)
 
                     switch (true) {
                         case foodScore > BOOST_ADD_FLOOR:
-                            _atom.play('atom01idle');
+                            _atom.play('atom01Small');
                             break;
 
                         case foodScore > 60:
-                            _atom.play('atom02idle');
+                            _atom.play('atom02Small');
                             break;
                         
                         case foodScore > 1:
-                            _atom.play('atom03idle');
+                            _atom.play('atom03Small');
                             break;
                         
                         case foodScore > 60:
                             break;
                     
                         default:
-                            _atom.play("atom04idle");
+                            _atom.play("atom04Small");
                             break;
                     }
 
@@ -10769,6 +10770,32 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 12,
         repeat: -1
     })
+
+    scene.anims.create({
+        key: 'atom01Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [0,1,2,3,4,5,6,7,8,9]}),
+        frameRate: 12,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'atom02Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [10,11,12,13,14,15,16,17,18,19]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'atom03Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [20,21,22,23,24,25,26,22,28,29]}),
+        frameRate: 6,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'atom04Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [30,31,32,33,34,35,36,37,38,39,40,41,42]}),
+        frameRate: 4,
+        repeat: -1
+    });
+    
 
     scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 12, frameHeight: 12,
         frame: 'atomicPickup01Anim.png'
