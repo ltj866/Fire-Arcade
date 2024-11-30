@@ -463,7 +463,7 @@ const RANK_LETTERS = new Map([
 ]);
 
 const RANK_BENCHMARKS = new Map([
-    // Calibrated for use with SpeedBonus
+    // Calibrated for use with Stage Score
     [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
     [RANKS.GOLD, 10000],
     [RANKS.SILVER, 5000],
@@ -7654,6 +7654,9 @@ class GameScene extends Phaser.Scene {
             ease: 'linear'
             }, this);
 
+        var popCounter = 1;
+        var numberOfThings = allTheThings.length;
+
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
             x: this.snake.head.x - GRID * 1,
@@ -7675,10 +7678,21 @@ class GameScene extends Phaser.Scene {
                 else{
                     blackholeTween.timeScale += .02;
                 }
-                this.sound.play('pop03', { volume: popVolume });
-                if (popVolume >= 0.00) {
-                    popVolume -= .005
+                if (numberOfThings > 100) {
+                    if (popCounter % 2 === 1) {
+                        this.sound.play('pop03', { volume: popVolume });
+                        if (popVolume >= 0.00) {
+                            popVolume -= .005
+                        }
+                    }
+                } else {
+                    this.sound.play('pop03', { volume: popVolume });
+                    if (popVolume >= 0.00) {
+                        popVolume -= .005
+                    }
                 }
+
+                popCounter += 1;
             },
             onComplete: () =>{
                 
