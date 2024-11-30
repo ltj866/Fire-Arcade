@@ -4265,6 +4265,7 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
+
         
 
         
@@ -7695,8 +7696,45 @@ class GameScene extends Phaser.Scene {
                 popCounter += 1;
             },
             onComplete: () =>{
+                var cameraPanTween = this.tweens.add({
+                    targets: this.cameras.main,
+                    scrollX: camDirection.y * 10,
+                    scrollY: camDirection.x * 10,
+                    duration: 1000,
+                    ease: 'Sine.In',
+                    delay: 500,
+                    onComplete: () =>{
+                        switch (true) {
+                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                                var nextStageRaw = this.nextStages[nextStageIndex];
+                                if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
+            
+                                    this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                                    
+                                } else {
+                                    this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                                }
+                                //setting this to visible is less noticible than leaving it blank for a frame
+                                //.comboCover.setVisible(true);
+                                break;
+                            case this.mode === MODES.GAUNTLET:
+                                var nextStageID = ourPersist.gauntlet.shift();
+                                this.nextStage(STAGES.get(nextStageID), camDirection);
+                                // TODO Save best Gauntlet score to localData also SAVE on GAMEOVER
+                                // TODO HANDLE GAUNTLET IN SCORE SCREEN
+                            
+                                break;
+                            case this.mode === MODES.PRACTICE:
+                                this.nextStage(this.stage, camDirection);
+                                break;
+                            default:
+                                debugger // Leave for safety break
+                                break;
+                        }
+                        this.gameSceneCleanup();
+                    }
+                });
                 
-
             }
         });
 
@@ -7705,44 +7743,6 @@ class GameScene extends Phaser.Scene {
                 blackholeImage.play('blackholeClose')
                 ourPersist.bgCoords.x += camDirection.y/2;
                 ourPersist.bgCoords.y += camDirection.x/2;
-            }
-        });
-        var cameraPanTween = this.tweens.add({
-            targets: this.cameras.main,
-            scrollX: camDirection.y * 10,
-            scrollY: camDirection.x * 10,
-            duration: 1000,
-            ease: 'Sine.In',
-            delay: 500,
-            onComplete: () =>{
-                switch (true) {
-                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
-                        var nextStageRaw = this.nextStages[nextStageIndex];
-                        if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
-    
-                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
-                            
-                        } else {
-                            this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
-                        }
-                        //setting this to visible is less noticible than leaving it blank for a frame
-                        //.comboCover.setVisible(true);
-                        break;
-                    case this.mode === MODES.GAUNTLET:
-                        var nextStageID = ourPersist.gauntlet.shift();
-                        this.nextStage(STAGES.get(nextStageID), camDirection);
-                        // TODO Save best Gauntlet score to localData also SAVE on GAMEOVER
-                        // TODO HANDLE GAUNTLET IN SCORE SCREEN
-                    
-                        break;
-                    case this.mode === MODES.PRACTICE:
-                        this.nextStage(this.stage, camDirection);
-                        break;
-                    default:
-                        debugger // Leave for safety break
-                        break;
-                }
-                this.gameSceneCleanup();
             }
         });
 
