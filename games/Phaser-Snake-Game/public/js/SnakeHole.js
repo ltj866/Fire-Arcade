@@ -7696,6 +7696,13 @@ class GameScene extends Phaser.Scene {
                 popCounter += 1;
             },
             onComplete: () =>{
+                this.nextStagePortals.forEach( blackholeImage=> {
+                    if (blackholeImage != undefined) {
+                        blackholeImage.play('blackholeClose')
+                        ourPersist.bgCoords.x += camDirection.y/2;
+                        ourPersist.bgCoords.y += camDirection.x/2;
+                    }
+                });
                 var cameraPanTween = this.tweens.add({
                     targets: this.cameras.main,
                     scrollX: camDirection.y * 10,
@@ -7738,13 +7745,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.nextStagePortals.forEach( blackholeImage=> {
-            if (blackholeImage != undefined) {
-                blackholeImage.play('blackholeClose')
-                ourPersist.bgCoords.x += camDirection.y/2;
-                ourPersist.bgCoords.y += camDirection.x/2;
-            }
-        });
+
 
         var blackholeTweenGround = this.tweens.add({
             targets: groundSprites, 
