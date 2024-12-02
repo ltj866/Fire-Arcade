@@ -4290,30 +4290,41 @@ class GameScene extends Phaser.Scene {
 
         ourSpaceBoyScene.setLog(this.stage);
 
-
-        switch (this.stage) {
-            case STAGES.get("1-1"):
+        // #region World Style
+        var worldID = this.stage.split("-")[0].split("_")[1];
+        switch (worldID) {
+            case "0":
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
-            case STAGES.get("2-1"):
+            case "1":
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
-            case STAGES.get("3-1"):
+            case "2":
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
-            case STAGES.get("4-1"):
+            case "3":
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
-            case STAGES.get("5-1"):
+            case "4":
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case "5":
                 ourPersist.fx.hue(300); // Move to Racing levels
                 break;
-            case STAGES.get("8-1"):
+            case "8":
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case "9":
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case "10":
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
             //if (this.stage === "testingFuturistic") {
             //    ourPersist.fx.hue(330);
             //}
             default:
+                debugger // don't remove
                 break;
         }
 
