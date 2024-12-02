@@ -1327,13 +1327,15 @@ class PlinkoMachineScene extends Phaser.Scene {
             }, this);
 
             //plinkoDisc.setCircle(3.33);
+            var friction = Phaser.Math.FloatBetween(0.012, 0.006);
+            var randomDelay = Phaser.Math.Between(0,36);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.01);
+            plinkoDisc.setFrictionAir(friction);
             plinkoDisc.setFixedRotation();
 
             number--;
-            this.time.delayedCall(delay, this.spawnPlinkos, [number], this);
+            this.time.delayedCall(delay - randomDelay, this.spawnPlinkos, [number], this);
         } else {
             console.log('Finished Visual Pinko Spawning');
             return
