@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -961,7 +961,8 @@ class MusicPlayerScene extends Phaser.Scene {
         //pauses and resumes sound so queued sfx don't play all at once upon resuming
         window.addEventListener('focus', () => {
             
-            this.sound.resumeAll(); //resumes all music instances so old tracks need to be stopped properly
+            this.sound.pauseAll(); // ensures all sounds do NOT play when clicking back into game (prevents unwanted noises)
+            this.music.resume(); //resumes all music instances so old tracks need to be stopped properly
             if (this.playerPaused) {
                 this.music.pause(); //keeps music paused if player clicked pause button
             }
@@ -7630,12 +7631,6 @@ class GameScene extends Phaser.Scene {
             this.scene.get("MusicPlayerScene").loopButton.setFrame(4);
         }
         this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
-
-        
-        // this prevents old tracks from persisting when resetting
-        this.sound.sounds.forEach((sound) => {
-            sound.stop();
-        });
     }
     
  
