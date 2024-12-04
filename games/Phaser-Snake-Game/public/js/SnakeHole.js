@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1215,7 +1215,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             tube.friction = 0; // Set the friction of the tube to 0 
         }
 
-        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 2, 5, 5, {
+        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 10, 5, 5, {
             isSensor: true ,
             isStatic: true
         });
@@ -1236,14 +1236,14 @@ class PlinkoMachineScene extends Phaser.Scene {
     spawnPlinkos (number) {
         
         if (number > 0){
-            var delay = 250;
+            var delay = 275;
             
             // TOP SPAWN
             //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
             var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
                 shape: {
                     type: 'polygon',
-                    radius: 3.5,
+                    radius: 3.7,
                     sides: 4,
                 },
                 //slop:0.8,
@@ -1253,6 +1253,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             plinkoDisc.setOnCollideWith(this.plinkoSensor, pair => {
                 // pair.bodyA
                 // pair.bodyB
+                number;
                 this.zedsToAdd += this.zedIndex;
 
 
@@ -1327,7 +1328,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             }, this);
 
             //plinkoDisc.setCircle(3.33);
-            var friction = Phaser.Math.FloatBetween(0.012, 0.006);
+            var friction = Phaser.Math.FloatBetween(0.013, 0.005);
             var randomDelay = Phaser.Math.Between(0,36);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
