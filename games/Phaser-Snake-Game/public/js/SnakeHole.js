@@ -1204,8 +1204,9 @@ class PlinkoMachineScene extends Phaser.Scene {
 
 
         this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(52);
-        this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
+        this.plinkoBoardMatterShape = this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
 
+        this.plinkoBoardBG = this.add.sprite(GRID * 6 + 7, GRID * 21.5, 'plinkoBoardBG').setOrigin(0,0).setDepth(40);
 
         var tubeData = [
             // Starting Top Tube
@@ -1768,6 +1769,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
         this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
+        this.load.image('plinkoBoardBG','assets/sprites/plinkoBoardBG.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
         this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png')
