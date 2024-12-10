@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_4-5.json",
+    "activeFile": "World_0-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1224,11 +1224,11 @@
             "scaleInDock": 1
         },
         "World_4-4.json": {
-            "scale": 1.9733024691358025,
-            "selectedLayer": 1,
+            "scale": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.56690388675997,
-                "y": 161.4045514976147
+                "x": 259.1666666666667,
+                "y": 162.16666666666666
             }
         },
         "World_4-4.json#tileSheetx12": {
@@ -2718,49 +2718,37 @@
     "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
     "openFiles": [
+        "Tutorial_1.json",
+        "Tutorial_2.json",
+        "Tutorial_3.json",
+        "World_0-1.json",
+        "World_1-2.json",
         "World_1-1.json",
-        "World_4-1.json",
-        "World_4-2.json",
-        "World_4-3.json",
-        "World_4-4.json",
-        "World_4-5.json",
-        "World_5-1_Racing.json",
-        "World_5-2_Racing.json",
-        "World_5-3_Racing.json",
-        "World_5-4_Racing.json",
-        "World_1-3.json",
-        "World_8-1_Adv_Portaling.json",
-        "World_8-2_Adv_Portaling.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
         "World_8-3_Adv_Portaling.json",
-        "World_8-4_Adv_Portaling.json",
-        "World_8-5_Adv_Portaling.json",
-        "World_9-2_Final_Exams.json",
-        "World_9-3_Final_Exams.json",
-        "World_9-4_Final_Exams.json",
-        "World_10-2.json",
-        "World_10-3.json",
-        "World_10-4.json",
-        "tileSheetx12.tsx",
-        "World_2-1.json",
-        "World_2-2.json",
-        "World_2-3.json",
-        "World_3-1_Wrap.json"
+        "World_4-3.json",
+        "r_11-30-4.json",
+        "r-07-10-4.json",
+        "r-11-30.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "World_1-1.json",
-        "World_4-1.json",
-        "World_4-2.json",
+        "Tutorial_1.json",
+        "Tutorial_2.json",
+        "Tutorial_3.json",
+        "r-11-30.json",
+        "r-07-10-4.json",
+        "r_11-30-4.json",
         "World_4-3.json",
-        "World_4-4.json",
-        "World_3-1_Wrap.json",
-        "World_2-3.json",
-        "World_2-2.json",
-        "World_2-1.json",
-        "tileSheetx12.tsx",
-        "World_10-4.json",
-        "World_10-3.json"
+        "World_8-3_Adv_Portaling.json",
+        "r-11-12-1.json",
+        "r-11-12-2.json",
+        "r-11-12-3.json",
+        "r-11-12-4.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -615,7 +615,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'r_12-10-2'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -11053,8 +11053,8 @@ class InputScene extends Phaser.Scene {
                 gameScene.arrowTween.destroy();
         }
             
-            gameScene.startingArrowsAnimN.setAlpha(0);
-            gameScene.startingArrowsAnimS.setAlpha(0);
+            //gameScene.startingArrowsAnimN.setAlpha(0);
+            //gameScene.startingArrowsAnimS.setAlpha(0);
  
         if (gameScene.startingArrowsAnimE != undefined){
             gameScene.startingArrowsAnimE.setAlpha(0);
