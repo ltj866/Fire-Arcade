@@ -615,7 +615,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'r_12-10-2'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -1750,7 +1750,7 @@ class StartScene extends Phaser.Scene {
         });
 
         this.load.bitmapFont('mainFont', 'assets/Fonts/mainFont_0.png', 'assets/Fonts/mainFont.fnt');
-
+        this.load.bitmapFont('mainFontLarge', 'assets/Fonts/mainFontLarge_0.png', 'assets/Fonts/mainFontLarge.fnt');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalHighlights', 'assets/sprites/portalAnimHighlight.png', { frameWidth: 32, frameHeight: 32 });
@@ -2510,7 +2510,7 @@ class ExtractTracker extends Phaser.Scene {
 
                     //var bestExtract = [...bestExtract, ...bestExtract]; // Temporary double
 
-                    const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFont',`PATH`,16
+                    const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH`,13
                     ).setOrigin(0,0).setScale(1);
 
                     trackerContainer.add(pathTitle);
@@ -2523,8 +2523,8 @@ class ExtractTracker extends Phaser.Scene {
 
                             var _x = topLeft + index * letterOffset;
                             
-                            const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${idArray[index]}`,16
-                            ).setOrigin(0.5,0).setScale(0.75);
+                            const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${idArray[index]}`,
+                            ).setOrigin(0.5,0);
                             trackerContainer.add([stageID]);
 
                         }
@@ -2551,8 +2551,8 @@ class ExtractTracker extends Phaser.Scene {
                             rankSum += _rank + 1; // 1 more so D's count as 1
                             rankCount += 1;
     
-                            const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`,16
-                            ).setOrigin(0.5,0).setScale(0.75);
+                            const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`
+                            ).setOrigin(0.5,0);
     
                             trackerContainer.add([bestRank, stageID]);
                             
@@ -2573,16 +2573,16 @@ class ExtractTracker extends Phaser.Scene {
 
                     }
 
-                    var bestScoreTitle = this.add.bitmapText(_x + GRID * 2, rowY, 'mainFont', "SCORE", 16
-                    ).setOrigin(0,0).setScale(0.75);
+                    var bestScoreTitle = this.add.bitmapText(_x + GRID * 2, rowY, 'mainFont', "SCORE",
+                    ).setOrigin(0,0);
 
                     
                     var scoreValue = bestExtract[bestExtract.length - 1][2];
                     
                     
-                    var bestScore = this.add.bitmapText(_x + GRID * 2, rowY + 15, 'mainFont',
+                    var bestScore = this.add.bitmapText(_x + GRID * 2, rowY + 15, 'mainFontLarge',
                         commaInt(scoreValue),
-                    16).setOrigin(0,0).setScale(1);
+                    13).setOrigin(0,0);
 
                     if (bestExtract === "Classic Clear") {
                         bestScoreTitle.x -= GRID * 2.5;
@@ -2609,7 +2609,7 @@ class ExtractTracker extends Phaser.Scene {
                     
                     
                 } else {
-                    const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFont',`PATH - UNDISCOVERED`,16
+                    const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH - UNDISCOVERED`,13
                     ).setOrigin(0,0).setScale(1).setTintFill(0x454545);
 
                     trackerContainer.add([pathTitle]);
@@ -2880,7 +2880,7 @@ class StageCodex extends Phaser.Scene {
             categoryText
         ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-
+//
         var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
@@ -2890,7 +2890,6 @@ class StageCodex extends Phaser.Scene {
 
         //codexContainer.add([titleText, playerRank, stages]);
 
-        
         var _index = 0;
 
         if (bestOfDisplay.size > 0 ) {
@@ -2898,7 +2897,7 @@ class StageCodex extends Phaser.Scene {
             bestOfDisplay.values().forEach( bestOf => {
                 //debugger
                 var topY = rowY + nextRow * stageNumber;
-                const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
+                const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFontLarge',`${bestOf.stage.toUpperCase()}`,13
                 ).setOrigin(0,0);
 
                 const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`TOTAL SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
@@ -6477,26 +6476,14 @@ class GameScene extends Phaser.Scene {
 
         this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
             .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFont',`${commaInt(this.bestBase.toString())}`,14)
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`${commaInt(this.bestBase.toString())}`,13)
             .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-
 
         // Score Text SET INVISIBLE
         this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        //this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFont',`0`, 14)
-        //    .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-
-        
-        this.scoreValue = this.add.dom(X_OFFSET + GRID * 34 - 1, GRID * 2.7 - 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            'color':"#1f211b",
-            'text-transform': 'uppercase',
-            "font-weight": 400,
-            'font-size': '28px',
-            //"font-family": '"Press Start 2P", system-ui',
-            })).setHTML(
-                `0`
-        ).setOrigin(1, 0).setScale(.5).setScrollFactor(0);
+        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
+            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
     
     
     
