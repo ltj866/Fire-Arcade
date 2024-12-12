@@ -9598,7 +9598,7 @@ class ScoreScene extends Phaser.Scene {
             from: 0,
             to:  atomList.length - 1,
             delay: delayStart,
-            duration: (frameTime * 4) * atomList.length,
+            duration: (frameTime * 5) * atomList.length,
             ease: 'Linear',
             onUpdate: _tween =>
             {    
@@ -9900,26 +9900,16 @@ class ScoreScene extends Phaser.Scene {
                             
                             rankProgressBar.fillStyle(0xA1662F); // Wood
                             rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
-                        }
-                    
-                        
+                        }     
                         break
                 
                     default:
                         debugger // Safety debugger
                         break;
                 }
-
-                
-
-
             }
         });
-
-        // After Complete
         
-
-        // #placeholder - james
         
         // #endregion
 
@@ -10055,23 +10045,7 @@ class ScoreScene extends Phaser.Scene {
                     );
                 }
             });
-            this.tweens.addCounter({
-                from: 0,
-                to:  ourScoreScene.stageData.medalBonus() * 100,
-                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-                ease: 'linear',
-                delay: 0, //133.3ms
-                onUpdate: tween =>
-                {
-                    const value3 = Math.round(tween.getValue());
-                    //multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                    //    `
-                    //
-                    //    MEDAL +${value3}%
-                    //    `
-                    //).setOrigin(1, 0).setScale(0.5);
-                }
-            });
+
             this.tweens.addCounter({
                 from: 0,
                 to:  1, //Number(_bonusMult * 100).toFixed(1),
@@ -10310,76 +10284,7 @@ class ScoreScene extends Phaser.Scene {
             alpha: [0, 1],
             ease: 'Sine.InOut',
             duration: 1000,
-        }, this)
-        
-
-        /*
-        this.tweens.addCounter({
-            from: 0,
-            to:  Number(_bonusMult * 100).toFixed(1),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = diffMult + zedMult;
-                multValuesUI1.setHTML(
-                    `x ${value}%
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
-            },
-            onComplete: () => {
-                multValuesUI2.setHTML(
-                    `
-                    <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
-                this.tweens.add({ 
-                    targets: multValuesUI2,
-                    alpha: 0,
-                    ease: 'Linear',
-                    duration: 250,
-                    loop: 0,
-                    yoyo: true,
-                });
-            }
-        });*/
-
-        /*this.tweens.addCounter({ //@holden move to reference?
-            from: 0,
-            to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
-            duration: atomList.length * 66.7,
-            ease: 'linear',
-            delay: atomList.length * 133.3,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                multValuesUI2.setHTML(
-                    `
-                    <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
-            ).setOrigin(1, 0);
-            },
-        });*/
-
-
-        
-        
-        /*
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.boostBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI2.setHTML(
-                    `
-                    +${value}
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        */
+        }, this);
 
         
 
@@ -10446,7 +10351,6 @@ class ScoreScene extends Phaser.Scene {
             rankProgressBar,
             //currentRankLetter,
             nextRankLetter,
-            //prevBestBar
          ]
         )
 
@@ -10563,21 +10467,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.spotlight = this.lights.addLight(0, 0, 66, lightColor).setIntensity(1.5); //
         this.spotlight2 = this.lights.addLight(0, 0, 66, lightColor2).setIntensity(1.5); //
-        
-
-        
-        //console.log(scoreAtomsTween.timeScale)
-        //debugger;
-        //scoreAtomsTween.timeScale = 8;
-
-
-        /*this.tweens.add({ //shows score screen atoms one by one
-            targets: scoreAtoms,
-            alpha: 1,
-            ease: 'Linear',
-            duration: 0,
-            delay: this.tweens.stagger(frameTime * 2),
-        });*/
 
         this.ScoreContainerL.x -= SCREEN_WIDTH
         this.tweens.add({ //brings left score container into camera frame
@@ -10617,16 +10506,10 @@ class ScoreScene extends Phaser.Scene {
                 duration: 200,
                 delay:0,
             });
-
-
-
-
-
         }, this);
 
         
         
-
         // #region Stat Cards (Right Side)
 
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
@@ -10763,6 +10646,7 @@ class ScoreScene extends Phaser.Scene {
                 || ourGame.mode === MODES.EXPERT
                 || ourGame.mode === MODES.TUTORIAL
                 || ourGame.mode === MODES.PRACTICE:
+
                 // #region Adventure
                 var prevStagesComplete;
                 var prevSumOfBest;
@@ -10925,13 +10809,6 @@ class ScoreScene extends Phaser.Scene {
             totalScore += stageData.calcTotal();
         });
 
-        /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '500px',
-            'font-size':'22px',
-            'font-weight': 400,
-        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
-
-
         this.prevZeds = this.scene.get("PersistScene").zeds;
 
 
@@ -10950,17 +10827,7 @@ class ScoreScene extends Phaser.Scene {
         if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
             localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
         }
-        // #endregion
-
-        this.input.keyboard.on('keydown-SPACE', function() { 
-            //ourScoreScene.scoreAtomsTween.setTimeScale(8); //doesn't do anything
-            //scoreAtomsTween.timeScale = 8;
-            //debugger
-            //this.scoreTimeScale= 0.25;
-        }, this);
-        /*this.input.keyboard.on('keyup-SPACE', function(scoreAtomsTween) { 
-            //scoreAtomsTween.timeScale = 1 //doesn't do anything
-        });*/
+        // #endregion   
 
         var extraFields = {
             startingScore: ourScoreScene.stageData.calcTotal(),
@@ -11012,16 +10879,7 @@ class ScoreScene extends Phaser.Scene {
         )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
         
-        continueText.setVisible(false);
-
-        //finalScoreTween.on('complete', e=> {
-            //debugger
-            //continueText.setVisible(true);
-
-        //}, this);
-
-
-        // Give a few seconds before a player can hit continue
+        continueText.setVisible(false); 
         
 
         const onContinue = function (scene) {
@@ -11160,19 +11018,16 @@ class ScoreScene extends Phaser.Scene {
                     // Early Complete
                     ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
                     scoreAtomsTween.complete();
-                    //finalScoreTween.complete();
                 }
             }, this);
-            
-            //continueText.setVisible(true);
+
+            continueText.on('pointerdown', e => {
+                onContinue(ourGame);
+            });
 
         }, [], this);
 
         
-
-        continueText.on('pointerdown', e => {
-            onContinue(ourGame);
-        });
 
 
     }
