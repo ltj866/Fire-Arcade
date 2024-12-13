@@ -115,11 +115,12 @@ export const PORTAL_PAUSE = 2;
 
 
 
-const RANK_NUM_1 = 617749;
+const RANK_NUM_1 = 2000000; 
 /* Rank 1 History
 412505 - James 11/9
 534,888 = James 11/12
 617,749 = James 11/12
+1,629,617 = James 12-13
 */
 const RANK_AMOUNT = 100;
 const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
@@ -482,6 +483,10 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 
     return zedsLevel;
 }
+
+
+var zedtest = calcZedLevel(114476);
+var zedtest2 = calcZedLevel(2306 * 120);
 
 const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
     113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,212,215,241,242,243,244,247];
