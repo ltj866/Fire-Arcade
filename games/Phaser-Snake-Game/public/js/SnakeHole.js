@@ -1934,7 +1934,10 @@ class StartScene extends Phaser.Scene {
         this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
-
+        this.load.image('UI_maskMenu', 'assets/sprites/UI_maskMenu.png');
+        this.load.image('UI_CodexLabel', 'assets/sprites/UI_CodexLabel.png');
+        this.load.image('UI_MainMenuLabel', 'assets/sprites/UI_MainMenuLabel.png');
+        this.load.image('UI_StageTrackerLabel', 'assets/sprites/UI_StageTrackerLabel.png');
 
         // Animations
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -2469,93 +2472,100 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
 
-        //menu arrows
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuR.play('arrowMenuIdle').setAlpha(1);
-        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
-
-        this.input.keyboard.on('keydown-LEFT', e => {
-
-            const ourGame = this.scene.get("GameScene");
-
+        // do NOT allow for left and right menus if in MODE SELECTOR or Gauntlet Mode menu
+        // future menus will also require this
+        if (qMenuArgs.textPrompt !== "MODE SELECTOR" &&
+            qMenuArgs.textPrompt !== "Gauntlet Mode") {
             
-            var displayList;
-            switch (ourGame.mode) {
-                case MODES.CLASSIC:
-                    displayList = ["Classic", "Overall", "Expert"];
-                    break;
-                case MODES.EXPERT:
-                    displayList = ["Expert", "Overall", "Classic"];
-                    break;
-                case MODES.TUTORIAL:
-                    displayList = ["Tutorial"];
-                    break;
-                case MODES.GAUNTLET:
-                    displayList = ["Overall", "Classic", "Expert"];
-                    break;
-                default:
-                    break;
-            }
+            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-            if (!this.scene.isSleeping("StageCodex")) {
-                this.scene.launch('StageCodex', {
-                    stage: this.scene.get("GameScene").stage,
-                    originScene: this.scene.get("GameScene"),
-                    fromQuickMenu: true,
-                    displayList: displayList,
-                    displayIndex: 0
-                    //category: this.scene.get("GameScene").mode
-                });
-                this.scene.sleep("QuickMenuScene");
-            } else {
-                this.scene.wake("StageCodex");
-                this.scene.sleep("QuickMenuScene");
-            }
+            var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
+                SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_CodexLabel').setOrigin(0,0.5);
+                codexLabel.angle = 90;
+   
+            var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
+                SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setOrigin(0,0.5);
+                UI_StageTrackerLabel.angle = 90;
 
-            ourGame.scene.pause();
-            ourGame.scene.setVisible(false);
-            
-            /***
-             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-             * DON't USE UNLESS YOU FIGURE THAT OUT
-             * //this.scene.sleep('GameScene');
-             */
-        }, this);
+            this.input.keyboard.on('keydown-LEFT', e => {
 
-        this.input.keyboard.on('keydown-RIGHT', e => {
-
-            const ourGame = this.scene.get("GameScene");
-
-            if (!this.scene.isSleeping('ExtractTracker')) {
-                this.scene.sleep("QuickMenuScene");
-                this.scene.launch('ExtractTracker', {
-                    stage: this.scene.get("GameScene").stage
-                });
-            } else {
-                this.scene.wake('ExtractTracker');
-                this.scene.sleep("QuickMenuScene");
-            }
-
-            ourGame.scene.pause();
-            ourGame.scene.setVisible(false);
-            
-            /***
-             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-             * DON't USE UNLESS YOU FIGURE THAT OUT
-             * //this.scene.sleep('GameScene');
-             */
-        }, this);
-            
-        
-
-        
-
-        
-
+                const ourGame = this.scene.get("GameScene");
+                
+                var displayList;
+                switch (ourGame.mode) {
+                    case MODES.CLASSIC:
+                        displayList = ["Classic", "Overall", "Expert"];
+                        break;
+                    case MODES.EXPERT:
+                        displayList = ["Expert", "Overall", "Classic"];
+                        break;
+                    case MODES.TUTORIAL:
+                        displayList = ["Tutorial"];
+                        break;
+                    case MODES.GAUNTLET:
+                        displayList = ["Overall", "Classic", "Expert"];
+                        break;
+                    default:
+                        break;
+                }
+    
+                if (!this.scene.isSleeping("StageCodex")) {
+                    this.scene.launch('StageCodex', {
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: this.scene.get("GameScene"),
+                        fromQuickMenu: true,
+                        displayList: displayList,
+                        displayIndex: 0
+                        //category: this.scene.get("GameScene").mode
+                    });
+                    this.scene.sleep("QuickMenuScene");
+                } else {
+                    this.scene.wake("StageCodex");
+                    this.scene.sleep("QuickMenuScene");
+                }
+    
+                ourGame.scene.pause();
+                //culprit bug code that keeps game scene invisible when it's not supposed to
+                ourGame.scene.setVisible(false);
+                
+                /***
+                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+                 * DON't USE UNLESS YOU FIGURE THAT OUT
+                 * //this.scene.sleep('GameScene');
+                 */
+            }, this);
+    
+            this.input.keyboard.on('keydown-RIGHT', e => {
+    
+                const ourGame = this.scene.get("GameScene");
+    
+                if (!this.scene.isSleeping('ExtractTracker')) {
+                    this.scene.launch('ExtractTracker', {
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: this.scene.get("GameScene"),
+                        fromQuickMenu: true,
+                    });
+                    this.scene.sleep("QuickMenuScene");
+                } else {
+                    this.scene.wake('ExtractTracker');
+                    this.scene.sleep("QuickMenuScene");
+                }
+    
+                ourGame.scene.pause();
+                //culprit bug code that keeps game scene invisible when it's not supposed to
+                ourGame.scene.setVisible(false);
+                
+                /***
+                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+                 * DON't USE UNLESS YOU FIGURE THAT OUT
+                 * //this.scene.sleep('GameScene');
+                 */
+            }, this);
+        }
         // #endregion
-
-
     }
 }
 // #region Extract Tracker
@@ -2569,16 +2579,21 @@ class ExtractTracker extends Phaser.Scene {
         this.selected = {};
 
     }
-    create() {
-
+    create(codexArgs) {
         var _index = 0;
         var topLeft = X_OFFSET + GRID * 8;
-        var rowY = Y_OFFSET + GRID * 12;
+        var rowY = Y_OFFSET + GRID * 1.5;
         var extractNumber = 0;
-        var nextRow = GRID * 3.25;
+        var nextRow = 72;
         var letterOffset = 30;
 
-        var trackerContainer = this.make.container(0, 0);
+        console.log(codexArgs)
+        var originScene = codexArgs.originScene;
+        console.log(originScene)
+
+        this.trackerContainer = this.make.container(0, 0);
+        this.maskContainerMenu = this.make.container(0, 0);
+
 
         var letterCounter = [0,0,0,0,0,0];
 
@@ -2586,13 +2601,13 @@ class ExtractTracker extends Phaser.Scene {
         if (localStorage.getItem("extractRanks")) {
             var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")));
 
-            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, Y_OFFSET + GRID * 6, 
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY + GRID, 
                 'uiPanelL', 'Glass', 
-                GRID * 24.5, GRID * 4, 
+                GRID * 27.5, GRID * 4, 
                 8, 8, 8, 8);
             topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
 
-            var pathsDiscovered = this.add.dom(X_OFFSET + GRID * 26, Y_OFFSET + GRID * 9 + 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            var pathsDiscovered = this.add.dom(X_OFFSET + GRID * 27, Y_OFFSET + GRID * 5.5 + 5, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 200,
             }),
@@ -2615,7 +2630,7 @@ class ExtractTracker extends Phaser.Scene {
                     const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH`,13
                     ).setOrigin(0,0).setScale(1);
 
-                    trackerContainer.add(pathTitle);
+                    this.trackerContainer.add(pathTitle);
                     
                     if (bestExtract === "Classic Clear") {
                         
@@ -2627,7 +2642,7 @@ class ExtractTracker extends Phaser.Scene {
                             
                             const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${idArray[index]}`,
                             ).setOrigin(0.5,0);
-                            trackerContainer.add([stageID]);
+                            this.trackerContainer.add([stageID]);
 
                         }
 
@@ -2656,7 +2671,7 @@ class ExtractTracker extends Phaser.Scene {
                             const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`
                             ).setOrigin(0.5,0);
     
-                            trackerContainer.add([bestRank, stageID]);
+                            this.trackerContainer.add([bestRank, stageID]);
                             
                         }
 
@@ -2671,7 +2686,7 @@ class ExtractTracker extends Phaser.Scene {
                         rankSum += finalRankValue + 1; // 1 more so D's count as 1
                         rankCount += 1;
 
-                        trackerContainer.add([finalRank]);
+                        this.trackerContainer.add([finalRank]);
 
                     }
 
@@ -2696,7 +2711,7 @@ class ExtractTracker extends Phaser.Scene {
                         overallScore += scoreValue;
                     }
 
-                    trackerContainer.add([bestScoreTitle, bestScore]);
+                    this.trackerContainer.add([bestScoreTitle, bestScore]);
 
                     
                     this.yMap.set(extractKey, {
@@ -2714,7 +2729,7 @@ class ExtractTracker extends Phaser.Scene {
                     const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH - UNDISCOVERED`,13
                     ).setOrigin(0,0).setScale(1).setTintFill(0x454545);
 
-                    trackerContainer.add([pathTitle]);
+                    this.trackerContainer.add([pathTitle]);
                     //debugger
                 }
                 _index += 1;
@@ -2729,7 +2744,7 @@ class ExtractTracker extends Phaser.Scene {
             var hasLetter = letterCounter.some(rank => rank != 0);
 
             if (hasLetter) {
-                var sumOfExtracts = this.add.dom(X_OFFSET + GRID * 26, Y_OFFSET + GRID * 6 + 8, 'div', Object.assign({}, STYLE_DEFAULT, {
+                var sumOfExtracts = this.add.dom(X_OFFSET + GRID * 27, Y_OFFSET + GRID * 2.5 + 8, 'div', Object.assign({}, STYLE_DEFAULT, {
                     "fontSize": '24px',
                     "fontWeight": 400,
                 }),
@@ -2737,14 +2752,14 @@ class ExtractTracker extends Phaser.Scene {
                 ).setOrigin(1,0).setScale(0.5).setAlpha(1);
                 console.log(letterCounter);
 
-                var _x = X_OFFSET + GRID * 3 + 6;
+                var _x = X_OFFSET + GRID * 1.5 + 6;
                 var _offset = GRID + 8;
 
                 for (let index = 0; index < letterCounter.length - 1; index++) {
-                    const rankSprite = this.add.sprite(_x + _offset * index, Y_OFFSET + GRID * 6 + 8, "ranksSpriteSheet", index 
+                    const rankSprite = this.add.sprite(_x + _offset * index, Y_OFFSET + GRID * 2.5 + 8, "ranksSpriteSheet", index 
                     ).setDepth(80).setOrigin(0,0).setScale(0.5);
 
-                    const rankCount = this.add.dom(_x + _offset * index, Y_OFFSET + GRID * 8 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    const rankCount = this.add.dom(_x + _offset * index + 2, Y_OFFSET + GRID * 4.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '24px',
                         "fontWeight": 400,
                     }),
@@ -2753,7 +2768,7 @@ class ExtractTracker extends Phaser.Scene {
                      
                 }
 
-                var rankCount = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                var rankCount = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
                     "fontSize": '24px',
                     "fontWeight": 200,
                 }),
@@ -2765,12 +2780,44 @@ class ExtractTracker extends Phaser.Scene {
             
 
             var selected = this.yMap.get([...this.yMap.keys()][0]);
-            var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+           
+            this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+
+            ////////
+            
+            // mask for top of codexContainer
+            var maskMenu = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: 0,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,0.0);
+
+            maskMenu.scaleX = 24;
+            
+            // mask for bottom of codexContainer
+            var maskMenu2 = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT - 42,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,1.0);
+            maskMenu2.scaleX = 24;
+            maskMenu2.scaleY = -1;
+
+
+            this.maskContainerMenu.add([maskMenu, maskMenu2]);
+            this.maskContainerMenu.setVisible(false);
+
+
+            this.trackerContainer.mask = new Phaser.Display.Masks.BitmapMask(this, this.maskContainerMenu);
+            this.trackerContainer.mask.invertAlpha = true;
+            /////
 
 
             this.tweens.add({
-                targets: trackerContainer,
-                y: containerToY,
+                targets: this.trackerContainer,
+                y: this.containerToY,
                 ease: 'Sine.InOut',
                 duration: 500,
                 onComplete: () => {
@@ -2790,10 +2837,15 @@ class ExtractTracker extends Phaser.Scene {
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
                 
-                containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: trackerContainer,
-                    y: containerToY,
+                this.containerToY = selected.conY * -1 + nextRow;
+
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                
+                /*this.tweens.add({
+                    targets: this.trackerContainer,
+                    y: this.containerToY,
                     ease: 'Sine.InOut',
                     duration: 500,
                     onComplete: () => {
@@ -2801,7 +2853,7 @@ class ExtractTracker extends Phaser.Scene {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                         selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
                     }
-                }, this);
+                }, this);*/
             }, this);
 
             this.input.keyboard.on('keydown-DOWN', e => {
@@ -2814,10 +2866,15 @@ class ExtractTracker extends Phaser.Scene {
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
                 
-                containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: trackerContainer,
-                    y: containerToY,
+                this.containerToY = selected.conY * -1 + nextRow;
+                
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                
+                /*this.tweens.add({
+                    targets: this.trackerContainer,
+                    y: this.containerToY,
                     ease: 'Sine.InOut',
                     duration: 500,
                     onComplete: () => {
@@ -2825,7 +2882,7 @@ class ExtractTracker extends Phaser.Scene {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                         selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
                     }
-                }, this);
+                }, this);*/
             }, this);
 
         } else {
@@ -2834,14 +2891,44 @@ class ExtractTracker extends Phaser.Scene {
                 ,16).setOrigin(0,0).setScale(1);
             // Display something if they have not yet done an extraction on
         }
-
         
         
         
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
             
+
         this.input.keyboard.on('keydown-LEFT', e => {
+
+            this.tweens.add({
+                targets: this.cameras.main,
+                x: { from: 0, to: 160 },
+                duration: 300,
+                ease: 'Power2',
+                onUpdate: (tween) => {
+                    if (tween.progress >= 0.25) {
+                        tween.complete();
+                        if (originScene.scene.isPaused()) {
+                            originScene.scene.resume();
+                            originScene.scene.setVisible(true);
+                        } 
+                        if (originScene.scene.key == "MainMenuScene") {
+                            this.scene.wake("MainMenuScene");
+                        }
+                        if (codexArgs.fromQuickMenu) {
+                            this.scene.wake('QuickMenuScene');
+                        }
+                        this.cameras.main.x = 0;
+                        this.scene.sleep('ExtractTracker');
+                    }
+                }
+            });
+
+
+
+
+
+            /*
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             const game = this.scene.get("GameScene");
@@ -2849,10 +2936,20 @@ class ExtractTracker extends Phaser.Scene {
             game.scene.setVisible(true);
 
             this.scene.wake('QuickMenuScene');
-            this.scene.sleep('ExtractTracker');
+            this.scene.sleep('ExtractTracker');*/
             
         }, this);
 
+    }
+    update() {
+        this.tweens.add({
+            targets: this.trackerContainer,
+            y: this.containerToY,
+            ease: 'Linear',
+            duration: 100,
+            repeat: 0,
+            yoyo: true,
+        });  
     }
 
 }
@@ -2881,45 +2978,23 @@ class StageCodex extends Phaser.Scene {
         var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageMemory;
 
         var displayCategory = displayList[displayIndex];
+        console.log(codexArgs)
         var originScene = codexArgs.originScene;
-
-
-        var exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
-            
-        var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "#181818",
-        }),
-                `EXIT`
-        ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
-
-        if (practiceMode) {
-            exitButton.setAlpha(1);
-            textElement.setAlpha(1);
-        }
+        console.log(originScene)
 
        
-        this.scene.moveBelow("StageCodex", "SpaceBoyScene");
+        this.scene.moveBelow( "SpaceBoyScene","StageCodex",);
         var topLeft = X_OFFSET + GRID * 1.5;
-        var rowY = Y_OFFSET + GRID * 5;
+        var rowY = Y_OFFSET + GRID * 1.5;
         var stageNumber = 0;
         var nextRow = 56;
 
-        var codexContainer = this.make.container(0, 0);
+        this.codexContainer = this.make.container(0, 0);
 
         var bestOfDisplay;
         var sumOfBestDisplay;
         var stagesCompleteDisplay;
         var categoryText;
-
-        var playerRank = this.add.dom(topLeft, rowY - 5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 200,
-            "color": COLOR_BONUS, 
-        }),
-            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
-        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
         updateSumOfBest(ourPersist);
 
@@ -2959,36 +3034,96 @@ class StageCodex extends Phaser.Scene {
                     break;
             }
         } 
+        // checking normal codex list
+        if (!practiceMode) {
 
-        var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY, 
-            'uiPanelL', 'Glass', 
-            GRID * 27.5, GRID * 4, 
-            8, 8, 8, 8);
-        topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+            var panelCard = this.make.container(0, 0);
 
-        var bestText = `Best of Codex - Sum of Best = ${commaInt(sumOfBestDisplay.toFixed(0))}`;
+            //was used to prevent list from moving, but bugs first time seeing menu
+            //this.codexContainer.y = this.containerToY;
 
-        var titleText = this.add.dom(topLeft, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            bestText
-        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
-        var categoryDom = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            categoryText
-        ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+            var playerRank = this.add.dom(topLeft + GRID * 26, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 200,
+                "color": COLOR_BONUS, 
+            }),
+                `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
+            ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-//
-        var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            `STAGES: ${stagesCompleteDisplay}`
-        ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2 + GRID * 0.75, rowY + GRID, 
+                'uiPanelL', 'Glass', 
+                GRID * 26, GRID * 4, 
+                8, 8, 8, 8);
+            topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+    
+            var bestText = `Sum of Best = ${commaInt(sumOfBestDisplay.toFixed(0))}`;
+    
+            var titleText = this.add.dom(topLeft + GRID * 1.5, rowY + GRID * 3.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                bestText
+            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+    
+
+
+            var categoryDom = this.add.dom(topLeft + GRID * 1.5, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                categoryText
+            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+
+            if (categoryText === "Expert") {
+                categoryDom.node.style.color = "red";
+            }
+            if (categoryText === "Classic") {
+                categoryDom.node.style.color = "#4d9be6";
+            }
+
+
+            var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 3.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                `Stages Complete: ${stagesCompleteDisplay}`
+            ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+
+            panelCard.add([playerRank,topPanel,titleText,categoryDom,stages]);
+            
+            /*this.tweens.add({
+                targets: this.cameras.main,
+                x: { from: -160, to: 0 },
+                duration: 300,
+                ease: 'Power2',
+            });*/
+        }
+        // checking for practice mode
+        else{
+            var topPanel = this.add.nineslice(SCREEN_WIDTH/2, rowY, 
+                'uiPanelL', 'Glass', 
+                GRID * 8.25, GRID * 2.25, 
+                8, 8, 8, 8);
+            topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+
+            var practiceText = this.add.dom(SCREEN_WIDTH/2, rowY + GRID * 1 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                `Practice Mode`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+    
+            var exitButton = this.add.sprite(X_OFFSET + GRID * 1,Y_OFFSET + GRID * 1, 'uiBackButton',0);
+            
+            var exitText = this.add.dom(X_OFFSET + GRID * 4.5, Y_OFFSET + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '10px',
+                "fontWeight": 400,
+                "color": "white",
+            }),
+                    `Tab to Menu`
+            );
+        }
 
         //codexContainer.add([titleText, playerRank, stages]);
 
@@ -2998,17 +3133,21 @@ class StageCodex extends Phaser.Scene {
         
             bestOfDisplay.values().forEach( bestOf => {
                 //debugger
-                var topY = rowY + nextRow * stageNumber;
-                const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFontLarge',`${bestOf.stage.toUpperCase()}`,13
+                var topY = rowY + nextRow * stageNumber + GRID * 1.5;
+                const stageTitle = this.add.bitmapText(topLeft, topY + 4, 'mainFontLarge',
+                    `${bestOf.stage.toUpperCase()}`,13
                 ).setOrigin(0,0);
 
-                const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`TOTAL SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
+                const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',
+                    `TOTAL SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
                 ).setOrigin(0,0).setScale(0.5);
 
-                const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, topY + 21, 'mainFont',`STAGE SCORE: ${commaInt(bestOf.preAdditive())} =>`,16
+                const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5 - 4, topY + 21, 'mainFont',
+                    `STAGE SCORE: ${commaInt(bestOf.preAdditive())} =>`,16
                 ).setOrigin(1,0).setScale(0.5);
 
-                const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
+                const rankTitle = this.add.bitmapText(topLeft + GRID * 24 - 6, topY + 21, 'mainFont',
+                    `RANK:`,16
                 ).setOrigin(1,0).setScale(0.5);
 
                 var _rank = bestOf.stageRank();
@@ -3016,17 +3155,17 @@ class StageCodex extends Phaser.Scene {
                 
 
                 if (_rank != 5) {
-                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
                     ).setDepth(80).setOrigin(0,0).setScale(1);
                     
                 } else {
-                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", 4
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 4
                     ).setDepth(80).setOrigin(0,0).setScale(1);
                     rankIcon.setTintFill(COLOR_BONUS_HEX);
                 }
 
 
-                codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
+                this.codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
 
                 this.yMap.set(bestOf.stage, {
                     stageTitle:bestOf.stage, 
@@ -3046,7 +3185,7 @@ class StageCodex extends Phaser.Scene {
                     } else {
                         _y = rowY + 34 + (nextRow * stageNumber);
                     }
-                    var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
+                    var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y + GRID * 1.5
                     ).setOrigin(0,0).setDepth(50)
 
                     switch (true) {
@@ -3073,11 +3212,12 @@ class StageCodex extends Phaser.Scene {
                     
 
                     if (foodIndex > 0 && foodScore > COMBO_ADD_FLOOR) {
-                        var _comboConnect = this.add.rectangle((topLeft) + ((foodIndex % 28) * foodSpace) - 2, _y + 3, 2, 3, 0xFFFF00, 1
+                        var _comboConnect = this.add.rectangle((topLeft) + ((foodIndex % 28) * foodSpace) - 2,
+                         _y + 3 + GRID * 1.5, 2, 3, 0xFFFF00, 1
                         ).setOrigin(0,0).setDepth(51).setAlpha(1);
-                        codexContainer.add([_atom, _comboConnect]);
+                        this.codexContainer.add([_atom, _comboConnect]);
                     } else {
-                        codexContainer.add(_atom);
+                        this.codexContainer.add(_atom);
                     }
 
                     
@@ -3102,19 +3242,41 @@ class StageCodex extends Phaser.Scene {
                 var selected = this.yMap.get(START_STAGE);
             }
 
-            var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            selected.title.setTintFill(COLOR_FOCUS_HEX);
+
+            this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            
+            this.maskContainerMenu = this.make.container(0, 0);
+            
+            // mask for top of codexContainer
+            var maskMenu = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: 0,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,0.0);
+
+            maskMenu.scaleX = 24;
+            
+            // mask for bottom of codexContainer
+            var maskMenu2 = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT - 42,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,1.0);
+            maskMenu2.scaleX = 24;
+            maskMenu2.scaleY = -1;
+
+
+            this.maskContainerMenu.add([maskMenu, maskMenu2]);
+            this.maskContainerMenu.setVisible(false);
+
+
+            this.codexContainer.mask = new Phaser.Display.Masks.BitmapMask(this, this.maskContainerMenu);
+            this.codexContainer.mask.invertAlpha = true;
             
 
-            this.tweens.add({
-                targets: codexContainer,
-                y: containerToY,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: () => {
-                    //debugger
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                }
-            }, this);
 
             this.input.keyboard.on('keydown-UP', e => {
 
@@ -3131,25 +3293,26 @@ class StageCodex extends Phaser.Scene {
                     selected = this.yMap.get(nextSelect);
                     ourPersist.prevCodexStageMemory = nextSelect;
                     
-                    containerToY = selected.conY * -1 + nextRow;
-                    this.tweens.add({
-                        targets: codexContainer,
-                        y: containerToY,
+                    this.containerToY = selected.conY * -1 + nextRow;
+
+                    selected.title.setTintFill(COLOR_FOCUS_HEX);
+                    /*this.tweens.add({
+                        targets: this.codexContainer,
+                        y: this.containerToY,
                         ease: 'Sine.InOut',
-                        duration: 500,
+                        duration: 0,
                         onComplete: () => {
                             if (exitButton.frame.name === 0) {
                                 selected.title.setTintFill(COLOR_FOCUS_HEX);
                             }
                         }
-                    }, this);
+                    }, this);*/
                     
                 } else {
                     exitButton.setFrame(1);
-                    
+                    exitText.node.style.color = "red";
                     var firstElement = this.yMap.get([...this.yMap.keys()][0]);
                     firstElement.title.clearTint();
-                    
                 }
                 
             }, this);
@@ -3157,13 +3320,18 @@ class StageCodex extends Phaser.Scene {
             this.input.keyboard.on('keydown-DOWN', e => {
 
                 var dur = 500;
-                if (exitButton.frame.name === 1) {
+                if (exitButton && exitButton.frame.name === 1) {
                     exitButton.setFrame(0);
+                    exitText.node.style.color = "white"
                     var safeIndex = 0;
                     dur = 0;
-                } else {
+                    
+                }
+                else {
                     var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
                 }
+                
+                
 
                 selected.title.clearTint()
      
@@ -3171,16 +3339,17 @@ class StageCodex extends Phaser.Scene {
                 selected = this.yMap.get(nextSelect);
                 ourPersist.prevCodexStageMemory = nextSelect;
                 
-                containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: codexContainer,
-                    y: containerToY,
+                this.containerToY = selected.conY * -1 + nextRow;
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                /*this.tweens.add({
+                    targets: this.codexContainer,
+                    y: this.containerToY,
                     ease: 'Sine.InOut',
-                    duration: dur,
+                    duration: 0,
                     onComplete: () => {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                     }
-                }, this);
+                }, this);*/
             }, this);  
         }
 
@@ -3189,7 +3358,7 @@ class StageCodex extends Phaser.Scene {
                 if (exitButton.frame.name === 1) {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
-                    this.scene.sleep('StageCodex');
+                   this.scene.sleep('StageCodex');
 
                 } else {
                     console.log("Launch Practice!", selected.stageTitle);
@@ -3199,43 +3368,56 @@ class StageCodex extends Phaser.Scene {
                         score: 0,
                         startupAnim: true,
                         mode: MODES.PRACTICE
-                    });
-                    
+                    });   
                 }
-                
-            }, this); 
+            }, this);
         }
 
-        if (disableArrows) {
-            
-        } else {
+        if (practiceMode) {
+                this.input.keyboard.on('keydown-TAB', e => {
+                    console.log("Exiting!");
+                    this.scene.wake('MainMenuScene');
+                    this.scene.stop('StageCodex');
+                });
+        } 
+        else {
             var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
                 arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+            var mainMenuLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2 + 1,
+                'UI_MainMenuLabel');
+            mainMenuLabel.angle = 90;
 
             // Default
             this.input.keyboard.on('keydown-RIGHT', e => {
-                //const game = this.scene.get("GameScene");
-                if (originScene.scene.isPaused()) {
-                    originScene.scene.resume();
-                    originScene.scene.setVisible(true);
-                } else {
-                }
+                const ourMenuScene = this.scene.get('MainMenuScene');
+                ourMenuScene.exitButton.setAlpha(1);
+                console.log("Exiting!");
 
-                if (originScene.scene.key == "MainMenuScene") {
-                    
-                    debugger
-                    this.scene.wake("MainMenuScene");
-                }
-
-                
-                
-
-                if (codexArgs.fromQuickMenu) {
-                    this.scene.wake('QuickMenuScene');
-                }
-            
-                this.scene.sleep('StageCodex');
-                
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    x: { from: 0, to: -160 },
+                    duration: 300,
+                    ease: 'Power2',
+                    onUpdate: (tween) => {
+                        if (tween.progress >= 0.25) {
+                            tween.complete();
+                            if (originScene.scene.isPaused()) {
+                                originScene.scene.resume();
+                                originScene.scene.setVisible(true);
+                            } 
+                            if (originScene.scene.key == "MainMenuScene") {
+                                //debugger
+                                this.scene.wake("MainMenuScene");
+                            }
+                            if (codexArgs.fromQuickMenu) {
+                                this.scene.wake('QuickMenuScene');
+                            }
+                            this.cameras.main.x = 0;
+                            // might need to stop scene instead
+                            this.scene.sleep('StageCodex');
+                        }
+                    }
+                });
                 }, this
             );
 
@@ -3243,11 +3425,12 @@ class StageCodex extends Phaser.Scene {
                 // Haven't unlocked Expert Mode
                 
             } else {
-                var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, Y_OFFSET + GRID * 4.5)
                         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
                 this.input.keyboard.on('keydown-LEFT', e => {
                     var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
+                    
                     this.scene.restart({
                         stage: this.scene.get("GameScene").stage,
                         originScene: originScene,
@@ -3255,10 +3438,39 @@ class StageCodex extends Phaser.Scene {
                         displayList: displayList,
                         displayIndex: newIndex
                     });
+
+                    /*this.tweens.add({
+                        targets: this.cameras.main,
+                        x: { from: 0, to: 160 },
+                        duration: 300,
+                        ease: 'Power2',
+                        onUpdate: (tween) => {
+                            if (tween.progress >= 0.25) {
+                                this.scene.restart({
+                                    stage: this.scene.get("GameScene").stage,
+                                    originScene: originScene,
+                                    fromQuickMenu: true, 
+                                    displayList: displayList,
+                                    displayIndex: newIndex
+                                });
+                            }
+                        }
+                    });*/
+                    
                     }, this
                 );   
             }                               
         }
+    }
+    update() {
+        this.tweens.add({
+            targets: this.codexContainer,
+            y: this.containerToY,
+            ease: 'Linear',
+            duration: 100,
+            repeat: 0,
+            yoyo: true,
+        });  
     }
 }
 
@@ -3353,8 +3565,7 @@ class MainMenuScene extends Phaser.Scene {
                     originScene: this,
                     fromQuickMenu: false,
                     disableArrows: true,
-                    practiceMode: true,
-                    
+                    practiceMode: true, 
                 });
                 mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
                 mainMenuScene.scene.get("PersistScene").coins = 12;
@@ -3551,15 +3762,33 @@ class MainMenuScene extends Phaser.Scene {
         this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
+        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
         
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
 
         //menu arrows
+
         var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
+
+
+        var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
+             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5);
+        codexLabel.angle = 90;
+
+        var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
+             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5);
+            UI_StageTrackerLabel.angle = 90;
+
+        /*if (this.exitTween) {
+            this.exitTween.reverse();
+        }*/
+        
+        
 
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
@@ -3578,24 +3807,49 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-LEFT', e => {
             if (this.pressedSpace ) {
-                //this.cameras.main.scrollX -= SCREEN_WIDTH
-
-                this.scene.launch("StageCodex", {
-                    originScene: this,
-                    fromQuickMenu: false,
-                    
-                });
-                this.scene.sleep('MainMenuScene');
-                
+                this.exitButton.setAlpha(0);
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    x: { from: 0, to: 160 },
+                    duration: 300,
+                    ease: 'Power2',
+                    onUpdate: (tween) => {
+                        if (tween.progress >= 0.25) {
+                            this.scene.launch("StageCodex", {
+                                originScene: this,
+                                fromQuickMenu: false,
+                            });
+                            tween.complete();
+                            this.cameras.main.x = 0;
+                            this.scene.sleep('MainMenuScene');
+                        }
+                    }
+                });  
             }
         }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
             if (this.pressedSpace) {
+                this.exitButton.setAlpha(0);
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    x: { from: 0, to: -160 },
+                    duration: 300,
+                    ease: 'Power2',
+                    onUpdate: (tween) => {
+                        if (tween.progress >= 0.25) {
+                            this.scene.launch("ExtractTracker", {
+                                originScene: this,
+                                fromQuickMenu: false,
+                            });
+                            tween.complete();
+                            this.cameras.main.x = 0;
+                            this.scene.sleep('MainMenuScene');
+                        }
+                    }
+                });  
                 //this.cameras.main.scrollX += SCREEN_WIDTH
                 //ourMap.cameras.main.scrollX += SCREEN_WIDTH
                 //mainMenuScene.scene.wake('MainMenuScene');
-                
-                ;
             }
         });
     
@@ -3699,7 +3953,8 @@ class MainMenuScene extends Phaser.Scene {
                 arrowMenuL,arrowMenuR,
                 ...menuElements,
                 this.exitButton,
-                this.graphics
+                this.graphics,
+                codexLabel,UI_StageTrackerLabel,
             ],
             alpha: 1,
             duration: 100,
@@ -3747,8 +4002,6 @@ class MainMenuScene extends Phaser.Scene {
 
         }, this);
 
-        
-        
     }
     update() {
         this.graphics.clear();
@@ -5182,7 +5435,8 @@ class GameScene extends Phaser.Scene {
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
         this.openingGoalPanel.setDepth(100).setOrigin(0.475,0).setAlpha(0);
-        this.tweens.add({
+        
+        this.openingGoalTween = this.tweens.add({
             targets: [this.openingGoalText, this.openingGoalPanel],
             x: SCREEN_WIDTH/2,
             ease: 'Sine.easeOutIn',
@@ -5667,6 +5921,13 @@ class GameScene extends Phaser.Scene {
                 this.tabDown = true;
                 const ourQuickMenu = this.scene.get('QuickMenuScene');
                 const ourScoreScene = this.scene.get('ScoreScene');
+                
+                // disable opening goal tween so it can't persist to other menus
+                this.openingGoalTween.stop();
+                this.openingGoalText.setAlpha(0);
+                this.openingGoalPanel.setAlpha(0);
+                this.r2.setAlpha(0);
+                this.stageText.setAlpha(0);
                 
                 if (!this.scene.isActive(ourScoreScene) && !this.scene.isActive('StageCodex')){
                     this.scene.launch("QuickMenuScene", {
