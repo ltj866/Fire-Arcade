@@ -9246,7 +9246,8 @@ var StageData = new Phaser.Class({
     },
 
     preAdditive() {
-        return calcStageScore(this.atomTime());
+        var val = calcStageScore(this.atomTime());
+        return val;
     },
 
     zedLevelBonus() {
@@ -9260,12 +9261,17 @@ var StageData = new Phaser.Class({
     bonusMult() {
         var zedLevelBonus = this.zedLevelBonus();
         var medalBonus = this.medalBonus();
-        return Number(this.diffBonus/100 + zedLevelBonus + medalBonus);
+
+        var val = Number(this.diffBonus/100 + zedLevelBonus + medalBonus);
+        return val;
         
     },
 
     postMult() {
-        return Math.floor(this.preAdditive() * this.bonusMult());
+        var pre = this.preAdditive();
+        var bonusMult = this.bonusMult()
+        var val = Math.floor(pre * bonusMult);
+        return val
     },
     
     bonkBonus(){
@@ -9305,7 +9311,9 @@ var StageData = new Phaser.Class({
     calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
-        return _postMult + _bonkBonus + this.comboBonus(); //+ this.boostBonus();
+
+        var val = _postMult + _bonkBonus + this.comboBonus(); //+ this.boostBonus();
+        return val;
     }
     
 });
@@ -9399,7 +9407,7 @@ class ScoreScene extends Phaser.Scene {
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
-            bestLog.zedLevel = calcZedLevel(ourPersist.zeds);
+            bestLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
 
             var bestLocal = bestLog.calcTotal();
         }
@@ -9464,7 +9472,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
         var bestLog = new StageData(bestLogJSON);
-        bestLog.zedLevel = calcZedLevel(ourPersist.zeds);
+        bestLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
     
         var bestLocal = bestLog.atomTime();
         var bestAve = bestLocal/bestLog.foodLog.length;
@@ -10362,7 +10370,7 @@ class ScoreScene extends Phaser.Scene {
                 "text-align": 'right',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `BEST ↑`
+                `OVERALL BEST ↑`
         ).setOrigin(1, 0).setDepth(20).setScale(0.5);
 
         this.tweens.add({
