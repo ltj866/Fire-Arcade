@@ -2742,7 +2742,7 @@ class ExtractTracker extends Phaser.Scene {
         var topLeft = X_OFFSET + GRID * 8;
         var rowY = Y_OFFSET + GRID * 1.5;
         var extractNumber = 0;
-        var nextRow = 72;
+        var nextRow = 68;
         var letterOffset = 30;
 
         console.log(codexArgs)
@@ -9946,6 +9946,8 @@ class ScoreScene extends Phaser.Scene {
                                         var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
 
                                         var sX = Math.trunc(postGold / sRankDelta);
+                                        console.log("MAX SCORE = ", sRankDelta * 10 + RANK_BENCHMARKS.get(RANKS.GOLD) - 1, "sDelta", sRankDelta, "10x - 1 + GOLD RANK");
+                                        console.log("MAX SCORE = ", sRankDelta * 9 + RANK_BENCHMARKS.get(RANKS.GOLD) - 1, "sDelta", sRankDelta, "9x - 1 + GOLD RANK");
 
                                         if (sX > 1 ) {
                                             nextRankLetter.setHTML(`x${sX}`);
