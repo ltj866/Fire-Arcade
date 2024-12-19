@@ -3737,8 +3737,8 @@ class StageCodex extends Phaser.Scene {
             }                               
         }
     }
-    update() {
-        this.tweens.add({
+    update() { 
+        this.tweens.add({ // CLEAN UP: THis is adding a tween every frame.
             targets: this.codexContainer,
             y: this.containerToY,
             ease: 'Linear',
@@ -4279,22 +4279,22 @@ class MainMenuScene extends Phaser.Scene {
 
     }
     update() {
-        this.graphics.clear();
-            if (this.pressedSpace) {
-                this.graphics.fillCircleShape(this.descriptionPointer);
-            
-                //left horizontal line connecting left dot
-                this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y - 0.5,
-                    this.descriptionPanel.x - 8,this.descriptionPointer.y - 0.5);
-                
-                //vertical line
-                this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
-                    this.descriptionPanel.x - 8,this.descriptionPanel.y + this.descriptionPanel.height/2);
+        this.graphics.clear(); 
+        if (this.pressedSpace) { // CLEAN UP: Does this really need to be called every frame? Consider using an event listener.
+            this.graphics.fillCircleShape(this.descriptionPointer);
         
-                //second horizontal line from left
-                this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
-                    this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2);
-            } 
+            //left horizontal line connecting left dot
+            this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y - 0.5,
+                this.descriptionPanel.x - 8,this.descriptionPointer.y - 0.5);
+            
+            //vertical line
+            this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPointer.y,
+                this.descriptionPanel.x - 8,this.descriptionPanel.y + this.descriptionPanel.height/2);
+    
+            //second horizontal line from left
+            this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
+                this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2);
+        } 
         }
 
     // Function to convert hex color to RGB
@@ -4974,6 +4974,17 @@ class PersistScene extends Phaser.Scene {
 
     
     update(time, delta) {
+
+        if (parseInt(time) % 300 === 0) {
+            var objMap = new Map();
+            
+            this.scene.manager.scenes.forEach( scene => {
+                objMap.set(scene.scene.key, scene.children.list.length);
+            })
+            debugger
+            console.log("Scene Game Objects", objMap);
+    
+        }
 
         //this.wavePipeline.setUniform('uTime', time / 1000);
         this.wavePipeline.set1f('uTime', time / 1000);
@@ -8986,7 +8997,7 @@ class GameScene extends Phaser.Scene {
     }
 
     // #region Game Update
-    update (time, delta) {
+    update(time, delta) {
 
 
         const ourInputScene = this.scene.get('InputScene');
