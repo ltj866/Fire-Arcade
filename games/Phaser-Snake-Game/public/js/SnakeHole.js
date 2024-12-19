@@ -726,6 +726,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
         const spaceboyFontColorHex = 0x1f211b;
         const persist = this.scene.get("PersistScene");
+        const ourGame = this.scene.get("GameScene");
 
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
@@ -804,15 +805,19 @@ class SpaceBoyScene extends Phaser.Scene {
         }
 
         // #region Top Right UI
-        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
-        .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`0`,13)
-            .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1,
+             'mainFontLarge',`BEST:`,13)
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 ,
+             'mainFontLarge',`0`,13)
+            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
         // Score Text SET INVISIBLE
-        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
+        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1,
+            'mainFontLarge',`SCORE:`,13)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
+        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2,
+            'mainFontLarge',`0`, 13)
             .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
 
@@ -823,6 +828,21 @@ class SpaceBoyScene extends Phaser.Scene {
         this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
             this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
 
+        // Length/Goal UI
+
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
+        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
+        ).setAlpha(0).setDepth(101).setOrigin(0,0).setScrollFactor(0);
+        
+        this.lengthGoalUIMaskSprite = this.add.sprite(X_OFFSET + GRID * 24,
+            27, 'UI_goalLabelMask').setDepth(101).setOrigin(0,0);
+
+        const lengthGoalUIMask = new Phaser.Display.Masks.BitmapMask(this,this.lengthGoalUIMaskSprite );
+    
+        this.lengthGoalUILabel.setMask(lengthGoalUIMask)
+        this.lengthGoalUIMaskSprite.visible = false;
+        this.lengthGoalUILabel.mask.invertAlpha = true;
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
     }
@@ -1063,6 +1083,15 @@ class SpaceBoyScene extends Phaser.Scene {
         this.navLog.push(stageText, stageOutLine);
 
     }
+    shiftLightsDim(){
+        this.tweens.add({
+            targets: [this.shiftLight1,this.shiftLight2,this.shiftLight3],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            duration: 500,
+        });
+    }
+
     
     scoreTweenShow(){
         this.tweens.add({
@@ -1074,6 +1103,15 @@ class SpaceBoyScene extends Phaser.Scene {
             yoyo: false
           });
           this.tweens.add({
+            targets: [this.scoreLabel, this.scoreValue],
+            alpha:0,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        })
+          this.tweens.add({
             targets: [this.bestScoreValue, this.bestScoreLabel],
             alpha: 1,
             ease: 'Sine.InOut',
@@ -1081,6 +1119,15 @@ class SpaceBoyScene extends Phaser.Scene {
             repeat: 0,
             yoyo: false
           });
+          this.tweens.add({
+            targets: [this.lengthGoalUI, this.lengthGoalUILabel],
+            alpha: 1,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        });
     }
     scoreTweenHide(){
         if (this.UIScoreContainer.y === 0) {
@@ -1112,6 +1159,43 @@ class SpaceBoyScene extends Phaser.Scene {
             })
         }
     }
+    scoreTweenVanish(){
+        this.tweens.add({
+            targets: this.UIScoreContainer,
+            y: (- GRID * 2),
+            ease: 'Sine.InOut',
+            duration: 800,
+            repeat: 0,
+            yoyo: false
+        });
+        this.tweens.add({
+            targets: [this.bestScoreValue, this.bestScoreLabel],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+        });
+
+        this.tweens.add({
+            targets: [this.scoreLabel, this.scoreValue],
+            alpha:0,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        })
+        this.tweens.add({
+            targets: [this.lengthGoalUI, this.lengthGoalUILabel],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        });
+    }
 }
 
 class MusicPlayerScene extends Phaser.Scene {
@@ -1120,6 +1204,7 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     init() {
         this.startedOnce = false;
+        this.musicOpacity = 0;
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -1134,46 +1219,66 @@ class MusicPlayerScene extends Phaser.Scene {
         this.playerLooped = false;
     }
     create() {
+        const ourGame = this.scene.get("GameScene");
+
         this.soundManager = this.sound;
 
         // Start volume at 50%
         this.soundManager.volume = 0.5;
 
-        // Create an invisible interactive zone for volume dial
+        // Create an invisible interactive zone for volume dial and the music player zone
         this.volumeControlZone = this.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
-             24, 36).setInteractive().setOrigin(0,0);
+             24, 36).setInteractive().setOrigin(0,0).setDepth(1);
+        this.musicPlayerZone = this.add.zone(X_OFFSET + GRID * 34, GRID * 0.5,
+            64, 104).setInteractive().setOrigin(0,0).setDepth(0);;
         // debugging bounding box
-        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.volumeControlZone);
+        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.musicPlayerZone);
 
         // speaker icon above slider
         this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 2.5, 'uiVolumeIcon',0).setDepth(100);
+            GRID * 2.5 + 7, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
         // volume slider icon
         this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75, 'uiVolumeSlider').setDepth(100);
+            GRID * 5.75  + 6, 'uiVolumeSlider').setDepth(100).setAlpha(0);
         // mask sprite
         this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75, 'uiVolumeSliderWidget').setDepth(101);
+            GRID * 5.75  + 6, 'uiVolumeSliderWidget').setDepth(101);
         // rendered sprite
         this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75, 'uiVolumeSliderWidgetRendered').setDepth(101);
+            GRID * 5.75  + 6, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
 
         const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
         this.volumeSlider.setMask(volumeMask)
         this.volumeSliderWidgetMask.visible = false;
         this.volumeSlider.mask.invertAlpha = true;
 
-        // is mouse hovering over volume wheel?
+        // is mouse hovering over volume wheel OR the entire music player area?
         this.isVolumeControlActive = false;
 
         this.volumeControlZone.on('pointerover', () => {
             this.input.setDefaultCursor('pointer');
             this.isVolumeControlActive = true;
+            this.musicOpacity = 1;
+            var show = true;
+            ourGame.musicPlayerDisplay(show);
         });
         this.volumeControlZone.on('pointerout', () => {
             this.input.setDefaultCursor('default');
             this.isVolumeControlActive = false
         }); 
+
+        this.musicPlayerZone.on('pointerover', () => {
+            this.musicOpacity = 1;
+            var show = true;
+            ourGame.musicPlayerDisplay(show);
+        });
+        this.musicPlayerZone.on('pointerout', () => {
+            var show = false;
+            ourGame.musicPlayerDisplay(show);
+            if (this.isVolumeControlActive === false) {
+                this.musicOpacity = 0;
+            }
+        });
 
         // Listen for mouse wheel events
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
@@ -1191,15 +1296,15 @@ class MusicPlayerScene extends Phaser.Scene {
                 this.updatedVolume = this.soundManager.volume + volumeChange
                 
                 // y values for adjusting the volumeSliderWidget and Mask
-                const minY = 40;
-                const maxY = 99;
+                const minY = 46;
+                const maxY = 105;
                 const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
                 
                 // this console log is one event call behind hence this.updatedVolume
                 //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
 
                 // set volume icon based on volume level
-                if (newY >= 40 && newY <= 99) {
+                if (newY >= 46 && newY <= 105) {
                     this.volumeSliderWidgetMask.y = newY;
                     this.volumeSliderWidgetReal.y = newY;
 
@@ -1222,8 +1327,10 @@ class MusicPlayerScene extends Phaser.Scene {
         // Buttons
         var columnX = X_OFFSET + GRID * 36 + 1;
 
-        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
-        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
+        this.trackIDLabel = this.add.bitmapText(columnX - GRID * 4 -5, GRID * 2.75, 'mainFont', `TRACK`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 2.75, 'mainFont', `000`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
 
@@ -1303,10 +1410,16 @@ class MusicPlayerScene extends Phaser.Scene {
         // checks whether cursor is over any button and then changes cursor to hand
         function setupButtonCursor(button, scene) {
             button.on('pointerover', () => {
+                scene.musicOpacity = 1;
                 scene.input.setDefaultCursor('pointer');
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
             });
             button.on('pointerout', () => {
                 scene.input.setDefaultCursor('default');
+                scene.musicOpacity = 0;
+                var show = false;
+                ourGame.musicPlayerDisplay(show);
             });
         }
         setupButtonCursor(this.loopButton, this);
@@ -1330,7 +1443,50 @@ class MusicPlayerScene extends Phaser.Scene {
             this.pauseButton.setFrame(1);
             this.sound.pauseAll(); // this prevents sound from being able to resume
         });
+
     }
+    update () {
+        let targetOpacity = Phaser.Math.Interpolation.Linear(
+            [this.volumeSlider.alpha, this.musicOpacity], 0.25);
+        //.log(targetOpacity)
+
+        this.volumeSlider.alpha = targetOpacity;
+        this.volumeSliderWidgetReal.alpha = targetOpacity;
+    }
+
+    /*showPlayer() {
+        this.tweens.add({
+            targets: [this.volumeIcon,this.volumeSlider,this.volumeSliderWidgetReal],
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+            yoyo: false,
+        });
+    }
+    
+    hidePlayer() {
+        this.tweens.add({
+            targets: [this.volumeIcon,this.volumeSlider,this.volumeSliderWidgetReal],
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+            yoyo: false,
+        });
+    }*/
+
+   showTrackID(){
+    this.tweens.add({
+        targets: [this.trackIDLabel,this.trackID, this.volumeIcon],
+        alpha: 1,
+        ease: 'Sine.InOut',
+        duration: 750,
+        repeat: 0,
+        yoyo: false,
+    });
+
+   }
 
     stopMusic() {
         this.sound.sounds.forEach((sound) => {
@@ -1432,12 +1588,14 @@ class PinballDisplayScene extends Phaser.Scene {
         // pinball display/combo cover
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
         .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+
         // 'READY?' text sprite
         this.comboCoverReady = this.add.sprite(GRID * 15, 2, 'UI_comboReady', 0
         ).setOrigin(1,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
+
         // pinball display snake face
         this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
-        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
+        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0).setAlpha(0);
 
         // combo letters
         this.letterC = this.make.image({
@@ -1508,6 +1666,19 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
         this.comboCover.mask.invertAlpha = true;
+    }
+    resetPinball(){
+        this.comboMasks.forEach((element) => {
+            if (element !== this.comboCoverSnake) {
+                element.setAlpha(0);
+            }
+        });
+        
+    }
+    resetPinballFull(){
+        this.comboMasks.forEach((element) => {
+            element.setAlpha(0);
+        });
     }
 }
 
@@ -2121,6 +2292,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
+        this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
+        this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
@@ -3634,6 +3807,7 @@ class StageCodex extends Phaser.Scene {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
                    this.scene.sleep('StageCodex');
+                   this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
 
                 } else {
                     console.log("Launch Practice!", selected.stageTitle);
@@ -3653,6 +3827,7 @@ class StageCodex extends Phaser.Scene {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
                     this.scene.stop('StageCodex');
+                    this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
                 });
         } 
         else {
@@ -3853,6 +4028,8 @@ class MainMenuScene extends Phaser.Scene {
                 
                 
                 this.scene.get("StartScene").UUID_MAP.size;
+
+                mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("ADVENTURE");
                 
                 if (EXPERT_CHOICE && checkExpertUnlocked.call(this)) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get(`adventure-mode`);
@@ -4269,7 +4446,8 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.pressToPlay.setAlpha(0)
                 mainMenuScene.pressedSpace = true;
                 titleTween.resume();
-                menuFadeTween.resume();            
+                menuFadeTween.resume();
+                this.scene.get("MusicPlayerScene").showTrackID();   
             }
             else{
                 menuOptions.get(menuList[cursorIndex]).call(this);
@@ -5242,7 +5420,6 @@ class GameScene extends Phaser.Scene {
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
-        
 
 
         if (this.stage == 'Tutorial_3') { // TODO @holden Move to customLevels.js
@@ -5460,6 +5637,8 @@ class GameScene extends Phaser.Scene {
 
         // show snake pan across pinball display
         if (this.stage == START_STAGE) {
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            this.scene.get('SpaceBoyScene').scoreTweenShow();
             ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
             this.tweens.add({
                 targets: ourPinball.comboCoverSnake,
@@ -5471,10 +5650,29 @@ class GameScene extends Phaser.Scene {
                 repeat: 0,
                 onComplete: () => {
                     ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 0)
+                },
+                onStart: () =>{
+                    ourPinball.comboCoverSnake.setAlpha(1);
                 }
             });  
-        } 
+            this.tweens.add({
+                targets: [ourSpaceBoy.lengthGoalUI, ourSpaceBoy.lengthGoalUILabel],
+                alpha:  1,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+            });
+        }
+        else{
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            ourSpaceBoy.lengthGoalUI.setAlpha(1);
+            ourSpaceBoy.lengthGoalUILabel.setAlpha(1);
+        }
         // fade in 'READY?' for pinball display
+        ourPinball.comboCoverReady.setOrigin(1.0,0)
+        ourPinball.comboCoverReady.setTexture('UI_comboReady')
+
         this.tweens.add({
             targets: ourPinball.comboCoverReady,
             alpha: {from: 0, to: 1},
@@ -5778,9 +5976,6 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
-                ourSpaceBoy.shiftLight1.setAlpha(0);
-                ourSpaceBoy.shiftLight2.setAlpha(0);
-                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("YES");
                 
                 ourGameScene.extractMenuOn = false;
@@ -5826,9 +6021,6 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
-                ourSpaceBoy.shiftLight1.setAlpha(0);
-                ourSpaceBoy.shiftLight2.setAlpha(0);
-                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
 
@@ -7089,43 +7281,24 @@ class GameScene extends Phaser.Scene {
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
-        // Goal UI
-        const lengthGoalStyle = {
-            "color":'0x1f211b',
-            "font-size": '16px',
-            "font-weight": 400,
-            "text-align": 'right',
-        }
-        
+        var length = 0;
+        this.lengthGoal = LENGTH_GOAL;
+        var length = `${ourGame.length}`;
 
-        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 2, GRID * 7, 'mainFont', ``, 8)
-        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 29.25) + 2, GRID * 7, 'mainFont', ``, 8)
-        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        
-        
-        var length = `${this.length}`;
         if (this.lengthGoal != 0) {
-            this.lengthGoalUI.setText(
+            ourSpaceBoy.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
-            ).setOrigin(0,0).setAlpha(0);
-            this.lengthGoalUILabel.setText(
-            `LENGTH\nGOAL`
-            ).setOrigin(0,0).setAlpha(0);
-            this.lengthGoalUILabel.setLineSpacing(3)
-            this.lengthGoalUI.setLineSpacing(3)
+            ).setOrigin(0,0);
+            ourSpaceBoy.lengthGoalUI.setLineSpacing(6)
+            //ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
-            .setAlpha(0);
-            this.lengthGoalUI.x = GRID * 27
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
+            ourSpaceBoy.lengthGoalUI.x = GRID * 27
+            //ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
         }
 
-        if (this.startupAnim) {
-            this.lengthGoalUI.setAlpha(0);
-            this.lengthGoalUILabel.setAlpha(0);
-        }
         
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
@@ -7408,7 +7581,6 @@ class GameScene extends Phaser.Scene {
             
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
-                    //targets: [this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
                     targets: [this.UIScoreContainer],
                     alpha: 1,
                     duration: 300,
@@ -8018,11 +8190,6 @@ class GameScene extends Phaser.Scene {
             ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
             }
         }
-            
-
-            
-
-        
 
         /*this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
             x:{min: 0, max: SCREEN_WIDTH},
@@ -8521,8 +8688,9 @@ class GameScene extends Phaser.Scene {
             log = null;
         }
 
+        this.scene.get("PinballDisplayScene").resetPinball()
 
-
+        ourSpaceBoy.shiftLightsDim();
     }
     gameSceneFullCleanup() {
         // Put end of run clean up loop.
@@ -8543,6 +8711,11 @@ class GameScene extends Phaser.Scene {
             this.scene.get("MusicPlayerScene").loopButton.setFrame(4);
         }
         this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
+
+        this.scene.get("PinballDisplayScene").resetPinballFull();
+
+        this.scene.get("SpaceBoyScene").scoreTweenVanish();
+        this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
     }
     
  
@@ -8556,8 +8729,6 @@ class GameScene extends Phaser.Scene {
         ourSpaceboy.scoreTweenShow();
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
-        ourPinball.comboCoverReady.setOrigin(1.0,0)
-        ourPinball.comboCoverReady.setTexture('UI_comboReady')
 
         if (this.helpPanel) {
             this.tweens.add({
@@ -8869,7 +9040,7 @@ class GameScene extends Phaser.Scene {
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
-        var ourGame = this.scene.get("GameScene");
+        const ourGame = this.scene.get("GameScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
         ourPersist.loseCoin();
         this.coinsUIIcon.setVisible(false);
@@ -8893,6 +9064,13 @@ class GameScene extends Phaser.Scene {
                 ourPinball.comboCoverBONK.x = GRID * 17.5
                 ourPinball.comboCoverBONK.setAlpha(0);
             },
+            onStart: () => {
+                if (ourGame.comboFadeTween) {
+                    ourGame.comboFadeTween.destroy();
+                    ourGame.comboHide();
+                }
+                
+            }
         }); 
 
         //if (this.UI_bonkTween.isPlaying()) {
@@ -8935,9 +9113,11 @@ class GameScene extends Phaser.Scene {
 
 
     comboBounce(){
+        const ourPinball = this.scene.get('PinballDisplayScene');
         this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
+            targets: [ourPinball.letterC,ourPinball.letterO,
+                ourPinball.letterM, ourPinball.letterB, 
+                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
             y: { from: GRID * 1.25, to: GRID * 0 },
             ease: 'Sine.InOut',
             duration: 200,
@@ -8946,28 +9126,47 @@ class GameScene extends Phaser.Scene {
             yoyo: true
             });
     }
+
     comboAppear(){
-        //console.log("appearing");
+        const ourPinball = this.scene.get('PinballDisplayScene');
+        console.log('appearing')
         this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
+            targets: [ourPinball.letterC,ourPinball.letterO,
+                ourPinball.letterM, ourPinball.letterB, 
+                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
             alpha: { from: 0, to: 1 },
             ease: 'Sine.InOut',
             duration: 300,
             repeat: 0,
         });
         this.comboActive = true;
-        }
+    }
+
     comboFade(){
-        //console.log("fading")
-        this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
+        const ourPinball = this.scene.get('PinballDisplayScene');
+        this.comboFadeTween = this.tweens.add({
+            targets: [ourPinball.letterC,ourPinball.letterO,
+                ourPinball.letterM, ourPinball.letterB, 
+                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 500,
             repeat: 0,
         });
+        this.comboActive = false;
+        this.comboCounter = 0;
+    }
+    
+    // Used when another element needs to take precedence such as bonking
+    comboHide(){
+        const ourPinball = this.scene.get('PinballDisplayScene');
+        ourPinball.letterC.setAlpha(0);
+        ourPinball.letterO.setAlpha(0);
+        ourPinball.letterM.setAlpha(0);
+        ourPinball.letterB.setAlpha(0);
+        ourPinball.letterO2.setAlpha(0);
+        ourPinball.letterExplanationPoint.setAlpha(0);
+
         this.comboActive = false;
         this.comboCounter = 0;
     }
@@ -8994,6 +9193,51 @@ class GameScene extends Phaser.Scene {
                 });
             }
         }); 
+    }
+
+    musicPlayerDisplay(show){
+        const ourSpaceboy = this.scene.get('SpaceBoyScene');
+        let _offset = 36;
+        if (show === true) {
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUI,
+                x: X_OFFSET + GRID * 32.25 + 3 - _offset,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUILabel,
+                x: X_OFFSET + GRID * 29.0 + 6 - _offset,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+        }
+        else if (show === false) {
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUI,
+                x: X_OFFSET + GRID * 32.25 + 3,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUILabel,
+                x: X_OFFSET + GRID * 29.0 + 6,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+        }
+            
+        
+        this.lengthGoalUI
+        this.lengthGoalUILabel
     }
 
     // #region Game Update
