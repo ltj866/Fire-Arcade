@@ -456,8 +456,8 @@ var intToBinHash = function (input) {
 }
 
 const ZED_CONSTANT = 64;
-const ZEDS_LEVEL_SCALAR = 0.02;
-const ZEDS_OVERLEVEL_SCALAR = 0.7;
+const ZEDS_LEVEL_SCALAR = 0.015;
+const ZEDS_OVERLEVEL_SCALAR = 0.15;
 var calcZedObj = function (remainingZeds, reqZeds=0, level=0) {
     // Would be nice to put tests here.
 
@@ -718,6 +718,7 @@ class SpaceBoyScene extends Phaser.Scene {
         this.navLog = [];
         this.maxBin = 0;
         this.prevZedLevel = 0;
+        this.zedSegments = [];
         //this.zedBar = this.add.graphics();
     }
     create() {
@@ -826,38 +827,140 @@ class SpaceBoyScene extends Phaser.Scene {
 
     }
     updateZedSegments(maxZeds) {
+
+        if (this.zedSegments.length > 0) {
+            this.zedSegments.forEach( seg => {
+                seg.destroy();
+            });
+            this.zedSegments = [];
+        } else {
+            this.zedSegments = [];
+        }
         this.zedSegments = [];
         this.zedBarGraphics.clear();
 
         var segments;
+        //var deltaX = 4;
+        var startX = GRID * 7 + 3;
+        var barY = GRID * 28 + 8;
         
-        switch (true) { // ALL NEED TO BE BALANCED
+        switch (true) { // ALL NEED TO BE BALANCED  James Zeds = 127947 12/17
             case maxZeds < 750:
-                segments = 6; // 127
+                segments = 7; // 127
+                var xOffsets = [0, 8, 15, 22, 30, 37, 44];
+                for (let index = 0; index < segments; index++) {
+
+                    var zedSeg;
+                    if (index === 0 || index === 3 || index === 6) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg7', 1
+                        ).setDepth(91).setOrigin(0,0);
+                        
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg6', 1
+                        ).setDepth(91).setOrigin(0,0); 
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
+                
                 break;
+
             case maxZeds < 1500:
                 segments = 8; // 511
+                var xOffsets = [0, 7, 14, 20, 26, 32, 38, 45];
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 0 || index === 1 || index === 6 || index === 7) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg6', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg5', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
                 break
+
+            case maxZeds < 4000:
+                segments = 9; // 2_047
+                var xOffsets = [0, 6, 12, 18, 24, 29, 35, 41, 47];
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 4) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
+                break
+
             case maxZeds < 6000:
                 segments = 10; // 2_047
+                var xOffsets = [0, 6, 11, 16, 21, 26, 31, 36, 41, 46];
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 0 || index === 9) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg5', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
                 break
-            case maxZeds < 10000:
+
+            case maxZeds < 14245:
                 segments = 13 // 16_383
+                var deltaX = 4;
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg = this.add.sprite(startX + deltaX * index, barY, 'zedBarSeg3', 1
+        
+                    ).setDepth(91).setOrigin(0,0);
+                    this.zedSegments.push(zedSeg); 
+                }
+
                 break
-            case maxZeds < 20000: // Over leveled here?
-                segments = 16; // 131_071
+
+            case maxZeds > 14245: // Over leveled.
+                segments = 15; // 131_071   
+                var xOffsets = [1, 3, 6,9, 12, 15, 18, 21, 24, 27, 30, 33, 37, 42, 47];
+                this.add.sprite(startX + 0, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
+                //this.add.sprite(startX + 50, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 0) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg2', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else if (index === 11) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3Cap', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else if (index === 12 || index === 13) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSegEnd', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else if (index === 14) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSegEnd', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
                 break
-            case maxZeds < 30000: // Over leveled here?
-                segments = 24; // 33_554_431
-                break
+
+            //case maxZeds < 20000: // Over leveled here?
+            //    segments = 24; // 33_554_431
+            //    break
+
             default:
                 segments = 26 // 134_217_727
                 break;
         }
 
-        var deltaX = 4;
-        var startX = GRID * 7 + 3;
-        var barY = GRID * 28 + 8;
+        
         //var segments = 13;
 
         this.maxBin = (2 ** segments) - 1;
@@ -865,22 +968,14 @@ class SpaceBoyScene extends Phaser.Scene {
        
         this.zedBarGraphics.lineStyle(2, 0x1F211B, 1); // ave bar
         this.zedBarGraphics.strokeRect(startX - 2, barY - 1, 
-            segments * deltaX + 2 , 5
+            13 * 4 + 2 , 5
         );
 
         this.zedBarGraphics.fillStyle(0x869D54);
         this.zedBarGraphics.fillRect(startX - 1, barY - 2 + 1, 
-            segments * deltaX + 1, 5
+            13 * 4 + 1, 5
         );
         
-        for (let index = 0; index < segments; index++) {
-
-            var zedSeg = this.add.sprite(startX + deltaX * index, barY, 'zedBarSegment', 1
-
-            ).setDepth(91).setOrigin(0,0);
-            this.zedSegments.push(zedSeg);
-            
-        }
 
     }
     updateZedDisplay(zobj) {
@@ -1487,7 +1582,7 @@ class PlinkoMachineScene extends Phaser.Scene {
 
         const spaceBoy = this.scene.get("SpaceBoyScene");
         //spaceBoy.zedTitle.setText('+0');
-        //this.spawnPlinkos(12);
+        //this.spawnPlinkos(1);
     }
     spawnPlinkos (number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
@@ -1540,10 +1635,9 @@ class PlinkoMachineScene extends Phaser.Scene {
                 });
 
                 zedText.setText(`+${this.zedIndex}`);
-                debugger
                 spaceBoy.zedTitle.setText(`+${this.zedsToAdd}`);
 
-                console.log("Add", this.zedIndex, " Zeds for a total", this.zedsToAdd);
+                //console.log("Add", this.zedIndex, " Zeds for a total", this.zedsToAdd);
                 this.zedIndex += 1;
 
                 if (number === 0) {
@@ -1561,7 +1655,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                                 alpha: { from: 1, to: 0 },
                                 ease: 'Sine.InOut',
                                 duration: 500, //600
-                                loop: 2, // 3
+                                loop: 1, // 3
                                 yoyo: true
                             },
                             {
@@ -1588,7 +1682,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         this.countDownTween = this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration: 50 * this.zedsToAdd * zedsPerSegment,
+                            duration: 66 * this.zedsToAdd * zedsPerSegment, // 50
                             ease: 'linear',
                             onUpdate: tween => {
                                 this.zedsToAdd = parseInt(tween.getValue());
@@ -1630,7 +1724,7 @@ class PlinkoMachineScene extends Phaser.Scene {
 
             //plinkoDisc.setCircle(3.33);
             var friction = Phaser.Math.FloatBetween(0.013, 0.005);
-            var randomDelay = Phaser.Math.Between(0,36);
+            var randomDelay = Phaser.Math.Between(0,34);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
             plinkoDisc.setFrictionAir(friction);
@@ -2030,7 +2124,16 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
-        this.load.spritesheet('zedBarSegment', 'assets/sprites/zedbar.png', { frameWidth: 3, frameHeight: 3 });
+        //this.load.spritesheet('zedBarSeg13', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg1', 'assets/sprites/zedbarSeg1.png', { frameWidth: 1, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg2', 'assets/sprites/zedbarSeg2.png', { frameWidth: 2, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg3', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg3Cap', 'assets/sprites/zedbarSeg3Cap.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSegEnd', 'assets/sprites/zedbarSegEnd.png', { frameWidth: 4, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg4', 'assets/sprites/zedbarSeg4.png', { frameWidth: 4, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg6', 'assets/sprites/zedbarSeg6.png', { frameWidth: 6, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg7', 'assets/sprites/zedbarSeg7.png', { frameWidth: 7, frameHeight: 3 });
         this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png');
         this.load.image('plinkoBoardBG','assets/sprites/plinkoBoardBG.png');
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png');
@@ -11185,7 +11288,8 @@ class ScoreScene extends Phaser.Scene {
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
                 const zedObject = calcZedObj(ourPersist.zeds);
-
+                console.log("ZedsToNext after rolling = ", zedObject.zedsToNext, ". Used to Tune 'maxZeds'");
+4
                 var extraFields = {
                     level: zedObject.level,
                     zedsToNext: zedObject.zedsToNext,
@@ -12262,6 +12366,7 @@ var tempHeightDiff = 16;
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     multiTexture: true,
+    //seed: 100, fixes randomness
     backgroundColor: '#bbbbbb', //'#4488aa'
     width: 640, 
     height: 360,// + tempHeightDiff * GRID,
