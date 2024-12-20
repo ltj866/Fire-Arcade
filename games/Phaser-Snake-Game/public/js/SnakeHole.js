@@ -3384,7 +3384,7 @@ class ExtractTracker extends Phaser.Scene {
 
                         var _x = topLeft + idArray.length * letterOffset;
 
-                        var extractWorld = idArray[idArray.length -1].slice(0,1);
+                        var extractWorld = idArray[idArray.length -1].split("-")[0];
 
     
 
@@ -3413,7 +3413,7 @@ class ExtractTracker extends Phaser.Scene {
                             
                         }
 
-                        var extractWorld = bestExtract[bestExtract.length -1][1].slice(0,1);         
+                        var extractWorld = bestExtract[bestExtract.length -1][1].split("-")[0];         
 
                         var _x = topLeft + bestExtract.length * letterOffset;
     
