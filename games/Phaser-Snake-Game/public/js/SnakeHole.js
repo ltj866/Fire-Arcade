@@ -3360,20 +3360,15 @@ class ExtractTracker extends Phaser.Scene {
             var overallScore = 0;
             var rankSum = 0;
             var rankCount = 0;
+            var worldCount = {};
             EXTRACT_CODES.forEach ( extractKey => {
 
                 if (bestExtractions.has(extractKey)) {
                     var bestExtract = bestExtractions.get(extractKey);
-                    var bestSum = 0;
-
-                    //var bestExtract = [...bestExtract, ...bestExtract]; // Temporary double
-
-                    const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH`,13
-                    ).setOrigin(0,0).setScale(1);
-
-                    this.trackerContainer.add(pathTitle);
+                    var bestSum = 0;   
                     
                     if (bestExtract === "Classic Clear") {
+
                         
                         
                         var idArray = extractKey.split("|");
@@ -3388,6 +3383,9 @@ class ExtractTracker extends Phaser.Scene {
                         }
 
                         var _x = topLeft + idArray.length * letterOffset;
+
+                        var extractWorld = idArray[idArray.length -1].slice(0,1);
+
     
 
                     } else {
@@ -3415,6 +3413,8 @@ class ExtractTracker extends Phaser.Scene {
                             
                         }
 
+                        var extractWorld = bestExtract[bestExtract.length -1][1].slice(0,1);         
+
                         var _x = topLeft + bestExtract.length * letterOffset;
     
                         var bestExtractRank = bestSum / bestExtract.length;
@@ -3429,6 +3429,21 @@ class ExtractTracker extends Phaser.Scene {
                         this.trackerContainer.add([finalRank]);
 
                     }
+
+                    if (!worldCount[extractWorld]) {
+                        worldCount[extractWorld] = 1;
+                    } else {
+                        worldCount[extractWorld] += 1;
+                    }
+
+                    var pathVersion = String.fromCharCode(96 + worldCount[extractWorld]).toUpperCase();
+                    debugger
+
+                    const pathTitle = this.add.bitmapText(topLeft - GRID * 1 - 1, rowY + 15, 'mainFontLarge',
+                        `PATH  ${extractWorld}-${pathVersion}`,13
+                    ).setOrigin(1,0).setScale(1);
+
+                    this.trackerContainer.add(pathTitle);
 
                     var bestScoreTitle = this.add.bitmapText(_x + GRID * 2, rowY, 'mainFont', "SCORE",
                     ).setOrigin(0,0);
