@@ -1865,6 +1865,14 @@ class PinballDisplayScene extends Phaser.Scene {
     }
     init() {
     }
+    preload(){
+        this.load.image('comboBG','assets/sprites/UI_comboBG.png');
+        this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
+        this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
+        this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
+        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
+        this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
+    }
     create() {
         //this.scene.bringToTop('PinballDisplayScene');
 
@@ -2123,7 +2131,7 @@ class PlinkoMachineScene extends Phaser.Scene {
         const spaceBoy = this.scene.get("SpaceBoyScene");
         //spaceBoy.zedTitle.setText('+0');
         //this.spawnPlinkos(1);
-        console.log('PLINK SCENE',this.lights.lights);
+        //console.log('PLINK SCENE',this.lights.lights);
 
     }
     spawnPlinkos(number) {
@@ -2746,9 +2754,9 @@ class StartScene extends Phaser.Scene {
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
-        this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
-        this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
-        this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
+        //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
+        //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
+        //this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
         this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
         this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
@@ -2773,7 +2781,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png');
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png');
         this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png');
-        this.load.image('comboBG','assets/sprites/UI_comboBG.png');
+        //this.load.image('comboBG','assets/sprites/UI_comboBG.png');
         this.load.spritesheet('wishlistButton1','assets/sprites/UI_WishlistButton1.png', { frameWidth: 101, frameHeight: 58 });
         
         // Tilemap
@@ -2841,8 +2849,8 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
-        this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
+        //this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
+        //this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
         this.load.image('UI_maskMenu', 'assets/sprites/UI_maskMenu.png');
@@ -7600,7 +7608,7 @@ class GameScene extends Phaser.Scene {
                 // Calculate the final intensity and radius
                 const finalIntensity = Phaser.Math.Clamp(baselineIntensity + additionalIntensity, baselineIntensity, maxIntensity);
                 light1.setIntensity(finalIntensity);
-                console.log(finalIntensity)
+                //console.log(finalIntensity)
                 light1.setRadius(newRadius); // Set the new radius
             });
         }
