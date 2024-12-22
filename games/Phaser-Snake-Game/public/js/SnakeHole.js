@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1476,6 +1476,14 @@ class MusicPlayerScene extends Phaser.Scene {
         this.playerPaused = false;
         this.playerLooped = false;
     }
+    preload() {
+        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
+
+    }
     create() {
         const ourGame = this.scene.get("GameScene");
 
@@ -2737,7 +2745,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
-        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
+        //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
@@ -2810,10 +2818,10 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
-        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
-        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
-        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
-        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
+        //this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        //this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        //this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        //this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
         //this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6});
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
