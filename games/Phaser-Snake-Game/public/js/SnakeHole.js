@@ -12921,7 +12921,8 @@ class InputScene extends Phaser.Scene {
             }
         }
         
-        if (gameScene.gState === GState.START_WAIT || gameScene.gState === GState.WAIT_FOR_INPUT) {
+        if (gameScene.gState === GState.START_WAIT || gameScene.gState === GState.WAIT_FOR_INPUT || gameScene.gState === GState.PLAY) {
+            // Temp - Should not check while playing, but needs to be robust enough to not have the extra check here.
             
             // Starting Game State
             gameScene.gState = GState.PLAY;
