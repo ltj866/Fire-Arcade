@@ -23,6 +23,7 @@ const ANALYTICS_VERS = "0.3.241018";
 const DEV_BRANCH = "dev";
 
 const ANALYTICS_ON = true;
+const TUTORIAL_ON = false;
 
 
 const GAME_VERSION = 'v0.8.11.07.002';
@@ -6062,12 +6063,15 @@ class GameScene extends Phaser.Scene {
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
         const ourPersist = this.scene.get('PersistScene');
-        var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
-        if (tutorialData === null && this.stage === 'World_0-1') {
-            this.stage = 'Tutorial_1'; // Remeber Override!
-            console.log('Tutorial Time!', this.stage);
-        }
 
+        if (TUTORIAL_ON) {
+            var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
+            if (tutorialData === null && this.stage === 'World_0-1') {
+                this.stage = 'Tutorial_1'; // Remeber Override!
+                console.log('Tutorial Time!', this.stage);
+            }
+        }
+        
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
         
         //const ourGame = this.scene.get("GameScene");
@@ -13625,8 +13629,4 @@ if (SCREEN_HEIGHT % GRID != 0) {
 
 
 export const game = new Phaser.Game(config);
-
-
-
-
 
