@@ -38,6 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
+const DEBUG_SKIP_INTRO = false;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -889,6 +890,8 @@ class SpaceBoyScene extends Phaser.Scene {
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
 
+
+
         
         // Create the sprites and apply initial dark tint
         // Initial Setup
@@ -1005,7 +1008,6 @@ class SpaceBoyScene extends Phaser.Scene {
                                     },
                                     //onUpdateScope: this // Ensure 'this' refers to the scene
                             });
-
                             }
                         });  
                         
@@ -1037,6 +1039,16 @@ class SpaceBoyScene extends Phaser.Scene {
                         this.lights.setAmbientColor(ambientColor);
                     }
                 });
+                if (DEBUG_SKIP_INTRO){
+                    var tweens = this.tweens.getTweens();
+                    tweens.forEach(tween => {
+                         tween.complete();
+                    });
+                    this.blankScreen.destroy();
+                    this.blankScreenInventory.destroy();
+                    this.blankScreenBoost.destroy();
+                    this.spaceBoyReady = true;
+                }
             }
             else{
                 //temporary solution for resetting the game -- doesn't preserve object permanence
@@ -1044,7 +1056,7 @@ class SpaceBoyScene extends Phaser.Scene {
             }
         });
         
-        
+
         
         
 
