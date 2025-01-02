@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -3539,7 +3539,7 @@ class QuickMenuScene extends Phaser.Scene {
             arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
             var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
-                SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_CodexLabel').setOrigin(0,0.5);
+                SCREEN_HEIGHT/2 - GRID * 1 - 6,'UI_CodexLabel').setOrigin(0,0.5);
                 codexLabel.angle = 90;
    
             var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
@@ -4898,7 +4898,7 @@ class MainMenuScene extends Phaser.Scene {
 
 
         var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
-             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5);
+             SCREEN_HEIGHT/2 - GRID * 1 - 6,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5);
         codexLabel.angle = 90;
 
         var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
