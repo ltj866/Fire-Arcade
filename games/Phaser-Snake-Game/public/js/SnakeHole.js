@@ -10409,7 +10409,7 @@ class GameScene extends Phaser.Scene {
                     case this.maxScore:  // 120 {}
                     this.atoms.forEach(atom => {
                         if (atom.anims.currentAnim.key !== 'atom01idle'||atom.anims.currentAnim.key !== 'atom05spawn') {
-                            //atom.play("atom01idle");
+                            atom.play("atom01idle");
                         }
                     
                         if (atom.electrons.anims.currentAnim.key !== 'electronIdle') {

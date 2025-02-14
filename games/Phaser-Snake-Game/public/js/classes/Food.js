@@ -81,10 +81,32 @@ var Food = new Phaser.Class({
 
         scene.events.emit('addScore', this); 
         scene.snake.grow(scene);
+
         // Avoid double _atom getting while in transition
         this.visible = false;
 
-    
+        this.move(scene);
+        // Moves the eaten atom after a delay including the electron.
+        this.delayTimer = scene.time.delayedCall(200, function () { // Amount of time in ms to delay next atom appearing
+            if (scene.gState != GState.TRANSITION) {
+                
+                this.anims.play("atom05spawn");  // Start the spawn animation
+                this.chain(['atom01idle']);
+                this.visible = true; //set newly spawned atom to visible once it's moved into position
+                scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
+            }
+
+        }, [], this);
+
+        scene.onEat(this);
+
+        if (scene.snake.body.length > 29) {
+            PLAYER_STATS.atomsOverEaten += 1;
+            if (scene.snake.body.length - 1 > PLAYER_STATS.longestBody) {
+                PLAYER_STATS.longestBody = scene.snake.body.length - 1;
+            }
+        }
+
         if (scene.moveInterval = SPEED_WALK) {
             // Play atom sound
             var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
@@ -95,35 +117,7 @@ var Food = new Phaser.Class({
             // There are some moveInterval shenanigans happening here. 
             // Need to debug when exactly the move call happens compared to setting the movesInterval.
         }
-
-
-        // Moves the eaten atom after a delay including the electron.
-        this.delayTimer = scene.time.delayedCall(200, function () { // Amount of time in ms to delay next atom appearing
-            if (scene.gState != GState.TRANSITION) {
-                
-                this.anims.play("atom05spawn");  // Start the spawn animation
-                this.chain(['atom01idle']);
-                this.move(scene);
-            }
-
-        }, [], this);
-
-        scene.onEat(this);
-        if (scene.snake.body.length > 29) {
-            PLAYER_STATS.atomsOverEaten += 1;
-            if (scene.snake.body.length - 1 > PLAYER_STATS.longestBody) {
-                PLAYER_STATS.longestBody = scene.snake.body.length - 1;
-            }
-            
-        }
-
         
-
-
-        
-        
-
-
         return 'valid';
     },
     
@@ -131,8 +125,6 @@ var Food = new Phaser.Class({
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
-        this.play('atom05spawn');
-        this.chain(['atom01idle']);
 
         scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = "empty";
         
@@ -146,14 +138,11 @@ var Food = new Phaser.Class({
         //console.log(this.x,this.y)
         this.electrons.setPosition(pos.x, pos.y);
         //console.log(this.electrons.x,this.electrons.y)
-
-        scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
+       
 
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
         }
-
-        this.visible = true; //set newly spawned atom to visible once it's moved into position
     },
 
     startDecay: function(scene) {
