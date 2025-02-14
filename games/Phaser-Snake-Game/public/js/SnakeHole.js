@@ -10408,8 +10408,8 @@ class GameScene extends Phaser.Scene {
                 switch (timeTick) {
                     case this.maxScore:  // 120 {}
                     this.atoms.forEach(atom => {
-                        if (atom.anims.currentAnim.key !== 'atom01idle' ||atom.anims.currentAnim.key !== 'atom05spawn') {
-                            atom.play("atom01idle");
+                        if (atom.anims.currentAnim.key !== 'atom01idle'||atom.anims.currentAnim.key !== 'atom05spawn') {
+                            //atom.play("atom01idle");
                         }
                     
                         if (atom.electrons.anims.currentAnim.key !== 'electronIdle') {
@@ -13251,7 +13251,7 @@ function loadSpriteSheetsAndAnims(scene) {
       key: 'atom05spawn',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 48, 49, 50, 51, 52]}),
       frameRate: 12,
-      delay: 200,
+      delay: 0,
       repeat: 0, // How long is the duration of this animation in milliseconds @ hodlen?
     });
 

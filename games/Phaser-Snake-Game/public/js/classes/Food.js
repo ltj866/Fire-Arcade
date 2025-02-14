@@ -15,15 +15,11 @@ var Food = new Phaser.Class({
         this.setDepth(47);
         this.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
 
-        
         this.play("atom05spawn");
         this.chain(['atom01idle']);
         
 
-        
-        
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(48);
-        //this.electrons.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
         this.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
         this.electrons.anims.msPerFrame = 66;
         this.electrons.visible = false;
@@ -100,12 +96,14 @@ var Food = new Phaser.Class({
             // Need to debug when exactly the move call happens compared to setting the movesInterval.
         }
 
+
         // Moves the eaten atom after a delay including the electron.
-        this.delayTimer = scene.time.delayedCall(0, function () { //USED to have delayed call:200
+        this.delayTimer = scene.time.delayedCall(200, function () { // Amount of time in ms to delay next atom appearing
             if (scene.gState != GState.TRANSITION) {
                 
+                this.anims.play("atom05spawn");  // Start the spawn animation
+                this.chain(['atom01idle']);
                 this.move(scene);
-                this.visible = true;
             }
 
         }, [], this);
@@ -133,8 +131,8 @@ var Food = new Phaser.Class({
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
-        //this.play('atom05spawn');
-        //this.chain(['atom01idle']);
+        this.play('atom05spawn');
+        this.chain(['atom01idle']);
 
         scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = "empty";
         
@@ -154,6 +152,8 @@ var Food = new Phaser.Class({
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
         }
+
+        this.visible = true; //set newly spawned atom to visible once it's moved into position
     },
 
     startDecay: function(scene) {
