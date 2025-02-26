@@ -4561,6 +4561,7 @@ class MainMenuScene extends Phaser.Scene {
     init(props){
         var { startingAnimation = "default" } = props;
         this.startingAnimation = startingAnimation;
+        this.subMenuEngaged = false;
     }
     create(props) {
         
@@ -4787,6 +4788,8 @@ class MainMenuScene extends Phaser.Scene {
                 return true;
             }],
             ['extras', function () {
+                // COLLAPSE MENU FUNCTION herehere
+                this.collapseMenu();
                 return true;
             }],
             ['options', function () {
@@ -4803,7 +4806,7 @@ class MainMenuScene extends Phaser.Scene {
         var spacing = 24;
 
         
-        var menuElements = []
+        this.menuElements = []
         for (let index = 0; index < menuList.length; index++) {
             if (index == 2 || index == 3 || index == 5) {
                 var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -4833,7 +4836,7 @@ class MainMenuScene extends Phaser.Scene {
                         `${menuList[index].toUpperCase()}`
                 ).setOrigin(0.0,0).setScale(0.5).setAlpha(0); 
             }
-            menuElements.push(textElement);
+            this.menuElements.push(textElement);
             
         }
         //menuElements[1].setAlpha(0);
@@ -4891,44 +4894,44 @@ class MainMenuScene extends Phaser.Scene {
         //menu arrows
 
         var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+        arrowMenuR.play('arrowMenuIdle').setAlpha(0).setScrollFactor(0);
 
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
+        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0).setScrollFactor(0);
 
 
         var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
-             SCREEN_HEIGHT/2 - GRID * 1 - 6,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5);
+             SCREEN_HEIGHT/2 - GRID * 1 - 6,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5).setScrollFactor(0);
         codexLabel.angle = 90;
 
         var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
-             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5);
+             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5).setScrollFactor(0);
             UI_StageTrackerLabel.angle = 90;
 
-        var wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9.5,
+        this.wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9.5,
             SCREEN_HEIGHT/2 + GRID * 12,'wishlistButton1',0)
             .setAlpha(0).setOrigin(0.5,0.5).setInteractive();
+            this.wishlistButton1.setScrollFactor(0);
 
-        wishlistButton1.on('pointerover', () => {
+        this.wishlistButton1.on('pointerover', () => {
             this.input.setDefaultCursor('pointer');
-            wishlistButton1.play('wListOn');
+            this.wishlistButton1.play('wListOn');
         });
-        wishlistButton1.on('pointerout', () => {
+        this.wishlistButton1.on('pointerout', () => {
             this.input.setDefaultCursor('default');
-            wishlistButton1.play('wListOff');
+            this.wishlistButton1.play('wListOff');
         });
 
 
-        var selected = menuElements[cursorIndex];
+        var selected = this.menuElements[cursorIndex];
         selected.node.style.color = "white";
 
         var mapEngaged = false;
 
         
-
+        // do we still need this?
         this.input.keyboard.on('keydown-SPACE', function() {
             if (this.menuState == 1) {
-                
             }
         })
 
@@ -4983,8 +4986,8 @@ class MainMenuScene extends Phaser.Scene {
         });
     
 
-        this.input.keyboard.on('keydown-DOWN', function() {
-            if (mainMenuScene.pressedSpace) {
+        this.input.keyboard.on('keydown-DOWN', (event) => {
+            if (mainMenuScene.pressedSpace && !this.subMenuEngaged) {
                 
 
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
@@ -4994,8 +4997,8 @@ class MainMenuScene extends Phaser.Scene {
                     selected.node.style.color = '#181818';
                 }
                 
-                cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length);
-                selected = menuElements[cursorIndex];
+                cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, this.menuElements.length);
+                selected = this.menuElements[cursorIndex];
                 if (cursorIndex == 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
@@ -5031,8 +5034,8 @@ class MainMenuScene extends Phaser.Scene {
             
         }, [], this);
 
-        this.input.keyboard.on('keydown-UP', function() {
-            if (mainMenuScene.pressedSpace) {
+        this.input.keyboard.on('keydown-UP', (event) => {
+            if (mainMenuScene.pressedSpace && !this.subMenuEngaged) {
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
                     selected.node.style.color = 'darkgrey';
                 }
@@ -5040,8 +5043,8 @@ class MainMenuScene extends Phaser.Scene {
                     selected.node.style.color = '#181818';
 
                 }
-                cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
-                selected = menuElements[cursorIndex];
+                cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, this.menuElements.length);
+                selected = this.menuElements[cursorIndex];
                 if (cursorIndex == 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
@@ -5053,7 +5056,7 @@ class MainMenuScene extends Phaser.Scene {
                 }
                 selected.setAlpha(1);
                 
-                selected = menuElements[cursorIndex];
+                selected = this.menuElements[cursorIndex];
                 if (cursorIndex === 2 || cursorIndex == 3 ||cursorIndex === 5
                 ) {
                     selected.node.style.color = "darkgrey";
@@ -5082,11 +5085,11 @@ class MainMenuScene extends Phaser.Scene {
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
                 arrowMenuL,arrowMenuR,
-                ...menuElements,
+                ...this.menuElements,
                 this.exitButton,
                 this.graphics,
                 codexLabel,UI_StageTrackerLabel,
-                wishlistButton1
+                this.wishlistButton1
             ],
             alpha: 1,
             duration: 300,
@@ -5140,7 +5143,13 @@ class MainMenuScene extends Phaser.Scene {
                     this.scene.get("MusicPlayerScene").showTrackID();   
                 }
                 else{
-                    menuOptions.get(menuList[cursorIndex]).call(this);
+                    // call the menu option if a sub menu isn't expanded
+                    if (!this.subMenuEngaged) {
+                        menuOptions.get(menuList[cursorIndex]).call(this); 
+                    }
+                    if (menuList[cursorIndex] === 'extras') {
+                        this.subMenuEngaged = true;
+                    }                    
                 }
             }
 
@@ -5164,12 +5173,50 @@ class MainMenuScene extends Phaser.Scene {
             //second horizontal line from left
             this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
                 this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2);
-        } 
-        }
+            } 
+
+
+        //console.log(`Object Scroll Factor: ${this.wishlistButton1.scrollFactorX}, ${this.wishlistButton1.scrollFactorY}`);
+        //console.log(`Camera Scroll: ${this.cameras.main.scrollX}, ${this.cameras.main.scrollY}`);
+        }  
 
     // Function to convert hex color to RGB
     hexToInt(hex) {
         return parseInt(hex.slice(1), 16);
+    }
+    collapseMenu() {
+        this.tweens.add({
+            targets: this.cameras.main,
+            scrollY: 180,
+            duration: 500,
+            ease: 'Sine.InOut',
+            onComplete: function() {
+                console.log('Camera tween complete');
+            }
+        });
+
+        const selectedElements = [
+            this.menuElements[0],
+            this.menuElements[1],
+            this.menuElements[2],
+            this.menuElements[3],
+            this.menuElements[4],
+            this.menuElements[5],
+            this.menuElements[7]
+        ];
+
+        this.tweens.add({
+            targets: [this.gauntletButton,this.gauntletIcon,this.gauntletKey,
+                this.optionsButton,this.optionsIcon,
+                this.endlessButton,this.endlessIcon,
+                this.championshipButton,this.championshipIcon,
+                this.extractionButton,this.extractionIcon,
+                ...selectedElements],
+            alpha: 0,
+            duration: 500,
+            ease: 'Sine.InOut',
+        });
+        console.log("collapsing");
     }
     changeMenuSprite(cursorIndex){
         this.practiceIcon.setFrame(0);
@@ -5565,7 +5612,6 @@ class PersistScene extends Phaser.Scene {
     this.hardcorePaths = genHardcorePaths();
     this.hardcoreNavMap = generateNavMap(this.hardcorePaths);
     console.log("hardcore Paths generated", this.hardcorePaths);
-    //herehere
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);

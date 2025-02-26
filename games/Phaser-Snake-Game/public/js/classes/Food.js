@@ -90,10 +90,10 @@ var Food = new Phaser.Class({
         this.delayTimer = scene.time.delayedCall(200, function () { // Amount of time in ms to delay next atom appearing
             if (scene.gState != GState.TRANSITION) {
                 
+                scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
                 this.anims.play("atom05spawn");  // Start the spawn animation
                 this.chain(['atom01idle']);
                 this.visible = true; //set newly spawned atom to visible once it's moved into position
-                scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
             }
 
         }, [], this);
