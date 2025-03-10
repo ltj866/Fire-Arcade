@@ -4561,7 +4561,11 @@ class MainMenuScene extends Phaser.Scene {
     init(props){
         var { startingAnimation = "default" } = props;
         this.startingAnimation = startingAnimation;
-        this.subMenuEngaged = false;
+        // menuState is an int right now but could be made into an object 
+        // 0 is main menu, 1 is extras
+        this.menuState = 0;
+        // used to make sure menu transitions are finished before switching
+        this.inMotion = false;
     }
     create(props) {
         
@@ -4788,8 +4792,9 @@ class MainMenuScene extends Phaser.Scene {
                 return true;
             }],
             ['extras', function () {
-                // COLLAPSE MENU FUNCTION herehere
                 this.collapseMenu();
+                this.menuState = 1;
+
                 return true;
             }],
             ['options', function () {
@@ -4928,10 +4933,11 @@ class MainMenuScene extends Phaser.Scene {
 
         var mapEngaged = false;
 
-        
-        // do we still need this?
-        this.input.keyboard.on('keydown-SPACE', function() {
-            if (this.menuState == 1) {
+        // used to back out of sub menus
+        this.input.keyboard.on('keydown-TAB', e => {
+            if (this.menuState === 1 && !this.inMotion) {
+                this.expandMenu();
+                this.menuState = 0;
             }
         })
 
@@ -4987,7 +4993,7 @@ class MainMenuScene extends Phaser.Scene {
     
 
         this.input.keyboard.on('keydown-DOWN', (event) => {
-            if (mainMenuScene.pressedSpace && !this.subMenuEngaged) {
+            if (mainMenuScene.pressedSpace && this.menuState == 0) {
                 
 
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
@@ -5035,7 +5041,7 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', (event) => {
-            if (mainMenuScene.pressedSpace && !this.subMenuEngaged) {
+            if (mainMenuScene.pressedSpace && this.menuState == 0) {
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
                     selected.node.style.color = 'darkgrey';
                 }
@@ -5144,16 +5150,11 @@ class MainMenuScene extends Phaser.Scene {
                 }
                 else{
                     // call the menu option if a sub menu isn't expanded
-                    if (!this.subMenuEngaged) {
+                    if (this.menuState == 0 && !this.inMotion) {
                         menuOptions.get(menuList[cursorIndex]).call(this); 
-                    }
-                    if (menuList[cursorIndex] === 'extras') {
-                        this.subMenuEngaged = true;
-                    }                    
+                    }                
                 }
             }
-
-
         }, this);
 
     }
@@ -5184,16 +5185,35 @@ class MainMenuScene extends Phaser.Scene {
     hexToInt(hex) {
         return parseInt(hex.slice(1), 16);
     }
+
+    // collapse main menu, and bring extras tab to focus
+    // this could be made more dynamic in the future for other menu options
     collapseMenu() {
+        this.inMotion = true;
         this.tweens.add({
             targets: this.cameras.main,
             scrollY: 180,
-            duration: 500,
+            duration: 300,
             ease: 'Sine.InOut',
-            onComplete: function() {
-                console.log('Camera tween complete');
+            onComplete: () => {
+                this.inMotion = false;
+                console.log('Camera collapse tween complete');
             }
         });
+
+        this.tweens.add({
+            targets: this.descriptionPanel,
+            y: this.descriptionPanel.y + 180,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        this.tweens.add({
+            targets: this.descriptionText,
+            y: this.descriptionText.y + 180,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        
 
         const selectedElements = [
             this.menuElements[0],
@@ -5213,11 +5233,66 @@ class MainMenuScene extends Phaser.Scene {
                 this.extractionButton,this.extractionIcon,
                 ...selectedElements],
             alpha: 0,
-            duration: 500,
+            duration: 300,
             ease: 'Sine.InOut',
         });
         console.log("collapsing");
     }
+
+    // brings back main menu and collapses previous menu
+    expandMenu(){
+        this.menuState = 0
+        this.inMotion = true;
+
+        this.tweens.add({
+            targets: this.cameras.main,
+            scrollY: 0,
+            duration: 300,
+            ease: 'Sine.InOut',
+            onComplete: () => {
+                this.inMotion = false;
+                console.log('Camera expand tween complete');
+            }
+        });
+
+        this.tweens.add({
+            targets: this.descriptionPanel,
+            y: this.descriptionPanel.y - 180,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        this.tweens.add({
+            targets: this.descriptionText,
+            y: this.descriptionText.y - 180,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        
+
+        const selectedElements = [
+            this.menuElements[0],
+            this.menuElements[1],
+            this.menuElements[2],
+            this.menuElements[3],
+            this.menuElements[4],
+            this.menuElements[5],
+            this.menuElements[7]
+        ];
+
+        this.tweens.add({
+            targets: [this.gauntletButton,this.gauntletIcon,this.gauntletKey,
+                this.optionsButton,this.optionsIcon,
+                this.endlessButton,this.endlessIcon,
+                this.championshipButton,this.championshipIcon,
+                this.extractionButton,this.extractionIcon,
+                ...selectedElements],
+            alpha: 1,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        console.log("expanding");
+    }
+
     changeMenuSprite(cursorIndex){
         this.practiceIcon.setFrame(0);
         this.adventureIcon.setFrame(1);
