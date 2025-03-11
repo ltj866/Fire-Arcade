@@ -4908,7 +4908,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
                 this.descriptionText.setText(this.descriptionDom);
                 this.expandMenu();
-
+                this.changeMenuSprite(6);
                 this.tweens.add({
                     targets: [...this.subMenuElements],
                     alpha: 0,
@@ -5360,6 +5360,9 @@ class MainMenuScene extends Phaser.Scene {
             }
         });
 
+        
+
+
         this.tweens.add({
             targets: this.descriptionPanel,
             y: this.descriptionPanel.y + 180,
@@ -5403,6 +5406,7 @@ class MainMenuScene extends Phaser.Scene {
     expandMenu(){
         this.menuState = 0
         this.inMotion = true;
+
 
         this.tweens.add({
             targets: this.cameras.main,
@@ -5711,7 +5715,7 @@ class MainMenuScene extends Phaser.Scene {
                     
                     this.tweens.add({
                         targets: this.extrasButton, //extras button is swapped to back button here
-                        width: 76,
+                        width: 62,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
