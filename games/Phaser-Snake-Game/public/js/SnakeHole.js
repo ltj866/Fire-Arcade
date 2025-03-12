@@ -3252,7 +3252,8 @@ class StartScene extends Phaser.Scene {
         
 
         //title logo
-        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
+        var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
+            'titleLogo').setDepth(60);
         var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,);
         //titlePortal.setTint(_portalColor);
         titlePortal.setTint(intColor).setScale(1.25);
@@ -4583,15 +4584,17 @@ class MainMenuScene extends Phaser.Scene {
             this.pressedSpace = false;
             var titleContainer = this.add.container().setDepth(51);
 
-            var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
-            var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,);
+            this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
+                'titleLogo').setDepth(60).setScrollFactor(0);
+            this.titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
+            .setScrollFactor(0);
             
-            titlePortal.setTint(portalTint).setScale(1.25);
-            titlePortal.play('portalIdle', {startFrame: portalFrame} );
+            this.titlePortal.setTint(portalTint).setScale(1.25);
+            this.titlePortal.play('portalIdle', {startFrame: portalFrame} );
 
 
-            titleContainer.add(titleLogo);
-            titleContainer.add(titlePortal);
+            titleContainer.add(this.titleLogo);
+            titleContainer.add(this.titlePortal);
             
             var titleTween = this.tweens.add({
                 targets: titleContainer,
@@ -4606,20 +4609,21 @@ class MainMenuScene extends Phaser.Scene {
             console.log('passing main menu skip')
             this.pressedSpace = true;
 
-            var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 6,
+            this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 6,
                 'titleLogo').setDepth(60).setAlpha(0);
-            var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,
+            this.titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,
                 Y_OFFSET +  GRID * 6.0,).setAlpha(0);
         
-            titlePortal.setTint(portalTint).setScale(1.25);
-            titlePortal.play('portalIdle', {startFrame: portalFrame} );
+            this.titlePortal.setTint(portalTint).setScale(1.25);
+            this.titlePortal.play('portalIdle', {startFrame: portalFrame} );
 
             var titleTween = this.tweens.add({
-                targets: [titleLogo,titlePortal],
+                targets: [this.titleLogo,this.titlePortal],
                 alpha: 1,
                 duration: 300,
                 ease: 'Sine.InOut',
             });
+
             var fadeInDuration = 0;
         }
 
@@ -4790,12 +4794,46 @@ class MainMenuScene extends Phaser.Scene {
             }],
             ['extras', function () {
                 this.collapseMenu();
-                this.menuState = 1;
                 subCursorIndex = 0;
+                this.menuState = 1;
+                //this.scene.get("MainMenuScene").titleLogo.setAlpha(0);
+                this.tweens.add({
+                    targets: [this.scene.get("MainMenuScene").titleLogo,
+                        this.scene.get("MainMenuScene").titlePortal],
+                    alpha: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
 
+                // manually set tweens here instead of using changeMenuSprite()
+                this.tweens.add({
+                    targets: this.extrasButton,
+                    width: 62,
+                    duration: 100,
+                    ease: 'Sine.InOut',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: SCREEN_WIDTH/2 - GRID * 4.575,
+                    y: SCREEN_WIDTH/2 + 3 - GRID * 1.5,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 32.0625,
+                    duration: 100,
+                    delay: 300,
+                    ease: 'Sine.Out',
+                });
+
+
+                // fade in buttons
                 this.tweens.add({
                     targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
-                        this.minigameButton, this.statsButton, this.awardButton],
+                            this.minigameButton, this.statsButton, this.awardButton,
+                            this.shopIcon,this.customizeIcon,this.minigameIcon,
+                            this.statsIcon,this.awardIcon],
                     alpha: 1,
                     duration: 300,
                     delay: 60,
@@ -4912,27 +4950,27 @@ class MainMenuScene extends Phaser.Scene {
         this.shopButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
             'uiMenu', 'gold', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.shopIcon = this.add.sprite(this.shopButton.x + 2,
-            this.shopButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+            this.shopButton.y,"menuIcons", 17 ).setOrigin(0,0.5).setAlpha(0);
 
         this.customizeButton = this.add.nineslice(_hOffset,_vOffset + GRID * 16,
             'uiMenu', 'teal', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.customizeIcon = this.add.sprite(this.customizeButton.x + 2,
-            this.customizeButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+            this.customizeButton.y,"menuIcons", 18 ).setOrigin(0,0.5).setAlpha(0);
 
         this.minigameButton = this.add.nineslice(_hOffset,_vOffset + GRID * 18,
-            'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+            'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
         this.minigameIcon = this.add.sprite(this.minigameButton.x + 2,
-            this.minigameButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+            this.minigameButton.y,"menuIcons", 19 ).setOrigin(0,0.5).setAlpha(0);
         
         this.statsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 20,
             'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.statsIcon = this.add.sprite(this.statsButton.x + 2,
-            this.statsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+            this.statsButton.y,"menuIcons", 20 ).setOrigin(0,0.5).setAlpha(0);
         
         this.awardButton = this.add.nineslice(_hOffset,_vOffset + GRID * 22,
-            'uiMenu', 'pink', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+            'uiMenu', 'pink', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
         this.awardIcon = this.add.sprite(this.awardButton.x + 2,
-            this.awardButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+            this.awardButton.y,"menuIcons", 21 ).setOrigin(0,0.5).setAlpha(0);
         // SUB MENU
 
         var subMenuOptions = new Map([
@@ -4944,11 +4982,26 @@ class MainMenuScene extends Phaser.Scene {
                 this.changeMenuSprite(6);
                 this.tweens.add({
                     targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
-                        this.minigameButton, this.statsButton, this.awardButton],
+                        this.minigameButton, this.statsButton, this.awardButton,
+                        this.shopIcon,this.customizeIcon,this.minigameIcon,
+                        this.statsIcon,this.awardIcon],
                     alpha: 0,
                     duration: 300,
                     delay: 60,
                     ease: 'linear',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+
+                this.tweens.add({
+                    targets: [this.titleLogo,this.titlePortal],
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'Sine.InOut',
                 });
 
                 return true;
@@ -5114,12 +5167,27 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.changeMenuSprite(6);
 
                 this.tweens.add({
+                    targets: [this.titleLogo,this.titlePortal],
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+
+                this.tweens.add({
                     targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
-                        this.minigameButton, this.statsButton, this.awardButton],
+                        this.minigameButton, this.statsButton, this.awardButton,
+                        this.shopIcon,this.customizeIcon,this.minigameIcon,
+                        this.statsIcon,this.awardIcon],
                     alpha: 0,
                     duration: 300,
                     delay: 60,
                     ease: 'linear',
+                });
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
                 });
             }
         })
@@ -5177,46 +5245,50 @@ class MainMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-DOWN', (event) => {
+            // check if player has entered main menu yet.
             if (mainMenuScene.pressedSpace && this.menuState == 0) {
-                if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
-                    selected.node.style.color = 'darkgrey';
-                }
-                else{
-                    selected.node.style.color = '#181818';
-                }
-                
                 cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, this.menuElements.length);
                 selected = this.menuElements[cursorIndex];
-                if (cursorIndex == 8) {
+                mainMenuScene.changeMenuSprite(cursorIndex);
+                // reiterate and set the unselected options' colors to the correct value
+                for (var i = 0; i < this.menuElements.length; i++) {
+                    var element = this.menuElements[i];
+                    if (i === 2 || i === 3 || i === 5) {
+                        element.node.style.color = menuOptionColors.locked; 
+                    }
+                    else{
+                        element.node.style.color = menuOptionColors.unlocked
+                    }
+                }
+                // apply the correct color for the selected node
+                if (cursorIndex === 2 ||cursorIndex === 3 || cursorIndex === 5) {
+                    selected.node.style.color = menuOptionColors.locked;
+                }
+                else{
+                    selected.node.style.color = menuOptionColors.selectedOption;
+                }
+
+                // change exit button to red sprite
+                if (cursorIndex === 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
                     mainMenuScene.exitButton.setFrame(1);
-                } else {
-                    mainMenuScene.exitButton.setFrame(0);
+
+                    this.tweens.add({
+                        targets: this.descriptionPanel,
+                        height: 32.0625,
+                        duration: 100,
+                        ease: 'Sine.Out',
+                    });
+                } else { 
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = selected.y + 7
+                    mainMenuScene.exitButton.setFrame(0);
                 }
-                selected.setAlpha(1);
-                
-                if (cursorIndex === 2 || cursorIndex == 3 ||cursorIndex === 5
-                ) {
-                    selected.node.style.color = "darkgrey";
-                    selected.setAlpha(1)
-                }
-                else{
-                    selected.node.style.color = "white";
-                    selected.setAlpha(1)
-                }
-                
+                // move background on option change
                 ourPersist.bgCoords.y += 5;
-                
-                mainMenuScene.changeMenuSprite(cursorIndex);
-                //upArrow.y = selected.y - 42;
-                //downArrow.y = selected.y + 32;
-
-                //continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }
-            else if (this.menuState == 1){
+            else if (this.menuState === 1){
                 subCursorIndex = Phaser.Math.Wrap(subCursorIndex + 1, 0, this.subMenuElements.length);
                 subSelected = this.subMenuElements[subCursorIndex];
                 menuSelector.y = subSelected.y + 7
@@ -5243,42 +5315,48 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', (event) => {
+            // check if player has entered main menu yet.
             if (mainMenuScene.pressedSpace && this.menuState == 0) {
-                if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
-                    selected.node.style.color = 'darkgrey';
-                }
-                else{
-                    selected.node.style.color = '#181818';
-
-                }
                 cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, this.menuElements.length);
                 selected = this.menuElements[cursorIndex];
-                if (cursorIndex == 8) {
+                mainMenuScene.changeMenuSprite(cursorIndex);
+                // reiterate and set the unselected options' colors to the correct value
+                for (var i = 0; i < this.menuElements.length; i++) {
+                    var element = this.menuElements[i];
+                    if (i === 2 || i === 3 || i === 5) {
+                        element.node.style.color = menuOptionColors.locked; 
+                    }
+                    else{
+                        element.node.style.color = menuOptionColors.unlocked
+                    }
+                }
+                // apply the correct color for the selected node
+                if (cursorIndex === 2 ||cursorIndex === 3 || cursorIndex === 5) {
+                    selected.node.style.color = menuOptionColors.locked;
+                }
+                else{
+                    selected.node.style.color = menuOptionColors.selectedOption;
+                }
+
+                // change exit button to red sprite
+                if (cursorIndex === 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
                     mainMenuScene.exitButton.setFrame(1);
-                } else {
-                    mainMenuScene.exitButton.setFrame(0);
+
+                    this.tweens.add({
+                        targets: this.descriptionPanel,
+                        height: 32.0625,
+                        duration: 100,
+                        ease: 'Sine.Out',
+                    });
+                } else { 
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = selected.y + 7
+                    mainMenuScene.exitButton.setFrame(0);
                 }
-                selected.setAlpha(1);
-                
-                selected = this.menuElements[cursorIndex];
-                if (cursorIndex === 2 || cursorIndex == 3 ||cursorIndex === 5
-                ) {
-                    selected.node.style.color = "darkgrey";
-                    selected.setAlpha(1)
-
-                }
-                else{
-                    selected.node.style.color = "white";
-                    selected.setAlpha(1)
-                }
-    
+                // move background on option change
                 ourPersist.bgCoords.y -= 5;
-    
-                mainMenuScene.changeMenuSprite(cursorIndex);
             }
             else if (this.menuState == 1){
                 subCursorIndex = Phaser.Math.Wrap(subCursorIndex - 1, 0, this.subMenuElements.length);
@@ -5434,8 +5512,7 @@ class MainMenuScene extends Phaser.Scene {
             }
         });
 
-        
-
+    
 
         this.tweens.add({
             targets: this.descriptionPanel,
@@ -5534,7 +5611,7 @@ class MainMenuScene extends Phaser.Scene {
 
     changeMenuSprite(cursorIndex){
         
-
+        // main menu option icons
         this.practiceIcon.setFrame(0);
         this.adventureIcon.setFrame(1);
         this.extractionIcon.setFrame(2);
@@ -5548,10 +5625,18 @@ class MainMenuScene extends Phaser.Scene {
             this.extrasIcon.setFrame(16);
         }
         this.optionsIcon.setFrame(7);
+        // sub menu option icons
+        this.shopIcon.setFrame(17);
+        this.customizeIcon.setFrame(18);
+        this.minigameIcon.setFrame(19);
+        this.statsIcon.setFrame(20);
+        this.awardIcon.setFrame(21);
 
         this.tweens.add({
             targets: [this.practiceButton,this.adventureButton,this.extractionButton,this.championshipButton,
-                this.gauntletButton,this.endlessButton,this.extrasButton,this.optionsButton],
+                this.gauntletButton,this.endlessButton,this.extrasButton,this.optionsButton,
+                this.shopButton, this.customizeButton, this.minigameButton, this.statsButton,
+                this.awardButton],
             width: 136,
             duration: 100,
             ease: 'Sine.InOut',
@@ -5623,7 +5708,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625, // this value is a decimal; otherwise visual errors
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5647,7 +5732,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5671,7 +5756,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5695,7 +5780,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5743,7 +5828,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5804,7 +5889,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5820,7 +5905,7 @@ class MainMenuScene extends Phaser.Scene {
                 case 1:
                     this.descriptionDom = 'Spend coins to unlock new items, game modes, cosmetics, and more.';
                     this.descriptionText.setText(this.descriptionDom)
-                    //this.adventureIcon.setFrame(9)
+                    this.shopIcon.setFrame(25)
                     this.tweens.add({
                         targets: this.shopButton,
                         width: 64,
@@ -5829,7 +5914,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 75,
+                        height: 45,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5843,8 +5928,8 @@ class MainMenuScene extends Phaser.Scene {
                     break;
                 case 2:
                     this.descriptionDom = 'Change how your snake looks with unlocked cosmetics.';
-                    this.descriptionText.setText(this.descriptionDom)
-                    this.extractionIcon.setFrame(10)
+                    this.descriptionText.setText(this.descriptionDom);
+                    this.customizeIcon.setFrame(26);
                     this.tweens.add({
                         targets: this.customizeButton,
                         width: 100,
@@ -5867,8 +5952,8 @@ class MainMenuScene extends Phaser.Scene {
                     break;
                 case 3:
                     this.descriptionDom = 'Playable in full game!';
-                    this.descriptionText.setText(this.descriptionDom)
-                    this.championshipIcon.setFrame(11)
+                    this.descriptionText.setText(this.descriptionDom);
+                    this.minigameIcon.setFrame(27);
                     this.tweens.add({
                         targets: this.minigameButton,
                         width: 100,
@@ -5877,7 +5962,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5891,8 +5976,8 @@ class MainMenuScene extends Phaser.Scene {
                     break;
                 case 4:
                     this.descriptionDom = 'View your statistics.';
-                    this.descriptionText.setText(this.descriptionDom)
-                    this.gauntletIcon.setFrame(12)
+                    this.descriptionText.setText(this.descriptionDom);
+                    this.statsIcon.setFrame(28);
                     this.tweens.add({
                         targets: this.statsButton,
                         width: 66,
@@ -5901,7 +5986,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5915,8 +6000,8 @@ class MainMenuScene extends Phaser.Scene {
                     break;
                 case 5:
                     this.descriptionDom = 'View your challenges and claim your prizes.';
-                    this.descriptionText.setText(this.descriptionDom)
-                    this.endlessIcon.setFrame(13)
+                    this.descriptionText.setText(this.descriptionDom);
+                    this.awardIcon.setFrame(29);
                     this.tweens.add({
                         targets: this.awardButton,
                         width: 120,
@@ -5925,7 +6010,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 45,
+                        height: 32.0625,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
