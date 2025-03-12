@@ -3395,7 +3395,7 @@ class QuickMenuScene extends Phaser.Scene {
         var _spacing = 20;
         this.menuElements = [];
 
-        
+
 
         this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuCenter - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
@@ -4794,7 +4794,8 @@ class MainMenuScene extends Phaser.Scene {
                 subCursorIndex = 0;
 
                 this.tweens.add({
-                    targets: [...this.subMenuElements],
+                    targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
+                        this.minigameButton, this.statsButton, this.awardButton],
                     alpha: 1,
                     duration: 300,
                     delay: 60,
@@ -4818,6 +4819,13 @@ class MainMenuScene extends Phaser.Scene {
 
         
         this.menuElements = []
+      
+        var menuOptionColors = {
+            locked: 'darkgrey',
+            unlocked: '#181818',
+            selectedOption: 'white'
+        };
+        
         for (let index = 0; index < menuList.length; index++) {
             if (index == 2 || index == 3 || index == 5) {
                 var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -4852,7 +4860,7 @@ class MainMenuScene extends Phaser.Scene {
         }
         //menuElements[1].setAlpha(0);
 
-        //panels
+        //panels (colored boxes behind text options)
 
         let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
         let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
@@ -4899,7 +4907,32 @@ class MainMenuScene extends Phaser.Scene {
 
         this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
+
+        // sub menu option buttons
+        this.shopButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
+            'uiMenu', 'gold', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.shopIcon = this.add.sprite(this.shopButton.x + 2,
+            this.shopButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.customizeButton = this.add.nineslice(_hOffset,_vOffset + GRID * 16,
+            'uiMenu', 'teal', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.customizeIcon = this.add.sprite(this.customizeButton.x + 2,
+            this.customizeButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.minigameButton = this.add.nineslice(_hOffset,_vOffset + GRID * 18,
+            'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.minigameIcon = this.add.sprite(this.minigameButton.x + 2,
+            this.minigameButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
         
+        this.statsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 20,
+            'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.statsIcon = this.add.sprite(this.statsButton.x + 2,
+            this.statsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.awardButton = this.add.nineslice(_hOffset,_vOffset + GRID * 22,
+            'uiMenu', 'pink', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.awardIcon = this.add.sprite(this.awardButton.x + 2,
+            this.awardButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
         // SUB MENU
 
         var subMenuOptions = new Map([
@@ -4910,7 +4943,8 @@ class MainMenuScene extends Phaser.Scene {
                 this.expandMenu();
                 this.changeMenuSprite(6);
                 this.tweens.add({
-                    targets: [...this.subMenuElements],
+                    targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
+                        this.minigameButton, this.statsButton, this.awardButton],
                     alpha: 0,
                     duration: 300,
                     delay: 60,
@@ -4949,26 +4983,29 @@ class MainMenuScene extends Phaser.Scene {
         // Sub Menu Text Options
 
         this.subMenuElements = []
+
         for (let index = 0; index < subMenuList.length; index++) {
-            if (index > -1) {
-                var subTextElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                    "fontSize": '24px',
-                    "fontWeight": 400,
-                    "color": "darkgrey",
-                    //"text-decoration": 'line-through'
-                }),
-                        `${subMenuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
-            }
-            /*else { // back button
-                var subTextElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                    "fontSize": '24px',
-                    "fontWeight": 400,
-                    "color": "#181818",
-                }),
-                        `${this.subMenuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0); 
-            }*/
+            var element = this.subMenuElements[index];
+                // check for sub menu options that are locked
+                if (index === 3 || index === 5) {
+                    var subTextElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '24px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${subMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+                }
+                // check for sub menu options that are unlocked
+                else{
+                    var subTextElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '24px',
+                        "fontWeight": 400,
+                        "color": "#181818",
+                    }),
+                            `${subMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+                }
             this.subMenuElements.push(subTextElement);
         }
         //menuElements[1].setAlpha(0);
@@ -5077,7 +5114,8 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.changeMenuSprite(6);
 
                 this.tweens.add({
-                    targets: [...this.subMenuElements],
+                    targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
+                        this.minigameButton, this.statsButton, this.awardButton],
                     alpha: 0,
                     duration: 300,
                     delay: 60,
@@ -5135,7 +5173,8 @@ class MainMenuScene extends Phaser.Scene {
                 //mainMenuScene.scene.wake('MainMenuScene');
             }
         });
-    
+
+
 
         this.input.keyboard.on('keydown-DOWN', (event) => {
             if (mainMenuScene.pressedSpace && this.menuState == 0) {
@@ -5182,8 +5221,25 @@ class MainMenuScene extends Phaser.Scene {
                 subSelected = this.subMenuElements[subCursorIndex];
                 menuSelector.y = subSelected.y + 7
                 mainMenuScene.changeMenuSprite(subCursorIndex);
-            }
-            
+
+                // reiterate and set the unselected options' colors to the correct value
+                for (var i = 0; i < this.subMenuElements.length; i++) {
+                    var element = this.subMenuElements[i];
+                    if (i === 3 || i === 5) {
+                        element.node.style.color = menuOptionColors.locked; 
+                    }
+                    else{
+                        element.node.style.color = menuOptionColors.unlocked
+                    }
+                }
+                // apply the correct color for the selected node
+                if (subCursorIndex == 3 || subCursorIndex == 5) {
+                    subSelected.node.style.color = menuOptionColors.locked;
+                }
+                else{
+                    subSelected.node.style.color = menuOptionColors.selectedOption;
+                }
+            }  
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', (event) => {
@@ -5229,6 +5285,24 @@ class MainMenuScene extends Phaser.Scene {
                 subSelected = this.subMenuElements[subCursorIndex];
                 menuSelector.y = subSelected.y + 7
                 mainMenuScene.changeMenuSprite(subCursorIndex);
+
+                // reiterate and set the unselected options' colors to the correct value
+                for (var i = 0; i < this.subMenuElements.length; i++) {
+                    var element = this.subMenuElements[i];
+                    if (i === 3 || i === 5) {
+                        element.node.style.color = menuOptionColors.locked; 
+                    }
+                    else{
+                        element.node.style.color = menuOptionColors.unlocked
+                    }
+                }
+                // apply the correct color for the selected node
+                if (subCursorIndex == 3 || subCursorIndex == 5) {
+                    subSelected.node.style.color = menuOptionColors.locked;
+                }
+                else{
+                    subSelected.node.style.color = menuOptionColors.selectedOption;
+                }
             }
         }, [], this);
 
@@ -5707,6 +5781,15 @@ class MainMenuScene extends Phaser.Scene {
         }
     
         else if (this.menuState === 1) {// if we are in the extras sub menu
+            this.extrasIcon.setFrame(16);
+            this.tweens.add({
+                targets: [this.extrasButton,this.shopButton,this.customizeButton,
+                    this.minigameButton,this.statsButton,this.awardButton
+                ],
+                width: 136,
+                duration: 100,
+                ease: 'Sine.Out',
+            });
             switch (cursorIndex) {
                 case 0:
                     this.descriptionDom = 'Return back to main menu.';
@@ -5727,7 +5810,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 2.5,
+                        x: _xOffset - GRID * 4.575,
                         y: _yOffset + GRID * 10,
                         duration: 100,
                         ease: 'Sine.Out',
@@ -5737,13 +5820,13 @@ class MainMenuScene extends Phaser.Scene {
                 case 1:
                     this.descriptionDom = 'Spend coins to unlock new items, game modes, cosmetics, and more.';
                     this.descriptionText.setText(this.descriptionDom)
-                    /*this.adventureIcon.setFrame(9)
+                    //this.adventureIcon.setFrame(9)
                     this.tweens.add({
-                        targets: this.adventureButton,
-                        width: 104,
+                        targets: this.shopButton,
+                        width: 64,
                         duration: 100,
                         ease: 'Sine.Out',
-                    });*/
+                    });
                     this.tweens.add({
                         targets: this.descriptionPanel,
                         height: 75,
@@ -5752,7 +5835,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 1,
+                        x: _xOffset - GRID * 4.5,
                         y: _yOffset + GRID * 12,
                         duration: 100,
                         ease: 'Sine.Out',
@@ -5763,8 +5846,8 @@ class MainMenuScene extends Phaser.Scene {
                     this.descriptionText.setText(this.descriptionDom)
                     this.extractionIcon.setFrame(10)
                     this.tweens.add({
-                        targets: this.extractionButton,
-                        width: 106,
+                        targets: this.customizeButton,
+                        width: 100,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5776,7 +5859,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 1,
+                        x: _xOffset - GRID * 1.5,
                         y: _yOffset + GRID * 14,
                         duration: 100,
                         ease: 'Sine.Out',
@@ -5787,8 +5870,8 @@ class MainMenuScene extends Phaser.Scene {
                     this.descriptionText.setText(this.descriptionDom)
                     this.championshipIcon.setFrame(11)
                     this.tweens.add({
-                        targets: this.championshipButton,
-                        width: 124,
+                        targets: this.minigameButton,
+                        width: 100,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5800,7 +5883,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset + GRID * .5,
+                        x: _xOffset - GRID * 1.5,
                         y: _yOffset + GRID * 16,
                         duration: 100,
                         ease: 'Sine.Out',
@@ -5811,8 +5894,8 @@ class MainMenuScene extends Phaser.Scene {
                     this.descriptionText.setText(this.descriptionDom)
                     this.gauntletIcon.setFrame(12)
                     this.tweens.add({
-                        targets: this.gauntletButton,
-                        width: 94,
+                        targets: this.statsButton,
+                        width: 66,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5824,7 +5907,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 2,
+                        x: _xOffset - GRID * 4.25,
                         y: _yOffset + GRID * 18,
                         duration: 100,
                         ease: 'Sine.Out',
@@ -5835,8 +5918,8 @@ class MainMenuScene extends Phaser.Scene {
                     this.descriptionText.setText(this.descriptionDom)
                     this.endlessIcon.setFrame(13)
                     this.tweens.add({
-                        targets: this.endlessButton,
-                        width: 84,
+                        targets: this.awardButton,
+                        width: 120,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5848,7 +5931,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 2.75,
+                        x: _xOffset + 3,
                         y: _yOffset + GRID * 20,
                         duration: 100,
                         ease: 'Sine.Out',
