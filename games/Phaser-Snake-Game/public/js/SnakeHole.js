@@ -4575,27 +4575,37 @@ class MainMenuScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
-        var { portalTint = parseInt("0xFFFFFF", 16)} = props;
+        //set a random color to the portal
+        this.portalColors = PORTAL_COLORS.slice();
+        let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
+
+        var hexToInt = function (hex) {
+            return parseInt(hex.slice(1), 16);
+        }
+
+        let intColor = hexToInt(randomColor);
+        var { portalTint = intColor} = props;
         var { portalFrame = 0 } = props;
+
+        this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
+            'titleLogo').setDepth(60).setScrollFactor(0);
+        this.titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
+        .setScrollFactor(0);
+
+        var titleContainer = this.add.container().setDepth(51);
+
+        this.titlePortal.setTint(portalTint).setScale(1.25);
+        this.titlePortal.play('portalIdle', {startFrame: portalFrame} );
+
+        titleContainer.add(this.titleLogo);
+        titleContainer.add(this.titlePortal);
 
         // starting from powering on
         if (this.startingAnimation === "default") {
             console.log('going straight to default')
             this.pressedSpace = false;
-            var titleContainer = this.add.container().setDepth(51);
 
-            this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
-                'titleLogo').setDepth(60).setScrollFactor(0);
-            this.titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
-            .setScrollFactor(0);
-            
-            this.titlePortal.setTint(portalTint).setScale(1.25);
-            this.titlePortal.play('portalIdle', {startFrame: portalFrame} );
-
-
-            titleContainer.add(this.titleLogo);
-            titleContainer.add(this.titlePortal);
-            
+ 
             var titleTween = this.tweens.add({
                 targets: titleContainer,
                 y: -GRID * 7,
@@ -4609,13 +4619,7 @@ class MainMenuScene extends Phaser.Scene {
             console.log('passing main menu skip')
             this.pressedSpace = true;
 
-            this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 6,
-                'titleLogo').setDepth(60).setAlpha(0);
-            this.titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,
-                Y_OFFSET +  GRID * 6.0,).setAlpha(0);
-        
-            this.titlePortal.setTint(portalTint).setScale(1.25);
-            this.titlePortal.play('portalIdle', {startFrame: portalFrame} );
+            titleContainer.y = -GRID * 6;
 
             var titleTween = this.tweens.add({
                 targets: [this.titleLogo,this.titlePortal],
