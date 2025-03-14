@@ -3973,7 +3973,8 @@ class ExtractTracker extends Phaser.Scene {
             
 
         this.input.keyboard.on('keydown-LEFT', e => {
-
+            const ourMenuScene = this.scene.get('MainMenuScene');
+            ourMenuScene.showExitButton(!ourMenuScene.isSmooth);
             this.tweens.add({
                 targets: this.cameras.main,
                 x: { from: 0, to: 160 },
@@ -4462,7 +4463,7 @@ class StageCodex extends Phaser.Scene {
             // Default
             this.input.keyboard.on('keydown-RIGHT', e => {
                 const ourMenuScene = this.scene.get('MainMenuScene');
-                ourMenuScene.exitButton.setAlpha(1);
+                ourMenuScene.showExitButton(!ourMenuScene.isSmooth);
                 console.log("Exiting!");
 
                 this.tweens.add({
@@ -4571,13 +4572,16 @@ class MainMenuScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
-        //set a random color to the portal
+        // set a random color to the portal
         this.portalColors = PORTAL_COLORS.slice();
         let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
 
         let intColor = this.hexToInt(randomColor);
         var { portalTint = intColor} = props;
         var { portalFrame = 0 } = props;
+
+        // for exit button transition speed -- false is instant
+        this.isSmooth = true;
 
         this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
             'titleLogo').setDepth(60).setScrollFactor(0);
@@ -4629,7 +4633,7 @@ class MainMenuScene extends Phaser.Scene {
             var fadeInDuration = 0;
         }
 
-        //description panel
+        // description panel
         this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
         this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
             'uiPanelL', 'Glass', 
@@ -5217,7 +5221,7 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-LEFT', e => {
             if (this.pressedSpace ) {
-                this.exitButton.setAlpha(0);
+                this.hideExitButton(!this.isSmooth);
                 this.tweens.add({
                     targets: this.cameras.main,
                     x: { from: 0, to: 160 },
@@ -5239,7 +5243,9 @@ class MainMenuScene extends Phaser.Scene {
         }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
             if (this.pressedSpace) {
-                this.exitButton.setAlpha(0);
+
+                this.hideExitButton(!this.isSmooth);
+
                 this.tweens.add({
                     targets: this.cameras.main,
                     x: { from: 0, to: -160 },
@@ -5493,6 +5499,7 @@ class MainMenuScene extends Phaser.Scene {
         }, this);
 
     }
+    
     update() {
         this.graphics.clear(); 
         if (this.pressedSpace) { // CLEAN UP: Does this really need to be called every frame? Consider using an event listener.
@@ -5510,7 +5517,6 @@ class MainMenuScene extends Phaser.Scene {
             this.graphics.lineBetween(this.descriptionPanel.x - 8, this.descriptionPanel.y + this.descriptionPanel.height/2,
                 this.descriptionPanel.x + 4,this.descriptionPanel.y + this.descriptionPanel.height/2);
             } 
-
 
         //console.log(`Object Scroll Factor: ${this.wishlistButton1.scrollFactorX}, ${this.wishlistButton1.scrollFactorY}`);
         //console.log(`Camera Scroll: ${this.cameras.main.scrollX}, ${this.cameras.main.scrollY}`);
@@ -5578,20 +5584,7 @@ class MainMenuScene extends Phaser.Scene {
                 break;
         }
 
-        this.menuElements[8].setAlpha(0);
-        this.tweens.add({
-            targets: this.exitButton,
-            y: this.exitButton.y - 2 * GRID,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
-        this.tweens.add({
-            targets: this.menuElements[8],
-            y: this.menuElements[8].y - 2 * GRID,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
-        
+        this.hideExitButton(this.isSmooth);
         
         // fade out main menu options to display sub menu
         const selectedElements = [
@@ -5650,21 +5643,8 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
         });
 
-        //exit button transition
-        this.tweens.add({
-            targets: this.exitButton,
-            y: this.exitButton.y + 2 * GRID,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
-        this.tweens.add({
-            targets: this.menuElements[8],
-            y: this.menuElements[8].y + 2 * GRID,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
+        this.showExitButton(this.isSmooth);
         
-
         const selectedElements = [
             this.menuElements[0],
             this.menuElements[1],
@@ -5688,6 +5668,58 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
         });
         console.log("expanding");
+    }
+
+    hideExitButton(ease){
+        
+        this.menuElements[8].setAlpha(0);  
+        
+        if (ease === true) {
+            console.log("smooth!!!")
+            this.tweens.add({
+                targets: this.exitButton,
+                y: this.exitButton.y - 2 * GRID,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            this.tweens.add({
+                targets: this.menuElements[8],
+                y: this.menuElements[8].y - 2 * GRID,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+        }
+        else{
+            this.exitButton.setAlpha(0);
+        }  
+        console.log("instant")
+    }
+
+    showExitButton(ease){
+        this.exitButton.setAlpha(1);
+        
+        if (ease === true) {
+            console.log("smooth!!!")
+            this.tweens.add({
+                targets: this.exitButton,
+                y: this.exitButton.y + 2 * GRID,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            this.tweens.add({
+                targets: this.menuElements[8],
+                y: this.menuElements[8].y + 2 * GRID,
+                duration: 300,
+                ease: 'Sine.InOut',
+                onComplete: () => {
+                    this.menuElements[8].setAlpha(1);
+                }
+            });
+        }
+        else{
+            this.menuElements[8].setAlpha(1);
+        }
+        console.log("instant")
     }
 
     changeMenuSprite(cursorIndex){
