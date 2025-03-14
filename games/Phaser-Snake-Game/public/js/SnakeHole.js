@@ -3234,10 +3234,6 @@ class StartScene extends Phaser.Scene {
         });
     
     
-
-
-
-
         this.portalColors = PORTAL_COLORS.slice();
         // Select a random color
         let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
@@ -3245,7 +3241,6 @@ class StartScene extends Phaser.Scene {
         var hexToInt = function (hex) {
             return parseInt(hex.slice(1), 16);
         }
-
         let intColor = hexToInt(randomColor);
         //console.log(_portalColor)
 
@@ -4579,11 +4574,7 @@ class MainMenuScene extends Phaser.Scene {
         this.portalColors = PORTAL_COLORS.slice();
         let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
 
-        var hexToInt = function (hex) {
-            return parseInt(hex.slice(1), 16);
-        }
-
-        let intColor = hexToInt(randomColor);
+        let intColor = this.hexToInt(randomColor);
         var { portalTint = intColor} = props;
         var { portalFrame = 0 } = props;
 
@@ -4622,8 +4613,14 @@ class MainMenuScene extends Phaser.Scene {
             titleContainer.y = -GRID * 6;
 
             var titleTween = this.tweens.add({
-                targets: [this.titleLogo,this.titlePortal],
+                targets: this.titleLogo,
                 alpha: 1,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            this.tweens.add({
+                targets: this.titlePortal,
+                scale: 1.25,
                 duration: 300,
                 ease: 'Sine.InOut',
             });
@@ -4797,14 +4794,21 @@ class MainMenuScene extends Phaser.Scene {
                 return true;
             }],
             ['extras', function () {
-                this.collapseMenu();
-                subCursorIndex = 0;
                 this.menuState = 1;
-                //this.scene.get("MainMenuScene").titleLogo.setAlpha(0);
+                this.collapseMenu(this.menuState);
+                
+                subCursorIndex = 0; // ensures cursor position is always in the same spot
+                subSelected = this.subMenuElements[0]; // updates this option to be highlighted white
+                
                 this.tweens.add({
-                    targets: [this.scene.get("MainMenuScene").titleLogo,
-                        this.scene.get("MainMenuScene").titlePortal],
+                    targets: this.titleLogo,
                     alpha: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+                this.tweens.add({
+                    targets: this.titlePortal,
+                    scale: 0.01, //if this is set to 0, visual/camera bugs occur
                     duration: 300,
                     ease: 'Sine.InOut',
                 });
@@ -5002,8 +5006,14 @@ class MainMenuScene extends Phaser.Scene {
                 });
 
                 this.tweens.add({
-                    targets: [this.titleLogo,this.titlePortal],
+                    targets: this.titleLogo,
                     alpha: 1,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+                this.tweens.add({
+                    targets: this.titlePortal,
+                    scale: 1.25,
                     duration: 300,
                     ease: 'Sine.InOut',
                 });
@@ -5171,8 +5181,14 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.changeMenuSprite(6);
 
                 this.tweens.add({
-                    targets: [this.titleLogo,this.titlePortal],
+                    targets: this.titleLogo,
                     alpha: 1,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+                this.tweens.add({
+                    targets: this.titlePortal,
+                    scale: 1.25,
                     duration: 300,
                     ease: 'Sine.InOut',
                 });
@@ -5500,38 +5516,62 @@ class MainMenuScene extends Phaser.Scene {
 
     // collapse main menu, and bring extras tab to focus
     // could be made more dynamic by passing arguments for other menus in the future
-    collapseMenu() {
+    collapseMenu(menuState) {
         this.inMotion = true;
-        this.tweens.add({
-            targets: this.cameras.main,
-            scrollY: 180,
-            duration: 300,
-            ease: 'Sine.InOut',
-            onComplete: () => {
-                this.inMotion = false;
-                this.extrasIcon.setFrame(24);
-                this.descriptionDom = 'Return back to main menu.';
-                this.descriptionText.setText(this.descriptionDom);
-                console.log('Camera collapse tween complete');
-            }
-        });
 
-    
+        switch (menuState) {
+            case 0:
+            console.log('placeholder menu state');
+            break;
 
-        this.tweens.add({
-            targets: this.descriptionPanel,
-            y: this.descriptionPanel.y + 180,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
-        this.tweens.add({
-            targets: this.descriptionText,
-            y: this.descriptionText.y + 180,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
+            case 1:
+                this.inMotion = true;
+
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    scrollY: 180,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                    onComplete: () => {
+                        this.inMotion = false;
+                        this.extrasIcon.setFrame(24);
+                        this.descriptionDom = 'Return back to main menu.';
+                        this.descriptionText.setText(this.descriptionDom);
+                        console.log('Camera collapseMenu() tween complete');
+                    }
+                });
         
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    y: this.descriptionPanel.y + 180,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+                this.tweens.add({
+                    targets: this.descriptionText,
+                    y: this.descriptionText.y + 180,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+                break;
 
+            case 2:
+                // Behavior for future menuState 2
+                console.log('Handle menuState 2 here');
+                break;
+
+            case 3:
+                // Behavior for future menuState 3 (if needed)
+                console.log('Handle menuState 3 here');
+                break;
+
+            default:
+                console.log('Unknown menuState:', menuState);
+                break;
+        }
+        
+        
+        // fade out main menu options to display sub menu
         const selectedElements = [
             this.menuElements[0],
             this.menuElements[1],
@@ -5554,7 +5594,7 @@ class MainMenuScene extends Phaser.Scene {
             duration: 300,
             ease: 'Sine.InOut',
         });
-        console.log("collapsing");
+        console.log("collapsing...");
     }
 
     // brings back main menu and collapses previous menu
