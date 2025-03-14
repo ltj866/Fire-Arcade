@@ -4183,7 +4183,8 @@ class StageCodex extends Phaser.Scene {
                 `Practice Mode`
             ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
     
-            var exitButton = this.add.sprite(X_OFFSET + GRID * 1,Y_OFFSET + GRID * 1, 'uiBackButton',0);
+            var exitButton = this.add.sprite(X_OFFSET + GRID * 1,Y_OFFSET + GRID * 1,
+                 'uiBackButton',0).setScrollFactor(0);
             
             var exitText = this.add.dom(X_OFFSET + GRID * 4.5, Y_OFFSET + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '10px',
@@ -4890,7 +4891,7 @@ class MainMenuScene extends Phaser.Scene {
                     "color": "#181818",
                 }),
                         `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0).setScrollFactor(0);
             }
             else{
                 var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -5523,6 +5524,7 @@ class MainMenuScene extends Phaser.Scene {
     // collapse main menu, and bring extras tab to focus
     // could be made more dynamic by passing arguments for other menus in the future
     collapseMenu(menuState) {
+        const ourMenuScene = this.scene.get('MainMenuScene');
         this.inMotion = true;
 
         switch (menuState) {
@@ -5575,6 +5577,20 @@ class MainMenuScene extends Phaser.Scene {
                 console.log('Unknown menuState:', menuState);
                 break;
         }
+
+        this.menuElements[8].setAlpha(0);
+        this.tweens.add({
+            targets: this.exitButton,
+            y: this.exitButton.y - 2 * GRID,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        this.tweens.add({
+            targets: this.menuElements[8],
+            y: this.menuElements[8].y - 2 * GRID,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
         
         
         // fade out main menu options to display sub menu
@@ -5616,6 +5632,7 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             onComplete: () => {
                 this.inMotion = false;
+                this.menuElements[8].setAlpha(1);
                 console.log('Camera expand tween complete');
             }
         });
@@ -5629,6 +5646,20 @@ class MainMenuScene extends Phaser.Scene {
         this.tweens.add({
             targets: this.descriptionText,
             y: this.descriptionText.y - 180,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+
+        //exit button transition
+        this.tweens.add({
+            targets: this.exitButton,
+            y: this.exitButton.y + 2 * GRID,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        this.tweens.add({
+            targets: this.menuElements[8],
+            y: this.menuElements[8].y + 2 * GRID,
             duration: 300,
             ease: 'Sine.InOut',
         });
