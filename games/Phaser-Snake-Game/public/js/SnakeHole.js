@@ -5331,6 +5331,9 @@ class MainMenuScene extends Phaser.Scene {
                 else{
                     subSelected.node.style.color = menuOptionColors.selectedOption;
                 }
+
+                // move background on option change
+                ourPersist.bgCoords.y += 5;
             }  
         }, [], this);
 
@@ -5401,6 +5404,9 @@ class MainMenuScene extends Phaser.Scene {
                 else{
                     subSelected.node.style.color = menuOptionColors.selectedOption;
                 }
+
+                // move background on option change
+                ourPersist.bgCoords.y -= 5;
             }
         }, [], this);
 
