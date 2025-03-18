@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = true;
+const DEBUG_SKIP_INTRO = false;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -4799,61 +4799,71 @@ class MainMenuScene extends Phaser.Scene {
                 return true;
             }],
             ['extras', function () {
-                this.menuState = 1;
-                this.collapseMenu(this.menuState);
-                
-                subCursorIndex = 0; // ensures cursor position is always in the same spot
-                subSelected = this.subMenuElements[0]; // updates this option to be highlighted white
-                
-                this.tweens.add({
-                    targets: this.titleLogo,
-                    alpha: 0,
-                    duration: 300,
-                    ease: 'Sine.InOut',
-                });
-                this.tweens.add({
-                    targets: this.titlePortal,
-                    scale: 0.01, //if this is set to 0, visual/camera bugs occur
-                    duration: 300,
-                    ease: 'Sine.InOut',
-                });
-
-                // manually set tweens here instead of using changeMenuSprite()
-                this.tweens.add({
-                    targets: this.extrasButton,
-                    width: 62,
-                    duration: 100,
-                    ease: 'Sine.InOut',
-                });
-                this.tweens.add({
-                    targets: this.descriptionPointer,
-                    x: SCREEN_WIDTH/2 - GRID * 4.575,
-                    y: SCREEN_WIDTH/2 + 3 - GRID * 1.5,
-                    duration: 100,
-                    ease: 'Sine.Out',
-                });
-                this.tweens.add({
-                    targets: this.descriptionPanel,
-                    height: 32.0625,
-                    duration: 100,
-                    delay: 300,
-                    ease: 'Sine.Out',
-                });
-
-
-                // fade in buttons
-                this.tweens.add({
-                    targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
+                const selectedElement = this.menuElements[cursorIndex];
+                // Check if selected option is locked or not
+                if (this.menuElements[cursorIndex].isLocked) {
+                    console.log(`Selected option at index ${cursorIndex} is locked.`);
+                    // Handle the locked state
+                } else {
+                    console.log(`Selected option at index ${cursorIndex} is unlocked.`);
+                    // Set menu state and collapse menu
+                    
+                    this.collapseMenu(1);
+        
+                    subCursorIndex = 0; // Reset cursor position
+                    subSelected = selectedElement; // Highlight the selected menu element
+                    
+                    // Add tweens for visuals
+                    this.tweens.add({
+                        targets: this.titleLogo,
+                        alpha: 0,
+                        duration: 300,
+                        ease: 'Sine.InOut',
+                    });
+                    this.tweens.add({
+                        targets: this.titlePortal,
+                        scale: 0.01, // Prevent visual/camera bugs
+                        duration: 300,
+                        ease: 'Sine.InOut',
+                    });
+        
+                    // Manually update tweens for buttons and pointer
+                    this.tweens.add({
+                        targets: this.extrasButton,
+                        width: 62,
+                        duration: 100,
+                        ease: 'Sine.InOut',
+                    });
+                    this.tweens.add({
+                        targets: this.descriptionPointer,
+                        x: SCREEN_WIDTH / 2 - GRID * 4.575,
+                        y: SCREEN_WIDTH / 2 + 3 - GRID * 1.5,
+                        duration: 100,
+                        ease: 'Sine.Out',
+                    });
+                    this.tweens.add({
+                        targets: this.descriptionPanel,
+                        height: 32.0625,
+                        duration: 100,
+                        delay: 300,
+                        ease: 'Sine.Out',
+                    });
+        
+                    // Fade in all submenu elements and related icons
+                    this.tweens.add({
+                        targets: [
+                            ...this.subMenuElements,
+                            this.shopButton, this.customizeButton,
                             this.minigameButton, this.statsButton, this.awardButton,
-                            this.shopIcon,this.customizeIcon,this.minigameIcon,
-                            this.statsIcon,this.awardIcon],
-                    alpha: 1,
-                    duration: 300,
-                    delay: 60,
-                    ease: 'linear',
-                });
-
-                return true;
+                            this.shopIcon, this.customizeIcon, this.minigameIcon,
+                            this.statsIcon, this.awardIcon,
+                        ],
+                        alpha: 1,
+                        duration: 300,
+                        delay: 60,
+                        ease: 'linear',
+                    });
+                }
             }],
             ['options', function () {
                 return true;
@@ -4878,37 +4888,36 @@ class MainMenuScene extends Phaser.Scene {
         };
         
         for (let index = 0; index < menuList.length; index++) {
-            if (index == 2 || index == 3 || index == 5) {
-                var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+            // Determine if the menu option is locked based on the index
+            let isLocked = (index === 2 || index === 3 || index === 5); // Locked options
+            let isExitButton = (index === 8); // Special case for the exit button
+        
+            // Create the text element
+            let textElement = this.add.dom(
+                isExitButton ? X_OFFSET + GRID * 0.75 : SCREEN_WIDTH / 2 - GRID * 8.5, // X position
+                isExitButton ? Y_OFFSET + 4 : textStart + index * spacing, // Y position
+                'div',
+                Object.assign({}, STYLE_DEFAULT, {
                     "fontSize": '24px',
                     "fontWeight": 400,
-                    "color": "darkgrey",
-                    //"text-decoration": 'line-through'
+                    "color": isLocked ? menuOptionColors.locked : menuOptionColors.unlocked,
                 }),
-                        `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+                `${menuList[index].toUpperCase()}`
+            ).setOrigin(0.0, 0).setScale(0.5).setAlpha(0);
+        
+            // Apply specific settings for the exit button
+            if (isExitButton) {
+                textElement.setScrollFactor(0);
             }
-            else if (index == 8) { //exit button
-                var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-                    "fontSize": '24px',
-                    "fontWeight": 400,
-                    "color": "#181818",
-                }),
-                        `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0).setScrollFactor(0);
-            }
-            else{
-                var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                    "fontSize": '24px',
-                    "fontWeight": 400,
-                    "color": "#181818",
-                }),
-                        `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.0,0).setScale(0.5).setAlpha(0); 
-            }
+        
+            // Add custom properties to the text element
+            textElement.isLocked = isLocked; // Indicate if the option is locked
+            textElement.menuKey = menuList[index]; // Store the menu option key for reference
+        
+            // Push the text element into the array
             this.menuElements.push(textElement);
-            
         }
+
         //menuElements[1].setAlpha(0);
 
         //panels (colored boxes behind text options)
@@ -5057,27 +5066,25 @@ class MainMenuScene extends Phaser.Scene {
         this.subMenuElements = []
 
         for (let index = 0; index < subMenuList.length; index++) {
-            var element = this.subMenuElements[index];
-                // check for sub menu options that are locked
-                if (index === 3 || index === 5) {
-                    var subTextElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                        "fontSize": '24px',
-                        "fontWeight": 400,
-                        "color": "darkgrey",
-                    }),
-                            `${subMenuList[index].toUpperCase()}`
-                    ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
-                }
-                // check for sub menu options that are unlocked
-                else{
-                    var subTextElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 8.5, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                        "fontSize": '24px',
-                        "fontWeight": 400,
-                        "color": "#181818",
-                    }),
-                            `${subMenuList[index].toUpperCase()}`
-                    ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
-                }
+            // we can define locked options in full game and adjust this logic dynamically
+            let isLocked = (index === 3 || index === 5);
+            
+            let subTextElement = this.add.dom(
+                SCREEN_WIDTH / 2 - GRID * 8.5, 
+                textStart + index * spacing, 
+                'div', 
+                Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '24px',
+                    "fontWeight": 400,
+                    "color": isLocked ? "darkgrey" : "#181818",
+                }),
+                `${subMenuList[index].toUpperCase()}`
+            ).setOrigin(0.0, 0).setScale(0.5).setAlpha(0);
+        
+            // Attach properties to associate the menu option
+            subTextElement.menuKey = subMenuList[index];
+            subTextElement.isLocked = isLocked;
+        
             this.subMenuElements.push(subTextElement);
         }
         //menuElements[1].setAlpha(0);
@@ -5529,11 +5536,12 @@ class MainMenuScene extends Phaser.Scene {
 
     // collapse main menu, and bring extras tab to focus
     // could be made more dynamic by passing arguments for other menus in the future
-    collapseMenu(menuState) {
+    collapseMenu(menuOption) {
+        this.menuState = 1;
         const ourMenuScene = this.scene.get('MainMenuScene');
         this.inMotion = true;
 
-        switch (menuState) {
+        switch (menuOption) {
             case 0:
             console.log('placeholder menu state');
             break;
