@@ -4728,12 +4728,12 @@ class MainMenuScene extends Phaser.Scene {
                 
                 return true;
             }],
-            ['extraction', function () {
-                return true;
-            }],
-            ['championship', function () {
-                return true;
-            }],
+            //['extraction', function () {
+            //    return true;
+            //}],
+            //['championship', function () {
+            //    return true;
+            //}],
             ['gauntlet', function () {
                 const ourPersist = this.scene.get("PersistScene");
                 const ourSpaceBoy = this.scene.get("SpaceBoyScene");
@@ -4803,19 +4803,24 @@ class MainMenuScene extends Phaser.Scene {
 
                 return true;
             }],
-            ['endless', function () {
-                return true;
-            }],
+            //['endless', function () {
+                // Check if selected option is locked or not
+                //if (this.menuElements[cursorIndex].isLocked) {
+                //    this.menuBonk(menuSelector);
+                //    console.log('LOCKED ENDLESS');
+                //} else {
+                //    console.log('UNLOCKED ENDLESS');
+                //}
+                //return true;
+            //}],
             ['extras', function () {
                 const selectedElement = this.menuElements[cursorIndex];
                 // Check if selected option is locked or not
                 if (this.menuElements[cursorIndex].isLocked) {
-                    console.log(`Selected option at index ${cursorIndex} is locked.`);
-                    // Handle the locked state
+                    this.menuBonk(menuSelector);
                 } else {
                     console.log(`Selected option at index ${cursorIndex} is unlocked.`);
                     // Set menu state and collapse menu
-                    
                     this.collapseMenu(1);
         
                     subCursorIndex = 0; // Reset cursor position
@@ -4845,7 +4850,7 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: SCREEN_WIDTH / 2 - GRID * 4.575,
-                        y: SCREEN_WIDTH / 2 + 3 - GRID * 1.5,
+                        y: SCREEN_WIDTH / 2 + 3 - GRID * 7.5,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -4856,15 +4861,28 @@ class MainMenuScene extends Phaser.Scene {
                         delay: 300,
                         ease: 'Sine.Out',
                     });
+
+                    // Fade out all main menu elements except 'extras'
+                    this.tweens.add({
+                        targets: [
+                            ...this.menuElements,
+                            this.adventureButton,this.adventureIcon,
+                            this.practiceButton,this.practiceIcon
+                        ],
+                        alpha: 0,
+                        duration: 300,
+                        delay: 60,
+                        ease: 'linear',
+                    });
         
                     // Fade in all submenu elements and related icons
                     this.tweens.add({
                         targets: [
                             ...this.subMenuElements,
-                            this.shopButton, this.customizeButton,
-                            this.minigameButton, this.statsButton, this.awardButton,
+                            this.shopButton, this.customizeButton,this.statsButton,
+                            //.minigameButton, this.statsButton, this.awardButton,
                             this.shopIcon, this.customizeIcon, this.minigameIcon,
-                            this.statsIcon, this.awardIcon,
+                            this.statsIcon //this.awardIcon,
                         ],
                         alpha: 1,
                         duration: 300,
@@ -4899,8 +4917,8 @@ class MainMenuScene extends Phaser.Scene {
         // main menu text and properties including isLocked
         for (let index = 0; index < menuList.length; index++) {
             // currently indexing isLocked, but post demo can check elsewhere
-            let isLocked = (index === 2 || index === 3 || index === 5); // Locked options
-            let isExitButton = (index === 8); // Special case for the exit button
+            let isLocked = (index === 2); // Locked options
+            let isExitButton = (index === 5); // Special case for the exit button
         
             // create the text element
             let textElement = this.add.dom(
@@ -4932,7 +4950,7 @@ class MainMenuScene extends Phaser.Scene {
         var subMenuOptions = new Map([
             ['Back', function () {
                 this.extrasIcon.setFrame(14);
-                this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
+                this.descriptionDom = 'Return to main menu.';
                 this.descriptionText.setText(this.descriptionDom);
                 this.expandMenu(cursorIndex);
                 this.changeMenuSprite(6);
@@ -4948,7 +4966,7 @@ class MainMenuScene extends Phaser.Scene {
                 });
                 this.tweens.add({
                     targets: this.descriptionPanel,
-                    height: 45,
+                    height: 32.25,
                     duration: 100,
                     ease: 'Sine.Out',
                 });
@@ -4966,6 +4984,21 @@ class MainMenuScene extends Phaser.Scene {
                     ease: 'Sine.InOut',
                 });
 
+                this.tweens.add({
+                    targets: this.extrasButton, //back button is swapped to extras button here
+                    width: 74,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: SCREEN_WIDTH/2 - GRID * 3.5,
+                    y: SCREEN_HEIGHT/2 + GRID * 4.25,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+
                 return true;
             }],
             ['Shop', function () {
@@ -4976,24 +5009,24 @@ class MainMenuScene extends Phaser.Scene {
                 console.log("Customize");
                 return true;
             }],
-            ['Minigames', function () {
+            /*['Minigames', function () {
                 console.log("Minigames");
                 return true;
-            }],
+            }],*/
             ['Stats', function () {
                 console.log("Stats");
                 return true;
             }],
-            ['Award Board', function () {
+            /*['Award Board', function () {
                 console.log("Award Board");
                 return true;
-            }],
+            }],*/
         ]);
 
         // make a list of each option
         var subMenuList = [...subMenuOptions.keys()];
         var subCursorIndex = 0;
-        var textStart = 152 + 24 * 6;
+        var textStart = 152 + 24 * 3;
         var spacing = 24;
 
         // list where the sub menu text elements are pushed to and handled
@@ -5001,7 +5034,7 @@ class MainMenuScene extends Phaser.Scene {
         // SUB MENU
         for (let index = 0; index < subMenuList.length; index++) {
             // index based for now
-            let isLocked = (index === 3 || index === 5);
+            let isLocked //= (index === 3 || index === 5);
             
             let subTextElement = this.add.dom(
                 SCREEN_WIDTH / 2 - GRID * 8.5, 
@@ -5065,14 +5098,14 @@ class MainMenuScene extends Phaser.Scene {
         // used to back out of sub menus
         this.input.keyboard.on('keydown-TAB', e => {
             if (this.menuState === 1 && !this.inMotion) {
-                subCursorIndex = 0;//herehere
+                subCursorIndex = 0;
                 this.subSelected = this.subMenuElements[0];
 
                 this.extrasIcon.setFrame(14);
                 this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
                 this.descriptionText.setText(this.descriptionDom);
                 
-                cursorIndex = 6;
+                cursorIndex = 3;
                 this.updateMenu(cursorIndex,subCursorIndex);
                 this.expandMenu(cursorIndex);
 
@@ -5109,6 +5142,21 @@ class MainMenuScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: this.descriptionPanel,
                     height: 45,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+                
+                this.tweens.add({
+                    targets: this.extrasButton, //back button is swapped to extras button here
+                    width: 74,
+                    duration: 100,
+                    ease: 'Sine.Out',
+                });
+
+                this.tweens.add({
+                    targets: this.descriptionPointer,
+                    x: SCREEN_WIDTH/2 - GRID * 3.5,
+                    y: SCREEN_HEIGHT/2 + GRID * 4.25,
                     duration: 100,
                     ease: 'Sine.Out',
                 });
@@ -5179,7 +5227,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.updateMenu(cursorIndex,subCursorIndex);
 
                 // change exit button to red sprite
-                if (cursorIndex === 8) {
+                if (cursorIndex === 5) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = this.selected.y + GRID * 2.25
                     mainMenuScene.exitButton.setFrame(1);
@@ -5221,7 +5269,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.updateMenu(cursorIndex,subCursorIndex);
 
                 // change exit button to red sprite
-                if (cursorIndex === 8) {
+                if (cursorIndex === 5) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = this.selected.y + GRID * 2.25
                     mainMenuScene.exitButton.setFrame(1);
@@ -5263,7 +5311,7 @@ class MainMenuScene extends Phaser.Scene {
                     } 
     
                     mainMenuScene.pressToPlayTween.stop();
-                    mainMenuScene.pressToPlay.setAlpha(0)
+                    mainMenuScene.pressToPlay.setAlpha(0);
                     mainMenuScene.pressedSpace = true;
                     if (this.startingAnimation === "default") {
                         titleTween.resume();
@@ -5302,7 +5350,7 @@ class MainMenuScene extends Phaser.Scene {
         this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,
             this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
         
-        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
+        /*this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
                 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
         this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,
             this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
@@ -5311,23 +5359,23 @@ class MainMenuScene extends Phaser.Scene {
                 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
         this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,
             this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
+        */
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
                 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,
             this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
+        /*this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
                 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
         this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,
             this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12,
+        */
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6,
                 'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,
             this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
                 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,
             this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
@@ -5336,31 +5384,31 @@ class MainMenuScene extends Phaser.Scene {
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
 
         // sub menu option buttons
-        this.shopButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
+        this.shopButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
             'uiMenu', 'gold', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.shopIcon = this.add.sprite(this.shopButton.x + 2,
             this.shopButton.y,"menuIcons", 17 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.customizeButton = this.add.nineslice(_hOffset,_vOffset + GRID * 16,
+        this.customizeButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
             'uiMenu', 'teal', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.customizeIcon = this.add.sprite(this.customizeButton.x + 2,
             this.customizeButton.y,"menuIcons", 18 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.minigameButton = this.add.nineslice(_hOffset,_vOffset + GRID * 18,
+        /*this.minigameButton = this.add.nineslice(_hOffset,_vOffset + GRID * 18,
             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
         this.minigameIcon = this.add.sprite(this.minigameButton.x + 2,
             this.minigameButton.y,"menuIcons", 19 ).setOrigin(0,0.5).setAlpha(0);
-        
-        this.statsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 20,
+        */
+        this.statsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12,
             'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.statsIcon = this.add.sprite(this.statsButton.x + 2,
             this.statsButton.y,"menuIcons", 20 ).setOrigin(0,0.5).setAlpha(0);
-        
+        /*
         this.awardButton = this.add.nineslice(_hOffset,_vOffset + GRID * 22,
             'uiMenu', 'pink', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
         this.awardIcon = this.add.sprite(this.awardButton.x + 2,
             this.awardButton.y,"menuIcons", 21 ).setOrigin(0,0.5).setAlpha(0);
-
+        */
         
         var menuFadeTween = this.tweens.add({
             targets: [this.practiceButton,this.practiceIcon,this.adventureButton,this.adventureIcon,
@@ -5437,13 +5485,32 @@ class MainMenuScene extends Phaser.Scene {
         return parseInt(hex.slice(1), 16);
     }
 
+    menuBonk(menuSelector){
+        if (!menuSelector.isTweening) {
+            // check if menuSelector has a tween currently playing
+            menuSelector.isTweening = true;
+            const tween = this.tweens.add({
+                targets: menuSelector,
+                x: menuSelector.x + 10,
+                yoyo: true,
+                repeat: 1,
+                duration: 67,
+                ease: 'Sine.InOut',
+                onComplete: () => {
+                    // Reset the 'isTweening' flag when the tween finishes
+                    menuSelector.isTweening = false;
+                }
+            });
+        }
+    }
+
     updateMenu(cursorIndex,subCursorIndex){
         
         if (this.menuState === 0) {
             console.log("updating.......1111")
             for (var i = 0; i < this.menuElements.length; i++) {
                 var element = this.menuElements[i];
-                if (i === 2 || i === 3 || i === 5) {
+                if (i === 2) {
                     element.node.style.color = this.menuoptioncolors.locked; 
                 }
                 else{
@@ -5451,7 +5518,7 @@ class MainMenuScene extends Phaser.Scene {
                 }
             }
             // apply the correct color for the selected node
-            if (cursorIndex === 2 ||cursorIndex === 3 || cursorIndex === 5) {
+            if (cursorIndex === 2) {
                 this.selected.node.style.color = this.menuoptioncolors.locked;
             }
             else{
@@ -5463,20 +5530,20 @@ class MainMenuScene extends Phaser.Scene {
             console.log("updating.......2222")
             for (var i = 0; i < this.subMenuElements.length; i++) {
                 var element = this.subMenuElements[i];
-                if (i === 3 || i === 5) {
-                    element.node.style.color = this.menuoptioncolors.locked; 
-                }
-                else{
+                //if (i ===  || i === 5) {
+                //    element.node.style.color = this.menuoptioncolors.locked; 
+                //}
+                //else{
                     element.node.style.color = this.menuoptioncolors.unlocked
-                }
+                //}
             }
             // apply the correct color for the selected node
-            if (subCursorIndex == 3 || subCursorIndex == 5) {
-                this.subSelected.node.style.color = this.menuoptioncolors.locked;
-            }
-            else{
+            //if (subCursorIndex == 3 || subCursorIndex == 5) {
+            //    this.subSelected.node.style.color = this.menuoptioncolors.locked;
+            //}
+            //else{
                 this.subSelected.node.style.color = this.menuoptioncolors.selectedOption;
-            }
+            //}
         }
         
         
@@ -5494,12 +5561,12 @@ class MainMenuScene extends Phaser.Scene {
             console.log('placeholder menu state');
             break;
 
-            case 1:
+            case 1: // EXTRAS
                 this.inMotion = true;
 
                 this.tweens.add({
                     targets: this.cameras.main,
-                    scrollY: 180,
+                    scrollY: 90,
                     duration: 300,
                     ease: 'Sine.InOut',
                     onComplete: () => {
@@ -5513,13 +5580,13 @@ class MainMenuScene extends Phaser.Scene {
         
                 this.tweens.add({
                     targets: this.descriptionPanel,
-                    y: this.descriptionPanel.y + 180,
+                    y: this.descriptionPanel.y + 90,
                     duration: 300,
                     ease: 'Sine.InOut',
                 });
                 this.tweens.add({
                     targets: this.descriptionText,
-                    y: this.descriptionText.y + 180,
+                    y: this.descriptionText.y + 90,
                     duration: 300,
                     ease: 'Sine.InOut',
                 });
@@ -5549,9 +5616,9 @@ class MainMenuScene extends Phaser.Scene {
             this.menuElements[2],
             this.menuElements[3],
             this.menuElements[4],
-            this.menuElements[5],
-            this.menuElements[6],
-            this.menuElements[7]
+            //this.menuElements[5],
+            //this.menuElements[6],
+            //this.menuElements[7]
         ];
 
         this.tweens.add({
@@ -5580,20 +5647,20 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             onComplete: () => {
                 this.inMotion = false;
-                this.menuElements[8].setAlpha(1);
+                this.menuElements[5].setAlpha(1);
                 console.log('Camera expand tween complete');
             }
         });
 
         this.tweens.add({
             targets: this.descriptionPanel,
-            y: this.descriptionPanel.y - 180,
+            y: this.descriptionPanel.y - 90,
             duration: 300,
             ease: 'Sine.InOut',
         });
         this.tweens.add({
             targets: this.descriptionText,
-            y: this.descriptionText.y - 180,
+            y: this.descriptionText.y - 90,
             duration: 300,
             ease: 'Sine.InOut',
         });
@@ -5606,9 +5673,9 @@ class MainMenuScene extends Phaser.Scene {
             this.menuElements[2],
             this.menuElements[3],
             this.menuElements[4],
-            this.menuElements[5],
-            this.menuElements[6],
-            this.menuElements[7]
+            //this.menuElements[5],
+            //this.menuElements[6],
+            //this.menuElements[7]
         ];
 
         this.tweens.add({
@@ -5622,12 +5689,25 @@ class MainMenuScene extends Phaser.Scene {
             duration: 300,
             ease: 'Sine.InOut',
         });
+
+        // Fade in all main menu elements except 'extras'
+        this.tweens.add({
+            targets: [
+                ...this.menuElements,
+                this.adventureButton,this.adventureIcon,
+                this.practiceButton,this.practiceIcon
+            ],
+            alpha: 1,
+            duration: 300,
+            delay: 60,
+            ease: 'linear',
+        });
         console.log("expanding");
     }
 
     hideExitButton(ease){
         
-        this.menuElements[8].setAlpha(0);  
+        this.menuElements[5].setAlpha(0);
         
         if (ease === true) {
             console.log("smooth!!!")
@@ -5638,8 +5718,8 @@ class MainMenuScene extends Phaser.Scene {
                 ease: 'Sine.InOut',
             });
             this.tweens.add({
-                targets: this.menuElements[8],
-                y: this.menuElements[8].y - 2 * GRID,
+                targets: this.menuElements[5],
+                y: this.menuElements[5].y - 2 * GRID,
                 duration: 300,
                 ease: 'Sine.InOut',
             });
@@ -5662,17 +5742,17 @@ class MainMenuScene extends Phaser.Scene {
                 ease: 'Sine.InOut',
             });
             this.tweens.add({
-                targets: this.menuElements[8],
-                y: this.menuElements[8].y + 2 * GRID,
+                targets: this.menuElements[5],
+                y: this.menuElements[5].y + 2 * GRID,
                 duration: 300,
                 ease: 'Sine.InOut',
                 onComplete: () => {
-                    this.menuElements[8].setAlpha(1);
+                    this.menuElements[5].setAlpha(1);
                 }
             });
         }
         else{
-            this.menuElements[8].setAlpha(1);
+            this.menuElements[5].setAlpha(1);
         }
         console.log("instant")
     }
@@ -5682,10 +5762,10 @@ class MainMenuScene extends Phaser.Scene {
         // main menu option icons
         this.practiceIcon.setFrame(0);
         this.adventureIcon.setFrame(1);
-        this.extractionIcon.setFrame(2);
-        this.championshipIcon.setFrame(3);
+        //this.extractionIcon.setFrame(2);
+        //this.championshipIcon.setFrame(3);
         this.gauntletIcon.setFrame(4);
-        this.endlessIcon.setFrame(5);
+        //this.endlessIcon.setFrame(5);
         if (this.menuState == 0) {
             this.extrasIcon.setFrame(6);
         }
@@ -5696,9 +5776,9 @@ class MainMenuScene extends Phaser.Scene {
         // sub menu option icons
         this.shopIcon.setFrame(17);
         this.customizeIcon.setFrame(18);
-        this.minigameIcon.setFrame(19);
+        //this.minigameIcon.setFrame(19);
         this.statsIcon.setFrame(20);
-        this.awardIcon.setFrame(21);
+        //this.awardIcon.setFrame(21);
 
         this.tweens.add({
             targets: [this.practiceButton,this.adventureButton,this.extractionButton,this.championshipButton,
@@ -5759,12 +5839,12 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 1,
-                        y: _yOffset,
+                        y: _yOffset ,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     break;
-                case 2:
+                /*case 2:
                     this.descriptionDom = 'Playable in full game!';
                     this.descriptionText.setText(this.descriptionDom)
                     this.extractionIcon.setFrame(10)
@@ -5811,8 +5891,8 @@ class MainMenuScene extends Phaser.Scene {
                         duration: 100,
                         ease: 'Sine.Out',
                     });
-                    break;
-                case 4:
+                    break;*/
+                case 2:
                     this.descriptionDom = 'Beat adventure mode to unlock.';
                     this.descriptionText.setText(this.descriptionDom)
                     this.gauntletIcon.setFrame(12)
@@ -5831,39 +5911,36 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 2,
-                        y: _yOffset + GRID * 6,
+                        y: _yOffset + GRID * 2,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
-                    break;
-                case 5:
-                    this.descriptionDom = 'Playable in full game!';
-                    this.descriptionText.setText(this.descriptionDom)
-                    this.endlessIcon.setFrame(13)
+
+                    /*
                     this.tweens.add({
-                        targets: this.endlessButton,
-                        width: 84,
+                        targets: this.extractionButton,
+                        width: 106,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     this.tweens.add({
                         targets: this.descriptionPanel,
-                        height: 32.0625,
+                        height: 32.0625, // this value is a decimal; otherwise visual errors
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 2.75,
-                        y: _yOffset + GRID * 8,
+                        x: _xOffset - GRID * 1,
+                        y: _yOffset + GRID * 2,
                         duration: 100,
                         ease: 'Sine.Out',
-                    });
+                    });*/
                     break;
-                case 6:
-                    this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
+                case 3: // EXTRAS
+                    this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';;
                     this.descriptionText.setText(this.descriptionDom)
-                    this.extrasIcon.setFrame(14)
+                    //this.endlessIcon.setFrame(13)
                     this.tweens.add({
                         targets: this.extrasButton,
                         width: 76,
@@ -5879,18 +5956,18 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 3.5,
-                        y: _yOffset + GRID * 10,
+                        y: _yOffset + GRID * 4,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     break;
-                case 7:
+                case 4:
                     this.descriptionDom = 'Configure game settings.';
                     this.descriptionText.setText(this.descriptionDom)
-                    this.optionsIcon.setFrame(15)
+                    this.extrasIcon.setFrame(14)
                     this.tweens.add({
                         targets: this.optionsButton,
-                        width: 84,
+                        width: 82,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5902,13 +5979,13 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     this.tweens.add({
                         targets: this.descriptionPointer,
-                        x: _xOffset - GRID * 2.75,
-                        y: _yOffset + GRID * 12,
+                        x: _xOffset - GRID * 3,
+                        y: _yOffset + GRID * 6,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     break;
-                case 8:
+                case 5:
                     this.descriptionDom = 'Quit to desktop.';
                     this.descriptionText.setText(this.descriptionDom) 
                     this.tweens.add({
@@ -5925,7 +6002,24 @@ class MainMenuScene extends Phaser.Scene {
                         ease: 'Sine.Out',
                     });
                     break;
-    
+                /*case 6:
+                    this.descriptionDom = 'Quit to desktop.';
+                    this.descriptionText.setText(this.descriptionDom) 
+                    this.tweens.add({
+                        targets: this.descriptionPanel,
+                        height: 45,
+                        duration: 100,
+                        ease: 'Sine.Out',
+                    });
+                    this.tweens.add({
+                        targets: this.descriptionPointer,
+                        x: _xOffset - GRID * 10.5,
+                        y: _yOffset - GRID * 10.25,
+                        duration: 100,
+                        ease: 'Sine.Out',
+                    });
+                    break;
+                */
                     
                 default:
                     //;    
@@ -5964,7 +6058,7 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 4.575,
-                        y: _yOffset + GRID * 10,
+                        y: _yOffset + GRID * 4,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -5989,7 +6083,7 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 4.5,
-                        y: _yOffset + GRID * 12,
+                        y: _yOffset + GRID * 6,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
@@ -6013,12 +6107,12 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 1.5,
-                        y: _yOffset + GRID * 14,
+                        y: _yOffset + GRID * 8,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     break;
-                case 3:
+                /*case 3:
                     this.descriptionDom = 'Playable in full game!';
                     this.descriptionText.setText(this.descriptionDom);
                     this.minigameIcon.setFrame(27);
@@ -6041,8 +6135,8 @@ class MainMenuScene extends Phaser.Scene {
                         duration: 100,
                         ease: 'Sine.Out',
                     });
-                    break;
-                case 4:
+                    break;*/
+                case 3:
                     this.descriptionDom = 'View your statistics.';
                     this.descriptionText.setText(this.descriptionDom);
                     this.statsIcon.setFrame(28);
@@ -6061,12 +6155,12 @@ class MainMenuScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: this.descriptionPointer,
                         x: _xOffset - GRID * 4.25,
-                        y: _yOffset + GRID * 18,
+                        y: _yOffset + GRID * 10,
                         duration: 100,
                         ease: 'Sine.Out',
                     });
                     break;
-                case 5:
+                /*case 5:
                     this.descriptionDom = 'View your challenges and claim your prizes.';
                     this.descriptionText.setText(this.descriptionDom);
                     this.awardIcon.setFrame(29);
@@ -6089,7 +6183,7 @@ class MainMenuScene extends Phaser.Scene {
                         duration: 100,
                         ease: 'Sine.Out',
                     });
-                    break;   
+                    break;*/ 
 
 
                 default:
