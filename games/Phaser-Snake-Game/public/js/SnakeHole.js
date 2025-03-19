@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -4560,8 +4560,7 @@ class MainMenuScene extends Phaser.Scene {
         var { startingAnimation = "default" } = props;
         this.startingAnimation = startingAnimation;
         // menuState is an int right now but could be made into an object 
-        // 0 is main menu, 1 is extras
-        this.menuState = 0;
+        this.menuState = 0; // 0 is main menu, 1 is extras
         // used to make sure menu transitions are finished before switching
         this.inMotion = false;
     }
@@ -4574,15 +4573,23 @@ class MainMenuScene extends Phaser.Scene {
 
         // set a random color to the portal
         this.portalColors = PORTAL_COLORS.slice();
-        let randomColor = this.portalColors[Math.floor(Math.random() * this.portalColors.length)];
-
+        let randomColor = this.portalColors[
+            Math.floor(Math.random() * this.portalColors.length)];
         let intColor = this.hexToInt(randomColor);
+        
         var { portalTint = intColor} = props;
         var { portalFrame = 0 } = props;
 
         // for exit button transition speed -- false is instant
         this.isSmooth = true;
 
+        // Snake cursor / selector
+        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5,
+            SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0);
+        
+
+
+        // title logo
         this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
             'titleLogo').setDepth(60).setScrollFactor(0);
         this.titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,SCREEN_HEIGHT/2 - GRID * 0.0,)
@@ -4596,12 +4603,11 @@ class MainMenuScene extends Phaser.Scene {
         titleContainer.add(this.titleLogo);
         titleContainer.add(this.titlePortal);
 
-        // starting from powering on
+        // when starting from powering on
         if (this.startingAnimation === "default") {
             console.log('going straight to default')
             this.pressedSpace = false;
 
- 
             var titleTween = this.tweens.add({
                 targets: titleContainer,
                 y: -GRID * 7,
@@ -4633,7 +4639,7 @@ class MainMenuScene extends Phaser.Scene {
             var fadeInDuration = 0;
         }
 
-        // description panel
+        // description panel (right side text in box)
         this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
         this.descriptionPanel = this.add.nineslice(SCREEN_WIDTH/2 + GRID * 2.5, SCREEN_HEIGHT/2 - GRID * 2, 
             'uiPanelL', 'Glass', 
@@ -4658,8 +4664,10 @@ class MainMenuScene extends Phaser.Scene {
         this.graphics.fillCircleShape(this.descriptionPointer);
         this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
         this.graphics.setAlpha(0);
-        this.graphics.setDepth(50)
+        this.graphics.setDepth(50);
 
+        // MAIN MENU
+        // main menu selectable options with their corresponding functions
         var menuOptions = new Map([
             ['practice', function () {
                 console.log("Practice");
@@ -4811,8 +4819,8 @@ class MainMenuScene extends Phaser.Scene {
                     this.collapseMenu(1);
         
                     subCursorIndex = 0; // Reset cursor position
-                    subSelected = selectedElement; // Highlight the selected menu element
-                    
+                    this.subSelected = selectedElement; // Highlight the selected menu element
+                    this.subMenuElements[0].node.style.color = "white";
                     // Add tweens for visuals
                     this.tweens.add({
                         targets: this.titleLogo,
@@ -4873,26 +4881,28 @@ class MainMenuScene extends Phaser.Scene {
             }]
         ]);
 
+        // make a list of each option
         var menuList = [...menuOptions.keys()];
         var cursorIndex = 1;
         var textStart = 152;
         var spacing = 24;
 
-        
-        this.menuElements = []
-      
-        var menuOptionColors = {
+        this.menuoptioncolors = {
             locked: 'darkgrey',
             unlocked: '#181818',
             selectedOption: 'white'
         };
-        
+
+        // list where the text elements are pushed to and handled
+        this.menuElements = [];
+
+        // main menu text and properties including isLocked
         for (let index = 0; index < menuList.length; index++) {
-            // Determine if the menu option is locked based on the index
+            // currently indexing isLocked, but post demo can check elsewhere
             let isLocked = (index === 2 || index === 3 || index === 5); // Locked options
             let isExitButton = (index === 8); // Special case for the exit button
         
-            // Create the text element
+            // create the text element
             let textElement = this.add.dom(
                 isExitButton ? X_OFFSET + GRID * 0.75 : SCREEN_WIDTH / 2 - GRID * 8.5, // X position
                 isExitButton ? Y_OFFSET + 4 : textStart + index * spacing, // Y position
@@ -4900,107 +4910,31 @@ class MainMenuScene extends Phaser.Scene {
                 Object.assign({}, STYLE_DEFAULT, {
                     "fontSize": '24px',
                     "fontWeight": 400,
-                    "color": isLocked ? menuOptionColors.locked : menuOptionColors.unlocked,
+                    "color": isLocked ? this.menuoptioncolors.locked : this.menuoptioncolors.unlocked,
                 }),
                 `${menuList[index].toUpperCase()}`
             ).setOrigin(0.0, 0).setScale(0.5).setAlpha(0);
         
-            // Apply specific settings for the exit button
+            // apply specific settings for the exit button
             if (isExitButton) {
                 textElement.setScrollFactor(0);
             }
-        
-            // Add custom properties to the text element
+
+            // assign if isLocked
             textElement.isLocked = isLocked; // Indicate if the option is locked
-            textElement.menuKey = menuList[index]; // Store the menu option key for reference
+            //textElement.menuKey = menuList[index]; // not sure if needed
         
-            // Push the text element into the array
             this.menuElements.push(textElement);
         }
-
-        //menuElements[1].setAlpha(0);
-
-        //panels (colored boxes behind text options)
-
-        let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
-        let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
-
-        this.practiceButton = this.add.nineslice(_hOffset,_vOffset,
-             'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,
-            this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
         
-        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2,
-             'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,
-            this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
-        
-        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,
-            this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,
-            this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,
-            this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,
-            this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12,
-             'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,
-            this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
-             'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,
-            this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
-        .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
-
-        // sub menu option buttons
-        this.shopButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
-            'uiMenu', 'gold', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.shopIcon = this.add.sprite(this.shopButton.x + 2,
-            this.shopButton.y,"menuIcons", 17 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.customizeButton = this.add.nineslice(_hOffset,_vOffset + GRID * 16,
-            'uiMenu', 'teal', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.customizeIcon = this.add.sprite(this.customizeButton.x + 2,
-            this.customizeButton.y,"menuIcons", 18 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.minigameButton = this.add.nineslice(_hOffset,_vOffset + GRID * 18,
-            'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
-        this.minigameIcon = this.add.sprite(this.minigameButton.x + 2,
-            this.minigameButton.y,"menuIcons", 19 ).setOrigin(0,0.5).setAlpha(0);
-        
-        this.statsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 20,
-            'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.statsIcon = this.add.sprite(this.statsButton.x + 2,
-            this.statsButton.y,"menuIcons", 20 ).setOrigin(0,0.5).setAlpha(0);
-        
-        this.awardButton = this.add.nineslice(_hOffset,_vOffset + GRID * 22,
-            'uiMenu', 'pink', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
-        this.awardIcon = this.add.sprite(this.awardButton.x + 2,
-            this.awardButton.y,"menuIcons", 21 ).setOrigin(0,0.5).setAlpha(0);
         // SUB MENU
-
+        // sub menu selectable options with their corresponding functions
         var subMenuOptions = new Map([
             ['Back', function () {
                 this.extrasIcon.setFrame(14);
                 this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
                 this.descriptionText.setText(this.descriptionDom);
-                this.expandMenu();
+                this.expandMenu(cursorIndex);
                 this.changeMenuSprite(6);
                 this.tweens.add({
                     targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
@@ -5056,17 +4990,17 @@ class MainMenuScene extends Phaser.Scene {
             }],
         ]);
 
+        // make a list of each option
         var subMenuList = [...subMenuOptions.keys()];
         var subCursorIndex = 0;
         var textStart = 152 + 24 * 6;
         var spacing = 24;
 
-        // Sub Menu Text Options
-
+        // list where the sub menu text elements are pushed to and handled
         this.subMenuElements = []
-
+        // SUB MENU
         for (let index = 0; index < subMenuList.length; index++) {
-            // we can define locked options in full game and adjust this logic dynamically
+            // index based for now
             let isLocked = (index === 3 || index === 5);
             
             let subTextElement = this.add.dom(
@@ -5081,62 +5015,12 @@ class MainMenuScene extends Phaser.Scene {
                 `${subMenuList[index].toUpperCase()}`
             ).setOrigin(0.0, 0).setScale(0.5).setAlpha(0);
         
-            // Attach properties to associate the menu option
-            subTextElement.menuKey = subMenuList[index];
+            // assign if isLocked
             subTextElement.isLocked = isLocked;
+            //subTextElement.menuKey = subMenuList[index];
         
             this.subMenuElements.push(subTextElement);
         }
-        //menuElements[1].setAlpha(0);
-
-        //panels
-
-        /*this.practiceButton = this.add.nineslice(_hOffset,_vOffset,
-             'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,
-            this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
-        
-        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2,
-             'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,
-            this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
-        
-        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,
-            this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,
-            this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,
-            this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
-             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,
-            this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12,
-             'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,
-            this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
-             'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,
-            this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
-
-        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
-        .setOrigin(0,0).setAlpha(0).setScrollFactor(0);*/
-
-        // Snake cursor / selector
-        var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5,
-            SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0);
 
         //menu arrows
 
@@ -5170,27 +5054,34 @@ class MainMenuScene extends Phaser.Scene {
         });
 
 
-        var selected = this.menuElements[cursorIndex];
-        selected.node.style.color = "white";
+        this.selected = this.menuElements[cursorIndex];
+        this.selected.node.style.color = "white";
 
-        var subSelected = this.subMenuElements[subCursorIndex];
-        subSelected.node.style.color = "white";
+        this.subSelected = this.subMenuElements[subCursorIndex];
+        this.subSelected.node.style.color = "white";
 
         var mapEngaged = false;
 
         // used to back out of sub menus
         this.input.keyboard.on('keydown-TAB', e => {
             if (this.menuState === 1 && !this.inMotion) {
+                subCursorIndex = 0;//herehere
+                this.subSelected = this.subMenuElements[0];
+
                 this.extrasIcon.setFrame(14);
                 this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
                 this.descriptionText.setText(this.descriptionDom);
-                this.expandMenu();
-                this.menuState = 0;
+                
                 cursorIndex = 6;
+                this.updateMenu(cursorIndex,subCursorIndex);
+                this.expandMenu(cursorIndex);
 
-                subSelected = this.subMenuElements[0];
-                menuSelector.y = subSelected.y + 7
+                
+
+                menuSelector.y = this.subSelected.y + 7
                 mainMenuScene.changeMenuSprite(6);
+
+                
 
                 this.tweens.add({
                     targets: this.titleLogo,
@@ -5280,32 +5171,17 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-DOWN', (event) => {
             // check if player has entered main menu yet.
-            if (mainMenuScene.pressedSpace && this.menuState == 0) {
+            if (mainMenuScene.pressedSpace && this.menuState === 0) {
                 cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, this.menuElements.length);
-                selected = this.menuElements[cursorIndex];
+                this.selected = this.menuElements[cursorIndex];
                 mainMenuScene.changeMenuSprite(cursorIndex);
                 // reiterate and set the unselected options' colors to the correct value
-                for (var i = 0; i < this.menuElements.length; i++) {
-                    var element = this.menuElements[i];
-                    if (i === 2 || i === 3 || i === 5) {
-                        element.node.style.color = menuOptionColors.locked; 
-                    }
-                    else{
-                        element.node.style.color = menuOptionColors.unlocked
-                    }
-                }
-                // apply the correct color for the selected node
-                if (cursorIndex === 2 ||cursorIndex === 3 || cursorIndex === 5) {
-                    selected.node.style.color = menuOptionColors.locked;
-                }
-                else{
-                    selected.node.style.color = menuOptionColors.selectedOption;
-                }
+                this.updateMenu(cursorIndex,subCursorIndex);
 
                 // change exit button to red sprite
                 if (cursorIndex === 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
-                    menuSelector.y = selected.y + GRID * 2.25
+                    menuSelector.y = this.selected.y + GRID * 2.25
                     mainMenuScene.exitButton.setFrame(1);
 
                     this.tweens.add({
@@ -5316,7 +5192,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                 } else { 
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
-                    menuSelector.y = selected.y + 7
+                    menuSelector.y = this.selected.y + 7
                     mainMenuScene.exitButton.setFrame(0);
                 }
                 // move background on option change
@@ -5324,27 +5200,11 @@ class MainMenuScene extends Phaser.Scene {
             }
             else if (this.menuState === 1){
                 subCursorIndex = Phaser.Math.Wrap(subCursorIndex + 1, 0, this.subMenuElements.length);
-                subSelected = this.subMenuElements[subCursorIndex];
-                menuSelector.y = subSelected.y + 7
+                this.subSelected = this.subMenuElements[subCursorIndex];
+                menuSelector.y = this.subSelected.y + 7
                 mainMenuScene.changeMenuSprite(subCursorIndex);
+                this.updateMenu(cursorIndex,subCursorIndex);
 
-                // reiterate and set the unselected options' colors to the correct value
-                for (var i = 0; i < this.subMenuElements.length; i++) {
-                    var element = this.subMenuElements[i];
-                    if (i === 3 || i === 5) {
-                        element.node.style.color = menuOptionColors.locked; 
-                    }
-                    else{
-                        element.node.style.color = menuOptionColors.unlocked
-                    }
-                }
-                // apply the correct color for the selected node
-                if (subCursorIndex == 3 || subCursorIndex == 5) {
-                    subSelected.node.style.color = menuOptionColors.locked;
-                }
-                else{
-                    subSelected.node.style.color = menuOptionColors.selectedOption;
-                }
 
                 // move background on option change
                 ourPersist.bgCoords.y += 5;
@@ -5355,30 +5215,15 @@ class MainMenuScene extends Phaser.Scene {
             // check if player has entered main menu yet.
             if (mainMenuScene.pressedSpace && this.menuState == 0) {
                 cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, this.menuElements.length);
-                selected = this.menuElements[cursorIndex];
+                this.selected = this.menuElements[cursorIndex];
                 mainMenuScene.changeMenuSprite(cursorIndex);
                 // reiterate and set the unselected options' colors to the correct value
-                for (var i = 0; i < this.menuElements.length; i++) {
-                    var element = this.menuElements[i];
-                    if (i === 2 || i === 3 || i === 5) {
-                        element.node.style.color = menuOptionColors.locked; 
-                    }
-                    else{
-                        element.node.style.color = menuOptionColors.unlocked
-                    }
-                }
-                // apply the correct color for the selected node
-                if (cursorIndex === 2 ||cursorIndex === 3 || cursorIndex === 5) {
-                    selected.node.style.color = menuOptionColors.locked;
-                }
-                else{
-                    selected.node.style.color = menuOptionColors.selectedOption;
-                }
+                this.updateMenu(cursorIndex,subCursorIndex);
 
                 // change exit button to red sprite
                 if (cursorIndex === 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
-                    menuSelector.y = selected.y + GRID * 2.25
+                    menuSelector.y = this.selected.y + GRID * 2.25
                     mainMenuScene.exitButton.setFrame(1);
 
                     this.tweens.add({
@@ -5389,7 +5234,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                 } else { 
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
-                    menuSelector.y = selected.y + 7
+                    menuSelector.y = this.selected.y + 7
                     mainMenuScene.exitButton.setFrame(0);
                 }
                 // move background on option change
@@ -5397,35 +5242,125 @@ class MainMenuScene extends Phaser.Scene {
             }
             else if (this.menuState == 1){
                 subCursorIndex = Phaser.Math.Wrap(subCursorIndex - 1, 0, this.subMenuElements.length);
-                subSelected = this.subMenuElements[subCursorIndex];
-                menuSelector.y = subSelected.y + 7
+                this.subSelected = this.subMenuElements[subCursorIndex];
+                menuSelector.y = this.subSelected.y + 7
                 mainMenuScene.changeMenuSprite(subCursorIndex);
-
-                // reiterate and set the unselected options' colors to the correct value
-                for (var i = 0; i < this.subMenuElements.length; i++) {
-                    var element = this.subMenuElements[i];
-                    if (i === 3 || i === 5) {
-                        element.node.style.color = menuOptionColors.locked; 
-                    }
-                    else{
-                        element.node.style.color = menuOptionColors.unlocked
-                    }
-                }
-                // apply the correct color for the selected node
-                if (subCursorIndex == 3 || subCursorIndex == 5) {
-                    subSelected.node.style.color = menuOptionColors.locked;
-                }
-                else{
-                    subSelected.node.style.color = menuOptionColors.selectedOption;
-                }
+                this.updateMenu(cursorIndex,subCursorIndex);
 
                 // move background on option change
                 ourPersist.bgCoords.y -= 5;
             }
         }, [], this);
 
-
         
+        this.input.keyboard.on('keydown-SPACE', function() {
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                this.scene.get("SpaceBoyScene").mapProgressPanelText.setAlpha(1);
+                if (!mainMenuScene.pressedSpace) {
+
+                    if (!this.scene.get("MusicPlayerScene").hasStarted) {
+                        this.scene.get("MusicPlayerScene").startMusic();
+                    } 
+    
+                    mainMenuScene.pressToPlayTween.stop();
+                    mainMenuScene.pressToPlay.setAlpha(0)
+                    mainMenuScene.pressedSpace = true;
+                    if (this.startingAnimation === "default") {
+                        titleTween.resume();
+                        menuFadeTween.resume();
+                    }
+                    this.scene.get("MusicPlayerScene").showTrackID();   
+                }
+                else{
+                    // call the main menu option
+                    if (this.menuState == 0 && !this.inMotion) {
+                        menuOptions.get(menuList[cursorIndex]).call(this);
+                        //this.selected = this.menuElements[cursorIndex];
+                        //this.updateMenu(cursorIndex,subCursorIndex,this.menuState);
+                    }
+                    // call the sub menu option       
+                    else if (this.menuState == 1 && !this.inMotion) {
+                        //this.updateMenu(cursorIndex,subCursorIndex);
+                        subMenuOptions.get(subMenuList[subCursorIndex]).call(this);       
+                    }                
+                }
+            }
+        }, this);
+
+        // panels (colored boxes behind text options)
+
+        let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
+        let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
+
+        this.practiceButton = this.add.nineslice(_hOffset,_vOffset,
+                'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,
+            this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2,
+                'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,
+            this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
+                'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,
+            this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6,
+                'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,
+            this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
+                'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,
+            this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
+                'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,
+            this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12,
+                'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,
+            this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
+                'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,
+            this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
+
+        // sub menu option buttons
+        this.shopButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
+            'uiMenu', 'gold', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.shopIcon = this.add.sprite(this.shopButton.x + 2,
+            this.shopButton.y,"menuIcons", 17 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.customizeButton = this.add.nineslice(_hOffset,_vOffset + GRID * 16,
+            'uiMenu', 'teal', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.customizeIcon = this.add.sprite(this.customizeButton.x + 2,
+            this.customizeButton.y,"menuIcons", 18 ).setOrigin(0,0.5).setAlpha(0);
+
+        this.minigameButton = this.add.nineslice(_hOffset,_vOffset + GRID * 18,
+            'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
+        this.minigameIcon = this.add.sprite(this.minigameButton.x + 2,
+            this.minigameButton.y,"menuIcons", 19 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.statsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 20,
+            'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.statsIcon = this.add.sprite(this.statsButton.x + 2,
+            this.statsButton.y,"menuIcons", 20 ).setOrigin(0,0.5).setAlpha(0);
+        
+        this.awardButton = this.add.nineslice(_hOffset,_vOffset + GRID * 22,
+            'uiMenu', 'pink', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0).setTint('0x8a8a8a');
+        this.awardIcon = this.add.sprite(this.awardButton.x + 2,
+            this.awardButton.y,"menuIcons", 21 ).setOrigin(0,0.5).setAlpha(0);
+
         
         var menuFadeTween = this.tweens.add({
             targets: [this.practiceButton,this.practiceIcon,this.adventureButton,this.adventureIcon,
@@ -5446,6 +5381,8 @@ class MainMenuScene extends Phaser.Scene {
             delay: fadeInDuration,
             ease: 'linear',
         });
+
+
         if (this.startingAnimation === "default") {
             titleTween.pause();
             menuFadeTween.pause();
@@ -5470,40 +5407,6 @@ class MainMenuScene extends Phaser.Scene {
                 paused: true
             });
         }
-
-        
-
-
-        this.input.keyboard.on('keydown-SPACE', function() {
-            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
-                this.scene.get("SpaceBoyScene").mapProgressPanelText.setAlpha(1);
-                if (!mainMenuScene.pressedSpace) {
-
-                    if (!this.scene.get("MusicPlayerScene").hasStarted) {
-                        this.scene.get("MusicPlayerScene").startMusic();
-                    } 
-    
-                    mainMenuScene.pressToPlayTween.stop();
-                    mainMenuScene.pressToPlay.setAlpha(0)
-                    mainMenuScene.pressedSpace = true;
-                    if (this.startingAnimation === "default") {
-                        titleTween.resume();
-                        menuFadeTween.resume();
-                    }
-                    this.scene.get("MusicPlayerScene").showTrackID();   
-                }
-                else{
-                    // call the menu option if a sub menu isn't expanded
-                    if (this.menuState == 0 && !this.inMotion) {
-                        menuOptions.get(menuList[cursorIndex]).call(this);
-                    }
-                    // call the sub menu option       
-                    else if (this.menuState == 1 && !this.inMotion) {
-                        subMenuOptions.get(subMenuList[subCursorIndex]).call(this); 
-                    }                
-                }
-            }
-        }, this);
 
     }
     
@@ -5532,6 +5435,51 @@ class MainMenuScene extends Phaser.Scene {
     // Function to convert hex color to RGB
     hexToInt(hex) {
         return parseInt(hex.slice(1), 16);
+    }
+
+    updateMenu(cursorIndex,subCursorIndex){
+        
+        if (this.menuState === 0) {
+            console.log("updating.......1111")
+            for (var i = 0; i < this.menuElements.length; i++) {
+                var element = this.menuElements[i];
+                if (i === 2 || i === 3 || i === 5) {
+                    element.node.style.color = this.menuoptioncolors.locked; 
+                }
+                else{
+                    element.node.style.color = this.menuoptioncolors.unlocked
+                }
+            }
+            // apply the correct color for the selected node
+            if (cursorIndex === 2 ||cursorIndex === 3 || cursorIndex === 5) {
+                this.selected.node.style.color = this.menuoptioncolors.locked;
+            }
+            else{
+                this.selected.node.style.color = this.menuoptioncolors.selectedOption;
+            }
+    
+        }
+        else if (this.menuState === 1){
+            console.log("updating.......2222")
+            for (var i = 0; i < this.subMenuElements.length; i++) {
+                var element = this.subMenuElements[i];
+                if (i === 3 || i === 5) {
+                    element.node.style.color = this.menuoptioncolors.locked; 
+                }
+                else{
+                    element.node.style.color = this.menuoptioncolors.unlocked
+                }
+            }
+            // apply the correct color for the selected node
+            if (subCursorIndex == 3 || subCursorIndex == 5) {
+                this.subSelected.node.style.color = this.menuoptioncolors.locked;
+            }
+            else{
+                this.subSelected.node.style.color = this.menuoptioncolors.selectedOption;
+            }
+        }
+        
+        
     }
 
     // collapse main menu, and bring extras tab to focus
@@ -5621,10 +5569,9 @@ class MainMenuScene extends Phaser.Scene {
     }
 
     // brings back main menu and collapses previous menu
-    expandMenu(){
+    expandMenu(cursorIndex){
         this.menuState = 0
         this.inMotion = true;
-
 
         this.tweens.add({
             targets: this.cameras.main,
