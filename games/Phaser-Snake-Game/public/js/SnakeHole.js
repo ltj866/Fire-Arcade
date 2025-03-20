@@ -4737,71 +4737,74 @@ class MainMenuScene extends Phaser.Scene {
             ['gauntlet', function () {
                 const ourPersist = this.scene.get("PersistScene");
                 const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-
+                console.log(this.menuElements[cursorIndex].isLocked)
                 if (this.menuElements[cursorIndex].isLocked) {
                     console.log("IS LOCKED")
                     this.menuBonk(menuSelector);
                 }
-                else 
-                {
-                var generateMenu = [
-                    ["Tab to Menu", function () {
-                        this.scene.wake('MainMenuScene');
-                        this.scene.stop("QuickMenuScene");
-                    }],
-                ];
+                else {
+                    console.log("not LOCKED")
+                    {
+                    var generateMenu = [
+                        ["Tab to Menu", function () {
+                            this.scene.wake('MainMenuScene');
+                            this.scene.stop("QuickMenuScene");
+                        }],
+                    ];
 
-                GAUNTLET_CODES.forEach( (val, key, map) => {
-                    
-                    var menuKey;
-                    var menuVal;
-                    
-                    if (val.checkUnlock.call()) {
-                        menuKey = key;
-                        menuVal = function () {
-                            ourPersist.mode = MODES.GAUNTLET;
-                            ourPersist.coins = val.startingCoins;
-                            ourPersist.gauntletKey = key;
-                            ourPersist.gauntlet = val.stages.split("|");
-                            ourPersist.gauntletSize = ourPersist.gauntlet.length;
-                            ourSpaceBoy.mapProgressPanelText.setText(key);
-
-                            this.scene.get("InputScene").scene.restart();
-
-                            this.scene.get("PersistScene").stageHistory = [];
-
-                            // Launch Game Here
-                            var startID = ourPersist.gauntlet.shift();
-                            //debugger
-                            this.scene.launch("GameScene", {
-                                stage: STAGES.get(startID),
-                                score: 0,
-                                startupAnim: true,
-                                mode: ourPersist.mode
-                            });
-
-                            mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
-                            mainMenuScene.scene.stop();
-                            this.scene.stop();
-                        }
-                        generateMenu.push([menuKey, menuVal]);
+                    GAUNTLET_CODES.forEach( (val, key, map) => {
                         
-                    } 
+                        var menuKey;
+                        var menuVal;
+                        
+                        if (val.checkUnlock.call()) {
+                            menuKey = key;
+                            menuVal = function () {
+                                ourPersist.mode = MODES.GAUNTLET;
+                                ourPersist.coins = val.startingCoins;
+                                ourPersist.gauntletKey = key;
+                                ourPersist.gauntlet = val.stages.split("|");
+                                ourPersist.gauntletSize = ourPersist.gauntlet.length;
+                                ourSpaceBoy.mapProgressPanelText.setText(key);
 
-                })
+                                this.scene.get("InputScene").scene.restart();
 
-                var qMenu = new Map(generateMenu);
+                                this.scene.get("PersistScene").stageHistory = [];
 
-                mainMenuScene.scene.launch("QuickMenuScene", {
-                    menuOptions: qMenu, 
-                    textPrompt: "Gauntlet Mode",
-                    fromScene: mainMenuScene,
-                    cursorIndex: 1,
-                    sideScenes: false
-                });
-                mainMenuScene.scene.bringToTop("QuickMenuScene");
+                                // Launch Game Here
+                                var startID = ourPersist.gauntlet.shift();
+                                //debugger
+                                this.scene.launch("GameScene", {
+                                    stage: STAGES.get(startID),
+                                    score: 0,
+                                    startupAnim: true,
+                                    mode: ourPersist.mode
+                                });
 
-                mainMenuScene.scene.sleep('MainMenuScene');
+                                mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+                                mainMenuScene.scene.stop();
+                                this.scene.stop();
+                            }
+                            generateMenu.push([menuKey, menuVal]);
+                            
+                        } 
+
+                    })
+
+
+                    var qMenu = new Map(generateMenu);
+
+                    mainMenuScene.scene.launch("QuickMenuScene", {
+                        menuOptions: qMenu, 
+                        textPrompt: "Gauntlet Mode",
+                        fromScene: mainMenuScene,
+                        cursorIndex: 1,
+                        sideScenes: false
+                    });
+                    mainMenuScene.scene.bringToTop("QuickMenuScene");
+
+                    mainMenuScene.scene.sleep('MainMenuScene');
+                }
             }
                 return true;
             }],
@@ -4907,6 +4910,24 @@ class MainMenuScene extends Phaser.Scene {
         var textStart = 152;
         var spacing = 24;
 
+        // check if Gauntlet Mode can be played
+        const targetUUID = "78dc0653-c6d4-4296-88c3-24f7f8415a68"; // UUID for level 1-4
+        this.gauntletPlayable = false;
+
+        var _lsTotal=0,_xLen,_x;for (_x in localStorage) {
+            if (!localStorage.hasOwnProperty(_x)) {
+                continue;
+            }
+            const _xLen = (localStorage[_x].length + _x.length) * 2;
+            _lsTotal += _xLen;
+    
+            // Check if the target UUID is found
+            if (_x.includes(targetUUID)) {
+                this.gauntletPlayable = true;
+                break; // Exit loop early since we found the UUID
+            }
+        }
+
         this.menuoptioncolors = {
             locked: 'darkgrey',
             unlocked: '#181818',
@@ -4915,11 +4936,15 @@ class MainMenuScene extends Phaser.Scene {
 
         // list where the text elements are pushed to and handled
         this.menuElements = [];
-
-        // main menu text and properties including isLocked
         for (let index = 0; index < menuList.length; index++) {
-            // currently indexing isLocked, but post demo can check elsewhere
-            let isLocked = (index === 2); // Locked options
+            let isLocked = false;
+
+            if (this.gauntletPlayable) {
+                isLocked = false;
+            } else {
+                isLocked = (index === 2);
+            }
+        
             let isExitButton = (index === 5); // Special case for the exit button
         
             // create the text element
@@ -4939,10 +4964,10 @@ class MainMenuScene extends Phaser.Scene {
             if (isExitButton) {
                 textElement.setScrollFactor(0);
             }
-
+        
             // assign if isLocked
             textElement.isLocked = isLocked; // Indicate if the option is locked
-            //textElement.menuKey = menuList[index]; // not sure if needed
+            console.log(index,"locked = ",textElement.isLocked);
         
             this.menuElements.push(textElement);
         }
@@ -5059,20 +5084,20 @@ class MainMenuScene extends Phaser.Scene {
 
         //menu arrows
 
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuR.play('arrowMenuIdle').setAlpha(0).setScrollFactor(0);
+        this.arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        this.arrowMenuR.play('arrowMenuIdle').setAlpha(0).setScrollFactor(0);
 
-        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0).setScrollFactor(0);
+        this.arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        this.arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0).setScrollFactor(0);
 
 
-        var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
+        this.codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
              SCREEN_HEIGHT/2 - GRID * 1 - 6,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5).setScrollFactor(0);
-        codexLabel.angle = 90;
+        this.codexLabel.angle = 90;
 
-        var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
+        this.stageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
              SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5).setScrollFactor(0);
-            UI_StageTrackerLabel.angle = 90;
+             this.stageTrackerLabel.angle = 90;
 
         this.wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9.5,
             SCREEN_HEIGHT/2 + GRID * 12,'wishlistButton1',0)
@@ -5168,7 +5193,7 @@ class MainMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-LEFT', e => {
-            if (this.pressedSpace ) {
+            if (this.pressedSpace && this.menuState === 0) {
                 this.hideExitButton(!this.isSmooth);
                 this.tweens.add({
                     targets: this.cameras.main,
@@ -5190,7 +5215,7 @@ class MainMenuScene extends Phaser.Scene {
             }
         }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
-            if (this.pressedSpace) {
+            if (this.pressedSpace && this.menuState === 0) {
 
                 this.hideExitButton(!this.isSmooth);
 
@@ -5419,11 +5444,11 @@ class MainMenuScene extends Phaser.Scene {
                 this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
-                arrowMenuL,arrowMenuR,
+                this.arrowMenuL,this.arrowMenuR,
                 ...this.menuElements,
                 this.exitButton,
                 this.graphics,
-                codexLabel,UI_StageTrackerLabel,
+                this.codexLabel,this.stageTrackerLabel,
                 this.wishlistButton1
             ],
             alpha: 1,
@@ -5506,14 +5531,52 @@ class MainMenuScene extends Phaser.Scene {
         }
     }
 
+    sideMenuPrompts(state){
+        if (state === 'hide') {
+            this.tweens.add({
+                targets: [this.codexLabel, this.arrowMenuL],
+                x: obj => obj.x - 20,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            this.tweens.add({
+                targets: [this.stageTrackerLabel, this.arrowMenuR],
+                x: obj => obj.x + 20,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+        }
+        else if (state === 'show'){
+            this.tweens.add({
+                targets: [this.codexLabel, this.arrowMenuL],
+                x: obj => obj.x + 20,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            this.tweens.add({
+                targets: [this.stageTrackerLabel, this.arrowMenuR],
+                x: obj => obj.x - 20,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+        }
+        else{
+        }
+    }
+
     updateMenu(cursorIndex,subCursorIndex){
-        
+        // for main menu
         if (this.menuState === 0) {
-            console.log("updating.......1111")
+            //reset all menu option colors to their unselected state
             for (var i = 0; i < this.menuElements.length; i++) {
                 var element = this.menuElements[i];
                 if (i === 2) {
-                    element.node.style.color = this.menuoptioncolors.locked; 
+                    if (!this.gauntletPlayable) {
+                        element.node.style.color = this.menuoptioncolors.locked; 
+                    }
+                    else{
+                        element.node.style.color = this.menuoptioncolors.unlocked
+                    }   
                 }
                 else{
                     element.node.style.color = this.menuoptioncolors.unlocked
@@ -5521,15 +5584,20 @@ class MainMenuScene extends Phaser.Scene {
             }
             // apply the correct color for the selected node
             if (cursorIndex === 2) {
-                this.selected.node.style.color = this.menuoptioncolors.locked;
+                if (!this.gauntletPlayable) {
+                    this.selected.node.style.color = this.menuoptioncolors.locked;
+                }
+                else{
+                    this.selected.node.style.color = this.menuoptioncolors.selectedOption;
+                }       
             }
             else{
                 this.selected.node.style.color = this.menuoptioncolors.selectedOption;
             }
     
         }
+        // for sub menu
         else if (this.menuState === 1){
-            console.log("updating.......2222")
             for (var i = 0; i < this.subMenuElements.length; i++) {
                 var element = this.subMenuElements[i];
                 //if (i ===  || i === 5) {
@@ -5555,6 +5623,7 @@ class MainMenuScene extends Phaser.Scene {
     // could be made more dynamic by passing arguments for other menus in the future
     collapseMenu(menuOption) {
         this.menuState = 1;
+        this.sideMenuPrompts('hide');
         const ourMenuScene = this.scene.get('MainMenuScene');
         this.inMotion = true;
 
@@ -5640,6 +5709,7 @@ class MainMenuScene extends Phaser.Scene {
     // brings back main menu and collapses previous menu
     expandMenu(cursorIndex){
         this.menuState = 0
+        this.sideMenuPrompts('show');
         this.inMotion = true;
 
         this.tweens.add({
