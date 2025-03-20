@@ -4738,6 +4738,12 @@ class MainMenuScene extends Phaser.Scene {
                 const ourPersist = this.scene.get("PersistScene");
                 const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
+                if (this.menuElements[cursorIndex].isLocked) {
+                    console.log("IS LOCKED")
+                    this.menuBonk(menuSelector);
+                }
+                else 
+                {
                 var generateMenu = [
                     ["Tab to Menu", function () {
                         this.scene.wake('MainMenuScene');
@@ -4778,13 +4784,9 @@ class MainMenuScene extends Phaser.Scene {
                             mainMenuScene.scene.stop();
                             this.scene.stop();
                         }
-                        
                         generateMenu.push([menuKey, menuVal]);
                         
-
-                    } else {
-                    }
-                    
+                    } 
 
                 })
 
@@ -4800,7 +4802,7 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.scene.bringToTop("QuickMenuScene");
 
                 mainMenuScene.scene.sleep('MainMenuScene');
-
+            }
                 return true;
             }],
             //['endless', function () {
@@ -4862,7 +4864,7 @@ class MainMenuScene extends Phaser.Scene {
                         ease: 'Sine.Out',
                     });
 
-                    // Fade out all main menu elements except 'extras'
+                    // Fade out all main menu elements except extras
                     this.tweens.add({
                         targets: [
                             ...this.menuElements,
@@ -4949,11 +4951,11 @@ class MainMenuScene extends Phaser.Scene {
         // sub menu selectable options with their corresponding functions
         var subMenuOptions = new Map([
             ['Back', function () {
-                this.extrasIcon.setFrame(14);
-                this.descriptionDom = 'Return to main menu.';
+                this.descriptionDom = 'Spend coins, customize, play bonus games, and more!.';
                 this.descriptionText.setText(this.descriptionDom);
                 this.expandMenu(cursorIndex);
                 this.changeMenuSprite(6);
+                this.extrasIcon.setFrame(14);
                 this.tweens.add({
                     targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
                         this.minigameButton, this.statsButton, this.awardButton,
@@ -4966,7 +4968,7 @@ class MainMenuScene extends Phaser.Scene {
                 });
                 this.tweens.add({
                     targets: this.descriptionPanel,
-                    height: 32.25,
+                    height: 45,
                     duration: 100,
                     ease: 'Sine.Out',
                 });
@@ -5101,7 +5103,6 @@ class MainMenuScene extends Phaser.Scene {
                 subCursorIndex = 0;
                 this.subSelected = this.subMenuElements[0];
 
-                this.extrasIcon.setFrame(14);
                 this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';
                 this.descriptionText.setText(this.descriptionDom);
                 
@@ -5112,7 +5113,8 @@ class MainMenuScene extends Phaser.Scene {
                 
 
                 menuSelector.y = this.subSelected.y + 7
-                mainMenuScene.changeMenuSprite(6);
+                this.changeMenuSprite(6);
+                this.extrasIcon.setFrame(14);
 
                 
 
@@ -5690,7 +5692,7 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
         });
 
-        // Fade in all main menu elements except 'extras'
+        // Fade in all main menu elements except extras
         this.tweens.add({
             targets: [
                 ...this.menuElements,
@@ -5769,8 +5771,8 @@ class MainMenuScene extends Phaser.Scene {
         if (this.menuState == 0) {
             this.extrasIcon.setFrame(6);
         }
-        else if (this.menuState == 1) {
-            this.extrasIcon.setFrame(16);
+        if (this.menuState == 1) {
+            this.extrasIcon.setFrame(14);
         }
         this.optionsIcon.setFrame(7);
         // sub menu option icons
@@ -5795,7 +5797,7 @@ class MainMenuScene extends Phaser.Scene {
 
         if (this.menuState === 0) {// if we are in the main menu
             switch (cursorIndex) {
-                case 0:
+                case 0:// Practice
                     this.descriptionDom = 'Build your skills and replay any level you have gotten to previously.';
                     this.descriptionText.setText(this.descriptionDom)
                     this.practiceIcon.setFrame(8)
@@ -5820,7 +5822,7 @@ class MainMenuScene extends Phaser.Scene {
                     });
                     
                     break;
-                case 1:
+                case 1:// Adventure
                     this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.';
                     this.descriptionText.setText(this.descriptionDom)
                     this.adventureIcon.setFrame(9)
@@ -5892,10 +5894,10 @@ class MainMenuScene extends Phaser.Scene {
                         ease: 'Sine.Out',
                     });
                     break;*/
-                case 2:
+                case 2:// Gauntlet
                     this.descriptionDom = 'Beat adventure mode to unlock.';
-                    this.descriptionText.setText(this.descriptionDom)
-                    this.gauntletIcon.setFrame(12)
+                    this.descriptionText.setText(this.descriptionDom);
+                    this.gauntletIcon.setFrame(12);
                     this.tweens.add({
                         targets: this.gauntletButton,
                         width: 94,
@@ -5937,10 +5939,10 @@ class MainMenuScene extends Phaser.Scene {
                         ease: 'Sine.Out',
                     });*/
                     break;
-                case 3: // EXTRAS
+                case 3: // Extras
                     this.descriptionDom = 'Spend coins, customize, play bonus games, and more!';;
-                    this.descriptionText.setText(this.descriptionDom)
-                    //this.endlessIcon.setFrame(13)
+                    this.descriptionText.setText(this.descriptionDom);
+                    this.extrasIcon.setFrame(14);
                     this.tweens.add({
                         targets: this.extrasButton,
                         width: 76,
@@ -5961,10 +5963,10 @@ class MainMenuScene extends Phaser.Scene {
                         ease: 'Sine.Out',
                     });
                     break;
-                case 4:
+                case 4:// Options
                     this.descriptionDom = 'Configure game settings.';
                     this.descriptionText.setText(this.descriptionDom)
-                    this.extrasIcon.setFrame(14)
+                    this.optionsIcon.setFrame(15);
                     this.tweens.add({
                         targets: this.optionsButton,
                         width: 82,
@@ -5985,7 +5987,7 @@ class MainMenuScene extends Phaser.Scene {
                         ease: 'Sine.Out',
                     });
                     break;
-                case 5:
+                case 5:// Exit
                     this.descriptionDom = 'Quit to desktop.';
                     this.descriptionText.setText(this.descriptionDom) 
                     this.tweens.add({
