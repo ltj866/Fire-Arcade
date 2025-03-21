@@ -3974,7 +3974,7 @@ class ExtractTracker extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-LEFT', e => {
             const ourMenuScene = this.scene.get('MainMenuScene');
-            ourMenuScene.showExitButton(!ourMenuScene.isSmooth);
+            ourMenuScene.showExitButton('instant');
             this.tweens.add({
                 targets: this.cameras.main,
                 x: { from: 0, to: 160 },
@@ -4463,7 +4463,7 @@ class StageCodex extends Phaser.Scene {
             // Default
             this.input.keyboard.on('keydown-RIGHT', e => {
                 const ourMenuScene = this.scene.get('MainMenuScene');
-                ourMenuScene.showExitButton(!ourMenuScene.isSmooth);
+                ourMenuScene.showExitButton('instant');
                 console.log("Exiting!");
 
                 this.tweens.add({
@@ -4565,7 +4565,6 @@ class MainMenuScene extends Phaser.Scene {
         this.inMotion = false;
     }
     create(props) {
-        
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
         const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
@@ -4581,13 +4580,11 @@ class MainMenuScene extends Phaser.Scene {
         var { portalFrame = 0 } = props;
 
         // for exit button transition speed -- false is instant
-        this.isSmooth = true;
+        //this.isSmooth = true;
 
-        // Snake cursor / selector
+        // Snake cursor/selector
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5,
             SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0);
-        
-
 
         // title logo
         this.titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,
@@ -4603,9 +4600,9 @@ class MainMenuScene extends Phaser.Scene {
         titleContainer.add(this.titleLogo);
         titleContainer.add(this.titlePortal);
 
-        // when starting from powering on
+        // when starting from power off state
         if (this.startingAnimation === "default") {
-            console.log('going straight to default')
+            //console.log('playing intro animations')
             this.pressedSpace = false;
 
             var titleTween = this.tweens.add({
@@ -4618,7 +4615,7 @@ class MainMenuScene extends Phaser.Scene {
         }
         // when returning to main menu and bypassing intro
         if (this.startingAnimation === "menuReturn") {
-            console.log('passing main menu skip')
+            //console.log('bypassing power-on intro');
             this.pressedSpace = true;
 
             titleContainer.y = -GRID * 6;
@@ -4683,8 +4680,6 @@ class MainMenuScene extends Phaser.Scene {
                 return true;
             }],
             ['adventure', function () {
-                // Check if played before here. Maybe check for world 0-1 level stage data?
-
                 this.scene.get("StartScene").UUID_MAP.size;
 
                 mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("ADVENTURE");
@@ -4696,7 +4691,6 @@ class MainMenuScene extends Phaser.Scene {
                         qMenu.set("Hardcore", function () {
                             const ourPersist = this.scene.get("PersistScene");
                             const mainMenuScene = this.scene.get("MainMenuScene");
-                            //const ourPersist = this.scene.get("PersistScene");
                             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
                             
                             ourPersist.mode = MODES.HARDCORE;
@@ -4737,13 +4731,13 @@ class MainMenuScene extends Phaser.Scene {
             ['gauntlet', function () {
                 const ourPersist = this.scene.get("PersistScene");
                 const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-                console.log(this.menuElements[cursorIndex].isLocked)
+                //console.log(this.menuElements[cursorIndex].isLocked)
                 if (this.menuElements[cursorIndex].isLocked) {
-                    console.log("IS LOCKED")
+                    //console.log("IS LOCKED")
                     this.menuBonk(menuSelector);
                 }
                 else {
-                    console.log("not LOCKED")
+                    //console.log("not LOCKED")
                     {
                     var generateMenu = [
                         ["Tab to Menu", function () {
@@ -4831,7 +4825,8 @@ class MainMenuScene extends Phaser.Scene {
                     subCursorIndex = 0; // Reset cursor position
                     this.subSelected = selectedElement; // Highlight the selected menu element
                     this.subMenuElements[0].node.style.color = "white";
-                    // Add tweens for visuals
+                    
+                    // Add tweens for logo hide
                     this.tweens.add({
                         targets: this.titleLogo,
                         alpha: 0,
@@ -4904,7 +4899,7 @@ class MainMenuScene extends Phaser.Scene {
             }]
         ]);
 
-        // make a list of each option
+        // make a list of each option derrived from menuOptions
         var menuList = [...menuOptions.keys()];
         var cursorIndex = 1;
         var textStart = 152;
@@ -4967,7 +4962,7 @@ class MainMenuScene extends Phaser.Scene {
         
             // assign if isLocked
             textElement.isLocked = isLocked; // Indicate if the option is locked
-            console.log(index,"locked = ",textElement.isLocked);
+            //console.log(index,"locked = ",textElement.isLocked); //this console log will print multiple times
         
             this.menuElements.push(textElement);
         }
@@ -5082,15 +5077,14 @@ class MainMenuScene extends Phaser.Scene {
             this.subMenuElements.push(subTextElement);
         }
 
-        //menu arrows
-
+        // menu arrows
         this.arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         this.arrowMenuR.play('arrowMenuIdle').setAlpha(0).setScrollFactor(0);
 
         this.arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         this.arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0).setScrollFactor(0);
 
-
+        // side menu labels
         this.codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
              SCREEN_HEIGHT/2 - GRID * 1 - 6,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5).setScrollFactor(0);
         this.codexLabel.angle = 90;
@@ -5098,7 +5092,8 @@ class MainMenuScene extends Phaser.Scene {
         this.stageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
              SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5).setScrollFactor(0);
              this.stageTrackerLabel.angle = 90;
-
+        
+        // wishlist button
         this.wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9.5,
             SCREEN_HEIGHT/2 + GRID * 12,'wishlistButton1',0)
             .setAlpha(0).setOrigin(0.5,0.5).setInteractive();
@@ -5113,7 +5108,7 @@ class MainMenuScene extends Phaser.Scene {
             this.wishlistButton1.play('wListOff');
         });
 
-
+        // establish selected node from menuElements
         this.selected = this.menuElements[cursorIndex];
         this.selected.node.style.color = "white";
 
@@ -5124,6 +5119,7 @@ class MainMenuScene extends Phaser.Scene {
 
         // used to back out of sub menus
         this.input.keyboard.on('keydown-TAB', e => {
+            // if we are in sub menu EXTRAS
             if (this.menuState === 1 && !this.inMotion) {
                 subCursorIndex = 0;
                 this.subSelected = this.subMenuElements[0];
@@ -5135,13 +5131,9 @@ class MainMenuScene extends Phaser.Scene {
                 this.updateMenu(cursorIndex,subCursorIndex);
                 this.expandMenu(cursorIndex);
 
-                
-
                 menuSelector.y = this.subSelected.y + 7
                 this.changeMenuSprite(6);
                 this.extrasIcon.setFrame(14);
-
-                
 
                 this.tweens.add({
                     targets: this.titleLogo,
@@ -5190,11 +5182,9 @@ class MainMenuScene extends Phaser.Scene {
             }
         })
 
-
-
         this.input.keyboard.on('keydown-LEFT', e => {
             if (this.pressedSpace && this.menuState === 0) {
-                this.hideExitButton(!this.isSmooth);
+                this.hideExitButton('instant');
                 this.tweens.add({
                     targets: this.cameras.main,
                     x: { from: 0, to: 160 },
@@ -5214,10 +5204,11 @@ class MainMenuScene extends Phaser.Scene {
                 });  
             }
         }, this);
+
         this.input.keyboard.on('keydown-RIGHT', e => {
             if (this.pressedSpace && this.menuState === 0) {
 
-                this.hideExitButton(!this.isSmooth);
+                this.hideExitButton('instant');
 
                 this.tweens.add({
                     targets: this.cameras.main,
@@ -5236,13 +5227,8 @@ class MainMenuScene extends Phaser.Scene {
                         }
                     }
                 });  
-                //this.cameras.main.scrollX += SCREEN_WIDTH
-                //ourMap.cameras.main.scrollX += SCREEN_WIDTH
-                //mainMenuScene.scene.wake('MainMenuScene');
             }
         });
-
-
 
         this.input.keyboard.on('keydown-DOWN', (event) => {
             // check if player has entered main menu yet.
@@ -5250,6 +5236,7 @@ class MainMenuScene extends Phaser.Scene {
                 cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, this.menuElements.length);
                 this.selected = this.menuElements[cursorIndex];
                 mainMenuScene.changeMenuSprite(cursorIndex);
+
                 // reiterate and set the unselected options' colors to the correct value
                 this.updateMenu(cursorIndex,subCursorIndex);
 
@@ -5265,9 +5252,9 @@ class MainMenuScene extends Phaser.Scene {
                         duration: 100,
                         ease: 'Sine.Out',
                     });
-                } else { 
-                    menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
-                    menuSelector.y = this.selected.y + 7
+                } else { //change exit button back to default grey
+                    menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5;
+                    menuSelector.y = this.selected.y + 7;
                     mainMenuScene.exitButton.setFrame(0);
                 }
                 // move background on option change
@@ -5280,7 +5267,6 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.changeMenuSprite(subCursorIndex);
                 this.updateMenu(cursorIndex,subCursorIndex);
 
-
                 // move background on option change
                 ourPersist.bgCoords.y += 5;
             }  
@@ -5292,7 +5278,7 @@ class MainMenuScene extends Phaser.Scene {
                 cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, this.menuElements.length);
                 this.selected = this.menuElements[cursorIndex];
                 mainMenuScene.changeMenuSprite(cursorIndex);
-                // reiterate and set the unselected options' colors to the correct value
+                // set the unselected options' colors to the correct value
                 this.updateMenu(cursorIndex,subCursorIndex);
 
                 // change exit button to red sprite
@@ -5307,7 +5293,7 @@ class MainMenuScene extends Phaser.Scene {
                         duration: 100,
                         ease: 'Sine.Out',
                     });
-                } else { 
+                } else { // exit button back to default grey
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = this.selected.y + 7
                     mainMenuScene.exitButton.setFrame(0);
@@ -5457,7 +5443,7 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'linear',
         });
 
-
+        // check if space boi needs to power on or not
         if (this.startingAnimation === "default") {
             titleTween.pause();
             menuFadeTween.pause();
@@ -5513,8 +5499,8 @@ class MainMenuScene extends Phaser.Scene {
     }
 
     menuBonk(menuSelector){
+        // check if menuSelector has a tween currently playing
         if (!menuSelector.isTweening) {
-            // check if menuSelector has a tween currently playing
             menuSelector.isTweening = true;
             const tween = this.tweens.add({
                 targets: menuSelector,
@@ -5524,7 +5510,6 @@ class MainMenuScene extends Phaser.Scene {
                 duration: 67,
                 ease: 'Sine.InOut',
                 onComplete: () => {
-                    // Reset the 'isTweening' flag when the tween finishes
                     menuSelector.isTweening = false;
                 }
             });
@@ -5561,6 +5546,7 @@ class MainMenuScene extends Phaser.Scene {
             });
         }
         else{
+            console.warn(`Unhandled state: ${state}`);
         }
     }
 
@@ -5678,7 +5664,7 @@ class MainMenuScene extends Phaser.Scene {
                 break;
         }
 
-        this.hideExitButton(this.isSmooth);
+        this.hideExitButton('smooth');
         
         // fade out main menu options to display sub menu
         const selectedElements = [
@@ -5737,7 +5723,7 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
         });
 
-        this.showExitButton(this.isSmooth);
+        this.showExitButton('smooth');
         
         const selectedElements = [
             this.menuElements[0],
@@ -5781,8 +5767,8 @@ class MainMenuScene extends Phaser.Scene {
         
         this.menuElements[5].setAlpha(0);
         
-        if (ease === true) {
-            console.log("smooth!!!")
+        if (ease === 'smooth') {
+            //console.log("smooth")
             this.tweens.add({
                 targets: this.exitButton,
                 y: this.exitButton.y - 2 * GRID,
@@ -5796,17 +5782,17 @@ class MainMenuScene extends Phaser.Scene {
                 ease: 'Sine.InOut',
             });
         }
-        else{
+        else if (ease === 'instant'){
             this.exitButton.setAlpha(0);
+            //console.log("instant")
         }  
-        console.log("instant")
     }
 
     showExitButton(ease){
         this.exitButton.setAlpha(1);
         
-        if (ease === true) {
-            console.log("smooth!!!")
+        if (ease === 'smooth') {
+            //console.log("smooth")
             this.tweens.add({
                 targets: this.exitButton,
                 y: this.exitButton.y + 2 * GRID,
@@ -5823,15 +5809,14 @@ class MainMenuScene extends Phaser.Scene {
                 }
             });
         }
-        else{
+        else if (ease === 'instant'){
             this.menuElements[5].setAlpha(1);
+            //console.log("instant")
         }
-        console.log("instant")
     }
 
     changeMenuSprite(cursorIndex){
-        
-        // main menu option icons
+        // update all menu sprites to their default state
         this.practiceIcon.setFrame(0);
         this.adventureIcon.setFrame(1);
         //this.extractionIcon.setFrame(2);
@@ -5865,6 +5850,7 @@ class MainMenuScene extends Phaser.Scene {
         let _xOffset = SCREEN_WIDTH/2;
         let _yOffset = SCREEN_HEIGHT/2+ 3;
 
+        // update individual menu option based on cursor index
         if (this.menuState === 0) {// if we are in the main menu
             switch (cursorIndex) {
                 case 0:// Practice
