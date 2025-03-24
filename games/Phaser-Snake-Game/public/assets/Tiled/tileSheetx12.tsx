@@ -41,6 +41,26 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="12">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="13">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="14">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="15">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="20">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
