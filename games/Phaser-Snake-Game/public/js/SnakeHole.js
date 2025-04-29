@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = true;
+const DEBUG_SKIP_INTRO = false;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -1193,9 +1193,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
         // Length/Goal UI
 
-        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 3 + 1, 'mainFontLarge', ``, 13)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
+        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 3 + 2, 'UI_goalLabel'
         ).setAlpha(0).setDepth(101).setOrigin(0,0).setScrollFactor(0);
         
         this.lengthGoalUIMaskSprite = this.add.sprite(X_OFFSET + GRID * 24,
@@ -1627,16 +1627,16 @@ class MusicPlayerScene extends Phaser.Scene {
 
         // speaker icon above slider
         this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 2.5 + 7, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
+            GRID * 7.5 + 8, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
         // volume slider icon
         this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75  + 6, 'uiVolumeSlider').setDepth(100).setAlpha(0);
+            GRID * 4.5  + 8, 'uiVolumeSlider').setDepth(100).setAlpha(0);
         // mask sprite
         this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75  + 6, 'uiVolumeSliderWidget').setDepth(101);
+            GRID * 4.5  + 8, 'uiVolumeSliderWidget').setDepth(101);
         // rendered sprite
         this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75  + 6, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
+            GRID * 4.5  + 8, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
 
         const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
         this.volumeSlider.setMask(volumeMask)
@@ -1694,15 +1694,15 @@ class MusicPlayerScene extends Phaser.Scene {
                     this.updatedVolume = this.soundManager.volume + volumeChange
                     
                     // y values for adjusting the volumeSliderWidget and Mask
-                    const minY = 46;
-                    const maxY = 105;
+                    const minY = this.volumeSlider.y - this.volumeSlider.height/2;
+                    const maxY = this.volumeSlider.y + this.volumeSlider.height/2;
                     const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
                     
                     // this console log is one event call behind hence this.updatedVolume
                     //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
 
                     // set volume icon based on volume level
-                    if (newY >= 46 && newY <= 105) {
+                    if (newY >= minY && newY <= maxY) {
                         this.volumeSliderWidgetMask.y = newY;
                         this.volumeSliderWidgetReal.y = newY;
 
@@ -1725,9 +1725,9 @@ class MusicPlayerScene extends Phaser.Scene {
         // Buttons
         var columnX = X_OFFSET + GRID * 36 + 1;
 
-        this.trackIDLabel = this.add.bitmapText(columnX - GRID * 4 -5, GRID * 2.75, 'mainFont', `TRACK`, 8
+        this.trackIDLabel = this.add.bitmapText(columnX - GRID * 4 -5, GRID * 7.75 + 1, 'mainFont', `TRACK`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
-        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 2.75, 'mainFont', `000`, 8
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75 + 1, 'mainFont', `000`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
@@ -4570,6 +4570,32 @@ class MainMenuScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
+
+        /* FOR CHECKING IF PLAYER NEEDS TO BE ALERTED -- UNFINISHED
+        // needs somewhere to reference/store if an alert has happened before
+        // menu option unlock state
+        const menuUnlockState = {
+            LOCKED: 0, // is locked
+            UNLOCKED_FIRST_TIME: 1, // just unlocked for the first time (should only happen once)
+            UNLOCKED_PERM: 2, // option has been unlocked and doesn't display anything new
+            UNLOCKED_NEW: 3, // for menus that need to show that something new updated but HAS been unlocked
+        };
+        
+        const easyGauntlet = GAUNTLET_CODES.get("Easy Gauntlet");
+        if (easyGauntlet) {
+            const unlockStatus = easyGauntlet.checkUnlock();
+            //console.log("Unlock status (returned rank):", unlockStatus);
+            if (unlockStatus === true) {
+                console.log("Unlocked");
+            } else {
+                console.log("Locked");
+            }
+        }
+        else{
+            console.log('Error: no gauntlet')
+        }
+        */
+
         // set a random color to the portal
         this.portalColors = PORTAL_COLORS.slice();
         let randomColor = this.portalColors[
@@ -6410,13 +6436,9 @@ class PersistScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(0x111111);
     this.add.image(SCREEN_WIDTH/2 - 1, GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
     
-
-   
-    
-    
     //waveshader     
     this.wavePipeline = game.renderer.pipelines.get('WaveShaderPipeline');
-    
+
     // #Backgrounds
     // for changing bg sprites
     this.bgTimer = 0;
@@ -6559,7 +6581,8 @@ class PersistScene extends Phaser.Scene {
     this.bgAsteroidsClose.add([...medAsteroidsClose, ...smallAsteroidsClose,
         compSpriteAsteroid1,compSpriteAsteroid2,compSpriteAsteroid3,compSpriteAsteroid4
     ]);
-
+    this.bgAsteroidsFar.setAlpha(0);
+    this.bgAsteroidsClose.setAlpha(0);
 
     // used by above functions to create an image and preserve its originalX/Y value
     function createImage(scene, x, y, key, frame) {
@@ -6650,6 +6673,21 @@ class PersistScene extends Phaser.Scene {
 
     this.graphics = this.add.graphics();
     }
+
+    pixelateTransition(){
+        // check here if entering new world theme
+        const fxCamera = this.cameras.main.postFX.addPixelate(-1);
+        this.add.tween({
+            targets: fxCamera,
+            duration: 1000,
+            amount: 5,
+            yoyo: true,
+            delay: 600,
+            onComplete: () => {
+                this.cameras.main.postFX.remove(fxCamera);
+            }
+        });
+    }
     
     closingTween(){
         this.tweens.addCounter({
@@ -6716,7 +6754,6 @@ class PersistScene extends Phaser.Scene {
         // Background Layer FAR    
         // Update the X and Y of each background container's child object.
         this.currentBackgroundFar.list.forEach(child => {
-            
             child.x = -((this.bgBack.tilePositionX  + this.spriteScrollX)) * 8+ child.originalX;
             var remainderX = (child.x % this.gameScreenRight);
             if (child.x > 0) {
@@ -6736,7 +6773,6 @@ class PersistScene extends Phaser.Scene {
                 child.y = remainderY;
             }
         });
-
         // Background Layer CLOSE    
         // Update the X and Y of each background container's child object.
         this.currentBackgroundClose.list.forEach(child => {
@@ -7027,6 +7063,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.bgAsteroidsClose.setAlpha(1);
                 ourPersist.currentBackgroundFar = ourPersist.bgAsteroidsFar;
                 ourPersist.currentBackgroundClose = ourPersist.bgAsteroidsClose;
+
                 break;
             case "3": // Move to Wrap levels
                 ourPersist.bgBack.setTexture('background03');
@@ -7980,6 +8017,8 @@ class GameScene extends Phaser.Scene {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
+            this.collapsePortals();
+
             // #region is unlocked?
 
             if (this.winned) {
@@ -8607,7 +8646,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        const portalLights = [];
+        this.portalLights = [];
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -8643,7 +8682,7 @@ class GameScene extends Phaser.Scene {
             
             this.portalLight = this.lights.addLight(portal.x +8, portal.y + 8, 128,
                   portalLightColor).setIntensity(1.5);
-            portalLights.push(this.portalLight);
+            this.portalLights.push(this.portalLight);
 
             var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
@@ -8707,7 +8746,7 @@ class GameScene extends Phaser.Scene {
 
         
         // Adjust intensities and radii
-        adjustLightIntensityAndRadius(portalLights);
+        adjustLightIntensityAndRadius(this.portalLights);
         
         
         
@@ -9565,6 +9604,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+
     // #region .Fanfare(
     victoryFanfare(){
         const ourInputScene = this.scene.get('InputScene');
@@ -9649,7 +9689,7 @@ class GameScene extends Phaser.Scene {
         else{
             //fanfare ending
             // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
-            this.snake.bodyVisualTween.pause();
+            this.snake.criticalStateTween.pause(); // stop flashing red if it exists
             console.log('should rainbow right now fr')
             this.slowMoTween = this.tweens.add({
                 targets: { value: 1 },
@@ -9981,11 +10021,11 @@ class GameScene extends Phaser.Scene {
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.activeArrows.add(this.startingArrowsAnimE );
         }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+        if (!this.map.hasTileAtWorldXY(_x - 1 * GRID, _y)) {
             this.activeArrows.add(this.startingArrowsAnimW );
         }
 
-        this.tweens.add({
+        this.arrowStartupTween = this.tweens.add({
             targets: [...this.activeArrows],
             alpha: 1,
             duration: 500,
@@ -10399,6 +10439,9 @@ class GameScene extends Phaser.Scene {
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
 
+        // drain boost bar so it's ready for next round
+        this.boostEnergy = Math.min(this.boostEnergy - 1000, 100);
+
         if (this.helpPanel) {
             this.tweens.add({
                 targets: [this.helpPanel,this.helpText],
@@ -10409,17 +10452,24 @@ class GameScene extends Phaser.Scene {
         }
 
 
-
         //dim UI
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
+            const ourPersist = this.scene.get('PersistScene');
             this.tweens.add({
                 targets: [ourGameScene.countDown,ourGameScene.coinUIText,
                     ourSpaceboy.shiftLight1,ourSpaceboy.shiftLight2,ourSpaceboy.shiftLight3],
                 alpha: { from: 1, to: 0},
                 ease: 'Sine.InOut',
                 duration: 500,
-                });
+            });
+            // check if the next stage is a new world
+            var nextStageRaw = this.nextStages[nextStageIndex];
+            console.log(nextStageRaw)
+            if (nextStageRaw === '2-1' || nextStageRaw === '3-1' || nextStageRaw === '4-1' ||
+                nextStageRaw === '5-1' || nextStageRaw === '8-1' || nextStageRaw === '9-2') {
+                ourPersist.pixelateTransition();
+            };
         });
 
         var wallSprites = [];
@@ -10474,7 +10524,7 @@ class GameScene extends Phaser.Scene {
         
         var allTheThings = [
             ...this.coinsArray,
-            ...this.portals,
+            //...this.portals,
             ...this.atoms,
             ...wallSprites,
         ];
@@ -10909,6 +10959,22 @@ class GameScene extends Phaser.Scene {
         
         this.lengthGoalUI
         this.lengthGoalUILabel
+    }
+
+    collapsePortals(){
+        this.portals.forEach(portal => {
+            portal.play('portalClose');
+            portal.portalHighlight.alpha = 0;
+            portal.alpha = 0;
+        })
+
+        this.portalLights.forEach(portalLight => {
+            this.lights.removeLight(portalLight);
+        });
+
+        this.portalParticles.forEach(portalParticles => { 
+            portalParticles.stop();
+        });
     }
 
     // #region Game Update
@@ -13784,6 +13850,7 @@ class InputScene extends Phaser.Scene {
             gameScene.scoreTimer.paused = false;
 
             gameScene.activeArrows.forEach ( arrow => {
+                gameScene.arrowStartupTween.stop();
                 arrow.setAlpha(0);
             });
         }
@@ -13897,6 +13964,12 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'portalForm',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
+        frameRate: 8,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'portalClose',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 9,8,7,6]}),
         frameRate: 8,
         repeat: 0
     });

@@ -24,7 +24,7 @@ var Snake = new Phaser.Class({
         this.previous = [];
 
         this.body.unshift(this.head);
-        this.bodyVisualTween = scene.tweens.addCounter({
+        this.criticalStateTween = scene.tweens.addCounter({
             from: 255,
             to: 0,
             yoyo: true,
@@ -42,7 +42,7 @@ var Snake = new Phaser.Class({
         });
 
         if (scene.scene.get("PersistScene").coins > 0) {
-            this.bodyVisualTween.pause();
+            this.criticalStateTween.pause();
         }
         
         //if (coins 0) {
@@ -395,14 +395,14 @@ var Snake = new Phaser.Class({
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
 
-        if (checkPortals.length > 1) {
+        if (checkPortals.length > 1 && !scene.winned) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
                 testPortal.x, testPortal.y);
 
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
-                this.closestPortal.flipX = true;
+                //this.closestPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: this.closestPortal.targetObject.portalHighlight,
@@ -432,7 +432,7 @@ var Snake = new Phaser.Class({
                 var oldPortal = this.closestPortal;
                 oldPortal.flipX = false;
 
-                testPortal.flipX = true;
+                //testPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: testPortal.targetObject.portalHighlight,
@@ -477,7 +477,7 @@ var Snake = new Phaser.Class({
         if (ourPersistScene.coins === 1) {
             debugger
             musicPlayer.nextSong(`track_175`);
-            this.bodyVisualTween.resume();
+            this.criticalStateTween.resume();
         }
 
         if (!scene.stopOnBonk) {
