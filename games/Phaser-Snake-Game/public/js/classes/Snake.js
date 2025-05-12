@@ -16,7 +16,6 @@ var Snake = new Phaser.Class({
         this.body = [];
 
         this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
-        
         //set snake invisible so it can appear from blackhole
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
@@ -395,7 +394,7 @@ var Snake = new Phaser.Class({
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
 
-        if (checkPortals.length > 1 && !scene.winned) {
+        if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
                 testPortal.x, testPortal.y);
