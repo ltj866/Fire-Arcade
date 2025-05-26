@@ -16,7 +16,6 @@ var Snake = new Phaser.Class({
         this.body = [];
 
         this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
-        
         //set snake invisible so it can appear from blackhole
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
@@ -24,7 +23,7 @@ var Snake = new Phaser.Class({
         this.previous = [];
 
         this.body.unshift(this.head);
-        this.bodyVisualTween = scene.tweens.addCounter({
+        this.criticalStateTween = scene.tweens.addCounter({
             from: 255,
             to: 0,
             yoyo: true,
@@ -42,7 +41,7 @@ var Snake = new Phaser.Class({
         });
 
         if (scene.scene.get("PersistScene").coins > 0) {
-            this.bodyVisualTween.pause();
+            this.criticalStateTween.pause();
         }
         
         //if (coins 0) {
@@ -391,25 +390,41 @@ var Snake = new Phaser.Class({
 
         }
 
-        // Update closet portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
+        // Update closest portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
-
-        if (checkPortals.length > 1) {
+        
+        if (scene.canPortal) {
+             scene.portals.forEach(portal => {
+                let dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
+                
+                var minFrameRate = 8; 
+                var maxFrameRate = 64;
+                
+                portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                    dist, minFrameRate, maxFrameRate);
+                portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
+                
+                portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(dist / maxFrameRate, 0, 1);
+            });
+        }
+       
+        if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
                 testPortal.x, testPortal.y);
 
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
-                this.closestPortal.flipX = true;
+                //this.closestPortal.flipX = true;
 
-                scene.tweens.add({
+                /*scene.tweens.add({
                     targets: this.closestPortal.targetObject.portalHighlight,
-                    alpha: {from: 1, to: 0},
+                    alpha: {from: this.closestPortal.targetObject.portalHighlight.alpha,
+                         to: 0},
                     duration: 98,
                     ease: 'Sine.Out',
-                    });
+                    });*/
             }
 
             checkPortals.forEach( portal => {
@@ -427,23 +442,27 @@ var Snake = new Phaser.Class({
 
             });
 
+
+
             if (this.closestPortal != testPortal) {
                 //console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 var oldPortal = this.closestPortal;
-                oldPortal.flipX = false;
+                //oldPortal.flipX = false;
 
-                testPortal.flipX = true;
+                //testPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: testPortal.targetObject.portalHighlight,
-                    alpha: {from: 0, to: 1},
+                    //alpha: {from: testPortal.targetObject.portalHighlight.alpha,
+                    //  to: 1},
                     duration: 98,
                     ease: 'Sine.Out',
                     onStart: () =>{
                         scene.tweens.add({
                             targets: oldPortal.targetObject.portalHighlight,
-                            alpha: {from: 1, to: 0},
-                            duration: 300,
+                            alpha: {from: oldPortal.targetObject.portalHighlight.alpha,
+                                 to: 0},
+                            duration: 200,
                             ease: 'Sine.Out',
                             });
                     }
@@ -451,6 +470,8 @@ var Snake = new Phaser.Class({
                 this.closestPortal = testPortal;
 
             }
+
+
             
         }
 
@@ -477,7 +498,7 @@ var Snake = new Phaser.Class({
         if (ourPersistScene.coins === 1) {
             debugger
             musicPlayer.nextSong(`track_175`);
-            this.bodyVisualTween.resume();
+            this.criticalStateTween.resume();
         }
 
         if (!scene.stopOnBonk) {
