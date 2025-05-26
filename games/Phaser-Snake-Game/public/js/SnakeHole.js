@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -927,7 +927,7 @@ class SpaceBoyScene extends Phaser.Scene {
         //.strokeRectShape(this.powerButtonZone).setDepth(102);
 
         
-        this.UI_PowerSwitch = this.add.sprite(GRID * 3.5 + 1, GRID * 6.5,
+        this.UI_PowerSwitch = this.add.sprite(GRID * 3.5, GRID * 6.5,
             'UI_PowerSwitch').setOrigin(0.0,0.0).setDepth(105);
 
         this.powerButtonZone.on('pointerover', () => {
@@ -2274,7 +2274,7 @@ class PlinkoMachineScene extends Phaser.Scene {
         const persist = this.scene.get("PersistScene");
     
         this.plinkoLightNum += 1;
-        console.log('PLINKOS',number,this.plinkoLightNum)
+        //console.log('PLINKOS',number,this.plinkoLightNum)
         // Array of all plinko lights
         const lights = [
             this.plinkoLightP, 
@@ -3175,7 +3175,7 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('PlinkoMachineScene');
         this.scene.launch('PinballDisplayScene');
         this.scene.launch('MusicPlayerScene');
-        this.scene.launch('GalaxyMapScene');
+        //this.scene.launch('GalaxyMapScene');
         this.scene.bringToTop('SpaceBoyScene');
         this.scene.bringToTop('MusicPlayerScene');
         
@@ -4582,7 +4582,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
         const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
-        const ourMap = this.scene.get('GalaxyMapScene');
+        //const ourMap = this.scene.get('GalaxyMapScene');
 
 
         /* FOR CHECKING IF PLAYER NEEDS TO BE ALERTED -- UNFINISHED
@@ -8430,6 +8430,7 @@ class GameScene extends Phaser.Scene {
 
         // #region Coin Layer Logic
         this.coinsArray = [];
+        this.coinDiff = 0;
 
         var coinVarient = ''
         if (this.varientIndex) {
@@ -9322,7 +9323,8 @@ class GameScene extends Phaser.Scene {
 
         // dot matrix
         
-        if (this.startupAnim){
+        // removing until it can be optimized
+        /*if (this.startupAnim){
 
             const hsv = Phaser.Display.Color.HSVColorWheel();
 
@@ -9357,16 +9359,16 @@ class GameScene extends Phaser.Scene {
                 [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
             ];
             this.getStaggerTween(0, group);
-        }
+        }*/
 
-        this.tweens.add( {
+        /*this.tweens.add( {
             targets: this.coinsArray,
             originY: [0.1875 - .0466,0.1875 + .0466],
             ease: 'sine.inout',
             duration: 500, //
             yoyo: true,
             repeat: -1,
-           })
+           })*/
 
         this.helpPanel = this.add.nineslice(0,0,
             'uiPanelL', 'Glass', 100, 56, 18,18,18,18).setDepth(100)
@@ -10539,6 +10541,9 @@ class GameScene extends Phaser.Scene {
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
 
+        console.log('COIN COUNT',this.coinsArray)
+        this.addCoins(0);
+
         // drain boost bar so it's ready for next round
         this.boostEnergy = Math.min(this.boostEnergy - 1000, 100);
 
@@ -10676,8 +10681,9 @@ class GameScene extends Phaser.Scene {
 
         var popCounter = 1;
         var numberOfThings = allTheThings.length;
-        
+
         //ourPersist.bgRatio = 1;
+
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
@@ -10717,6 +10723,7 @@ class GameScene extends Phaser.Scene {
                 popCounter += 1;
             },
             onComplete: () =>{
+
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -10817,6 +10824,25 @@ class GameScene extends Phaser.Scene {
             
         });
                     
+    }
+
+    addCoins(index){
+        const ourPersist = this.scene.get('PersistScene');
+        
+        if (index >= this.coinsArray.length - this.coinDiff) return;
+        
+        const element = this.coinsArray[index];
+
+        this.time.delayedCall(120, () => {
+            ourPersist.coins += 1;
+            console.log('adding coin +1')
+            this.coinSound.play();
+            this.coinUIText.setHTML(`${commaInt(ourPersist.coins).padStart(2, '0')}`);
+
+            // Call the function recursively with the next index
+            this.addCoins(index + 1);
+        }, [], this);
+
     }
 
     currentScoreTimer() {
@@ -11409,7 +11435,9 @@ class GameScene extends Phaser.Scene {
             this.lastTimeTick = timeTick;
 
             if(!this.scoreTimer.paused) {
-                this.coinSpawnCounter -= 1;
+                if (!this.winned) {
+                    this.coinSpawnCounter -= 1;
+                }
 
                 if (this.coinSpawnCounter < 1) {
                     if (this.spawnCoins) {
@@ -11424,7 +11452,7 @@ class GameScene extends Phaser.Scene {
                                 
                                 _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
         
-                                this.coinsArray.push(_coin);
+                                //this.coinsArray.push(_coin);
                                 
                                 break;
                             case MODES.EXPERT:
@@ -13481,7 +13509,7 @@ class ScoreScene extends Phaser.Scene {
                     plinkoMachine.zedIndex = 1;
                     plinkoMachine.countDownTween.pause();
                 }
-                plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
+                //plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
                 const zedObject = calcZedObj(ourPersist.zeds);
@@ -13627,16 +13655,20 @@ class InputScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('upWASD', 'assets/sprites/upWASD.png')
-        this.load.image('downWASD', 'assets/sprites/downWASD.png');
-        this.load.image('leftWASD', 'assets/sprites/leftWASD.png');
-        this.load.image('rightWASD', 'assets/sprites/rightWASD.png');
-        this.load.image('spaceWASD', 'assets/sprites/spaceWASD.png');
+        //this.load.image('upWASD', 'assets/sprites/upWASD.png')
+        //this.load.image('downWASD', 'assets/sprites/downWASD.png');
+        //this.load.image('leftWASD', 'assets/sprites/leftWASD.png');
+        //this.load.image('rightWASD', 'assets/sprites/rightWASD.png');
+        //this.load.image('spaceWASD', 'assets/sprites/spaceWASD.png');
 
     }
     create() {
     const ourGame = this.scene.get("GameScene");
     const ourInput = this.scene.get("InputScene");
+
+    // disable camera for scenes with no rendered objects
+    this.cameras.remove(this.cameras.main);
+
 
     var tempButtonScale = 10;
     var tempInOffSet = 8;
@@ -13646,9 +13678,9 @@ class InputScene extends Phaser.Scene {
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'upWASD', 0
-    ).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
-    this.upWASD.on('pointerdown', function (pointer)
+    //this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'upWASD', 0
+    //).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
+    /*this.upWASD.on('pointerdown', function (pointer)
     {
 
         this.setTint(0xff0000);
@@ -13749,7 +13781,7 @@ class InputScene extends Phaser.Scene {
     {
         this.clearTint();
 
-    });
+    });*/
     
     }
     update() {
@@ -14669,7 +14701,7 @@ var config = {
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
     scene: [ StartScene, 
-        MainMenuScene, PlinkoMachineScene,QuickMenuScene, GalaxyMapScene, 
+        MainMenuScene, PlinkoMachineScene,QuickMenuScene, //GalaxyMapScene, 
         PersistScene, TutorialScene,
         GameScene, InputScene, ScoreScene, 
         StageCodex, ExtractTracker,
