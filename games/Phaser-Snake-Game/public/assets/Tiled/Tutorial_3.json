@@ -3,33 +3,33 @@
  "infinite":false,
  "layers":[
         {
-         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         "data":[133, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 133,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 257, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
-            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
-            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
             133, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 133,
-            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
-            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
-            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 289, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            133, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 134, 133],
          "height":27,
          "id":1,
          "name":"Wall",
@@ -42,35 +42,35 @@
         }, 
         {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
+            481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481, 481,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":27,
-         "id":7,
-         "name":"Coin",
+         "id":9,
+         "name":"Food",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
@@ -84,9 +84,9 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 616, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -116,7 +116,7 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":9,
+ "nextlayerid":10,
  "nextobjectid":1,
  "orientation":"orthogonal",
  "properties":[
@@ -126,6 +126,11 @@
          "value":"4c577a41-07a0-4aea-923e-d33c36893027e"
         }, 
         {
+         "name":"atoms",
+         "type":"int",
+         "value":3
+        }, 
+        {
          "name":"diffBonus",
          "type":"int",
          "value":100
@@ -133,12 +138,12 @@
         {
          "name":"next",
          "type":"string",
-         "value":"end"
+         "value":""
         }, 
         {
          "name":"slug",
          "type":"string",
-         "value":"these-are-coins"
+         "value":"tut3"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
@@ -229,6 +234,141 @@
                         }]
                 }, 
                 {
+                 "id":12,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":13,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":14,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":20,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":21,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":22,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":23,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":24,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":25,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":26,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":27,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":28,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":29,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":30,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":32,
                  "properties":[
                         {
@@ -281,7 +421,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":38,
                  "properties":[
@@ -293,6 +434,105 @@
                 }, 
                 {
                  "id":39,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":52,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":53,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":54,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":55,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":56,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":57,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":58,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":59,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":60,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":61,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":62,
                  "properties":[
                         {
                          "name":"hasCollision",
@@ -373,6 +613,106 @@
                         }]
                 }, 
                 {
+                 "id":84,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":85,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":86,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":87,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":88,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":89,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":90,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":91,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
+                 "id":92,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":93,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":94,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":96,
                  "properties":[
                         {
@@ -416,8 +756,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":101,
                  "properties":[
@@ -438,6 +777,105 @@
                 }, 
                 {
                  "id":103,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":116,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":117,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":118,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":119,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":120,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":121,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":122,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":123,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":124,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":125,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":126,
                  "properties":[
                         {
                          "name":"hasCollision",
@@ -507,9 +945,181 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":135,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":136,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":137,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":138,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":139,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":140,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":141,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":142,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":143,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":148,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":149,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":150,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":151,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":152,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":153,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":154,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":155,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":156,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":157,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":158,
                  "properties":[
                         {
                          "name":"hasCollision",
@@ -590,6 +1200,178 @@
                         }]
                 }, 
                 {
+                 "id":168,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
+                 "id":169,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":170,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":171,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":172,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":173,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":174,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":175,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":180,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":181,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":182,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":183,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":184,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":185,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":186,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":187,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":188,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":189,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":190,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":192,
                  "properties":[
                         {
@@ -662,6 +1444,142 @@
                         }]
                 }, 
                 {
+                 "id":200,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":201,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":202,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
+                 "id":203,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":204,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":205,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":206,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":207,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":212,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":213,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":214,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":215,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":216,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":217,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":218,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":224,
                  "properties":[
                         {
@@ -678,8 +1596,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":226,
                  "properties":[
@@ -727,6 +1644,160 @@
                 }, 
                 {
                  "id":231,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":232,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":233,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":234,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":235,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":236,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":237,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":238,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":239,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":244,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
+                 "id":245,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":246,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":247,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":248,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":249,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":250,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":280,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":281,
                  "properties":[
                         {
                          "name":"hasCollision",
