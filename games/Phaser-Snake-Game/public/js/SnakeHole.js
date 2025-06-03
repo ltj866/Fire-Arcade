@@ -5452,9 +5452,70 @@ class MainMenuScene extends Phaser.Scene {
             }),
                     `Press Space`
             ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+
+            var controlsStyle = {
+                "fontSize": '12px',
+                "fontWeight": 200,
+                "color": "white",
+                "textAlign": 'center',
+                "border": '1px solid white', /* Thickness, style, and color */
+                "border-radius": '4px',
+                "padding": '4px', /* Space between text and border */
+                "display": 'inline-block', /* Ensures the border wraps tightly around the text */
+            }
+
+            var controlsY = 266;
+
+            var controlsPlus1 = this.add.dom(304, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
+                "border": '0px', /* Thickness, style, and color */
+            }),
+                    `+`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+            var controlsTab = this.add.dom(287, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle),
+                    `Tab`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+            var controlsSpace = this.add.dom(322, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle),
+                    `Space`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+            var controlsPlus2 = this.add.dom(344, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
+                "border": '0px', /* Thickness, style, and color */
+            }),
+                    `+`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+
+            var controlsArrowsDown = this.add.dom(366, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
+                "fontSize": '9px',
+            }),
+                    `🡇`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+            var controlsArrowsLeft = this.add.dom(356, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
+                "fontSize": '9px',
+            }),
+                    `🡄`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+            var controlsArrowsRight = this.add.dom(376, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
+                "fontSize": '9px',
+            }),
+                    `🡆`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+
+            var controlsArrowsUp = this.add.dom(366, 254, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
+                "fontSize": '9px',
+            }),
+                    `🡅`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+              
     
             this.pressToPlayTween = this.tweens.add({
-                targets: this.pressToPlay,
+                targets: [
+                    this.pressToPlay,
+                ],
                 alpha: 1,
                 duration: 1000,
                 ease: 'Sine.InOut',
