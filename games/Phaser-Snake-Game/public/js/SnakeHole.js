@@ -5298,11 +5298,10 @@ class MainMenuScene extends Phaser.Scene {
                 this.hasPlayedBefore = false;
                 console.log("Testing LOCAL STORAGE => Has not played.", );
 
-                var howToCard = "move";
                 //debugger
                 this.scene.start('TutorialScene', {
-                    cards: [howToCard],
-                    toStage: "Tutorial_1", // Tutorial_1
+                    cards: ["move", "atoms"],
+                    toStage: "T_Tutorial-1", // Tutorial_1
                 });
             } else {
                 this.hasPlayedBefore = true;

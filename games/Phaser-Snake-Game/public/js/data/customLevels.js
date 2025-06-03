@@ -2,7 +2,7 @@ import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS
 import { PORTAL_COLORS } from '../const.js';
 
 export var STAGE_OVERRIDES = new Map([
-    ["Tutorial_1", {
+    ["T_Tutorial-1", {
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
@@ -29,8 +29,8 @@ export var STAGE_OVERRIDES = new Map([
                         scene.gameSceneFullCleanup();
 
                         scene.scene.start('TutorialScene', {
-                            cards: ["move","atoms"],
-                            toStage: "Tutorial_2",
+                            cards: ["walls","screenwrap"],
+                            toStage: "T_Tutorial-2",
                         });
                     });
 
@@ -52,7 +52,7 @@ export var STAGE_OVERRIDES = new Map([
         }
 
     }],
-    ["Tutorial_2", {
+    ["T_Tutorial-2", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -74,12 +74,10 @@ export var STAGE_OVERRIDES = new Map([
             scene.checkWinCon = function(){
                 if (scene.length >= 14) {
                     scene.gameSceneFullCleanup();
-
-                    var howToCard = "move";
                     
                     scene.scene.start('TutorialScene', {
-                        cards: [howToCard],
-                        toStage: "Tutorial_3",
+                        cards: ["portals"],
+                        toStage: "T_Tutorial-3",
                     });
     
                 } else {
@@ -89,7 +87,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["Tutorial_3", {
+    ["T_Tutorial-3", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -109,12 +107,10 @@ export var STAGE_OVERRIDES = new Map([
                 if (scene.length >= 21) {
 
                     scene.gameSceneFullCleanup();
-
-                    var howToCard = "move";
                     
                     scene.scene.start('TutorialScene', {
-                        cards: [howToCard],
-                        toStage: "Tutorial_4",
+                        cards: ["coins"],
+                        toStage: "T_Tutorial-4",
                     });
     
                 } else {
@@ -124,7 +120,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["Tutorial_4", {
+    ["T_Tutorial-4", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -147,12 +143,10 @@ export var STAGE_OVERRIDES = new Map([
                     scene.snake.direction = DIRS.STOP;
 
                     scene.gameSceneFullCleanup();
-
-                    var howToCard = "move";
                     
                     scene.scene.start('TutorialScene', {
-                        cards: [howToCard],
-                        toStage: "Tutorial_5",
+                        cards: ["blackholes"],
+                        toStage: "T_Tutorial-5",
                     });
     
                 } else {
@@ -162,7 +156,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["Tutorial_5", {
+    ["T_Tutorial-5", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -194,7 +188,7 @@ export var STAGE_OVERRIDES = new Map([
         }
     }],
 
-    ["Tutorial_6", {
+    ["T_Tutorial-6", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -202,6 +196,9 @@ export var STAGE_OVERRIDES = new Map([
             //scene.skipScoreScreen = true;
 
             //window.location.reload();
+
+            //temporary solution for resetting the game -- doesn't preserve object permanence
+            window.location.reload();
 
         },
         postFix: function (scene) {
