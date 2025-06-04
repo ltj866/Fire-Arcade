@@ -2,7 +2,7 @@ import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS
 import { PORTAL_COLORS } from '../const.js';
 
 export var STAGE_OVERRIDES = new Map([
-    ["T_Tutorial-1", {
+    ["Tutorial_T-1", {
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
@@ -30,7 +30,7 @@ export var STAGE_OVERRIDES = new Map([
 
                         scene.scene.start('TutorialScene', {
                             cards: ["walls","screenwrap"],
-                            toStage: "T_Tutorial-2",
+                            toStage: "Tutorial_T-2",
                         });
                     });
 
@@ -52,7 +52,7 @@ export var STAGE_OVERRIDES = new Map([
         }
 
     }],
-    ["T_Tutorial-2", {
+    ["Tutorial_T-2", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -77,7 +77,7 @@ export var STAGE_OVERRIDES = new Map([
                     
                     scene.scene.start('TutorialScene', {
                         cards: ["portals"],
-                        toStage: "T_Tutorial-3",
+                        toStage: "Tutorial_T-3",
                     });
     
                 } else {
@@ -87,7 +87,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["T_Tutorial-3", {
+    ["Tutorial_T-3", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -110,7 +110,7 @@ export var STAGE_OVERRIDES = new Map([
                     
                     scene.scene.start('TutorialScene', {
                         cards: ["coins"],
-                        toStage: "T_Tutorial-4",
+                        toStage: "Tutorial_T-4",
                     });
     
                 } else {
@@ -120,7 +120,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["T_Tutorial-4", {
+    ["Tutorial_T-4", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -146,7 +146,7 @@ export var STAGE_OVERRIDES = new Map([
                     
                     scene.scene.start('TutorialScene', {
                         cards: ["blackholes"],
-                        toStage: "T_Tutorial-5",
+                        toStage: "Tutorial_T-5",
                     });
     
                 } else {
@@ -156,7 +156,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["T_Tutorial-5", {
+    ["Tutorial_T-5", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -188,7 +188,7 @@ export var STAGE_OVERRIDES = new Map([
         }
     }],
 
-    ["T_Tutorial-6", {
+    ["Tutorial_T-6", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;

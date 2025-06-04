@@ -5301,7 +5301,7 @@ class MainMenuScene extends Phaser.Scene {
                 //debugger
                 this.scene.start('TutorialScene', {
                     cards: ["move", "atoms"],
-                    toStage: "T_Tutorial-1", // Tutorial_1
+                    toStage: "Tutorial_T-1", // Tutorial_1
                 });
             } else {
                 this.hasPlayedBefore = true;
