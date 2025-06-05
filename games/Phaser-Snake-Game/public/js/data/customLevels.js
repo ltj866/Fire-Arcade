@@ -1,4 +1,4 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, INVENTORY } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS, INVENTORY } from "../SnakeHole.js";
 import { PORTAL_COLORS } from '../const.js';
 
 
@@ -45,7 +45,7 @@ export var STAGE_OVERRIDES = new Map([
 
                 scene.piggy.onOver = function() {
                     INVENTORY.set("piggybank", true);
-                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)))
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
 
                     scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
                     
@@ -353,6 +353,57 @@ export var STAGE_OVERRIDES = new Map([
         postFix: function (scene) {
     
         },
+        
+    }],
+    ["World_4-1", {
+        preFix: function (scene) {
+            scene.startEWraps = PLAYER_STATS.eWraps;
+            scene.startWWraps = PLAYER_STATS.wWraps;
+            scene.delta = 0;
+            scene.deltaCache = 0;
+
+            scene.secretPortal = undefined;
+            //scene.lengthGoal = 0;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = 147;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+
+        },
+        onMove: function (scene) {
+            var currentEWraps = PLAYER_STATS.eWraps - scene.startEWraps;
+            var currentWWraps = PLAYER_STATS.wWraps - scene.startWWraps;
+
+            scene.delta = currentWWraps - currentEWraps;
+            if (scene.delta < 1) {
+                scene.delta = 0;
+            } 
+
+            if (scene.wallVarient === "Wall_2" && scene.delta != scene.deltaCache) {
+
+                var tile = scene.wallLayer.getTileAt(16, 12);
+
+
+                if (scene.delta > 4 && scene.secretPortal === undefined) {
+                    scene.secretPortal = scene.add.sprite(tile.pixelX + X_OFFSET + GRID * 3.5, tile.pixelY + Y_OFFSET + GRID * 0.5);
+                    scene.secretPortal.play('blackholeForm');
+                    console.log("SPAWNING SECRET BLACKHOLE", scene.delta);
+
+                    scene.secretPortal.onOver = function() {
+                        console.log("Something Secret!");
+                    } 
+                    scene.interactLayer[tile.x + 3][tile.y] = scene.secretPortal;
+                }
+                // add in code here to tint based on the delta size.
+                tile.tint = 0xFF0000;
+                scene.deltaCache = scene.delta;
+            }
+
+            
+        }
         
     }],
 ]);
