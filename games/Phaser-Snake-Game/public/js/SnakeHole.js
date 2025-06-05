@@ -8468,7 +8468,7 @@ class GameScene extends Phaser.Scene {
         
 
         // #region Coin Layer Logic
-        this.coinsArray = [];
+        this.coinsArray = new Set();
         this.coinDiff = 0;
 
         var coinVarient = ''
@@ -10250,9 +10250,6 @@ class GameScene extends Phaser.Scene {
         //tween here
         this.scene.get("SpaceBoyScene").savedCoinsUI.setText(INVENTORY.get("savedCoins"));
 
-
-        debugger
-
         //nineSlice
         this.finalScorePanel = this.add.nineslice(windowCenterX, finalWindowTop, 
             'uiPanelL', 'Glass', 
@@ -10522,6 +10519,7 @@ class GameScene extends Phaser.Scene {
         this.goFadeOut = false;
 
         console.log('COIN COUNT',this.coinsArray)
+        debugger
         this.addCoins(0);
 
         // drain boost bar so it's ready for next round
@@ -10612,7 +10610,7 @@ class GameScene extends Phaser.Scene {
         //Phaser.Utils.Array.Shuffle(wallSprites);
         
         var allTheThings = [
-            ...this.coinsArray,
+            ...this.coinsArray, // Double check this works with Sets
             //...this.portals,
             ...this.atoms,
             ...sortedWallSprites,
@@ -10801,9 +10799,9 @@ class GameScene extends Phaser.Scene {
     addCoins(index){
         const ourPersist = this.scene.get('PersistScene');
         
-        if (index >= this.coinsArray.length - this.coinDiff) return;
-        
-        const element = this.coinsArray[index];
+        if (this.coinsArray.size === 0) {
+            return index;
+        }
 
         this.time.delayedCall(120, () => {
             ourPersist.coins += 1;
@@ -10811,7 +10809,12 @@ class GameScene extends Phaser.Scene {
             this.coinSound.play();
             this.coinUIText.setHTML(`${commaInt(ourPersist.coins).padStart(2, '0')}`);
 
-            // Call the function recursively with the next index
+            // Get and remove an item
+            const iterator = this.coinsArray.values(); // Get an iterator for the Set
+            const item = iterator.next().value; // Get the first value
+            this.coinsArray.delete(item); // Remove the item from the Set
+
+            // Call the function recursively
             this.addCoins(index + 1);
         }, [], this);
 

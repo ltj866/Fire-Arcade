@@ -347,8 +347,12 @@ export var STAGE_OVERRIDES = new Map([
             //scene.stopOnBonk = true;
             //scene.maxScore = 60;
             //scene.speedWalk = SPEED_SPRINT;
-            scene.speedSprint = 147;
+            
             //scene.boostCost = 3;
+
+
+            // Slow Boost Number
+            //scene.speedSprint = 147;
         },
         postFix: function (scene) {
     

@@ -26,7 +26,7 @@ var Coin = new Phaser.Class({
             repeat: -1,
            })
 
-        coinArray.push(this);
+        coinArray.add(this);
         
         scene.children.add(this);
         
@@ -62,6 +62,9 @@ var Coin = new Phaser.Class({
         // was using coinsArray.pop() but ordering issues occured, so this
         // new value is subtracted from the array in gameScene
         scene.coinDiff += 1;
+        debugger
+
+        scene.coinsArray.delete(this);
 
         this.destroy();
         

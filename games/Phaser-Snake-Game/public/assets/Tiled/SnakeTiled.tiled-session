@@ -1437,7 +1437,7 @@
         },
         "World_4-1.json": {
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 173.75,
                 "y": 162
