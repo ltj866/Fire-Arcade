@@ -470,6 +470,16 @@ var tempSumOfBest = function(scene, stageData) {
     return sumOfBest;
 }
 
+export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory") ?? "{}"))); {
+    
+    var inventoryDefaults = new Map([
+        ["piggybank", INVENTORY.get("piggybank") ?? false],
+    ])
+    INVENTORY = inventoryDefaults;
+
+    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+}
+
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     if (!JSON.parse(localStorage.getItem("playerStats"))) {
@@ -1203,7 +1213,13 @@ class SpaceBoyScene extends Phaser.Scene {
         this.lengthGoalUILabel.mask.invertAlpha = true;
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
-        console.log('SPACE BOY SCENE',this.lights.lights);
+        console.log('SPACE BOY SCENE',this.lights.lights)
+
+        if (INVENTORY.get("piggybank")) {
+            var piggy = this.add.sprite(501, 140, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+            piggy.play('coin01idle');
+        }
     }
 
     loseCoin(){
@@ -7321,9 +7337,6 @@ class GameScene extends Phaser.Scene {
             });  
         }
         
-        
-
-        
 
         
         this.load.start(); // Loader doesn't start on its own outside of the preload function.
@@ -8909,8 +8922,6 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
         }
-
-
         
         // #endregion
 
