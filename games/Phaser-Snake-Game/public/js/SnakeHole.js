@@ -8469,7 +8469,6 @@ class GameScene extends Phaser.Scene {
 
         // #region Coin Layer Logic
         this.coinsArray = new Set();
-        this.coinDiff = 0;
 
         var coinVarient = ''
         if (this.varientIndex) {
@@ -11143,6 +11142,23 @@ class GameScene extends Phaser.Scene {
             console.log("YOU WIN" , this.stage);
             this.winned = true;
             this.canPortal = false;
+
+
+            var coinsToRemove = Math.floor(this.coinsArray.size / 2);
+            const iterator = this.coinsArray.values(); // Get an iterator for the Set
+        
+            // Remove half of remaining coins.
+            while (coinsToRemove > 0) {
+                const coin = iterator.next().value; // Get the first value
+                this.coinsArray.delete(coin);
+                coin.destroy();  
+                
+                coinsToRemove--;
+            }
+
+
+            
+
             this.atoms.forEach(atom => {
                 // So you can't see them during free play.
                 atom.electrons.visible = false;

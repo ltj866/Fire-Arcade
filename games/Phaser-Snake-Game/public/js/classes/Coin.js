@@ -59,11 +59,6 @@ var Coin = new Phaser.Class({
 
         scene.interactLayer[(this.x - X_OFFSET)/GRID][(this.y - Y_OFFSET)/GRID] = "empty";
 
-        // was using coinsArray.pop() but ordering issues occured, so this
-        // new value is subtracted from the array in gameScene
-        scene.coinDiff += 1;
-        debugger
-
         scene.coinsArray.delete(this);
 
         this.destroy();
