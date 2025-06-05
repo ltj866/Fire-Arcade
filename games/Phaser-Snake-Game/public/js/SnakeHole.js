@@ -474,6 +474,7 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
     
     var inventoryDefaults = new Map([
         ["piggybank", INVENTORY.get("piggybank") ?? false],
+        ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -871,7 +872,7 @@ class __Scene extends Phaser.Scene {
 
 */
 
-// #region SpaceBoyScene
+// #region SpaceBoy
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
         super({key: 'SpaceBoyScene', active: false});
@@ -1222,8 +1223,14 @@ class SpaceBoyScene extends Phaser.Scene {
 
         if (INVENTORY.get("piggybank")) {
             var piggy = this.add.sprite(501, 140, 'coinPickup01Anim.png')
-            .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+            .setOrigin(0, 0).setDepth(80).setTint(0x800080);
             piggy.play('coin01idle');
+
+            var target = piggy.getBottomRight();
+
+            this.savedCoinsUI = this.add.bitmapText(target.x, target.y, 'mainFont',
+                INVENTORY.get("savedCoins"),
+            8).setOrigin(1,1).setDepth(81)
         }
     }
 
@@ -10235,6 +10242,16 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 `EXTRACTION COMPLETE`
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
+
+        
+        INVENTORY.set("savedCoins", INVENTORY.get("savedCoins") + this.scene.get("PersistScene").coins);
+        localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+
+        //tween here
+        this.scene.get("SpaceBoyScene").savedCoinsUI.setText(INVENTORY.get("savedCoins"));
+
+
+        debugger
 
         //nineSlice
         this.finalScorePanel = this.add.nineslice(windowCenterX, finalWindowTop, 

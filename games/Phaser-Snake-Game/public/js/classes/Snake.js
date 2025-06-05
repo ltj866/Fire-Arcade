@@ -490,9 +490,7 @@ var Snake = new Phaser.Class({
         //        
         //});
 
-        if (STAGE_OVERRIDES.has(scene.stage)) {
-            // could check to only run stages with onMove @optimize
-            //console.log("Running postFix Override on", scene.stage);
+        if (STAGE_OVERRIDES.has(scene.stage) && "onMove" in STAGE_OVERRIDES.get(scene.stage)) {
             STAGE_OVERRIDES.get(scene.stage).onMove(scene);
         }
     },
