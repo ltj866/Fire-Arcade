@@ -282,4 +282,18 @@ export var STAGE_OVERRIDES = new Map([
         },
         
     }],
+    ["World_0-1", {
+        preFix: function (scene) {
+            //scene.lengthGoal = 0;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            scene.speedSprint = 147;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+    
+        },
+        
+    }],
 ]);
