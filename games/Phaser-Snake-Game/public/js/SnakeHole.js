@@ -7008,8 +7008,6 @@ class GameScene extends Phaser.Scene {
 
         // Boost Array
         this.boostOutlinesBody = [];
-        //this.boostOutlines.length = 0; //this needs to be set to 1 on init or else a lingering outline persists on space-down
-        this.boostOutlinesSmall;
         this.boostGhosts = [];
 
         // Sounds
@@ -7934,6 +7932,7 @@ class GameScene extends Phaser.Scene {
                     });
                     
                     if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
+                        // Move snake by arrow key press.
                         
                         var lastElement = this.boostOutlinesBody.shift();
                         lastElement.destroy();
@@ -7999,7 +7998,7 @@ class GameScene extends Phaser.Scene {
                         ease: 'linear'
                         }, this);
 
-                    if (index < this.snake.body.length -1) {
+                    if (index < this.snake.body.length -1 || this.snake.body.length === 1) {
                         // For all the body segments
                         boostOutline.play("snakeOutlineAnim");
                         this.boostOutlinesBody.unshift(boostOutline);
@@ -8021,8 +8020,10 @@ class GameScene extends Phaser.Scene {
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
 
-                // add the tail in.
-                this.boostOutlinesBody.push(this.boostOutlineTail);
+                if (this.snake.body.length > 1) {
+                    // add the tail in.
+                    this.boostOutlinesBody.push(this.boostOutlineTail);
+                }
 
                 this.boostOutlinesBody.forEach(boostOutline =>{ //TODO - Do this in a wave with delay?
                     var fadeoutTween = this.tweens.add({
@@ -11358,8 +11359,12 @@ class GameScene extends Phaser.Scene {
 
 
                 if (this.boostEnergy < 1) {
-                    // add the tail in.
-                    this.boostOutlinesBody.push(this.boostOutlineTail);
+
+                    if (this.snake.body.length > 1) {
+                        // add the tail in.
+                        this.boostOutlinesBody.push(this.boostOutlineTail);
+                    }
+                    
     
                     this.boostOutlinesBody.forEach(boostOutline =>{
                         var fadeoutTween = this.tweens.add({
@@ -11383,24 +11388,26 @@ class GameScene extends Phaser.Scene {
             //this.spaceKey.isDown
 
 
-            if(this.boostOutlinesBody.length > 0){ //needs to only happen when boost bar has energy, will abstract later
+            if (this.boostOutlinesBody.length > 0) { //needs to only happen when boost bar has energy, will abstract later
                 // Get ride of the old one
-                if (this.boostOutlinesBody.length > 0) {
-                    var toDelete = this.boostOutlinesBody.shift();
-                    toDelete.destroy();
-    
-                    // Make the new one
-                    var boostOutline = this.add.sprite(
-                        this.snake.head.x, 
-                        this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(8);
-                    
-                    boostOutline.play("snakeOutlineAnim");
-                    this.boostOutlinesBody.push(boostOutline);
-                    
-                }
+                
+                var toDelete = this.boostOutlinesBody.shift();
+                toDelete.destroy();
+
+                // Make the new one
+                var boostOutline = this.add.sprite(
+                    this.snake.head.x, 
+                    this.snake.head.y
+                ).setOrigin(.083333,.083333).setDepth(8);
+                
+                boostOutline.play("snakeOutlineAnim");
+                this.boostOutlinesBody.push(boostOutline);
+
+                if (this.boostOutlinesBody.length > 1) {
+                    // Has tail
                     this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
-                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;        
+                }       
 
             }
             
