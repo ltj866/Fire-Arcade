@@ -7519,9 +7519,22 @@ class GameScene extends Phaser.Scene {
 
 
         if (this.map.getLayer('Ghost-1')) {
-            this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
-            this.ghostWallLayer.setDepth(26);
+            var ghostTiles = [
+                545, 546, 547, 548,
+                577, 578, 579, 580,
+                609, 610, 611, 612
+            ];
+
+            var passed = ghostTiles.some( tileIndex => {
+                return this.map.findByIndex(tileIndex, false, false, 'Ghost-1');
+            });
+
+            if (passed) {
+                this.hasGhostTiles = true;
+                this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
+                this.ghostWallLayer.setDepth(26);
+            }
+  
         }
        
 
