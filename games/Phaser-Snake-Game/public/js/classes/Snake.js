@@ -21,6 +21,8 @@ var Snake = new Phaser.Class({
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
 
+        this.newHead = {};
+
         this.previous = [];
 
         this.body.unshift(this.head);
@@ -53,8 +55,6 @@ var Snake = new Phaser.Class({
         this.lastPortal = undefined; // Set
         this.closestPortal = undefined; // TYPE Portal.
         
-
-
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
         this.portalBodyParts = [];
@@ -398,20 +398,7 @@ var Snake = new Phaser.Class({
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
         
-        if (scene.canPortal) {
-             scene.portals.forEach(portal => {
-                let dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
-                
-                var minFrameRate = 8; 
-                var maxFrameRate = 64;
-                
-                portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
-                    dist, minFrameRate, maxFrameRate);
-                portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
-                
-                portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(dist / maxFrameRate, 0, 1);
-            });
-        }
+        
        
         if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
@@ -420,8 +407,7 @@ var Snake = new Phaser.Class({
 
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
-                //this.closestPortal.flipX = true;
-
+                
                 /*scene.tweens.add({
                     targets: this.closestPortal.targetObject.portalHighlight,
                     alpha: {from: this.closestPortal.targetObject.portalHighlight.alpha,
@@ -432,52 +418,93 @@ var Snake = new Phaser.Class({
             }
 
             checkPortals.forEach( portal => {
-
+                //console.log(portal.targetObject.anims)
                 this.snakeLights.forEach( light => {
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
-
+                    
                     if (dist > distN) {
                         dist = distN;
                         testPortal = portal;
+                        this.newHead = light;
                     }
-
                 });
 
             });
 
+            if (scene.canPortal) {
+                scene.portals.forEach(portal => {
+                    let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
+                        portal.x, portal.y);
+                        // normalized code to be used at a later point
+                        /*const distNormalized = Phaser.Math.Clamp(
+                        (_dist - 0) / (600 - 0), 
+                        0, 1
+                        );*/
 
+                    if (portal.targetObject.portalTimerRunning === false) { // && portal.canHighlight === true) {
 
+                        var minFrameRate = 32; 
+                        var maxFrameRate = 64;
+                        
+                        //removing portal speed up until it's bug-free
+                        /*portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                            _dist, minFrameRate, maxFrameRate);
+                        portal.targetObject.portalHighlight.anims.msPerFrame = 
+                            portal.targetObject.anims.msPerFrame;*/
+                        
+                        portal.targetObject.portalHighlight.alpha = 
+                            1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
+                        
+                        //console.log(portal.targetObject.portalHighlight.alpha);
+                    }  
+                    else {
+                        //portal.anims.msPerFrame = 128;
+                        //portal.portalHighlight.anims.msPerFrame =  128;
+
+                        //portal.portalHighlight.alpha = 0;
+                    }
+                });
+            }
+
+            /*scene.tweens.add({
+                targets: testPortal.targetObject.portalHighlight,
+                //alpha: {from: testPortal.targetObject.portalHighlight.alpha,
+                //  to: 1},
+                duration: 98,
+                ease: 'Sine.Out',
+                onStart: () =>{
+                    scene.tweens.add({
+                        targets: oldPortal.targetObject.portalHighlight,
+                        alpha: {from: oldPortal.targetObject.portalHighlight.alpha,
+                                to: 0},
+                        duration: 200,
+                        ease: 'Sine.Out',
+                    });
+                }
+            })*/
             if (this.closestPortal != testPortal) {
                 //console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 var oldPortal = this.closestPortal;
-                //oldPortal.flipX = false;
-
-                //testPortal.flipX = true;
-
-                scene.tweens.add({
-                    targets: testPortal.targetObject.portalHighlight,
-                    //alpha: {from: testPortal.targetObject.portalHighlight.alpha,
-                    //  to: 1},
-                    duration: 98,
-                    ease: 'Sine.Out',
-                    onStart: () =>{
-                        scene.tweens.add({
-                            targets: oldPortal.targetObject.portalHighlight,
-                            alpha: {from: oldPortal.targetObject.portalHighlight.alpha,
-                                 to: 0},
-                            duration: 200,
-                            ease: 'Sine.Out',
-                            });
-                    }
-                    });
                 this.closestPortal = testPortal;
 
+                /*if (dist < 72) {
+                    scene.tweens.add({
+                        targets: testPortal.targetObject.portalHighlight,
+                        alpha: {from: testPortal.targetObject.portalHighlight.alpha,
+                        to: 1},
+                        duration: 98,
+                        ease: 'Sine.Out',
+                        onStart: () =>{
+                            testPortal.targetObject.portalTimerRunning = true;
+                            testPortal.targetObject.portalHighlight.alpha = 1;
+                            scene.time.delayedCall(240, () => { 
+                                testPortal.targetObject.portalTimerRunning = false; }, scene);
+                        }  
+                    });
+                }*/
+                }
             }
-
-
-            
-        }
 
         // #region Coin Collision
         //for (let index = 0; index < scene.coins.length; index++) {
@@ -503,6 +530,8 @@ var Snake = new Phaser.Class({
         this.direction = DIRS.STOP;
         scene.screenShake();
 
+
+
         if (ourPersistScene.coins === 1) {
             debugger
             musicPlayer.nextSong(`track_175`);
@@ -513,6 +542,12 @@ var Snake = new Phaser.Class({
 
             scene.gState = GState.BONK;
             scene.scene.get("InputScene").moveHistory.push(["BONK"]);
+
+            //reset portal visuals on bonk
+            scene.portals.forEach(portal => {
+                portal.portalHighlight.alpha = 0;
+                console.log(portal.portalHighlight.alpha)
+            });
             //console.log(scene.gState, "BONK" , this.direction);
 
             if (!scene.winned) {

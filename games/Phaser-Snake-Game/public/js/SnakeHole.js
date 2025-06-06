@@ -8584,6 +8584,9 @@ class GameScene extends Phaser.Scene {
             p1.targetObject = p2;
             p2.targetObject = p1;
 
+            p1.setBlendMode(Phaser.BlendModes.ADD);
+            p2.setBlendMode(Phaser.BlendModes.ADD);
+
             //p1.flipX = true;
 
             scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p2;
@@ -8895,7 +8898,7 @@ class GameScene extends Phaser.Scene {
     
             sortedPortals.forEach (portal => {
                 portal.play(portal.anim);
-                portal.portalHighlight.playAfterDelay("portalHighlights", 32);
+                portal.portalHighlight.play("portalHighlights");
                 portal.portalHighlight.alpha = 0;
             });
             
@@ -11313,7 +11316,7 @@ class GameScene extends Phaser.Scene {
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
                 
             
-                closestPortal.fx.setActive(false);
+                //closestPortal.fx.setActive(false);
                 
                 // Distance on an x y grid
 
@@ -11339,14 +11342,14 @@ class GameScene extends Phaser.Scene {
                 if (closestPortalDist < 6) {
                     this.portals.forEach(portal => {
                         if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
-                            portal.fx.setActive(true);
+                            //portal.fx.setActive(true);
                             
                             //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
-                            portal.fx.outerStrength = 6 - closestPortalDist;
+                            //portal.fx.outerStrength = 6 - closestPortalDist;
 
-                            closestPortal.fx.setActive(true);
+                            //closestPortal.fx.setActive(true);
                             //closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                            closestPortal.fx.outerStrength = 0;
+                            //closestPortal.fx.outerStrength = 0;
 
                         }
                     });
@@ -14151,7 +14154,7 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'portalFormHighlight',
         frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 6,7,8,9]}),
-        frameRate: 8,
+        frameRate: 16,
         repeat: 0
     });
     scene.anims.create({
@@ -14170,7 +14173,7 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'portalForm',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
-        frameRate: 8,
+        frameRate: 16,
         repeat: 0
     });
     scene.anims.create({
