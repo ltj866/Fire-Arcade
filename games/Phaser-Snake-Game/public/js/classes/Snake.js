@@ -546,7 +546,7 @@ var Snake = new Phaser.Class({
                     }
                     
                     // Turn back on arrows
-                    ourGame.startArrows(ourGame.snake.head);
+                    ourGame.events.emit("spawnArrows", ourGame.snake.head);
     
                     ourGame.gState = GState.WAIT_FOR_INPUT;
                     ourGame.scoreTimer.paused = true;

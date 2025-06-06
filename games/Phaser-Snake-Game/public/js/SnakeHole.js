@@ -6991,6 +6991,7 @@ class GameScene extends Phaser.Scene {
 
         // Arrays for collision detection
         this.atoms = new Set();
+        this.activeArrows = new Set();
         this.foodHistory = [];
         this.walls = [];
         this.portals = [];
@@ -7577,22 +7578,7 @@ class GameScene extends Phaser.Scene {
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
 
-        this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
-        this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
-
-        this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-        this.startingArrowsAnimS.flipY = true;
-        this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
-
-        this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-        this.startingArrowsAnimE.angle = 90;
-        this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
-
-        this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-        this.startingArrowsAnimW.angle = 270;
-        this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
-
-        this.startArrows(this.snake.head);
+        this.events.emit("spawnArrows", this.snake.head);
 
         //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
         
@@ -7654,7 +7640,7 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(3000, event => {
             // Turns on Arrows after delay. Only on start.
             if (this.gState != GState.PLAY && !this.winned) {
-                this.startArrows(this.snake.head);
+                this.events.emit("spawnArrows", this.snake.head);
             }
         });
 
@@ -7717,7 +7703,7 @@ class GameScene extends Phaser.Scene {
                     repeat: 0,
                     alpha: 1,
                 });
-                ourGameScene.startArrows(ourGameScene.snake.head);
+                ourGameScene.events.emit("spawnArrows", ourGameScene.snake.head);
                 ourGameScene.gState = GState.WAIT_FOR_INPUT;
                 ourGameScene.snake.direction = DIRS.STOP; 
                 ourGameScene.extractMenuOn = false;
@@ -9398,6 +9384,54 @@ class GameScene extends Phaser.Scene {
             
         }, this);
 
+        this.events.on('spawnArrows', function (vect) {
+            var _x = vect.x;
+            var _y = vect.y;
+
+            this.map.getLayer(this.wallVarient);
+            if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
+                var startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
+                startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
+                
+                startingArrowsAnimN.setPosition(_x + GRID/2, _y - GRID);
+                this.activeArrows.add(startingArrowsAnimN );
+            }
+            if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
+                var startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+                startingArrowsAnimS.flipY = true;
+                startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
+                
+                startingArrowsAnimS.setPosition(_x + GRID/2, _y + GRID * 2);
+                this.activeArrows.add(startingArrowsAnimS );
+            }
+            if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+                var startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+                startingArrowsAnimE.angle = 90;
+                startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
+
+                startingArrowsAnimE.setPosition(_x + GRID * 2, _y + GRID /2);
+                this.activeArrows.add(startingArrowsAnimE );
+            }
+            if (!this.map.hasTileAtWorldXY(_x - 1 * GRID, _y)) {
+                var startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+                startingArrowsAnimW.angle = 270;
+                startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
+
+                startingArrowsAnimW.setPosition(_x - GRID, _y + GRID/2); 
+                this.activeArrows.add(startingArrowsAnimW );
+                
+            }
+
+
+            this.arrowStartupTween = this.tweens.add({
+                targets: [...this.activeArrows],
+                alpha: 1,
+                duration: 500,
+                ease: 'linear',
+                });
+
+        }, this);
+
         this.lastTimeTick = 0;
         // 9-Slice Panels
         // We recalculate running score so it can be referenced for the 9-slice panel
@@ -10077,40 +10111,6 @@ class GameScene extends Phaser.Scene {
 
         
     }
-    startArrows(snakeHead){
-
-        var _x = snakeHead.x;
-        var _y = snakeHead.y;
-
-        this.startingArrowsAnimN.setPosition(_x + GRID/2, _y - GRID);
-        this.startingArrowsAnimS.setPosition(_x + GRID/2, _y + GRID * 2);
-        this.startingArrowsAnimE.setPosition(_x + GRID * 2, _y + GRID /2);
-        this.startingArrowsAnimW.setPosition(_x - GRID, _y + GRID/2); 
-
-        this.activeArrows = new Set();
-
-        this.map.getLayer(this.wallVarient);
-        if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
-            this.activeArrows.add(this.startingArrowsAnimN );
-        }
-        if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
-            this.activeArrows.add(this.startingArrowsAnimS );
-        }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.activeArrows.add(this.startingArrowsAnimE );
-        }
-        if (!this.map.hasTileAtWorldXY(_x - 1 * GRID, _y)) {
-            this.activeArrows.add(this.startingArrowsAnimW );
-        }
-
-        this.arrowStartupTween = this.tweens.add({
-            targets: [...this.activeArrows],
-            alpha: 1,
-            duration: 500,
-            ease: 'linear',
-            });
-    }
-
     // #region .extractPrompt(
     extractPrompt(){
 
@@ -10542,6 +10542,7 @@ class GameScene extends Phaser.Scene {
         // Clear for reseting game
         ourGameScene.events.off('addScore');
         ourGameScene.events.off('spawnBlackholes');
+        ourGameScene.events.off('spawnArrows');
         ourGameScene.scene.get("InputScene").scene.restart();
 
         this.gameSceneExternalCleanup();
@@ -10549,7 +10550,7 @@ class GameScene extends Phaser.Scene {
         while (ourSpaceBoy.navLog.length > 0) {
             var log = ourSpaceBoy.navLog.pop();
             log.destroy();
-            log = null;
+            log = null; // why the null here as well? - James
         }
 
         this.scene.get("PinballDisplayScene").resetPinball()
@@ -11593,10 +11594,7 @@ class GameScene extends Phaser.Scene {
             
         }
         
-        
-
-
-        
+     
         
         if (GState.PLAY === this.gState) {
             if (ourInputScene.spaceBar.isDown) {
@@ -11604,7 +11602,7 @@ class GameScene extends Phaser.Scene {
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
                     this.moveInterval = this.scene.get("PersistScene").speedSprint;
-                    
+a                    
                     if (!this.winned) {
                         // Boost Stats
                         ourInputScene.boostTime += 6;
@@ -13555,8 +13553,7 @@ class ScoreScene extends Phaser.Scene {
 
             //score screen starting arrows
             ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
-
-            ourGame.startArrows(ourGame.snake.head);
+            ourGame.events.emit("spawnArrows", ourGame.snake.head);
             
 
             
@@ -14095,11 +14092,16 @@ class InputScene extends Phaser.Scene {
             // Starting Game State
             gameScene.gState = GState.PLAY;
             gameScene.scoreTimer.paused = false;
+            if (gameScene.activeArrows.size > 0 ) {
+                    gameScene.activeArrows.forEach ( arrow => {
+                        gameScene.activeArrows.delete(arrow);
+                        gameScene.arrowStartupTween.stop();
+                        arrow.destroy();
+                });
+            }
 
-            gameScene.activeArrows.forEach ( arrow => {
-                gameScene.arrowStartupTween.stop();
-                arrow.setAlpha(0);
-            });
+
+            
         }
 
     }

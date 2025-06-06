@@ -83,7 +83,6 @@ export const PORTAL_TILE_RULES = { // TODO Move out of here
 export const ITEMS = new Map([
     ["piggybank", {
         addToInventory: function (scene) {
-            debugger
             var piggy = scene.add.sprite(501, 140, 'coinPickup01Anim.png')
             .setOrigin(0, 0).setDepth(80).setTint(0x800080);
             piggy.play('coin01idle');
