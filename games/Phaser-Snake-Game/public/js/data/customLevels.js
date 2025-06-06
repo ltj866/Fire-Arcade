@@ -1,13 +1,64 @@
 import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS, INVENTORY } from "../SnakeHole.js";
-import { PORTAL_COLORS } from '../const.js';
+import { PORTAL_COLORS, ITEMS } from '../const.js';
 
 
 
 
 export var STAGE_OVERRIDES = new Map([
+    ["World_4-4", {
+        preFix: function (scene) {
+
+        },
+        postFix: function (scene) {
+
+            var transTile = scene.wallLayer.findByIndex(11);
+            transTile.index = -1;
+
+            if (!INVENTORY.get("gearbox")) {
+                scene.gearbox = scene.add.sprite(transTile.pixelX + X_OFFSET, transTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+                .setOrigin(0, 0).setDepth(100).setTint(0xFfc0cb);
+
+                scene.gearbox.play('coin01idle');
+
+                scene.tweens.add( {
+                    targets: scene.gearbox,
+                    originY: [0.1875 - .0466,0.1875 + .0466],
+                    ease: 'sine.inout',
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                });
+
+
+                if (scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] === "empty") {
+
+                    scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] = scene.gearbox;
+
+                } else {
+                    // Sanity debugger.
+                    debugger
+                }
+                
+
+
+
+                scene.gearbox.onOver = function() {
+                    INVENTORY.set("gearbox", true);
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+
+                    scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] = "empty";
+                    
+                    scene.gearbox.destroy();
+
+                    var spaceboy = scene.scene.get("SpaceBoyScene");
+                    ITEMS.get("gearbox").addToInventory(spaceboy);
+                }
+            }
+        }
+
+    }],
     ["World_2-4", {
         preFix: function (scene) {
-            scene.get
 
         },
         postFix: function (scene) {
@@ -39,8 +90,7 @@ export var STAGE_OVERRIDES = new Map([
                     // Sanity debugger.
                     debugger
                 }
-                
-
+            
 
 
                 scene.piggy.onOver = function() {
@@ -52,10 +102,7 @@ export var STAGE_OVERRIDES = new Map([
                     scene.piggy.destroy();
 
                     var spaceboy = scene.scene.get("SpaceBoyScene");
-                    
-                    var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
-                    .setOrigin(0, 0).setDepth(100).setTint(0x800080);
-                    piggy.play('coin01idle'); 
+                    ITEMS.get("piggybank").addToInventory(spaceboy);
                 }
             }
         }
