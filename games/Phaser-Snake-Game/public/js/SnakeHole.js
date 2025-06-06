@@ -12105,7 +12105,6 @@ class ScoreScene extends Phaser.Scene {
         var stageScore;
         var cursorIndex = -1; // Plays sound at 0;
         
-        debugger
         var atomTimeTotal = atomList.reduce((a,b) => a + b, 0);
         var stageCache = this.cache.json.get(`${this.stageData.stage}.properties`);
 
