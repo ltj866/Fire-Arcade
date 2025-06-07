@@ -238,7 +238,7 @@ var Snake = new Phaser.Class({
 
 
         // #region Bonk Ghost Walls
-        if (scene.map.getLayer('Ghost-1')) {
+        if (this.ghostWallLayer) {
             scene.map.setLayer("Ghost-1"); // When there are multiple version. Get the current one here.
             if (scene.map.getTileAtWorldXY( xN, yN )) {
             
@@ -270,7 +270,11 @@ var Snake = new Phaser.Class({
                     }
                     if (!portalSafe && scene.bonkable) {
                         this.bonk(scene);    
-                    }  
+                    }
+                    
+                    return true;
+                } else {
+                    return false;
                 }
             }) 
         }
@@ -400,7 +404,7 @@ var Snake = new Phaser.Class({
         
         
        
-        if (checkPortals.length > 1 && scene.canPortal) {
+        if (checkPortals.length > 1 && scene.canPortal && scene.gState === GState.PLAY) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
                 testPortal.x, testPortal.y);
@@ -419,6 +423,7 @@ var Snake = new Phaser.Class({
 
             checkPortals.forEach( portal => {
                 //console.log(portal.targetObject.anims)
+
                 this.snakeLights.forEach( light => {
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
@@ -434,6 +439,7 @@ var Snake = new Phaser.Class({
 
             if (scene.canPortal) {
                 scene.portals.forEach(portal => {
+
                     let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
                         portal.x, portal.y);
                         // normalized code to be used at a later point
@@ -441,6 +447,24 @@ var Snake = new Phaser.Class({
                         (_dist - 0) / (600 - 0), 
                         0, 1
                         );*/
+                    if (scene.gState != GState.PORTAL) {
+                        switch (true) {
+                            case _dist > GRID * 5:
+                                
+                                portal.anims.msPerFrame = 125; // 125
+                                break;
+                            case _dist > GRID * 3:
+                                portal.anims.msPerFrame = 32;
+                                break;
+                            case _dist > GRID * 0:
+                                portal.anims.msPerFrame = 16;
+                                break;
+                        
+                            default:
+                                break;
+                        }   
+                    }
+                    
 
                     if (portal.targetObject.portalTimerRunning === false) { // && portal.canHighlight === true) {
 
@@ -454,7 +478,7 @@ var Snake = new Phaser.Class({
                             portal.targetObject.anims.msPerFrame;*/
                         
                         portal.targetObject.portalHighlight.alpha = 
-                            1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
+                            1 - Phaser.Math.Clamp(_dist / maxFrameRate / 2, -0.5, 1.25);
                         
                         //console.log(portal.targetObject.portalHighlight.alpha);
                     }  
@@ -530,8 +554,6 @@ var Snake = new Phaser.Class({
         this.direction = DIRS.STOP;
         scene.screenShake();
 
-
-
         if (ourPersistScene.coins === 1) {
             debugger
             musicPlayer.nextSong(`track_175`);
@@ -544,9 +566,15 @@ var Snake = new Phaser.Class({
             scene.scene.get("InputScene").moveHistory.push(["BONK"]);
 
             //reset portal visuals on bonk
+            debugger
             scene.portals.forEach(portal => {
                 portal.portalHighlight.alpha = 0;
-                console.log(portal.portalHighlight.alpha)
+                console.log(portal.portalHighlight.alpha);
+
+                portal.anims.msPerFrame = 128;
+
+                // If portalling interupted make sure all portal segments are invisible.
+                portal.snakePortalingSprite.visible = false;
             });
             //console.log(scene.gState, "BONK" , this.direction);
 
@@ -559,9 +587,9 @@ var Snake = new Phaser.Class({
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             
-            // If portalling interupted make sure all portal segments are invisible.
+            
             scene.portals.forEach ( portal => {
-                portal.snakePortalingSprite.visible = false;
+                
             });
     
             scene.wallPortals.forEach ( portalWallSegment => {
