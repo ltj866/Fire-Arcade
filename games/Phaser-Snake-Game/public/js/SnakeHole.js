@@ -100,7 +100,7 @@ const PORTAL_SPAWN_DELAY = 66;
 
 // Make into a ENUM
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
-const BOOST_ADD_FLOOR = 100;
+export const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
 export const X_OFFSET = 292 / 2;
@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-13'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -6542,7 +6542,7 @@ class PersistScene extends Phaser.Scene {
         this.prevCodexStageMemory = START_STAGE;
         this.prevStage = START_STAGE;
         this.prevRank = 0;
-        this.speedSprint = SPEED_SPRINT;
+        //this.speedSprint = SPEED_SPRINT;
 
         // List of Background Containers
         this.bgPlanets = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
@@ -7032,8 +7032,9 @@ class GameScene extends Phaser.Scene {
 
         this.moveInterval = SPEED_WALK;
         this.boostCost = 6;
+        this.boostAdd = 1;
         this.speedWalk = SPEED_WALK;
-        //this.speedSprint = this.scene.get("PersistScene").speedSprint;
+        this.speedSprint = SPEED_SPRINT;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -7041,6 +7042,7 @@ class GameScene extends Phaser.Scene {
         // Special flags
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
+        this.collideSelf = true;
         this.stepMode = false; // Stops auto moving, only pressing moves.
         this.extractMenuOn = false; // set to true to enable extract menu functionality.
         this.spawnCoins = true;
@@ -8029,7 +8031,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.input.keyboard.on('keyup-SPACE', e => { 
+        this.input.keyboard.on('keyup-SPACE', e => {  //JMS1
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
                 debugger
@@ -9102,7 +9104,6 @@ class GameScene extends Phaser.Scene {
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
         var length = 0;
-        this.lengthGoal = LENGTH_GOAL;
         var length = `${ourGame.length}`;
 
         if (this.lengthGoal != 0) {
@@ -9366,7 +9367,7 @@ class GameScene extends Phaser.Scene {
             }
 
              // Restart Score Timer
-            if (this.length < this.lengthGoal || this.lengthGoal === 0) {
+            if (this.length < this.lengthGoal) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                     delay: this.maxScore * 100,
                     paused: false
@@ -9559,7 +9560,7 @@ class GameScene extends Phaser.Scene {
 
     // #region .screenShake(
     screenShake(){
-        if (this.moveInterval === this.scene.get("PersistScene").speedSprint) {
+        if (this.moveInterval === this.speedSprint) {
             this.cameras.main.shake(400, .01);
         }
         else if (this.moveInterval === this.speedWalk){
@@ -9685,7 +9686,7 @@ class GameScene extends Phaser.Scene {
         
         // Store speed values
         let _walkSpeed = this.speedWalk;
-        let _sprintSpeed = this.scene.get("PersistScene").speedSprint;
+        let _sprintSpeed = this.speedSprint;
 
         // Store initial camera position
         let initialCameraX = this.cameras.main.scrollX;
@@ -9735,7 +9736,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = slowMoValue;
                         this.anims.globalTimeScale = slowMoValue;
                         this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed / slowMoValue;
+                        this.speedSprint = _sprintSpeed / slowMoValue;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = slowMoValue;
                         }
@@ -9745,7 +9746,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = 1;
                         this.anims.globalTimeScale = 1;
                         this.speedWalk = _walkSpeed;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed;
+                        this.speedSprint = _sprintSpeed;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = 1;
                         }
@@ -9780,7 +9781,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = slowMoValue;
                         this.anims.globalTimeScale = slowMoValue;
                         this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed / slowMoValue;
+                        this.speedSprint = _sprintSpeed / slowMoValue;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = slowMoValue;
                         }
@@ -9833,7 +9834,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = 1;
                         this.anims.globalTimeScale = 1;
                         this.speedWalk = _walkSpeed;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed;
+                        this.speedSprint = _sprintSpeed;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = 1;
                         }
@@ -9924,7 +9925,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Linear',
             repeat: 0,
             timeScale: slowMoValCopy,
-            delay: this.tweens.stagger(this.scene.get("PersistScene").speedSprint),
+            delay: this.tweens.stagger(this.speedSprint),
             onUpdate: (tween) => {
                 this.timeScale = slowMoValCopy /2;
             }
@@ -10894,17 +10895,10 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(this.scene.get("PersistScene").speedSprint),
+            delay: this.tweens.stagger(this.speedSprint),
         });
 
         return this.snakeEating
-    }
-    onEat(food) {
-
-        
-        // Moves the eaten atom after a delay including the electron.
-        
-
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
@@ -10950,19 +10944,18 @@ class GameScene extends Phaser.Scene {
 
     }
     checkWinCon() { // Returns Bool
-        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
-            return this.length >= this.lengthGoal
-        }
+        return this.length >= this.lengthGoal
         
     }
 
     checkLoseCon() {
+        /*
         if (this.lengthGoal > 0) { // Placeholder check for bonus level.
             const ourPersist = this.scene.get("PersistScene");
             return ourPersist.coins < 0;
         } else {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 === 1; 
-        }
+        */
         
     }
 
@@ -11435,21 +11428,10 @@ class GameScene extends Phaser.Scene {
             // #region boost update
  
         }
-        
 
         var timeTick = this.currentScoreTimer()
       
-        
-        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level. // @james do I even need this anymore?
-        if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
-            // Temp Code for bonus level
-            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
-
-            this.scene.pause();
-
-            this.scene.start('ScoreScene');
-
-        }
+    
         // #endregion
 
         if (!this.checkWinCon() && !this.scoreTimer.paused) {
@@ -11503,6 +11485,10 @@ class GameScene extends Phaser.Scene {
                         }
                     }
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
+                }
+
+                if (STAGE_OVERRIDES.has(this.stage) && "afterTick" in STAGE_OVERRIDES.get(this.stage)) {
+                    STAGE_OVERRIDES.get(this.stage).afterTick(this);
                 }
             }
 
@@ -11564,7 +11550,7 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = this.scene.get("PersistScene").speedSprint;
+                    this.moveInterval = this.speedSprint;
 a                    
                     if (!this.winned) {
                         // Boost Stats
@@ -11584,7 +11570,8 @@ a
                 //console.log("spacebar not down");
                 this.moveInterval = this.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
-                this.boostEnergy = Math.min(this.boostEnergy + 1, 1000); // Recharge Boost Slowly
+                
+                this.boostEnergy = Math.min(this.boostEnergy + this.boostAdd, 1000); // Recharge Boost Slowly
             }
             this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
             this.boostBarTween.updateTo("duration", 30000, true);
@@ -13057,6 +13044,7 @@ class ScoreScene extends Phaser.Scene {
                 delay:0,
                 onComplete: () =>
                     {
+                        debugger
                         this.rankSounds[rank].play();
                         nextRankLetter.setAlpha(1);
                     },
@@ -13855,7 +13843,7 @@ class InputScene extends Phaser.Scene {
     moveUp(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode) || !gameScene.collideSelf) { 
 
             //console.log("I'm Moving Up");
             
@@ -13891,7 +13879,7 @@ class InputScene extends Phaser.Scene {
     moveDown(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode ) || !gameScene.collideSelf) { 
            
 
             this.setPLAY(gameScene);
@@ -13923,7 +13911,7 @@ class InputScene extends Phaser.Scene {
     moveLeft(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) {
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)  || !gameScene.collideSelf) {
             
             this.setPLAY(gameScene);
 
@@ -13955,7 +13943,7 @@ class InputScene extends Phaser.Scene {
     moveRight(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode) || !gameScene.collideSelf) { 
             
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);
