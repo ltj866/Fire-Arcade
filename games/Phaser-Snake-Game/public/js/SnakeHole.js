@@ -2255,8 +2255,6 @@ class PinballDisplayScene extends Phaser.Scene {
                 this.comboActive = false;
             }
         });
-        this.comboActive = false;
-        //this.scene.get("GameScene").snake.comboCounter = 0;
     }
     interrupt(tween) {
         if (tween) {
