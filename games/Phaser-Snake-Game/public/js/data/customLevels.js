@@ -828,54 +828,6 @@ export var STAGE_OVERRIDES = new Map([
 
         }      
     }],
-    ["Bonus_X-13", {
-        preFix: function (scene) {
-            scene.lengthGoal = Infinity;
-            scene.stopOnBonk = true;
-            scene.highScore = INVENTORY.get("comboTrainerHS");
-        },
-        postFix: function (scene) {
-            scene.checkWinCon = this.checkWinCon;
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-
-            scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
-                scene.comboCounter, 
-                8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
-
-        },
-        afterMove: function (scene) {
-            if (scene.comboCounter === 0) {
-                        if (scene.snake.body.length > 3) {
-                    scene.snake.tail = scene.snake.body.slice(-1);
-                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
-
-                    oldPart[0].destroy();  
-                }
-            }
-
-
-            if (scene.comboCounter > scene.highScore) {
-                scene.highScore = scene.comboCounter;
-                scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.highScore);
-
-                INVENTORY.set("comboTrainerHS", scene.comboCounter);
-                localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
-            }
-            //debugger
-
-            var head = scene.snake.body[1].getCenter();
-
-            scene.comboText.x = head.x;
-            scene.comboText.y = head.y;
-            scene.comboText.setText(scene.comboCounter);
-
-        },
-        checkWinCon: function () {
-            return false;
-        }, 
-    }],
     // #endregion Bonus
     ["Tutorial_T-1", {
         // #region T-1
@@ -1153,3 +1105,52 @@ export var STAGE_OVERRIDES = new Map([
         
     }],
 ]);
+
+STAGE_OVERRIDES.add("Bonus_X-13", {
+    preFix: function (scene) {
+        scene.lengthGoal = Infinity;
+        scene.stopOnBonk = true;
+        scene.highScore = INVENTORY.get("comboTrainerHS");
+    },
+    postFix: function (scene) {
+        scene.checkWinCon = this.checkWinCon;
+        scene.snake.grow(scene);
+        scene.snake.grow(scene);
+        scene.snake.grow(scene);
+
+        scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
+            scene.comboCounter, 
+            8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
+
+    },
+    afterMove: function (scene) {
+        if (scene.comboCounter === 0) {
+                    if (scene.snake.body.length > 3) {
+                scene.snake.tail = scene.snake.body.slice(-1);
+                var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+
+                oldPart[0].destroy();  
+            }
+        }
+
+
+        if (scene.comboCounter > scene.highScore) {
+            scene.highScore = scene.comboCounter;
+            scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.highScore);
+
+            INVENTORY.set("comboTrainerHS", scene.comboCounter);
+            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+        }
+        //debugger
+
+        var head = scene.snake.body[1].getCenter();
+
+        scene.comboText.x = head.x;
+        scene.comboText.y = head.y;
+        scene.comboText.setText(scene.comboCounter);
+
+    },
+    checkWinCon: function () {
+        return false;
+    }, 
+});
