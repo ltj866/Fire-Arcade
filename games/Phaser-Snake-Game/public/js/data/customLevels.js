@@ -1107,6 +1107,7 @@ export var STAGE_OVERRIDES = new Map([
 ]);
 
 STAGE_OVERRIDES.add("Bonus_X-13", {
+    X_13: null,
     preFix: function (scene) {
         scene.lengthGoal = Infinity;
         scene.stopOnBonk = true;
