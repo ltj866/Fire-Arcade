@@ -437,7 +437,7 @@ var Snake = new Phaser.Class({
                             portal.targetObject.anims.msPerFrame;*/
                         
                         portal.targetObject.portalHighlight.alpha = 
-                            1 - Phaser.Math.Clamp(_dist / maxFrameRate / 2, -0.5, 1.25);
+                            1 - Phaser.Math.Clamp(_dist / maxFrameRate / 2 , -0.5, 1.5);
                         
                         //console.log(portal.targetObject.portalHighlight.alpha);
                     }  
