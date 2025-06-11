@@ -159,8 +159,6 @@ var Snake = new Phaser.Class({
         // wrapping tiles
         scene.map.setLayer(scene.wallVarient);
         
-        
-
 
         // Look ahead for bonks
     
@@ -272,43 +270,14 @@ var Snake = new Phaser.Class({
         }
         // #endregion
 
-        // Make Portal Snake body piece invisible. 
-        // TODO redo this to check every move for if there is a portal using the interact layer.
-        
-        
-        
-
         /**
          * Interface requirement that all objects in the interative layer 
-         * need an onOver function to work properly.
-         */
-        
+         * need an onOver method to work properly or be "empty".
+         */ 
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
-            var __x = (this.head.x - X_OFFSET) / GRID;
-            var __y = (this.head.y - Y_OFFSET) / GRID;
-                 //this.body includes the head I think
-                 //only happen if snake is on an atom. ++
-                 //only if the atom is the final atom.
-                 //debugger;
-                 if (scene.interactLayer[__x][__y] instanceof Food
-                    && scene.length === scene.lengthGoal -1
-                 ) {
-                    debugger;
-                    //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
-
-                 }
-                 else{
-                    
-                    if (scene.interactLayer[__x][__y] instanceof Food) {
-                        //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
-
-                    }
-                    //console.log('SHIFT POSITION')
-                    Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
-                 }
-                
+                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);      
         }
 
     

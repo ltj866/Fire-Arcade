@@ -11027,7 +11027,6 @@ class GameScene extends Phaser.Scene {
     }
     checkWinCon() { // Returns Bool
         return this.length >= this.lengthGoal
-        
     }
 
     checkLoseCon() {
