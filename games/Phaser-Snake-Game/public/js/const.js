@@ -1,7 +1,7 @@
 
 
 
-import {GRID, INVENTORY, MODES} from "./SnakeHole.js";
+import {GRID, INVENTORY, MODES,} from "./SnakeHole.js";
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 
 export const PORTAL_COLORS = [
@@ -79,22 +79,25 @@ export const PORTAL_TILE_RULES = { // TODO Move out of here
     424:3
 };
 
+const INVENTORY_X = 499;
+const INVENTORY_Y = 136;
+const INVENTORY_GRID = 19;
 
 
 export const ITEMS = new Map([
     ["piggybank", {
         addToInventory: function (scene) {
-            var piggy = scene.add.sprite(501, 140, 'coinPickup01Anim.png')
-            .setOrigin(0, 0).setDepth(80).setTint(0x800080);
-            piggy.play('coin01idle');
+            var piggy = scene.add.sprite(INVENTORY_X -2,
+                 INVENTORY_Y + INVENTORY_GRID * 10.25,'inventoryIcons',2)
+            .setOrigin(0, 0).setDepth(80);
 
             piggy.name = "piggybank";
 
-            scene.invItems.set("piggybank", piggy);
+            //scene.invItems.set("piggybank", piggy);
 
             var target = piggy.getBottomRight();
             
-            scene.savedCoinsUI = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.savedCoinsUI = scene.add.bitmapText(target.x + GRID * 3.25, target.y - 6, 'mainFont',
                 INVENTORY.get("savedCoins") ?? 0,
             8).setOrigin(1,1).setDepth(81)
 
@@ -107,9 +110,9 @@ export const ITEMS = new Map([
     }],
     ["gearbox", {
         addToInventory: function (scene) {
-            var gearbox = scene.add.sprite(501 + GRID * 1.5, 140, 'coinPickup01Anim.png')
+            var gearbox = scene.add.sprite(INVENTORY_X, INVENTORY_Y,
+                'inventoryIcons',26)
             .setOrigin(0, 0).setDepth(80).setTint(0xFfc0cb);
-            gearbox.play('coin01idle');
 
             gearbox.name = "gearbox";
 
@@ -118,9 +121,9 @@ export const ITEMS = new Map([
 
             var target = gearbox.getBottomRight();
             
-            gearbox.text = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            /*gearbox.text = scene.add.bitmapText(target.x, target.y, 'mainFont',
                 "FAST",
-            8).setOrigin(0,1).setDepth(81)
+            8).setOrigin(1,1).setDepth(81)*/
 
             return gearbox;
         },
@@ -130,15 +133,17 @@ export const ITEMS = new Map([
 
             if (scene.invSettings.get("gearbox") === "fast") {
 
-                sprite.setTint(0x606000);
+                //sprite.setTint(0x606000);
                 scene.invSettings.set("gearbox", "slow");
-                sprite.text.setText("SLOW");
+                sprite.setFrame(27);
+                //sprite.text.setText("SLOW");
                 scene.scene.get("PersistScene").speedSprint = 138
                 
             } else if (scene.invSettings.get("gearbox") === "slow") {
-                sprite.setTint(0xFfc0cb);
+                //sprite.setTint(0xFfc0cb);
+                sprite.setFrame(26);
                 scene.invSettings.set("gearbox", "fast");
-                sprite.text.setText("FAST");
+                //sprite.text.setText("FAST");
                 scene.scene.get("PersistScene").speedSprint = 33
                 
             }
@@ -150,9 +155,8 @@ export const ITEMS = new Map([
     }],
     ["comboTrainer", {
         addToInventory: function (scene) {
-            var item = scene.add.sprite(501, 330
-            ).setOrigin(0, 0).setDepth(80).setTint(0x800080);
-            item.play('atom05spawn');
+            var item = scene.add.sprite(INVENTORY_X, INVENTORY_Y + INVENTORY_GRID * 6,
+            'inventoryIcons',42).setOrigin(0, 0).setDepth(80);
             
 
             item.name = "comboTrainer";
@@ -161,7 +165,7 @@ export const ITEMS = new Map([
 
             var target = item.getBottomRight();
             
-            scene.comboTrainertPB = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.comboTrainertPB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
                 INVENTORY.get("comboTrainerHS") ?? 0,
             8).setOrigin(1,1).setDepth(81)
 
@@ -188,9 +192,8 @@ export const ITEMS = new Map([
     }],
     ["comboTrainerX", {
         addToInventory: function (scene) {
-            var item = scene.add.sprite(501 + GRID * 1.5, 330
-            ).setOrigin(0, 0).setDepth(80).setTint(0x808000);
-            item.play('atom05spawn');
+            var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 6,
+            'inventoryIcons',43).setOrigin(0, 0).setDepth(80);
 
             
 
@@ -200,7 +203,7 @@ export const ITEMS = new Map([
 
             var target = item.getBottomRight();
             
-            scene.comboTrainerX_PB = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.comboTrainerX_PB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
                 INVENTORY.get("comboTrainerXHS") ?? 0,
             8).setOrigin(1,1).setDepth(81);
 

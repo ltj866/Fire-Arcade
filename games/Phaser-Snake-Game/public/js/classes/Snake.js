@@ -539,7 +539,8 @@ var Snake = new Phaser.Class({
 
             if (!scene.winned) {
                 // @Overridable
-                scene.onBonk(); 
+                scene.onBonk();
+                console.log('BONK')
             }
     
             scene.snakeCrash.play();    

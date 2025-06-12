@@ -997,7 +997,8 @@ class SpaceBoyScene extends Phaser.Scene {
                                 this.blankScreenInventory.destroy();
                                 this.blankScreenBoost.destroy();
                                 this.spaceBoyReady = true;
-                                this.scene.get("MainMenuScene").pressToPlayTween.play();
+                                this.scene.get("MainMenuScene").UI_PressStartTween.play();
+                                this.scene.get("MainMenuScene").UI_ControlsTween.play();
                                 this.scene.get("PinballDisplayScene").pinballballPowerOn();
                                 // Tween to remove the dark tint and transition back to default
                                 this.tweens.add({
@@ -1232,10 +1233,10 @@ class SpaceBoyScene extends Phaser.Scene {
 
             var firstItem = this.invArray[selectedIndex];
 
-            firstItem.outLine = this.add.rectangle(firstItem.getBottomLeft().x, firstItem.getBottomLeft().y + 3 , 10, 1
-            ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
-
-            firstItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);
+            //UI INVENTORY SELECTOR HERE
+            firstItem.outLine = this.add.sprite(firstItem.x, firstItem.y + 9 ,
+                'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1);
+            firstItem.outLine.play('inventorySelectorIdle');
         }, this);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
@@ -1249,11 +1250,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 var nextItem = this.invArray[this.invIndex];
 
-                nextItem.outLine = this.add.rectangle(nextItem.getBottomLeft().x, nextItem.getBottomLeft().y + 3 , 10, 1
-                ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
-    
-                nextItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);
-                
+                nextItem.outLine = this.add.sprite(nextItem.x, nextItem.y + 9 ,
+                    'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1);
+                nextItem.outLine.play('inventorySelectorIdle');
             }
 
         }, this);
@@ -1269,10 +1268,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 var nextItem = this.invArray[this.invIndex];
 
-                nextItem.outLine = this.add.rectangle(nextItem.getBottomLeft().x, nextItem.getBottomLeft().y + 3 , 10, 1
-                ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
-    
-                nextItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);  
+                 nextItem.outLine = this.add.sprite(nextItem.x, nextItem.y + 9 ,
+                    'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1); 
+                nextItem.outLine.play('inventorySelectorIdle');
             }
         }, this);
 
@@ -1289,6 +1287,7 @@ class SpaceBoyScene extends Phaser.Scene {
             if (this.inInventory) {
 
                 var selected = this.invArray[this.invIndex];
+                this.scene.get("MainMenuScene").overlayDimmer.setAlpha(0.0);
                 selected.outLine.destroy();
 
                 this.inInventory = false;
@@ -2116,7 +2115,10 @@ class PinballDisplayScene extends Phaser.Scene {
         //this.scene.bringToTop('PinballDisplayScene');
 
         //const ourGame = this.scene.get("GameScene");
-
+        
+        //check for if combo is ready to display
+        this.comboReady = true;
+        
         // pinball display/combo cover comboCover comboBG
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0 + 2,'comboBG')
         .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0).setAlpha(1).setTint(0x555555);
@@ -2184,7 +2186,7 @@ class PinballDisplayScene extends Phaser.Scene {
 
         this.comboCountText = this.bestScoreLabel = this.add.bitmapText(
             206, GRID * 1.25,
-            'mainFontLarge',``, 18
+            'mainFontLarge',``, 13
         ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0).setAlpha(0);
 
         this.comboCountText.name = 'ComboCountText';
@@ -2214,7 +2216,7 @@ class PinballDisplayScene extends Phaser.Scene {
         this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+                this.letterO2, this.letterExplanationPoint,], //this.comboCountText], 
             y: { from: GRID * 1.25, to: GRID * 0 },
             ease: 'Sine.InOut',
             duration: 200,
@@ -2226,7 +2228,13 @@ class PinballDisplayScene extends Phaser.Scene {
 
     comboAppear(){
         console.log('appearing')
-        this.tweens.add({
+        // any remnants of fade happening need to be halted right away
+        if (this.comboFadeTween) {
+                console.log('interrupting fade')
+                this.interrupt(this.comboFadeTween);
+                this.comboFadeTween.destroy();
+            }
+        this.comboAppearTween = this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
                 this.letterO2, this.letterExplanationPoint, this.comboCountText], 
@@ -2242,6 +2250,8 @@ class PinballDisplayScene extends Phaser.Scene {
     }
 
     comboFade(){
+        console.log('fading')
+        this.comboActive = false
         this.comboFadeTween = this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
@@ -2251,10 +2261,8 @@ class PinballDisplayScene extends Phaser.Scene {
             duration: 300,
             delay: 750,
             repeat: 0,
-            onComplete: (tween) => {
-                this.comboActive = false;
-            }
         });
+
     }
     interrupt(tween) {
         if (tween) {
@@ -2269,7 +2277,7 @@ class PinballDisplayScene extends Phaser.Scene {
             this.comboCountText.setAlpha(0);
 
             this.comboActive = false;           
-        } 
+        }
     }
 
     pinballballFGOn(){
@@ -3072,6 +3080,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
+        this.load.spritesheet('inventoryIcons', 'assets/sprites/UI_InventorySheet.png', { frameWidth: 18, frameHeight: 18 });
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
@@ -3082,6 +3091,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
         this.load.image('UI_PowerSwitch', 'assets/sprites/UI_PowerSwitch.png');
         this.load.image('UI_InventoryBG', 'assets/sprites/UI_InventoryBG.png');
+        this.load.spritesheet('UI_InventorySelector', 'assets/sprites/UI_InventorySelector.png', { frameWidth: 20, frameHeight: 20});
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
@@ -3425,25 +3435,6 @@ class StartScene extends Phaser.Scene {
         //titlePortal.setTint(_portalColor);
         titlePortal.setTint(intColor).setScale(1.25);
         titlePortal.play('portalIdle');
-
-        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "white",
-            "textAlign": 'center'
-
-        }),
-                `Press Space`
-        ).setOrigin(0.5,0.5).setScale(0.5);
-
-        this.pressToPlayTween = this.tweens.add({
-            targets: this.pressToPlay,
-            alpha: 0,
-            duration: 1000,
-            ease: 'Sine.InOut',
-            yoyo: true,
-            repeat: -1,
-        });
 
         // SHORTCUT SCENE START HERE TO GO DIRECTLY
         //this.scene.start("StageCodex");
@@ -4685,6 +4676,8 @@ class MainMenuScene extends Phaser.Scene {
     preload(){
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
+        this.load.image('UI_Controls', 'assets/sprites/UI_Controls.png');
+        this.load.image('UI_PressStart', 'assets/sprites/UI_PressStart.png');
     }
     init(props){
         var { startingAnimation = "default" } = props;
@@ -5275,9 +5268,13 @@ class MainMenuScene extends Phaser.Scene {
 
         var mapEngaged = false;
 
+        this.overlayDimmer = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000)
+            .setOrigin(0, 0).setAlpha(0).setDepth(100); 
+
         // used to back out of sub menus
         this.input.keyboard.on('keydown-Q', e => {
             if (this.menuState === 0) {
+                this.overlayDimmer.setAlpha(0.5);
                 this.scene.pause();
                 this.scene.get("SpaceBoyScene").events.emit("navInventory", 0);
             }
@@ -5506,8 +5503,12 @@ class MainMenuScene extends Phaser.Scene {
                         this.scene.get("MusicPlayerScene").startMusic();
                     } 
     
-                    mainMenuScene.pressToPlayTween.stop();
-                    mainMenuScene.pressToPlay.setAlpha(0);
+                    mainMenuScene.UI_PressStartTween.stop();
+                    mainMenuScene.UI_ControlsTween.stop();
+                    mainMenuScene.UI_PressStart.stop();
+                    
+                    mainMenuScene.UI_PressStart.destroy();
+                    mainMenuScene.UI_Controls.destroy();
                     mainMenuScene.pressedSpace = true;
                     if (this.startingAnimation === "default") {
                         titleTween.resume();
@@ -5641,74 +5642,30 @@ class MainMenuScene extends Phaser.Scene {
                     `Press Space`
             ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
-            var controlsStyle = {
-                "fontSize": '12px',
-                "fontWeight": 200,
-                "color": "white",
-                "textAlign": 'center',
-                "border": '1px solid white', /* Thickness, style, and color */
-                "border-radius": '4px',
-                "padding": '4px', /* Space between text and border */
-                "display": 'inline-block', /* Ensures the border wraps tightly around the text */
-            }
-
-            var controlsY = 266;
-
-            var controlsPlus1 = this.add.dom(304, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "border": '0px', /* Thickness, style, and color */
-            }),
-                    `+`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsTab = this.add.dom(287, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle),
-                    `Tab`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsSpace = this.add.dom(322, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle),
-                    `Space`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsPlus2 = this.add.dom(344, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "border": '0px', /* Thickness, style, and color */
-            }),
-                    `+`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-
-            var controlsArrowsDown = this.add.dom(366, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡇`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsArrowsLeft = this.add.dom(356, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡄`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsArrowsRight = this.add.dom(376, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡆`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsArrowsUp = this.add.dom(366, 254, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡅`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-              
+            this.UI_Controls = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + GRID * 8,
+                'UI_Controls').setOrigin(0.5,0.5).setAlpha(0);
+            this.UI_PressStart = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + GRID * 5,
+                'UI_PressStart').setOrigin(0.5,0.5).setAlpha(0); 
     
-            this.pressToPlayTween = this.tweens.add({
+            this.UI_PressStartTween = this.tweens.add({
                 targets: [
-                    this.pressToPlay,
+                    this.UI_PressStart,
                 ],
                 alpha: 1,
                 duration: 1000,
                 ease: 'Sine.InOut',
                 yoyo: true,
                 repeat: -1,
+                paused: true
+            });
+            this.UI_ControlsTween = this.tweens.add({
+                targets: [
+                    this.UI_Controls,
+                ],
+                alpha: 1,
+                duration: 1000,
+                ease: 'Sine.InOut',
+                yoyo: false,
                 paused: true
             });
         }
@@ -9165,7 +9122,7 @@ class GameScene extends Phaser.Scene {
 
        // Combo Sprites
 
-       this.comboActive = false; //used to communicate when to activate combo tweens
+       //this.comboActive = false; //used to communicate when to activate combo tweens
 
        /*this.letterC = this.add.sprite(X_OFFSET + GRID * 0 - GRID * 4,GRID * 1.25,"comboLetters", 0).setDepth(51)//.setAlpha(0);
        this.letterO = this.add.sprite(X_OFFSET + GRID * 1.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51)//.setAlpha(0);
@@ -10994,6 +10951,10 @@ class GameScene extends Phaser.Scene {
         this.coinUIText.setHTML(
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
         );
+
+        // we set a timer here because upon respawning, comboAppear() function wants to run immediately
+        ourPinball.comboReady = false;
+        this.time.delayedCall(3000, () => ourPinball.comboReady = true);
         
         ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 5)
         
@@ -11013,11 +10974,17 @@ class GameScene extends Phaser.Scene {
             onStart: () => {
                 const ourPinball = this.scene.get('PinballDisplayScene');
                 if (ourPinball.comboFadeTween) {
+                    console.log('interrupting fade')
                     ourPinball.interrupt(ourPinball.comboFadeTween);
+                    ourPinball.comboFadeTween.destroy();
                 }
-                
+                if (ourPinball.comboAppearTween) {
+                    console.log('interrupting appear')
+                    ourPinball.interrupt(ourPinball.comboAppearTween);
+                    ourPinball.comboAppearTween.destroy();
+                }
             }
-        }); 
+        });
 
         //if (this.UI_bonkTween.isPlaying()) {
         //    this.UI_bonkTween.restart();
@@ -11565,20 +11532,18 @@ class GameScene extends Phaser.Scene {
 
             const PINBALL = this.scene.get("PinballDisplayScene");
 
-            if (this.snake.comboCounter > 0 && !PINBALL.comboActive) {
-                PINBALL.comboAppear();
+            if (this.snake.comboCounter > 0 && !PINBALL.comboActive && PINBALL.comboReady) {
+                PINBALL.comboAppear(); 
             }
 
             // Check Combo Counter
             if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR) {
                 this.snake.comboCounter = 0;
-
+                //console.log(PINBALL.comboActive)
                 if (PINBALL.comboActive) {
                     PINBALL.comboFade();
                 }
             }
-            
-            
         }
         
      
@@ -14197,6 +14162,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 9,8,7,6]}),
         frameRate: 8,
         repeat: 0
+    });
+    scene.anims.create({
+        key: 'inventorySelectorIdle',
+        frames: scene.anims.generateFrameNumbers('UI_InventorySelector',{ frames: [ 0,1,2,3,4,5]}),
+        frameRate: 8,
+        repeat: -1
     });
     scene.anims.create({
         key: 'starIdle',
