@@ -9648,9 +9648,8 @@ class GameScene extends Phaser.Scene {
         
     }
 
-    compassUpdate(){
-        // #region Compass
-        const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
+    compassUpdate(_angle){
+        const SPACE_BOY = this.scene.get("SpaceBoyScene");
         let compassCheck = undefined;
         //let compassCode = undefined;
         let compassDir = undefined;
@@ -9661,13 +9660,9 @@ class GameScene extends Phaser.Scene {
         });
 
         if (compassCheck && this.stageID) {
-            
             this.stageID;
             compassDir = compassCheck.get(this.stageID);
         } 
-        
-
-       
 
         switch (compassDir) {
             case "N":
@@ -9700,18 +9695,40 @@ class GameScene extends Phaser.Scene {
                 break;
         }
 
-        let currentAngle = ourSpaceBoyScene.compassNeedle.angle;
+        if (_angle !== undefined) {
+            compassDir = _angle;
+        }
+        else{
+            // compass highlight code will go here
+            /*SPACE_BOY.compassBase.preFX.setPadding(2);
+            const fx = SPACE_BOY.compassNeedle.preFX.addGlow(0xffffff,2,0);
+            
+            this.tweens.add({
+                targets: fx,
+                outerStrength: 4,
+                yoyo: true,
+                loop: -1,
+                ease: 'sine.inout'
+            });*/
+        }
+
+        let currentAngle = SPACE_BOY.compassNeedle.angle;
         let shortestDiff = Phaser.Math.Angle.ShortestBetween(currentAngle, compassDir);
         let finalAngle = currentAngle + shortestDiff;
+        //console.log('compassDir',compassDir)
+        //console.log('currentAngle',currentAngle,
+        //    'shortestDiff',shortestDiff,
+        //    'finalAngle',finalAngle
+        //)
 
-        ourSpaceBoyScene.tweens.chain({
-            targets: [ourSpaceBoyScene.compassNeedle, ourSpaceBoyScene.compassNeedleShadow],
+        SPACE_BOY.tweens.chain({
+            targets: [SPACE_BOY.compassNeedle, SPACE_BOY.compassNeedleShadow],
             tweens: [
                 {
                     angle: { 
                         from: currentAngle, 
                         to: finalAngle },
-                    duration: 1000, // Duration in milliseconds,
+                    duration: 1000,
                     ease: 'Sine.InOut'
                 }
             ]
@@ -10649,9 +10666,7 @@ class GameScene extends Phaser.Scene {
         ourGameScene.scene.get("InputScene").scene.restart();
 
         //reset compass needle
-        this.compassUpdate()
-        //ourSpaceBoy.compassNeedle.angle = 0;
-        //ourSpaceBoy.compassNeedleShadow.angle = 0;
+        this.compassUpdate(0)
 
         this.gameSceneExternalCleanup();
 
