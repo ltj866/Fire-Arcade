@@ -123,9 +123,10 @@ export const EXTRACT_CODES = [
     "0-1|2-1|10-2|10-3|10-4",   
 ];
 
-const COMPASS_ORDER = [
+export const COMPASS_ORDER = [
     ["1-3", new Map([["0-1", "E"],["1-1", "E"],["1-2", "E"]])],
-    ["2-3", new Map([["0-1", "W"]])]
+    ["2-3", new Map([["0-1", "W"]])],
+    ["8-4", new Map([["0-1", "W"]])], // Random placehodler test
 ];
 
 export const GAUNTLET_CODES = new Map([

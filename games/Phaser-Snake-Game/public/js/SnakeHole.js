@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS, ITEMS } from './const.js';
-import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, COMPASS_ORDER, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -1159,6 +1159,7 @@ class SpaceBoyScene extends Phaser.Scene {
         this.compassBase.name = 'compassBase';
         this.compassNeedle = this.add.sprite(528 , 308,'compassNeedle');
         this.compassNeedle.name = 'compassNeedle';
+
         switch (persist.mode) {
             case MODES.CLASSIC:
                 this.mapProgressPanelText.setText("ADVENTURE");
@@ -7155,6 +7156,7 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
+        const SPACE_BOY = this.scene.get("SpaceBoyScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
@@ -8183,6 +8185,74 @@ class GameScene extends Phaser.Scene {
         this.events.on('spawnBlackholes', function (thingWePass) {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+
+            // #region Compass
+
+            let compassCheck = undefined;
+            let compassCode = undefined;
+            let compassDir = undefined;
+
+            COMPASS_ORDER.some( entry => {
+                compassCheck = entry[1];
+                return !checkRankGlobal(STAGES.get(entry[0]), RANKS.WOOD)
+            });
+
+            if (compassCheck && this.stageID) {
+                
+                this.stageID;
+                compassDir = compassCheck.get(this.stageID);
+            }
+
+            switch (compassDir) {
+                case "N":
+                    compassDir = 0;
+                    break;
+                case "NE":
+                    compassDir = 45;
+                    break;
+                case "E":
+                    compassDir = 90;
+                    break;
+                case "SE":
+                    compassDir = 135;
+                    break;
+                case "S":
+                    compassDir = 180;
+                    break;
+                case "SW":
+                    compassDir = 225;
+                    break;
+                case "W":
+                    compassDir = 270;
+                    break;
+                case "NW":
+                    compassDir = 315;
+                    break;
+                default:
+                    // is undefined
+                    compassDir = 0;
+                    break;
+            }
+
+            SPACE_BOY.tweens.chain({
+                targets: SPACE_BOY.compassNeedle,
+                tweens: [
+                    {
+                        angle: { 
+                            from: SPACE_BOY.compassNeedle.angle, 
+                            to: 0},
+                        duration: 750, // Duration in milliseconds,
+                        ease: 'Linear',
+                    },
+                    {
+                        angle: { 
+                            from: 0, 
+                            to: compassDir },
+                        duration: 1000, // Duration in milliseconds,
+                        ease: 'Linear'
+                    }
+                ]
+            }); 
             
 
             // #region is unlocked?
@@ -8929,8 +8999,6 @@ class GameScene extends Phaser.Scene {
         
         // Adjust intensities and radii
         adjustLightIntensityAndRadius(this.portalLights);
-        
-        
         
         
         
