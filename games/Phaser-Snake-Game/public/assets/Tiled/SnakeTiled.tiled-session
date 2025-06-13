@@ -1,5 +1,1619 @@
 {
     "activeFile": "Stage-x8.json",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        ":/automap-tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "Bonus_X-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Bonus_X-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Bonus_X-10.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Bonus_X-10.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Bonus_X-13.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Bonus_X-13.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Dark_Stage-02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "Dark_Stage-02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Dark_Stage-04.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Dark_Stage-06.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "Dark_Stage-06.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Gauntlet_1-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Gauntlet_1-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Gauntlet_1-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Gauntlet_1-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Gauntlet_1-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Gauntlet_1-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Gauntlet_1-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Gauntlet_1-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Gauntlet_1-5.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Gauntlet_1-5.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Ghost_Stage-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "Ghost_Stage-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Ghost_Stage-04a.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "Ghost_Stage-04a.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Ghost_Stage-04b.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "Ghost_Stage-04b.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Portal_Stage-ghost.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "Portal_Stage-ghost.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Racing_Stage-02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Racing_Stage-02.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Racing_Stage-04_Dark.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "Racing_Stage-04_Dark.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Racing_Stage-06_test.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 371.5
+            }
+        },
+        "Racing_Stage-06_test.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Racing_Stage-test.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Racing_Stage-test.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Racing_Stage-test02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Racing_Stage-test02.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Stage-02e.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 371.5
+            }
+        },
+        "Stage-02e.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Stage-03zzz.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "Stage-03zzz.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-06.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "Stage-08.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "Stage-09.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "Stage-10.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "Stage-11.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "Stage-11.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-12.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "Stage-12.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-13.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "Stage-AA.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "Stage-AA.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Stage-x8.json": {
+            "scale": 0.7750672043010752,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 338.6803086794416,
+                "y": 405.77126506546426
+            }
+        },
+        "Stage-x8.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Tutorial_T-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Tutorial_T-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Tutorial_T-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Tutorial_T-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Tutorial_T-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Tutorial_T-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Tutorial_T-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Tutorial_T-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Tutorial_T-5.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Tutorial_T-5.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Tutorial_T-6.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Tutorial_T-6.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_0-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_0-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_1-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_1-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_1-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_1-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_1-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_1-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_1-3.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_1-3.tmx#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_10-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_10-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_10-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_10-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_10-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_10-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_2-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_2-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_2-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-3_OLD.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_2-3_OLD.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_2-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_3-1_Wrap.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_3-1_Wrap.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_3-2_Wrap.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_3-2_Wrap.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_3-3_Wrap.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_3-3_Wrap.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_4-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_4-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_4-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_4-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_4-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_4-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_4-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_4-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_4-5.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_4-5.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_5-1_Racing.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_5-1_Racing.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_5-2_Racing.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_5-2_Racing.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_5-3_Racing.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_5-3_Racing.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_5-4_Racing.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_5-4_Racing.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-1_Adv_Portaling.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_8-1_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-2_Adv_Portaling.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_8-2_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-3_Adv_Portaling.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_8-3_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-4_Adv_Portaling.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_8-4_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-5_Adv_Portaling.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_8-5_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_9-2_Final_Exams.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_9-2_Final_Exams.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_9-3_Final_Exams.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_9-3_Final_Exams.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_9-4_Final_Exams.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "World_9-4_Final_Exams.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Wrap_Stage-03.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-03b.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "Wrap_Stage-03b.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-03c.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Wrap_Stage-03c.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-04.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Wrap_Stage-04.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "Wrap_Stage-xx.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "Wrap_Stage-xx.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "archive-World_1-1-max-combo-record.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "archive-World_1-1-max-combo-record.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-07-10-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "r-07-10-2.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r-07-10-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "r-07-10-3.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r-07-10-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "r-07-10-4.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r-07-10-5.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "r-07-10-5.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r-07-10-6.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-07-10-6.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-07-10.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "r-07-10.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r-10-17.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-10-17.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-12-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-11-12-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-12-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-11-12-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-12-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-11-12-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-12-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-11-12-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-30.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r-11-30.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r07-14.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "r07-15-01.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "r07-15-01.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r07-15-02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.5,
+                "y": 338.5
+            }
+        },
+        "r07-15-02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r07-15-03-big.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 960.5,
+                "y": 818.5
+            }
+        },
+        "r07-15-03-big.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "r07-15-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "r07-15-04.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "r09-16-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 20.5
+            }
+        },
+        "r09-16-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16-2b.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "r09-16-2b.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "r09-16-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "r09-16-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16-5.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "r09-16-5.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16-6.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "r09-16-6.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16-7.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r09-16-7.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r09-16.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "r09-16.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r10-19-2-4x4.tmj": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r10-19-2-4x4.tmj#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r10-19-grapple.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r10-19-grapple.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r10-19.tmj": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r10-19.tmj#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_11-30-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r_11-30-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_11-30-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r_11-30-3.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_11-30-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r_11-30-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_11-30.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r_11-30.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_12-10-1.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r_12-10-1.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_12-10-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "r_12-10-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "rough-02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-04.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-04.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-05-02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-05-02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-05-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-05-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-05-04.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-05-04.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-05-04b.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-05-04b.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-05.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-05.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-0r.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-0r.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-0r2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-0r2.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-daft-02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "rough-daft-02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "rough-daft-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "rough-daft-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "template-10-24.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "template-10-24.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "template-11-12.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "template-11-12.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "testing.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 371.5
+            }
+        },
+        "testing03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing03.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing04.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing04.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing05.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing05.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing07.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 371.5
+            }
+        },
+        "testing09.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 185.5,
+                "y": 185.5
+            }
+        },
+        "testing10-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing10-3.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing10.json": {
+            "scale": 0.7750672043010752,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.22578687245294,
+                "y": 189.01586751062175
+            }
+        },
+        "testing10.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing11.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing11.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing12-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing12-2.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing12-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing12-3.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing12-4.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing12-4.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing12.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing12.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing14.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "testing14.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing15-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testing15-2.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing15-3.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "testing15-3.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing15.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "testingRacetrack.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.5,
+                "y": 162.5
+            }
+        },
+        "testingRacetrack.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "testingWallPortal-2.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "testingWallPortal-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "testingWallPortal.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "testingWallPortal.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "testing_SnP_example.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.5,
+                "y": 161.5
+            }
+        },
+        "testing_SnP_example.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "testingx01.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "testingx01.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "tileSheetx12.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tileSheetx24.tsx": {
+            "scaleInDock": 1
+        },
+        "zoolander-01.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 229.5
+            }
+        },
+        "zoolander-01.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "zoolander-03.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.5,
+                "y": 372.5
+            }
+        },
+        "zoolander-03.json#tileSheetx24": {
+            "scaleInDock": 1
+        }
+    },
     "openFiles": [
         "Gauntlet_1-2.json",
         "r-11-12-4.json",
@@ -78,7 +1692,6 @@
         "testing09.json",
         "testing07.json",
         "testing10.json",
-        "testing-07.json",
         "testing05.json",
         "testing04.json",
         "testing03.json",
@@ -152,5 +1765,20 @@
         "Stage-03zzz.json",
         "Stage-13.json",
         "Stage-AA.json"
+    ],
+    "project": "SnakeTiled.tiled-project",
+    "recentFiles": [
+        "Gauntlet_1-2.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_4-3.json",
+        "r_11-30-4.json",
+        "r-07-10-4.json",
+        "r-11-30.json",
+        "World_3-1_Wrap.json",
+        "World_3-2_Wrap.json"
     ]
 }

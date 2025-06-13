@@ -29,7 +29,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1155,10 +1155,13 @@ class SpaceBoyScene extends Phaser.Scene {
         setOrigin(0,0).setDepth(102).setAlpha(0);
 
 
-        this.compassBase = this.add.sprite(528 , 304,'compassBase');
+        this.compassBase = this.add.sprite(528 , 304,'compassBase').setDepth(50);
         this.compassBase.name = 'compassBase';
-        this.compassNeedle = this.add.sprite(528 , 308,'compassNeedle');
+        this.compassNeedleShadow = this.add.sprite(530 , 310,'compassNeedleShadow').setDepth(51);
+        this.compassNeedleShadow.name = 'compassNeedleShadow';
+        this.compassNeedle = this.add.sprite(528 , 308,'compassNeedle').setDepth(52);
         this.compassNeedle.name = 'compassNeedle';
+
 
         switch (persist.mode) {
             case MODES.CLASSIC:
@@ -3114,6 +3117,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('inventoryIcons', 'assets/sprites/UI_InventorySheet.png', { frameWidth: 18, frameHeight: 18 });
         this.load.image('compassBase', 'assets/sprites/UI_InventoryCompassBase.png');
         this.load.image('compassNeedle', 'assets/sprites/UI_InventoryCompassNeedle.png');
+        this.load.image('compassNeedleShadow', 'assets/sprites/UI_InventoryCompassNeedleShadow.png');
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
@@ -8212,74 +8216,7 @@ class GameScene extends Phaser.Scene {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
-            // #region Compass
-
-            let compassCheck = undefined;
-            let compassCode = undefined;
-            let compassDir = undefined;
-
-            COMPASS_ORDER.some( entry => {
-                compassCheck = entry[1];
-                return !checkRankGlobal(STAGES.get(entry[0]), RANKS.WOOD)
-            });
-
-            if (compassCheck && this.stageID) {
-                
-                this.stageID;
-                compassDir = compassCheck.get(this.stageID);
-            }
-
-            switch (compassDir) {
-                case "N":
-                    compassDir = 0;
-                    break;
-                case "NE":
-                    compassDir = 45;
-                    break;
-                case "E":
-                    compassDir = 90;
-                    break;
-                case "SE":
-                    compassDir = 135;
-                    break;
-                case "S":
-                    compassDir = 180;
-                    break;
-                case "SW":
-                    compassDir = 225;
-                    break;
-                case "W":
-                    compassDir = 270;
-                    break;
-                case "NW":
-                    compassDir = 315;
-                    break;
-                default:
-                    // is undefined
-                    compassDir = 0;
-                    break;
-            }
-
-            SPACE_BOY.tweens.chain({
-                targets: SPACE_BOY.compassNeedle,
-                tweens: [
-                    {
-                        angle: { 
-                            from: SPACE_BOY.compassNeedle.angle, 
-                            to: 0},
-                        duration: 750, // Duration in milliseconds,
-                        ease: 'Linear',
-                    },
-                    {
-                        angle: { 
-                            from: 0, 
-                            to: compassDir },
-                        duration: 1000, // Duration in milliseconds,
-                        ease: 'Linear'
-                    }
-                ]
-            }); 
-            
+            this.compassUpdate();
 
             // #region is unlocked?
 
@@ -9711,6 +9648,76 @@ class GameScene extends Phaser.Scene {
         
     }
 
+    compassUpdate(){
+        // #region Compass
+        const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
+        let compassCheck = undefined;
+        //let compassCode = undefined;
+        let compassDir = undefined;
+
+        COMPASS_ORDER.some( entry => {
+            compassCheck = entry[1];
+            return !checkRankGlobal(STAGES.get(entry[0]), RANKS.WOOD)
+        });
+
+        if (compassCheck && this.stageID) {
+            
+            this.stageID;
+            compassDir = compassCheck.get(this.stageID);
+        } 
+        
+
+       
+
+        switch (compassDir) {
+            case "N":
+                compassDir = 0;
+                break;
+            case "NE":
+                compassDir = 45;
+                break;
+            case "E":
+                compassDir = 90;
+                break;
+            case "SE":
+                compassDir = 135;
+                break;
+            case "S":
+                compassDir = 180;
+                break;
+            case "SW":
+                compassDir = 225;
+                break;
+            case "W":
+                compassDir = 270;
+                break;
+            case "NW":
+                compassDir = 315;
+                break;
+            default:
+                // is undefined
+                compassDir = 0;
+                break;
+        }
+
+        let currentAngle = ourSpaceBoyScene.compassNeedle.angle;
+        let shortestDiff = Phaser.Math.Angle.ShortestBetween(currentAngle, compassDir);
+        let finalAngle = currentAngle + shortestDiff;
+
+        ourSpaceBoyScene.tweens.chain({
+            targets: [ourSpaceBoyScene.compassNeedle, ourSpaceBoyScene.compassNeedleShadow],
+            tweens: [
+                {
+                    angle: { 
+                        from: currentAngle, 
+                        to: finalAngle },
+                    duration: 1000, // Duration in milliseconds,
+                    ease: 'Sine.InOut'
+                }
+            ]
+        }); 
+    }
+
     // #region .validSpawnLocation(
     validSpawnLocations() {
 
@@ -10640,6 +10647,11 @@ class GameScene extends Phaser.Scene {
         ourGameScene.events.off('spawnBlackholes');
         ourGameScene.events.off('spawnArrows');
         ourGameScene.scene.get("InputScene").scene.restart();
+
+        //reset compass needle
+        this.compassUpdate()
+        //ourSpaceBoy.compassNeedle.angle = 0;
+        //ourSpaceBoy.compassNeedleShadow.angle = 0;
 
         this.gameSceneExternalCleanup();
 
