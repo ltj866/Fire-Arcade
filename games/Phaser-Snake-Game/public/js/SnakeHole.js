@@ -5,9 +5,10 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS, ITEMS } from './const.js';
+import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
 import { STAGE_UNLOCKS, COMPASS_ORDER, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
+import { ITEMS } from './data/items.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
 
@@ -112,6 +113,9 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 const NO_BONK_BASE = 2400;
 
 const STAGE_TOTAL = STAGES.size;
+
+export let SPACE_BOY; // Defined at runtime
+export let PERSISTS;
 
 
 
@@ -480,6 +484,11 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["comboTrainerHS", INVENTORY.get("comboTrainerHS") ?? 0],
         ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
         ["comboTrainerXHS", INVENTORY.get("comboTrainerXHS") ?? 0],
+        ["skull", INVENTORY.get("skull") ?? false],
+        ["classicCard", INVENTORY.get("classicCard") ?? false],
+        ["classicCardBank", INVENTORY.get("classicCardBank") ?? 0],
+        ["sonicCoins", INVENTORY.get("sonicCoins") ?? false],
+        ["slowPortals", INVENTORY.get("slowPortals") ?? false],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -1326,6 +1335,13 @@ class SpaceBoyScene extends Phaser.Scene {
         if (INVENTORY.get("comboTrainerX")) {
             this.comboTrainerX = ITEMS.get("comboTrainerX").addToInventory(this);
         }
+
+        // Default In for testing. Needs logic to find them.
+
+        ITEMS.get("slowPortals").addToInventory(this);
+        ITEMS.get("skull").addToInventory(this);
+        ITEMS.get("classicCard").addToInventory(this);
+        ITEMS.get("sonicCoins").addToInventory(this);
 
 
     }
@@ -3245,6 +3261,9 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
 
 
+        SPACE_BOY = this.scene.get("SpaceBoyScene");
+        PERSISTS = this.scene.get("PersistScene");
+        
         // Loads All Stage Properties
         STAGES.forEach( stageName => {
             /***
@@ -7186,7 +7205,6 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
-        const SPACE_BOY = this.scene.get("SpaceBoyScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
@@ -11087,9 +11105,14 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
         ourSpaceboy.loseCoin();
         this.coinsUIIcon.setVisible(false);
-        ourPersist.coins += -1;
+        if (SPACE_BOY.invSettings.get("skullMult") === 5 ) {
+            PERSISTS.coins = -1;
+        } else {
+            PERSISTS.coins += -1;
+        }
+
         this.coinUIText.setHTML(
-            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+            `${commaInt(PERSISTS.coins).padStart(2, '0')}`
         );
 
         // we set a timer here because upon respawning, comboAppear() function wants to run immediately
@@ -11128,13 +11151,29 @@ class GameScene extends Phaser.Scene {
                     ourPinball.comboAppearTween.destroy();
                 }
             }
-        });
+        }); 
 
-        //if (this.UI_bonkTween.isPlaying()) {
-        //    this.UI_bonkTween.restart();
-        //}
-        
+        if (SPACE_BOY.invSettings.get("sonicCoins")) {
+            var locations = this.validSpawnLocations();
+            while (PERSISTS.coins > 0) {
 
+                let pos = Phaser.Utils.Array.RemoveRandomElement(locations);
+                var _coin = new Coin(this, this.coinsArray, pos.x , pos.y );
+                _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+                this.interactLayer[(pos.x - X_OFFSET) / GRID][(pos.y - Y_OFFSET)/ GRID] = _coin;
+
+                PERSISTS.coins--;
+                this.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
+
+                this.tweens.add({
+                    targets: _coin,
+                    x: { from: this.snake.head.x, to: _coin.x },
+                    y: { from: this.snake.head.x, to: _coin.y },
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                });
+            }
+        }
     }
     checkWinCon() { // Returns Bool
         return this.length >= this.lengthGoal
@@ -14902,4 +14941,7 @@ if (SCREEN_HEIGHT % GRID != 0) {
 
 
 export const game = new Phaser.Game(config);
+
+// I'd love to put this here as a const, but I don't know how
+// const SPACE_BOY = game.scene.getScene("SpaceBoyScene");
 
