@@ -30,7 +30,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -11204,11 +11204,17 @@ class GameScene extends Phaser.Scene {
 
         if (SPACE_BOY.invSettings.get("sonicCoins")) {
             var locations = this.validSpawnLocations();
+            var lastCoin;
+
+            PERSISTS.coins++ ; // Add back in the one removed so the player can hunt it.
             while (PERSISTS.coins > 0) {
+
 
                 let pos = Phaser.Utils.Array.RemoveRandomElement(locations);
                 var _coin = new Coin(this, this.coinsArray, pos.x , pos.y );
                 _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+                lastCoin = _coin;
+
                 this.interactLayer[(pos.x - X_OFFSET) / GRID][(pos.y - Y_OFFSET)/ GRID] = _coin;
 
                 PERSISTS.coins--;
@@ -11222,6 +11228,24 @@ class GameScene extends Phaser.Scene {
                     duration: 500,
                 });
             }
+
+            this.tweens.add({
+                targets:lastCoin,
+                alpha: {from: 1, to: .2},
+                ease: 'Sine.InOut',
+                loop: 10,
+                duration: 200,
+                yoyo: true,
+                onComplete: function (tween, targets) {
+                    
+                    var _lastCoin = targets[0];
+                    tween.parent.scene.interactLayer[(_lastCoin.x - X_OFFSET) / GRID][(_lastCoin.y - Y_OFFSET)/ GRID] = "empty";
+
+                    tween.parent.scene.coinsArray.delete(_lastCoin);
+                    _lastCoin.destroy();
+                },
+
+            }, this);
         }
     }
     checkWinCon() { // Returns Bool

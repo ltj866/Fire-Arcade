@@ -33,6 +33,7 @@ var Coin = new Phaser.Class({
         coinArray.add(this);
         
         scene.children.add(this);
+        return this
         
     },
     onOver: function(scene) {
