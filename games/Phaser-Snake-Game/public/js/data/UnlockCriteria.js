@@ -21,7 +21,7 @@ export var checkRank = function(stageName, targetRank) {
     // But progress Expert just like you progress classic.
     
     switch (this.scene.get("GameScene").mode) {
-        case MODES.CLASSIC:
+        /*case MODES.CLASSIC:
             if (BEST_OF_ALL.get(stageName) != undefined ) {
                 
                 var resultRank = BEST_OF_ALL.get(stageName).stageRank()
@@ -31,7 +31,7 @@ export var checkRank = function(stageName, targetRank) {
                 //debugger
                 return false;
             }
-            break;
+            break;*/ // Default seems to work okay.
 
         case MODES.EXPERT:
             if (BEST_OF_ALL.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
@@ -45,6 +45,15 @@ export var checkRank = function(stageName, targetRank) {
             break;
     
         default:
+            if (BEST_OF_ALL.get(stageName) != undefined ) {
+                
+                var resultRank = BEST_OF_ALL.get(stageName).stageRank()
+                var bool = resultRank >= targetRank
+                return  bool;
+            } else {
+                //debugger
+                return false;
+            }
             break;
     }
 }

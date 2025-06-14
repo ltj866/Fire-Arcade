@@ -1058,7 +1058,7 @@ export var STAGE_OVERRIDES = new Map([
                     for (let index = 1; index <= INVENTORY.get("classicCardBank"); index++) {
                         scene.time.delayedCall(coinTime * index, () => {
                             PERSISTS.coins += 1;
-                            console.log('adding classicCardCoin +1')
+                            console.log('adding classicCardCoin +1');
                             scene.coinSound.play();
                             scene.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
 
@@ -1070,7 +1070,6 @@ export var STAGE_OVERRIDES = new Map([
                             if (INVENTORY.get("classicCardBank") === 0) {
                                 SPACE_BOY.invItems.get("classicCard").invText.setText("");
                             }
-
 
                         }, scene);
                     }

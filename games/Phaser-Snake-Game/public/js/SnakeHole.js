@@ -4747,6 +4747,18 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.addCapture('UP,DOWN,SPACE,Q,TAB');
         const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
+
+
+
+        let newContent = PERSISTS.checkNewContent();
+
+        if (newContent != "none") {
+            const newContentText = this.add.bitmapText(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 3.5, 'mainFont',
+                    newContent.toUpperCase(),16
+                ).setOrigin(0.5,0.5).setScale(0.5);
+            newContentText.name = "newContentText";
+        }
+        
         //const ourMap = this.scene.get('GalaxyMapScene');
 
 
@@ -6904,6 +6916,40 @@ class PersistScene extends Phaser.Scene {
     this.scene.moveBelow("StartScene", "PersistScene");
 
     this.graphics = this.add.graphics();
+    }
+    checkNewContent () {
+        let message = "none";
+        let stageName;
+
+        let checkArray = [
+            [checkRankGlobal(STAGES.get("1-3"), RANKS.BRONZE) && !checkRankGlobal(STAGES.get("2-1"), RANKS.BRONZE), 
+                { stage:STAGES.get("2-1"), message: "*New World Unlocked*" } 
+            ],
+            [checkRankGlobal(STAGES.get("2-3"), RANKS.BRONZE) && !checkRankGlobal(STAGES.get("4-1"), RANKS.BRONZE), 
+                { stage:STAGES.get("4-1"), message: "*New World Unlocked*" } 
+            ],
+            [STAGE_UNLOCKS.get('easy-wrap').call(this) && !checkRankGlobal(STAGES.get("3-1"), RANKS.BRONZE),
+                { stage:STAGES.get("3-1"), message: "*New World Unlocked*" } 
+            ],
+            [checkRankGlobal(STAGES.get("4-3"), RANKS.BRONZE) && !checkRankGlobal(STAGES.get("8-1"), RANKS.BRONZE), 
+                { stage:STAGES.get("8-1"), message: "*New World Unlocked*" } 
+            ],
+            [checkRankGlobal(STAGES.get("8-4"), RANKS.BRONZE) && !checkRankGlobal(STAGES.get("9-2"), RANKS.BRONZE), 
+                { stage:STAGES.get("9-2"), message: "*New World Unlocked*" } 
+            ],
+            [checkRankGlobal(STAGES.get("8-4"), RANKS.BRONZE) && !checkRankGlobal(STAGES.get("10-2"), RANKS.BRONZE), 
+                { stage:STAGES.get("10-2"), message: "*New World Unlocked*" } 
+            ],
+        ];
+
+        checkArray.some( entry => {
+            if (entry[0]) {
+                message = entry[1].message;
+                return true;
+            }
+        });
+
+        return message
     }
 
     pixelateTransition(){
@@ -10464,7 +10510,10 @@ class GameScene extends Phaser.Scene {
         localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
 
         //tween here
-        this.scene.get("SpaceBoyScene").savedCoinsUI.setText(INVENTORY.get("savedCoins"));
+        if (SPACE_BOY.invItems.has("piggyBank")) {
+            this.scene.get("SpaceBoyScene").savedCoinsUI.setText(INVENTORY.get("savedCoins"));
+        }
+        
 
         //nineSlice
         this.finalScorePanel = this.add.nineslice(windowCenterX, finalWindowTop, 
