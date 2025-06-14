@@ -481,9 +481,9 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["gearbox", INVENTORY.get("gearbox") ?? false],
         ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
         ["comboTrainer", INVENTORY.get("comboTrainer") ?? true],
-        ["comboTrainerHS", INVENTORY.get("comboTrainerHS") ?? 0],
+        ["comboTrainerPB", INVENTORY.get("comboTrainerPB") ?? 0],
         ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
-        ["comboTrainerXHS", INVENTORY.get("comboTrainerXHS") ?? 0],
+        ["comboTrainerXPB", INVENTORY.get("comboTrainerXPB") ?? 0],
         ["skull", INVENTORY.get("skull") ?? false],
         ["classicCard", INVENTORY.get("classicCard") ?? false],
         ["classicCardBank", INVENTORY.get("classicCardBank") ?? 0],
@@ -493,6 +493,19 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
     INVENTORY = inventoryDefaults;
 
     localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+}
+
+export var INVENTORY_DATA = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory-data") ?? "{}"))); {
+        
+    var inventoryDataDefaults = new Map([
+        ["savedCoins", INVENTORY_DATA.get("savedCoins") ?? 0],
+        ["comboTrainerPB", INVENTORY_DATA.get("comboTrainerPB") ?? 0],
+        ["comboTrainerXPB", INVENTORY_DATA.get("comboTrainerXPB") ?? 0],
+        ["classicCardBank", INVENTORY_DATA.get("classicCardBank") ?? 0],
+    ])
+    INVENTORY_DATA = inventoryDataDefaults;
+
+    localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
 }
 
 // SHOULD BE READ ONLY
@@ -10506,12 +10519,12 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         
-        INVENTORY.set("savedCoins", INVENTORY.get("savedCoins") + this.scene.get("PersistScene").coins);
-        localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+        INVENTORY_DATA.set("savedCoins", INVENTORY.get("savedCoins") + this.scene.get("PersistScene").coins);
+        localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY)));
 
         //tween here
         if (SPACE_BOY.invItems.has("piggyBank")) {
-            this.scene.get("SpaceBoyScene").savedCoinsUI.setText(INVENTORY.get("savedCoins"));
+            this.scene.get("SpaceBoyScene").savedCoinsUI.setText(INVENTORY_DATA.get("savedCoins"));
         }
         
 

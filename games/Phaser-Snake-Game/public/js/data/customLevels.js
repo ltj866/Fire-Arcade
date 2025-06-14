@@ -1,8 +1,9 @@
 import { X_OFFSET, Y_OFFSET, 
     GRID, SPEED_WALK, SPEED_SPRINT, MODES, 
     GState, DIRS, commaInt, PLAYER_STATS, 
-    INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, SPACE_BOY, 
-    PERSISTS} from "../SnakeHole.js";
+    INVENTORY,INVENTORY_DATA,
+    BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, 
+    SPACE_BOY, PERSISTS } from "../SnakeHole.js";
 import { Food } from "../classes/Food.js";
 import { Snake } from "../classes/Snake.js";
 import { PORTAL_COLORS} from '../const.js';
@@ -329,7 +330,7 @@ export var STAGE_OVERRIDES = new Map([
     ["Bonus_X-5", {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            scene.highScore = INVENTORY.get("comboTrainerXHS");
+            scene.highScore = INVENTORY_DATA.get("comboTrainerXPB");
             scene.firstFood = false;
         },
         postFix: function (scene) {
@@ -342,8 +343,8 @@ export var STAGE_OVERRIDES = new Map([
                 scene.highScore = scene.snake.comboCounter;
                 scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.highScore);
 
-                INVENTORY.set("comboTrainerXHS", scene.snake.comboCounter);
-                localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+                INVENTORY_DATA.set("comboTrainerXPB", scene.snake.comboCounter);
+                localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
             }
 
             if (scene.snake.comboCounter === 0 && scene.firstFood) {
@@ -1051,23 +1052,23 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
 
-            if (scene.mode === MODES.CLASSIC && INVENTORY.get("classicCardBank") > 0) {
+            if (scene.mode === MODES.CLASSIC && INVENTORY_DATA.get("classicCardBank") > 0) {
                 var coinTime = 250;
 
                 scene.time.delayedCall(1250, () => {
-                    for (let index = 1; index <= INVENTORY.get("classicCardBank"); index++) {
+                    for (let index = 1; index <= INVENTORY_DATA.get("classicCardBank"); index++) {
                         scene.time.delayedCall(coinTime * index, () => {
                             PERSISTS.coins += 1;
                             console.log('adding classicCardCoin +1');
                             scene.coinSound.play();
                             scene.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
 
-                            INVENTORY.set("classicCardBank", INVENTORY.get("classicCardBank") - 1);
-                            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+                            INVENTORY_DATA.set("classicCardBank", INVENTORY_DATA.get("classicCardBank") - 1);
+                            localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
 
-                            SPACE_BOY.invItems.get("classicCard").invText.setText(INVENTORY.get("classicCardBank"));
+                            SPACE_BOY.invItems.get("classicCard").invText.setText(INVENTORY_DATA.get("classicCardBank"));
 
-                            if (INVENTORY.get("classicCardBank") === 0) {
+                            if (INVENTORY_DATA.get("classicCardBank") === 0) {
                                 SPACE_BOY.invItems.get("classicCard").invText.setText("");
                             }
 
@@ -1135,7 +1136,7 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
     preFix: function (scene) {
         scene.lengthGoal = Infinity;
         scene.stopOnBonk = true;
-        scene.highScore = INVENTORY.get("comboTrainerHS");
+        scene.highScore = INVENTORY_DATA.get("comboTrainerPB");
     },
     postFix: function (scene) {
         scene.checkWinCon = this.checkWinCon;
@@ -1165,8 +1166,8 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
             scene.highScore = scene.snake.comboCounter;
             scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.highScore);
 
-            INVENTORY.set("comboTrainerHS", scene.snake.comboCounter);
-            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+            INVENTORY_DATA.set("comboTrainerPB", scene.snake.comboCounter);
+            localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
         }
         //debugger
 

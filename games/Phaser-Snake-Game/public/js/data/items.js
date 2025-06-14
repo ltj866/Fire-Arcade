@@ -1,4 +1,4 @@
-import {GRID, INVENTORY, MODES,} from "../SnakeHole.js"; //
+import {GRID, INVENTORY, INVENTORY_DATA, MODES,} from "../SnakeHole.js"; //
 import { TUTORIAL_PANELS } from './tutorialScreens.js';
 
 
@@ -23,7 +23,7 @@ ITEMS.set("piggybank", {
         var target = piggy.getBottomRight();
         
         scene.savedCoinsUI = scene.add.bitmapText(target.x + GRID * 3.25, target.y - 6, 'mainFont',
-            INVENTORY.get("savedCoins") ?? 0,
+            INVENTORY_DATA.get("savedCoins") ?? 0,
         8).setOrigin(1,1).setDepth(81)
 
         return piggy;
@@ -95,7 +95,7 @@ ITEMS.set("comboTrainer", {
         var target = item.getBottomRight();
         
         scene.comboTrainertPB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
-            INVENTORY.get("comboTrainerHS") ?? 0,
+            INVENTORY_DATA.get("comboTrainerPB") ?? 0,
         8).setOrigin(1,1).setDepth(81)
 
         return item;
@@ -135,7 +135,7 @@ ITEMS.set("comboTrainerX", {
         var target = item.getBottomRight();
         
         scene.comboTrainerX_PB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
-            INVENTORY.get("comboTrainerXHS") ?? 0,
+            INVENTORY_DATA.get("comboTrainerXPB") ?? 0,
         8).setOrigin(1,1).setDepth(81);
 
 
@@ -216,26 +216,26 @@ ITEMS.set("classicCard", {
             "",
         8).setOrigin(1,1).setDepth(81);
 
-        if (INVENTORY.get("classicCardBank") > 0) {
-            item.invText.setText(INVENTORY.get("classicCardBank"));
+        if (INVENTORY_DATA.get("classicCardBank") > 0) {
+            item.invText.setText(INVENTORY_DATA.get("classicCardBank"));
         }
 
         return item;
     },
     interact: function (scene) {
 
-        if (INVENTORY.get("savedCoins") > 4) {
+        if (INVENTORY_DATA.get("savedCoins") > 4) {
 
             let _invS = scene.invSettings;
 
-            INVENTORY.set("classicCardBank", INVENTORY.get("classicCardBank") + 2);
-            INVENTORY.set("savedCoins", INVENTORY.get("savedCoins") - 5);
+            INVENTORY_DATA.set("classicCardBank", INVENTORY_DATA.get("classicCardBank") + 2);
+            INVENTORY_DATA.set("savedCoins", INVENTORY_DATA.get("savedCoins") - 5);
 
-            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+            localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
 
-            scene.invItems.get("classicCard").invText.setText(INVENTORY.get("classicCardBank"));
+            scene.invItems.get("classicCard").invText.setText(INVENTORY_DATA.get("classicCardBank"));
 
-            scene.savedCoinsUI.setText(INVENTORY.get("savedCoins"));
+            scene.savedCoinsUI.setText(INVENTORY_DATA.get("savedCoins"));
         }
     }
 });
