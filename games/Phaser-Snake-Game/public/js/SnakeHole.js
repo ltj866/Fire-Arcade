@@ -474,25 +474,25 @@ var tempSumOfBest = function(scene, stageData) {
     return sumOfBest;
 }
 
-export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory") ?? "{}"))); {
+export var INVENTORY_ITEMS = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory-items") ?? "{}"))); {
     
     var inventoryDefaults = new Map([
-        ["piggybank", INVENTORY.get("piggybank") ?? false],
-        ["gearbox", INVENTORY.get("gearbox") ?? false],
-        ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
-        ["comboTrainer", INVENTORY.get("comboTrainer") ?? true],
-        ["comboTrainerPB", INVENTORY.get("comboTrainerPB") ?? 0],
-        ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
-        ["comboTrainerXPB", INVENTORY.get("comboTrainerXPB") ?? 0],
-        ["skull", INVENTORY.get("skull") ?? false],
-        ["classicCard", INVENTORY.get("classicCard") ?? false],
-        ["classicCardBank", INVENTORY.get("classicCardBank") ?? 0],
-        ["sonicCoins", INVENTORY.get("sonicCoins") ?? false],
-        ["slowPortals", INVENTORY.get("slowPortals") ?? false],
+        ["piggybank", INVENTORY_ITEMS.get("piggybank") ?? false],
+        ["gearbox", INVENTORY_ITEMS.get("gearbox") ?? false],
+        ["savedCoins", INVENTORY_ITEMS.get("savedCoins") ?? 0],
+        ["comboTrainer", INVENTORY_ITEMS.get("comboTrainer") ?? true],
+        ["comboTrainerPB", INVENTORY_ITEMS.get("comboTrainerPB") ?? 0],
+        ["comboTrainerX", INVENTORY_ITEMS.get("comboTrainerX") ?? true],
+        ["comboTrainerXPB", INVENTORY_ITEMS.get("comboTrainerXPB") ?? 0],
+        ["skull", INVENTORY_ITEMS.get("skull") ?? false],
+        ["classicCard", INVENTORY_ITEMS.get("classicCard") ?? false],
+        ["classicCardBank", INVENTORY_ITEMS.get("classicCardBank") ?? 0],
+        ["sonicCoins", INVENTORY_ITEMS.get("sonicCoins") ?? false],
+        ["slowPortals", INVENTORY_ITEMS.get("slowPortals") ?? false],
     ])
-    INVENTORY = inventoryDefaults;
+    INVENTORY_ITEMS = inventoryDefaults;
 
-    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+    localStorage.setItem("inventory-items", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
 }
 
 export var INVENTORY_DATA = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory-data") ?? "{}"))); {
@@ -1329,23 +1329,23 @@ class SpaceBoyScene extends Phaser.Scene {
 
 
 
-        if (INVENTORY.get("piggybank")) {
+        if (INVENTORY_ITEMS.get("piggybank")) {
 
             var piggy = ITEMS.get("piggybank").addToInventory(this);
         }
 
-        if (INVENTORY.get("gearbox")) {
+        if (INVENTORY_ITEMS.get("gearbox")) {
 
             ITEMS.get("gearbox").addToInventory(this);
             
             this.invSettings.set("gearbox", "fast");
         }
 
-        if (INVENTORY.get("comboTrainer")) {
+        if (INVENTORY_ITEMS.get("comboTrainer")) {
             this.comboTrainer = ITEMS.get("comboTrainer").addToInventory(this);
         }
 
-        if (INVENTORY.get("comboTrainerX")) {
+        if (INVENTORY_ITEMS.get("comboTrainerX")) {
             this.comboTrainerX = ITEMS.get("comboTrainerX").addToInventory(this);
         }
 
@@ -10519,8 +10519,8 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         
-        INVENTORY_DATA.set("savedCoins", INVENTORY.get("savedCoins") + this.scene.get("PersistScene").coins);
-        localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY)));
+        INVENTORY_DATA.set("savedCoins", INVENTORY_DATA.get("savedCoins") + this.scene.get("PersistScene").coins);
+        localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
 
         //tween here
         if (SPACE_BOY.invItems.has("piggyBank")) {

@@ -1,4 +1,4 @@
-import {GRID, INVENTORY, INVENTORY_DATA, MODES,} from "../SnakeHole.js"; //
+import {GRID, INVENTORY_DATA, MODES,} from "../SnakeHole.js"; //
 import { TUTORIAL_PANELS } from './tutorialScreens.js';
 
 

@@ -1,7 +1,7 @@
 import { X_OFFSET, Y_OFFSET, 
     GRID, SPEED_WALK, SPEED_SPRINT, MODES, 
     GState, DIRS, commaInt, PLAYER_STATS, 
-    INVENTORY,INVENTORY_DATA,
+    INVENTORY_ITEMS,INVENTORY_DATA,
     BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, 
     SPACE_BOY, PERSISTS } from "../SnakeHole.js";
 import { Food } from "../classes/Food.js";
@@ -24,7 +24,7 @@ export var STAGE_OVERRIDES = new Map([
             var transTile = scene.wallLayer.findByIndex(11);
             transTile.index = -1;
 
-            if (!INVENTORY.get("gearbox")) {
+            if (!INVENTORY_ITEMS.get("gearbox")) {
                 scene.gearbox = scene.add.sprite(transTile.pixelX + X_OFFSET, transTile.pixelY + Y_OFFSET, 'inventoryIcons',26)
                 .setOrigin(0, 0).setDepth(100);
 
@@ -53,8 +53,8 @@ export var STAGE_OVERRIDES = new Map([
             }
         },
         onOver: function () {
-            INVENTORY.set("gearbox", true);
-            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+            INVENTORY_ITEMS.set("gearbox", true);
+            localStorage.setItem("inventory-items", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
 
             this.interactLayer[(this.gearbox.x - X_OFFSET)/GRID][(this.gearbox.y - Y_OFFSET)/GRID] = "empty";
             
@@ -77,7 +77,7 @@ export var STAGE_OVERRIDES = new Map([
             var piggyTile = scene.wallLayer.findByIndex(11);
             piggyTile.index = -1;
 
-            if (!INVENTORY.get("piggybank")) {
+            if (!INVENTORY_ITEMS.get("piggybank")) {
                 scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'inventoryIcons',3)
                     .setOrigin(0, 0).setDepth(100);
 
@@ -103,8 +103,8 @@ export var STAGE_OVERRIDES = new Map([
 
 
                 scene.piggy.onOver = function() {
-                    INVENTORY.set("piggybank", true);
-                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+                    INVENTORY_ITEMS.set("piggybank", true);
+                    localStorage.setItem("inventor-items", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
 
                     scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
                     

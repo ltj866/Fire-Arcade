@@ -1,4 +1,4 @@
-import { PLAYER_STATS, RANKS, START_STAGE, START_UUID, MODES, INVENTORY} from "../SnakeHole.js";
+import { PLAYER_STATS, RANKS, START_STAGE, START_UUID, MODES} from "../SnakeHole.js";
 import { TUTORIAL_PANELS } from "./tutorialScreens.js";
 import { GAUNTLET_CODES, STAGES } from "./UnlockCriteria.js";
 
