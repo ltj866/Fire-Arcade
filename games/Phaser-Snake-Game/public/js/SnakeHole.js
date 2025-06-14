@@ -30,7 +30,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 24; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3226,7 +3226,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('tutSnakeSPACE', 'assets/HowToCards/tutorial_snake_SPACE.png');
         this.load.image('tutSnakePortal1', 'assets/HowToCards/tutorial_snake_portal1.png');
         this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
-        //this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('ranksSpriteSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        //this.load.spritesheet('ranksSpriteSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -8174,7 +8175,6 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keyup-SPACE', e => {  //JMS1
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
-                debugger
 
                 if (this.boostOutlineTail) {
                     // add the tail in.
@@ -10800,8 +10800,6 @@ class GameScene extends Phaser.Scene {
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
 
-        console.log('COIN COUNT',this.coinsArray)
-        debugger
         this.addCoins(0);
 
         // drain boost bar so it's ready for next round
@@ -10820,9 +10818,9 @@ class GameScene extends Phaser.Scene {
                 duration: 500,
             });
             // check if the next stage is a new world
-            debugger
+            
             var nextStageRaw = this.nextStages[nextStageIndex];
-            console.log(nextStageRaw)
+            console.log(nextStageRaw) // #TODO - Move to its own data
             if (nextStageRaw === '2-1' || nextStageRaw === '3-1' || nextStageRaw === '4-1' ||
                 nextStageRaw === '5-1' || nextStageRaw === '8-1' || nextStageRaw === '9-2') {
                 ourPersist.pixelateTransition();
@@ -10993,7 +10991,6 @@ class GameScene extends Phaser.Scene {
                     onComplete: () =>{
                         switch (true) {
                             case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.HARDCORE || this.mode === MODES.TUTORIAL:
-                                var nextStageRaw = this.nextStages[nextStageIndex];
                                 if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
             
                                     this.nextStage(this.nextStages[nextStageIndex], camDirection);
@@ -11898,15 +11895,14 @@ var StageData = new Phaser.Class({
         let rank;
         let stageScore = this.preAdditive();
 
-        
+        var isGrandmaster = (
+            (Math.min(...this.foodLog.slice(1,-1)) > RANK_BENCHMARKS.get(RANKS.GRAND_MASTER)) &&
+            (this.foodLog.length === 28)
+        );
+ 
         switch (true) {
-            case Math.min(...this.foodLog.slice(1,-1)) > RANK_BENCHMARKS.get(RANKS.GRAND_MASTER):
-                if (this.foodLog.length === 28) {
-                    rank = RANKS.GRAND_MASTER
-                } else {
-                    // Nice for testing and not accidentally getting FULL COMBO
-                    rank = RANKS.BRONZE;
-                }
+            case isGrandmaster:
+                rank = RANKS.GRAND_MASTER;
                 break
             case this.sRank != null && stageScore > this.sRank:
                 rank = RANKS.PLATINUM;
@@ -13165,16 +13161,17 @@ class ScoreScene extends Phaser.Scene {
 
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
+
+        debugger
         
         let rank = this.stageData.stageRank(); // FileNames start at 01.png
         
-        //rank = 4; // Temp override.
         if (rank != 5) {
             var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", rank
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         } else {
-            debugger
+            // Extra stuff for GrandMaster
             var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 4
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
             letterRank.setTintFill(COLOR_BONUS_HEX);
@@ -13218,8 +13215,6 @@ class ScoreScene extends Phaser.Scene {
             duration: 4000,
             repeat: -1
         });
-        //console.log("rank", rank)
-        rank -= 1; //this needs to be set back to rank-1 from being +1'd earlier
 
         // region Particle Emitter
         if(rank >= RANKS.SILVER){
@@ -14353,9 +14348,10 @@ function loadSpriteSheetsAndAnims(scene) {
         frame: 'comboLetters.png'
     });*/
 
+    /*
     scene.textures.addSpriteSheetFromAtlas('ranksSpriteSheet', { atlas: 'megaAtlas', frameWidth: 24, frameHeight: 36,
         frame: 'ranksSpriteSheet.png'
-    })
+    })*/
 
 
     // Sprite Sheets and add Animations
