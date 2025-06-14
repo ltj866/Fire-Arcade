@@ -3235,8 +3235,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('tutSnakeSPACE', 'assets/HowToCards/tutorial_snake_SPACE.png');
         this.load.image('tutSnakePortal1', 'assets/HowToCards/tutorial_snake_portal1.png');
         this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
-        this.load.spritesheet('ranksSpriteSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
-        //this.load.spritesheet('ranksSpriteSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
+        //this.load.spritesheet('ranksSpriteSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('ranksSpriteSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 24, frameHeight: 36 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
