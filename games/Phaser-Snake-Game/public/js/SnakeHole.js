@@ -479,14 +479,10 @@ export var INVENTORY_ITEMS = new Map(Object.entries(JSON.parse(localStorage.getI
     var inventoryDefaults = new Map([
         ["piggybank", INVENTORY_ITEMS.get("piggybank") ?? false],
         ["gearbox", INVENTORY_ITEMS.get("gearbox") ?? false],
-        ["savedCoins", INVENTORY_ITEMS.get("savedCoins") ?? 0],
         ["comboTrainer", INVENTORY_ITEMS.get("comboTrainer") ?? true],
-        ["comboTrainerPB", INVENTORY_ITEMS.get("comboTrainerPB") ?? 0],
         ["comboTrainerX", INVENTORY_ITEMS.get("comboTrainerX") ?? true],
-        ["comboTrainerXPB", INVENTORY_ITEMS.get("comboTrainerXPB") ?? 0],
         ["skull", INVENTORY_ITEMS.get("skull") ?? false],
         ["classicCard", INVENTORY_ITEMS.get("classicCard") ?? false],
-        ["classicCardBank", INVENTORY_ITEMS.get("classicCardBank") ?? 0],
         ["sonicCoins", INVENTORY_ITEMS.get("sonicCoins") ?? false],
         ["slowPortals", INVENTORY_ITEMS.get("slowPortals") ?? false],
     ])
