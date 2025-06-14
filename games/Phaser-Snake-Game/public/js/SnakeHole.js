@@ -30,7 +30,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 24; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4417,9 +4417,9 @@ class StageCodex extends Phaser.Scene {
                     ).setDepth(80).setOrigin(0,0).setScale(1);
                     
                 } else {
-                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 4
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 5
                     ).setDepth(80).setOrigin(0,0).setScale(1);
-                    rankIcon.setTintFill(COLOR_BONUS_HEX);
+                    //rankIcon.setTintFill(COLOR_BONUS_HEX);
                 }
 
 
@@ -13181,9 +13181,9 @@ class ScoreScene extends Phaser.Scene {
 
         } else {
             // Extra stuff for GrandMaster
-            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 4
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 5
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
-            letterRank.setTintFill(COLOR_BONUS_HEX);
+            //letterRank.setTintFill(COLOR_BONUS_HEX);
         }
         
     
