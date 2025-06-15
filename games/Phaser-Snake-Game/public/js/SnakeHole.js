@@ -3143,6 +3143,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('compassBase', 'assets/sprites/UI_InventoryCompassBase.png');
         this.load.image('compassNeedle', 'assets/sprites/UI_InventoryCompassNeedle.png');
         this.load.image('compassNeedleShadow', 'assets/sprites/UI_InventoryCompassNeedleShadow.png');
+        this.load.image('gridAlign', 'assets/sprites/UI_GridAlign.png');
+        this.load.image('gridCenter', 'assets/sprites/UI_GridCenter.png');
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
@@ -7394,6 +7396,12 @@ class GameScene extends Phaser.Scene {
                 break;
         }
 
+        // GRID
+
+        this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
+        .setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
+        //this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
+        //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
 
         // SOUND
 
