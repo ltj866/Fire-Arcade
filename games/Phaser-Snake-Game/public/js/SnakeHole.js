@@ -7398,10 +7398,10 @@ class GameScene extends Phaser.Scene {
 
         // GRID
 
-        this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
-        .setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
-        //this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
+        //this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
         //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
+        this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
+        .setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
 
         // SOUND
 
