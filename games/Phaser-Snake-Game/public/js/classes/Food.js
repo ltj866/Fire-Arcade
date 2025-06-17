@@ -347,7 +347,7 @@ var Food = new Phaser.Class({
                                         follow: SPACE_BOY.electronFanfare,
                                     }).setFrequency(150,[1]).setDepth(1);
                     
-                                    scene.countDown.setAlpha(0);
+                                    scene.countDownTimer.setAlpha(0);
                                 }
                     
                             scene.tweens.add({ //slower one-off snakeEating tween
@@ -375,14 +375,14 @@ var Food = new Phaser.Class({
                                             ease: 'Sine.easeIn',
                                             duration: 1250,
                                             onComplete: () => {
-                                                scene.countDown.setAlpha(1);
-                                                scene.countDown.x = X_OFFSET + GRID * 4 - 6;
-                                                scene.countDown.y = 3;
+                                                scene.countDownTimer.setAlpha(1);
+                                                scene.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
+                                                scene.countDownTimer.y = 3;
                                                 SPACE_BOY.atomComet.destroy();
                                             }
                                         });
-                                                scene.countDown.setHTML('W1N');
-                                                scene.countDown.x += 3
+                                                scene.countDownTimer.setHTML('W1N');
+                                                scene.countDownTimer.x += 3
                                         }
                                         
                                 });

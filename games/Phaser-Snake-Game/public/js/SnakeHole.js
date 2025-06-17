@@ -9306,12 +9306,11 @@ class GameScene extends Phaser.Scene {
             paused: true
          }, this);
 
-        var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        var countDown = this.currentScoreTimer();
         
 
-
          // Countdown Text
-        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 1, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDownTimer = this.add.dom(X_OFFSET + GRID * 8 + 1, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -9321,7 +9320,7 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 countDown.toString().padStart(3,"0")
         ).setOrigin(1,0.5).setAlpha(0).setScale(.5);
-        this.countDown.setScrollFactor(0);
+        this.countDownTimer.setScrollFactor(0);
 
 
         if (this.coinsUIIcon == undefined) {
@@ -9351,7 +9350,7 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
             this.tweens.add({
-                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                targets: [ourGameScene.countDownTimer,ourGameScene.coinUIText],
                 alpha: { from: 0, to: 1 },
                 ease: 'Sine.InOut',
                 duration: 500,
@@ -10439,7 +10438,7 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
             this.tweens.add({
-                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                targets: [ourGameScene.countDownTimer,ourGameScene.coinUIText],
                 alpha: { from: 1, to: 0},
                 ease: 'Sine.InOut',
                 duration: 500,
@@ -10640,7 +10639,7 @@ class GameScene extends Phaser.Scene {
             const ourGameScene = this.scene.get('GameScene');
             const ourPersist = this.scene.get('PersistScene');
             this.tweens.add({
-                targets: [ourGameScene.countDown,ourGameScene.coinUIText,
+                targets: [ourGameScene.countDownTimer,ourGameScene.coinUIText,
                     ourSpaceboy.shiftLight1,ourSpaceboy.shiftLight2,ourSpaceboy.shiftLight3,
                     ourSpaceboy.shiftLight4,ourSpaceboy.shiftLight5],
                 alpha: { from: 1, to: 0},
@@ -11284,15 +11283,12 @@ class GameScene extends Phaser.Scene {
             
 
             if (this.portals.length > 0) {
+                // DO WE EVEN USE THIS ANYMORE?
             
-            // #region P HIGHLIGHT
-            // Calculate Closest Portal to Snake Head
-            let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
+                // #region P HIGHLIGHT
+                // Calculate Closest Portal to Snake Head
+                let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
                 
-            
-                //closestPortal.fx.setActive(false);
-                
-                // Distance on an x y grid
 
                 var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
                                                                     closestPortal.x/GRID, closestPortal.y/GRID);
@@ -11308,26 +11304,6 @@ class GameScene extends Phaser.Scene {
                         closestPortal = portal;
                     }
                 });
-
-
-                // This is a bit eccessive because I only store the target portal coordinates
-                // and I need to get the portal object to turn on the effect. Probably can be optimized.
-                // Good enough for testing.
-                if (closestPortalDist < 6) {
-                    this.portals.forEach(portal => {
-                        if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
-                            //portal.fx.setActive(true);
-                            
-                            //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
-                            //portal.fx.outerStrength = 6 - closestPortalDist;
-
-                            //closestPortal.fx.setActive(true);
-                            //closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                            //closestPortal.fx.outerStrength = 0;
-
-                        }
-                    });
-                }
             } // End Closest Portal
             
             
@@ -11413,23 +11389,24 @@ class GameScene extends Phaser.Scene {
     
         // #endregion
 
-        /*
-        if (!this.checkWinCon() && !this.scoreTimer.paused) {
+        
+        if (!this.winned && !this.scoreTimer.paused) {
             /***
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly during portaling. After the timer pauses at the Score Floor
              *  the countdown timer will go to 0.  
              *  -Note: Could this be fixed with a Math.max() and put it back together again? 
-             *//*
-            var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+             */
+            /*
+            var countDown = this.currentScoreTimer();
     
             if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
                 this.scoreTimer.paused = true;
             }
 
-            this.countDown.setText(countDown.toString().padStart(3,"0"));
+            this.countDownTimer.setText(countDown.toString().padStart(3,"0"));*/
         }
-        */ // can I get this working without?
+         // can I get this working without?
 
         if (timeTick != this.lastTimeTick) {
             // #region TimerTick
@@ -11441,6 +11418,15 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 if (!this.winned) {
                     this.coinSpawnCounter -= 1;
+
+                    var countDown = this.currentScoreTimer(); 
+    
+                    if (countDown < SCORE_FLOOR) {
+                        this.scoreTimer.paused = true;
+                        countDown = Math.max(1, countDown); // max 1 Saves this from being zero after portalling
+                    }
+
+                    this.countDownTimer.setText(countDown.toString().padStart(3,"0"));
                 }
 
                 if (this.coinSpawnCounter < 1) {
@@ -11775,8 +11761,8 @@ class ScoreScene extends Phaser.Scene {
         /*var style = {
             'color': '0x828213'
           };
-        ourGame.countDown.style = style*/
-        ourGame.countDown.setHTML('0FF');
+        ourGame.countDownTimer.style = style*/
+        ourGame.countDownTimer.setHTML('0FF');
 
         this.ScoreContainerL = this.make.container(0,0);
         this.ScoreContainerR = this.make.container(0,0);
