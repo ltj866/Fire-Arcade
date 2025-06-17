@@ -139,6 +139,8 @@ STAGE_OVERRIDES.set("Bonus_X-1", {
         },
         postFix: function (scene) {
             // Override
+
+            scene.oldBonk = scene.onBonk;
             scene.onBonk = this.onBonk;
             scene.checkWinCon = this.checkWinCon;
 
@@ -203,6 +205,7 @@ STAGE_OVERRIDES.set("Bonus_X-1", {
             });
 
             if (check) {
+                this.bonk = this.oldBonk; // This needs to be verified still.
                 this.events.emit('win');
             }
              
@@ -450,7 +453,10 @@ STAGE_OVERRIDES.set("Bonus_X-7", {
             }
             
             scene.checkWinCon = this.checkWinCon;
+
+            scene.oldGrow = this.snake.grow;
             scene.snake.grow = this.grow;
+            scene.snake.grow = this.oldGrow;
     
         },
         checkWinCon: function () {
@@ -496,6 +502,7 @@ STAGE_OVERRIDES.set("Bonus_X-7", {
                 oldPart[0].destroy();
                 
             } else {
+                scene.snake.grow = this.oldGrow;
                 scene.winned = true;
             }
     
@@ -620,10 +627,12 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
             ).setOrigin(1,1).setDepth(50).setAlpha(1).setTintFill(0xFFFFFF);
 
             scene.checkWinCon = this.checkWinCon;
+            scene.oldGrow = this.snake.grow;
             scene.snake.grow = this.grow;
         },
         checkWinCon: function () {
             if (this.snake.body.length < 2) {
+                scene.snake.grow = this.oldGrow;
                 this.events.emit('win');
             }
             return 
@@ -817,6 +826,7 @@ STAGE_OVERRIDES.set("Bonus_X-12", {
         },
         checkWinCon: function () {
             if (scene.snake.body.length < 2) {
+                this.moveWall = undefined;
                 this.events.emit("win");
             }
             return
