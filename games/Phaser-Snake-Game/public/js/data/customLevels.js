@@ -1062,7 +1062,7 @@ STAGE_OVERRIDES.set("Tutorial_T-6", {
             //window.location.reload();
 
             //temporary solution for resetting the game -- doesn't preserve object permanence
-            window.location.reload();
+            //window.location.reload();
 
         },
         postFix: function (scene) {

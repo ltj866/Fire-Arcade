@@ -7239,6 +7239,15 @@ class GameScene extends Phaser.Scene {
 
 
         this.coinSpawnCounter = 100;
+
+        // This is here so it correctly is reloaded on every game scene start/restart.
+        // Bonus levels reasign this function after this point. 
+        // The standard game returns nothing and uses the length goal
+
+        this.checkWinCon = function () {
+            // remember to emit "win" when overriding directly.
+            return
+        }
     }
     
     
@@ -11065,11 +11074,6 @@ class GameScene extends Phaser.Scene {
 
             }, this);
         }
-    }
-    checkWinCon() { 
-        // Use Atom for default game.
-        // this.length >= this.lengthGoal
-        return
     }
 
     checkLoseCon() {
