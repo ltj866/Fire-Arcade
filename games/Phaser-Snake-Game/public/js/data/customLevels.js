@@ -1096,6 +1096,7 @@ STAGE_OVERRIDES.set("World_4-1", {
             }
   
         }
+    }
 });
 
 STAGE_OVERRIDES.set("World_0-1", {
