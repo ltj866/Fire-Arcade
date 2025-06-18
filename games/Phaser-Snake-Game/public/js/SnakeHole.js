@@ -30,7 +30,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3189,7 +3189,13 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
         this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
         this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
-
+        this.load.spritesheet('tutMove', 'assets/HowToCards/tutorial_snake_move.png', { frameWidth: 240, frameHeight: 18 });
+        this.load.spritesheet('tutWASDMove', 'assets/HowToCards/tutorial_snake_WASD_Sheet.png', { frameWidth: 240, frameHeight: 36 });
+        this.load.spritesheet('tutWalls', 'assets/HowToCards/tutorial_snake_walls_Sheet.png', { frameWidth: 164, frameHeight: 26 });
+        this.load.image('tutWallSprite', 'assets/HowToCards/tutorial_walls_wall.png');
+        this.load.spritesheet('tutWrap', 'assets/HowToCards/tutorial_snake_wrap_Sheet.png', { frameWidth: 232, frameHeight: 36 });
+        this.load.image('tutWallSprite2', 'assets/HowToCards/tutorial_walls_wall2.png');
+        this.load.spritesheet('tutBlackHole', 'assets/HowToCards/tutorial_snake_blackHole_Sheet.png', { frameWidth: 232, frameHeight: 46 });
 
         SPACE_BOY = this.scene.get("SpaceBoyScene");
         PERSISTS = this.scene.get("PersistScene");
@@ -4843,7 +4849,7 @@ class MainMenuScene extends Phaser.Scene {
 
                             var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                             mainMenuScene.scene.launch('TutorialScene', {
-                                cards: [randomHowTo],
+                                cards: ['blackholes'], //randomHowTo
                                 toStage: START_STAGE, 
                             });
 
@@ -14109,18 +14115,56 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 1,
         repeat: 0
       });
+
     scene.anims.create({
-    key: 'tutAll',
-    frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 1,2,1,3,4,3,5,6,5,7,8,7]}),
-    frameRate: 12,
-    repeat: -1
+        key: 'tutAll',
+        frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 1,2,1,3,4,3,5,6,5,7,8,7]}),
+        frameRate: 10,
+        repeat: -1
     });
+
+    scene.anims.create({
+        key: 'tutMove',
+        frames: scene.anims.generateFrameNumbers('tutMove',{ frames: [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]}),
+        frameRate: 10,
+        repeat: -1
+    });
+    
+    scene.anims.create({
+        key: 'tutWASDMove',
+        frames: scene.anims.generateFrameNumbers('tutWASDMove',{ frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]}),
+        frameRate: 10,
+        repeat: -1
+    });
+
     scene.anims.create({
         key: 'tutSpace',
-        frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [ 0,0,0,0,1,2,2,2,2,1]}),
+        frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [0,0,0,0,1,2,2,2,2,1]}),
         frameRate: 12,
         repeat: -1
     });
+
+    scene.anims.create({
+        key: 'tutWalls',
+        frames: scene.anims.generateFrameNumbers('tutWalls',{ frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}),
+        frameRate: 12,
+        repeat: -1
+    });
+    
+    scene.anims.create({
+        key: 'tutWrap',
+        frames: scene.anims.generateFrameNumbers('tutWrap',{ frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]}),
+        frameRate: 12,
+        repeat: -1
+    });
+    
+    scene.anims.create({
+        key: 'tutBlackHole',
+        frames: scene.anims.generateFrameNumbers('tutBlackHole',{ frames: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]}),
+        frameRate: 12,
+        repeat: -1
+    });
+    //herehere
     
     /*scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
         frame: 'portalAnim.png'
