@@ -6665,7 +6665,6 @@ class PersistScene extends Phaser.Scene {
         this.prevCodexStageMemory = START_STAGE;
         this.prevStage = START_STAGE;
         this.prevRank = 0;
-        //this.speedSprint = SPEED_SPRINT;
 
         // List of Background Containers
         this.bgPlanets = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
@@ -7178,7 +7177,6 @@ class GameScene extends Phaser.Scene {
         this.portalParticles = [];
         this.snakePortalingSprites = [];
 
-        this.stageOver = false; // deprecated to be removed
 
         this.canPortal = true;
         this.winned = false; // marked as true any time this.winCondition is met.
@@ -7187,23 +7185,30 @@ class GameScene extends Phaser.Scene {
         const { stage = START_STAGE } = props 
         this.stage = stage;
 
-        this.moveInterval = SPEED_WALK;
-        this.boostCost = 6;
-        this.boostAdd = 1;
-        this.speedWalk = SPEED_WALK;
-        this.speedSprint = SPEED_SPRINT;
+        // Special flags - Typically Read Only Settings.
+        // Wrapped in an object to make sure they are reset.
+        // Particularly ones added during bonus stages.
+        this.gameSettings = {
+            moveInterval: SPEED_WALK,
+            boostCost: 6,
+            boostAdd: 1,
+            speedWalk: SPEED_WALK,
+            speedSprint: SPEED_SPRINT,
+            bonkable : true, // No longer bonks when you hit yourself or a wall
+            collideSelf : true,
+            stepMode : false, // Stops auto moving, only pressing moves.
+            spawnCoins : true,
+            skipScoreScreen : false, //
+            lengthGoal: LENGTH_GOAL,
+            maxScore: MAX_SCORE
+        };
+
+        
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
 
-        // Special flags
-        this.ghosting = false;
-        this.bonkable = true; // No longer bonks when you hit yourself or a wall
-        this.collideSelf = true;
-        this.stepMode = false; // Stops auto moving, only pressing moves.
-        this.extractMenuOn = false; // set to true to enable extract menu functionality.
-        this.spawnCoins = true;
-        this.skipScoreScreen = false; //
+        this.extractMenuOn = false; // set to true to enable extract menu functionality. // GOTTOGO
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -7217,10 +7222,6 @@ class GameScene extends Phaser.Scene {
         this.stageStartScore = Math.trunc(score);
 
         this.length = 0;
-        this.lengthGoal = LENGTH_GOAL;
-        this.maxScore = MAX_SCORE;
-
-        this.scoreMulti = 0;
         this.globalFruitCount = 0;
         this.bonks = 0;
         this.medals = {};
@@ -7245,7 +7246,7 @@ class GameScene extends Phaser.Scene {
         // The standard game returns nothing and uses the length goal
 
         this.checkWinCon = function () {
-            // remember to emit "win" when overriding directly.
+            // remember to emit "win" when overriding.
             return
         }
     }
@@ -8138,7 +8139,7 @@ class GameScene extends Phaser.Scene {
 
                     
     
-                    if (this.currentScoreTimer() === this.maxScore) {
+                    if (this.currentScoreTimer() === this.gameSettings.maxScore) {
                         /**
                          * This code is duplicated here to make sure that the electron 
                          * animation is played as soon as you move from the start and wait state.
@@ -9281,9 +9282,9 @@ class GameScene extends Phaser.Scene {
         var length = 0;
         var length = `${ourGame.length}`;
 
-        if (this.lengthGoal != 0) {
+        if (this.gameSettings.lengthGoal != 0) {
             ourSpaceBoy.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
+                `${length.padStart(2, "0")}\n${this.gameSettings.lengthGoal.toString().padStart(2, "0")}`
             ).setOrigin(0,0);
             ourSpaceBoy.lengthGoalUI.setLineSpacing(6)
             //ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
@@ -9302,7 +9303,7 @@ class GameScene extends Phaser.Scene {
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
         this.scoreTimer = this.time.addEvent({
-            delay: this.maxScore * 100,
+            delay: this.gameSettings.maxScore * 100,
             paused: true
          }, this);
 
@@ -9541,21 +9542,21 @@ class GameScene extends Phaser.Scene {
             }
 
              // Restart Score Timer
-            if (this.length < this.lengthGoal) {
+            if (this.length < this.gameSettings.lengthGoal) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: this.maxScore * 100,
+                    delay: this.gameSettings.maxScore * 100,
                     paused: false
                  }, this);   
             }
 
             switch (this.length) {
-                case this.lengthGoal - 4:
+                case this.gameSettings.lengthGoal - 4:
                     ourSpaceBoy.shiftLight1.setAlpha(1);
                     ourSpaceBoy.shiftLight1.setFrame(0);
                     ourSpaceBoy.shiftLight5.setAlpha(1);
                     ourSpaceBoy.shiftLight5.setFrame(0);
                     break;
-                case this.lengthGoal - 3:
+                case this.gameSettings.lengthGoal - 3:
                     ourSpaceBoy.shiftLight2.setAlpha(1);
                     ourSpaceBoy.shiftLight1.setFrame(1);
                     ourSpaceBoy.shiftLight2.setFrame(1);
@@ -9563,7 +9564,7 @@ class GameScene extends Phaser.Scene {
                     ourSpaceBoy.shiftLight4.setFrame(1);
                     ourSpaceBoy.shiftLight5.setFrame(1);
                     break;
-                case this.lengthGoal - 2:
+                case this.gameSettings.lengthGoal - 2:
                     ourSpaceBoy.shiftLight3.setAlpha(2);
                     ourSpaceBoy.shiftLight1.setFrame(2);
                     ourSpaceBoy.shiftLight2.setFrame(2);
@@ -9799,11 +9800,11 @@ class GameScene extends Phaser.Scene {
         
     }
     playAtomSound() {
-        if (this.moveInterval = SPEED_WALK) {
+        if (this.gameSettings.moveInterval = SPEED_WALK) {
             // Play atom sound
             var _index = Phaser.Math.Between(0, this.atomSounds.length - 1);
             this.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
-            } else if (this.moveInterval = SPEED_SPRINT) {
+            } else if (this.gameSettings.moveInterval = SPEED_SPRINT) {
                 
                 // Play sniper sound here.
                 // There are some moveInterval shenanigans happening here. 
@@ -9827,10 +9828,10 @@ class GameScene extends Phaser.Scene {
 
     // #region .screenShake(
     screenShake(){
-        if (this.moveInterval === this.speedSprint) {
+        if (this.gameSettings.moveInterval === this.gameSettings.speedSprint) {
             this.cameras.main.shake(400, .01);
         }
-        else if (this.moveInterval === this.speedWalk){
+        else if (this.gameSettings.moveInterval === this.gameSettings.speedWalk){
             this.cameras.main.shake(300, .00625)
         }    
     }
@@ -10967,7 +10968,7 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(this.speedSprint),
+            delay: this.tweens.stagger(this.gameSettings.speedSprint),
         });
 
         return this.snakeEating
@@ -11077,7 +11078,7 @@ class GameScene extends Phaser.Scene {
 
     checkLoseCon() {
         /*
-        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
+        if (this.gameSettings.lengthGoal > 0) { // Placeholder check for bonus level.
             const ourPersist = this.scene.get("PersistScene");
             return ourPersist.coins < 0;
         } else {
@@ -11256,7 +11257,7 @@ class GameScene extends Phaser.Scene {
 
 
 
-        if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
+        if(time >= this.lastMoveTime + this.gameSettings.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
 
             // could we move this into snake.move()
@@ -11315,12 +11316,12 @@ class GameScene extends Phaser.Scene {
                 // Move at last second
                 this.snake.move(this);
                 
-                if (ourInputScene.moveHistory[ourInputScene.moveHistory.length - 1][0] === `s${this.moveInterval}` ) {
+                if (ourInputScene.moveHistory[ourInputScene.moveHistory.length - 1][0] === `s${this.gameSettings.moveInterval}` ) {
                     ourInputScene.moveHistory[ourInputScene.moveHistory.length - 1][1] += 1;
                 } else {
-                    ourInputScene.moveHistory.push([ `s${this.moveInterval}`, 1 ]);
+                    ourInputScene.moveHistory.push([ `s${this.gameSettings.moveInterval}`, 1 ]);
                 }
-                //ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
+                //ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.gameSettings.moveInterval]);
                 ourInputScene.moveCount += 1;
 
 
@@ -11430,7 +11431,7 @@ class GameScene extends Phaser.Scene {
                 }
 
                 if (this.coinSpawnCounter < 1) {
-                    if (this.spawnCoins) {
+                    if (this.gameSettings.spawnCoins) {
                         switch (this.mode) {
                             case MODES.CLASSIC:
                                 console.log("COIN TIME YAY. SPAWN a new coin");
@@ -11466,7 +11467,7 @@ class GameScene extends Phaser.Scene {
             // Update Atom Animation.
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
-                    case this.maxScore:  // 120 {}
+                    case this.gameSettings.maxScore:  // 120 {}
                     this.atoms.forEach(atom => {
                         if (atom.anims.currentAnim.key !== 'atom01idle'||atom.anims.currentAnim.key !== 'atom05spawn') {
                             atom.play("atom01idle");
@@ -11536,25 +11537,25 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = this.speedSprint;
+                    this.gameSettings.moveInterval = this.gameSettings.speedSprint;
 a                    
                     if (!this.winned) {
                         // Boost Stats
                         ourInputScene.boostTime += 6;
                         //this.boostMask.setScale(this.boostEnergy/1000,1);
 
-                        this.boostEnergy = Math.max(this.boostEnergy - this.boostCost, 0);
+                        this.boostEnergy = Math.max(this.boostEnergy - this.gameSettings.boostCost, 0);
                     } 
                 } else{
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
                     this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
-                    this.moveInterval = this.speedWalk;
+                    this.gameSettings.moveInterval = this.gameSettings.speedWalk;
                 }
         
             } else {
                 //console.log("spacebar not down");
-                this.moveInterval = this.speedWalk; // Less is Faster
+                this.gameSettings.moveInterval = this.gameSettings.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
                 
                 this.boostEnergy = Math.min(this.boostEnergy + this.boostAdd, 1000); // Recharge Boost Slowly
@@ -13560,7 +13561,7 @@ class ScoreScene extends Phaser.Scene {
             } 
         }
 
-        if (ourGame.skipScoreScreen) {
+        if (ourGame.gameSettings.skipScoreScreen) {
             onContinue(ourGame);
         }
 
@@ -13822,7 +13823,7 @@ class InputScene extends Phaser.Scene {
     moveUp(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode) || !gameScene.collideSelf) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode) || !gameScene.gameSettings.collideSelf) { 
 
             //console.log("I'm Moving Up");
             
@@ -13839,9 +13840,9 @@ class InputScene extends Phaser.Scene {
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
             this.turns += 1;
             
-            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.gameSettings.moveInterval);
 
-            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+            if (_cornerTime < gameScene.gameSettings.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
                 this.cornerTime += _cornerTime;
 
             }
@@ -13861,7 +13862,7 @@ class InputScene extends Phaser.Scene {
     moveDown(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode ) || !gameScene.collideSelf) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode ) || !gameScene.gameSettings.collideSelf) { 
            
 
             this.setPLAY(gameScene);
@@ -13874,9 +13875,9 @@ class InputScene extends Phaser.Scene {
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.gameSettings.moveInterval);
 
-            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+            if (_cornerTime < gameScene.gameSettings.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
                this.cornerTime += _cornerTime;
             }
             gameScene.lastMoveTime = gameScene.time.now;
@@ -13895,7 +13896,7 @@ class InputScene extends Phaser.Scene {
     moveLeft(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)  || !gameScene.collideSelf) {
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode)  || !gameScene.gameSettings.collideSelf) {
             
             this.setPLAY(gameScene);
 
@@ -13907,9 +13908,9 @@ class InputScene extends Phaser.Scene {
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.gameSettings.moveInterval);
 
-            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+            if (_cornerTime < gameScene.gameSettings.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
                 this.cornerTime += _cornerTime;
             }
             gameScene.lastMoveTime = gameScene.time.now;
@@ -13928,7 +13929,7 @@ class InputScene extends Phaser.Scene {
     moveRight(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode) || !gameScene.collideSelf) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode) || !gameScene.gameSettings.collideSelf) { 
             
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);
@@ -13940,9 +13941,9 @@ class InputScene extends Phaser.Scene {
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.gameSettings.moveInterval);
 
-            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+            if (_cornerTime < gameScene.gameSettings.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
                 this.cornerTime += _cornerTime;
             }
             gameScene.lastMoveTime = gameScene.time.now;
