@@ -4849,7 +4849,7 @@ class MainMenuScene extends Phaser.Scene {
 
                             var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                             mainMenuScene.scene.launch('TutorialScene', {
-                                cards: ['blackholes'], //randomHowTo
+                                cards: [randomHowTo],
                                 toStage: START_STAGE, 
                             });
 
