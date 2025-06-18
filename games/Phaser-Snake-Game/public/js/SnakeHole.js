@@ -832,7 +832,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-2'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7153,6 +7153,7 @@ class GameScene extends Phaser.Scene {
 
         // Arrays for collision detection
         this.atoms = new Set();
+        this.atomRespawnPool = new Set();
         this.activeArrows = new Set();
         this.foodHistory = [];
         this.walls = [];
@@ -7160,7 +7161,7 @@ class GameScene extends Phaser.Scene {
         this.wallPortals = [];
         this.dreamWalls = [];
         this.nextStagePortals = [];
-        this.extractHole = [];
+        this.extractHole = undefined;
 
         this.snakeLights = [];
 
@@ -7184,7 +7185,6 @@ class GameScene extends Phaser.Scene {
         this.snakePortalingSprites = [];
 
 
-        this.canPortal = true;
         this.winned = false; // marked as true any time this.winCondition is met.
         this.canContinue = true; // used to check for a true game over
 
@@ -8153,7 +8153,9 @@ class GameScene extends Phaser.Scene {
                          * have the input be more responsive.  - James
                          */
                         this.atoms.forEach( atom => {
-                            atom.electrons.visible = true;
+                            if (atom.visible) {
+                                atom.electrons.visible = true;
+                            }
                         });
                     }
                 }
@@ -8321,7 +8323,7 @@ class GameScene extends Phaser.Scene {
 
             // #region is unlocked?
 
-            if (this.winned) {
+            if (this.winned) { // DO WE NEED THIS CHECK? -ME
                 updateSumOfBest(ourPersist);
 
 
@@ -8387,7 +8389,7 @@ class GameScene extends Phaser.Scene {
                                 this.r3.postFX.addShine(1, .5, 5)
                                 this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
         
-                                this.extractHole.push(extractImage);
+                                this.extractHole = extractImage;
                                 this.extractLables.push(this.extractText,this.r3);
         
                                 this.tweens.add({
@@ -8423,7 +8425,7 @@ class GameScene extends Phaser.Scene {
                                     this.r3.postFX.addShine(1, .5, 5)
                                     this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
             
-                                    this.extractHole.push(extractImage);
+                                    this.extractHole = extractImage;
                                     this.extractLables.push(this.extractText,this.r3);
             
                                     this.tweens.add({
@@ -8682,7 +8684,7 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125)
                         if (ourPersist.gauntlet.length === 0) {
                             extractImage.play('extractHoleIdle');
-                            this.extractHole.push(extractImage);
+                            this.extractHole = extractImage;
                             
                         } else {
                             extractImage.play('blackholeForm');
@@ -9110,6 +9112,35 @@ class GameScene extends Phaser.Scene {
         for (let index = 1; index <= this.atomToSpawn; index++) {
             var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
         }
+        
+
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        
 
 
         // #endregion
@@ -9519,9 +9550,6 @@ class GameScene extends Phaser.Scene {
             //this.runningScoreLabelUI.setText(
             //    `${commaInt(this.runningScore.toString())}`
             //);
-            
-            
-
 
             // Update UI
             //var tempScore = `${this.scoreHistory.reduce((a,b) => a + b, 0)}`
@@ -9635,7 +9663,6 @@ class GameScene extends Phaser.Scene {
         this.events.once('win', function (){
             console.log("YOU WIN" , this.stage);
             this.winned = true;
-            this.canPortal = false;
 
             var coinsToRemove = Math.floor(this.coinsArray.size / 2);
             const iterator = this.coinsArray.values(); // Get an iterator for the Set
@@ -9692,8 +9719,11 @@ class GameScene extends Phaser.Scene {
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
 
-            //this.backgroundBlur(true);
-            this.collapsePortals();
+            if (STAGE_OVERRIDES.has(this.stage) &&
+                STAGE_OVERRIDES.get(ourGame.stage).methods.hasOwnProperty("beforeScoreScreen") ) {
+                console.log("Running beforeScoreScreen Override on", this.stage);
+                STAGE_OVERRIDES.get(this.stage).methods.beforeScoreScreen(this);
+             }
 
             this.scene.launch('ScoreScene', stageDataJSON);
             
@@ -10145,7 +10175,7 @@ class GameScene extends Phaser.Scene {
 
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
-        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
 
         // hide the level labels
         this.levelLabelHide = this.tweens.add({
@@ -10313,7 +10343,7 @@ class GameScene extends Phaser.Scene {
         
 
 
-        this.extractHole[0].play('extractHoleClose');
+        this.extractHole.play('extractHoleClose');
 
         this.tweens.add({
             targets: this.snake.body, 
@@ -10630,6 +10660,9 @@ class GameScene extends Phaser.Scene {
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
         const ourPinball = this.scene.get("PinballDisplayScene");
         this.gState = GState.TRANSITION;
+
+        //this.backgroundBlur(true);
+        this.collapsePortals();
 
         ourSpaceboy.scoreTweenShow();
         this.drainScore();
@@ -10950,34 +10983,24 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    vortexIn(target, x, y){
+    vortexIn(target, x, y, time, ease){
+
+        if (!ease) {
+            ease = 'Sine.easeOutIn';
+        }
 
         this.vortexTween = this.tweens.add({
             targets: target, 
             x: x, //this.pathRegroup.vec.x,
             y: y, //this.pathRegroup.vec.y,
             yoyo: false,
-            duration: 500,
-            ease: 'Sine.easeOutIn',
+            ease: ease, //'Sine.easeOutIn'
+            duration: time,
             repeat: 0,
             delay: this.tweens.stagger(30)
         });
 
         return this.vortexTween
-    }
-
-    snakeEating(){
-        this.snakeEatingTween = this.tweens.add({
-            targets: this.snake.body, 
-            scale: [1.25,1],
-            yoyo: false,
-            duration: 64,
-            ease: 'Linear',
-            repeat: 0,
-            delay: this.tweens.stagger(this.gameSettings.speedSprint),
-        });
-
-        return this.snakeEating
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
@@ -11108,31 +11131,8 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    getStaggerTween (i, group)
-    {
-        const stagger = this.variations[i];
-        
-        this.tweens.add({
-            targets: group.getChildren(),
-            scale: [2,0],
-            alpha: [.5,0],
-            ease: 'power2',
-            duration: 800,
-            delay: this.tweens.stagger(...stagger),
-            completeDelay: 1000,
-            repeat: 0,
-            onComplete: () =>
-            {
-                group.getChildren().forEach(child => {
-
-                    child.destroy();
-
-                });
-            }
-        }); 
-    }
-
     musicPlayerDisplay(show){
+        // move to spaceboy or music player. #TODO
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
         let _offset = 36;
         if (show === true) {
@@ -11171,22 +11171,26 @@ class GameScene extends Phaser.Scene {
                 repeat: 0,
             }); 
         }
-            
-        
         this.lengthGoalUI
         this.lengthGoalUILabel
     }
 
     collapsePortals(){
         this.portals.forEach(portal => {
+
+            this.interactLayer[portal.tileX()][portal.tileY()] = "empty";
+
             portal.play('portalClose');
             portal.on('animationcomplete', (animation) => {
                 if (animation.key === 'portalClose') {
-                    portal.alpha = 0;
+                    portal.destroy();
+                    portal.portalHighlight.destroy();
                 }
             });
-            portal.portalHighlight.alpha = 0;
-        })
+            
+        });
+
+        this.portals = [];
 
         this.portalLights.forEach(portalLight => {
             this.lights.removeLight(portalLight);
@@ -11435,6 +11439,21 @@ class GameScene extends Phaser.Scene {
 
                     this.countDownTimer.setText(countDown.toString().padStart(3,"0"));
                 }
+
+                if (this.atomRespawnPool.size > 0) {
+                    this.atomRespawnPool.forEach(atom => {
+                        atom.respawnTimer-- ;
+
+                        if (atom.respawnTimer < 0) {
+                            atom.visible = true; // visible
+                            atom.electrons.visible = true;
+                            atom.anims.play("atom05spawn");  // Start the spawn animation
+                            atom.chain(['atom01idle']);
+                            this.atomRespawnPool.delete(atom);
+                        }
+                    });
+                }
+                
 
                 if (this.coinSpawnCounter < 1) {
                     if (this.gameSettings.spawnCoins) {

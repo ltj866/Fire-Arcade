@@ -1151,6 +1151,9 @@ STAGE_OVERRIDES.set("World_0-1", {
                 }, scene);  
             } 
         },
+        beforeScoreScreen: function (scene) {
+            scene.collapsePortals();
+        }
     }
 });
 
