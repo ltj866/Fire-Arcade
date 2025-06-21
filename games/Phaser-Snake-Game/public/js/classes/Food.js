@@ -22,7 +22,6 @@ var Food = new Phaser.Class({
 
         this.respawnTimer = 0; // Tenths of seconds
         
-
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(48);
         this.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
         this.electrons.anims.msPerFrame = 66;
@@ -97,14 +96,14 @@ var Food = new Phaser.Class({
             } else {
                 // Last Atom!
                 scene.winned = true;
-                debugger
+                scene.gState = GState.TRANSITION;
 
                 var _x = this.prevX;
                 var _y = this.prevY;
 
-                var finalAtom = scene.add.sprite(_x, _y).setOrigin(0,0);
-                finalAtom.play("atom02idle", this.frame.name); // Needs to select the correct frame
-                finalAtom.setDepth(45); 
+                var finalAtomCopy = scene.add.sprite(_x, _y).setOrigin(0,0);
+                finalAtomCopy.play("atom02idle", this.frame.name); // Needs to select the correct frame
+                finalAtomCopy.setDepth(45); 
 
                 var tempSounds = [];
 
@@ -113,26 +112,23 @@ var Food = new Phaser.Class({
                     tempSounds.push(scene.sound.add(soundID[0]));
                 });
                 tempSounds[4].play();
+                
 
-                debugger
-
-                scene.gState = GState.TRANSITION;
-
-                var finalFanfare = false;
+                var finalFare = false;
                         
                 switch (true) {
                     case scene.mode === MODES.CLASSIC || scene.mode === MODES.EXPERT:
                         if (scene.nextStagePortalLayer.findByIndex(616)){
-                            finalFanfare = true;
+                            finalFare = true;
                         }
                         break;
                     case scene.mode === MODES.GAUNTLET:
                         if (PERSISTS.gauntlet.length === 0) {
-                            finalFanfare = true;
+                            finalFare = true;
                         }
                         break;
                     case scene.mode === MODES.PRACTICE:
-                        finalFanfare = false;
+                        finalFare = false;
                         break;
                 
                     default:
@@ -142,8 +138,8 @@ var Food = new Phaser.Class({
 
                 
 
-                if (!finalFanfare) {
-                    // Normal Final Atom Case
+                if (!finalFare) {
+                    // Normal Fan
 
                     /* Brightness Tween *shrug* not great
                     const brightness = scene.snake.head.preFX.addColorMatrix().brightness(2);
@@ -164,13 +160,16 @@ var Food = new Phaser.Class({
                         }
                     });
                     */
+                    scene.snake.head.x = scene.snake.previous[0];
+                    scene.snake.head.y = scene.snake.previous[1];
 
                     scene.tweens.add({
                         targets: scene.snake.head,
                         x: {from: scene.snake.previous[0], to:_x },
                         y: { from: scene.snake.previous[1], to:_y },
-                        duration: 1,
-                        ease:'Expo.easeIn',
+                        duration: 240,
+                        delay: 600,
+                        ease:'Expo.easeIn', // 'Expo.easeIn' 'Back.easeIn'
                         onComplete: () =>{
 
                             
@@ -180,21 +179,22 @@ var Food = new Phaser.Class({
                             
                             this.electrons.visible = false;
 
-                            var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Expo.easeInOut');
+                            var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Back.easeIn'); // 'Back.easeIn' 'Expo.easeInOut'
 
                             vortexTween.on('complete', () => {
-                                scene.time.delayedCall(200, () => {
 
+                                scene.hidePortals(120);
+                            
+                                scene.time.delayedCall(1, () => {
 
-
-                                    scene.playAtomSound();
+                                    //scene.playAtomSound();
                                     scene.snake.grow(scene);
-                                    finalAtom.destroy();
+                                    finalAtomCopy.destroy();
                                     scene.events.emit('win');
                                 
                                     // Store speed values
-                                    let _walkSpeed = scene.speedWalk;
-                                    let _sprintSpeed = scene.speedSprint;
+                                    let _walkSpeed = scene.gameSettings.speedWalk;
+                                    let _sprintSpeed = scene.gameSettings.speedSprint;
                             
                                     // Store initial camera position
                                     let initialCameraX = scene.cameras.main.scrollX;
@@ -261,8 +261,8 @@ var Food = new Phaser.Class({
                                                 // Apply the interpolated slowMoValue to all the timeScales
                                                 scene.tweens.timeScale = slowMoValue;
                                                 scene.anims.globalTimeScale = slowMoValue;
-                                                scene.speedWalk = _walkSpeed  / slowMoValue;
-                                                scene.speedSprint = _sprintSpeed / slowMoValue;
+                                                scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
+                                                scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
                                                 if (scene.starEmitterFinal) {
                                                     scene.starEmitterFinal.timeScale = slowMoValue;
                                                 }
@@ -314,8 +314,8 @@ var Food = new Phaser.Class({
                                                 
                                                 scene.tweens.timeScale = 1;
                                                 scene.anims.globalTimeScale = 1;
-                                                scene.speedWalk = _walkSpeed;
-                                                scene.speedSprint = _sprintSpeed;
+                                                scene.gameSettings.speedWalk = _walkSpeed;
+                                                scene.gameSettings.speedSprint = _sprintSpeed;
                                                 if (scene.starEmitterFinal) {
                                                     scene.starEmitterFinal.timeScale = 1;
                                                 }
@@ -365,8 +365,6 @@ var Food = new Phaser.Class({
                                                 PERSISTS.cameras.main.scrollY = 0;*/
                                                 SPACE_BOY.CapSparkFinale = SPACE_BOY.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                                                 .setDepth(100);
-                                                
-                                                scene.gState = GState.PLAY;
                                         }
                                     });
                         
@@ -445,7 +443,6 @@ var Food = new Phaser.Class({
                         
                                         scene.countDownTimer.setAlpha(0);
                             
-                                    debugger
                                     /*
                                         scene.tweens.add({ //slower one-off snakeEating tween
                                         targets: scene.snake.body, 
@@ -460,10 +457,6 @@ var Food = new Phaser.Class({
                                             scene.timeScale = slowMoValCopy /2;
                                         }
                                     });*/
-                            
-                                    
-
-
                                     
                                     console.log('tween finished, start electrons');
                         
@@ -476,18 +469,145 @@ var Food = new Phaser.Class({
                     scene.snake.grow(scene);
                     // Avoid double _atom getting while in transition
                     this.visible = false;
+                    scene.pathTweens = new Set();
 
                     scene.playAtomSound();
-                    // Finale Fanfare!
+
+                    // #region BAR RAINBOW
+                    // Boost Bar Rainbow Code.
+                    //scene.fxBoost = scene.boostBar.preFX.addColorMatrix();
+                    scene.tweens.addCounter({
+                        from: 0,
+                        to: 360,
+                        duration: 3000,
+                        loop: -1,
+                        onUpdate: (tween) => {
+                            let hueValue = tween.getValue();
+                            //scene.fxBoost.hue(hueValue);
+                    
+                            // Update each segment's tint with an offset and apply pastel effect
+                            scene.snake.body.forEach((part, index) => {
+                                // Add an offset to the hue for each segment
+                                let partHueValue = (hueValue + index * 12.41) % 360;
+                    
+                                // Reduce saturation and increase lightness
+                                let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+                    
+                                if (color) {// only update color when it's not null
+                                    part.setTint(color.color);
+                                }
+                            });
+                        }
+                    });
+
+                    // #endregion
+                    
+                    // Finalfare!
+
+                    var timeToScoreScreen = 2250;
+                    var delayHold = 1000;
+
+                    
+
+                    scene.snake.criticalStateTween.pause(); 
                     scene.tweens.add({
                         targets: scene.snake.head,
                         x: {from: scene.snake.previous[0], to:_x },
                         y: { from: scene.snake.previous[1], to:_y },
-                        duration: 800,
+                        duration: timeToScoreScreen,
+                        delay: 720,
+                        ease:'Expo.easeIn', // 'Expo.easeIn' 'Back.easeIn'
                         onComplete: () => {
                             this.move(scene);
+                            scene.hidePortals(120);
+                            scene.countDownTimer.setHTML('W1N');
+                            //scene.countDownTimer.x += 3;
+                            scene.events.emit('win');
+                            finalAtomCopy.destroy();
+                            
                         }
                     });
+
+                    // #region Spiral
+
+                    var body = scene.snake.body.slice(1, scene.snake.body.length);
+
+                    var graphics = scene.add.graphics();
+                    graphics.lineStyle(1, 0xffffff, 1);
+
+                    var flipCounter = 0;
+
+                    body.forEach( segment => {
+                        var path = new Phaser.Curves.Path();
+
+                        segment.setOrigin(0.5,0.5);
+                        segment.x = segment.x + GRID / 2;
+                        segment.y = segment.y + GRID / 2;
+
+                        var r = Phaser.Math.Distance.BetweenPoints(scene.snake.head.getCenter(), segment.getCenter());
+                        var _angle = Phaser.Math.Angle.BetweenPoints(scene.snake.head, segment);
+
+                        var _degrees = Phaser.Math.RadToDeg(_angle);
+
+                        var clockwise;
+                        flipCounter++;
+
+                        if (flipCounter % 2 === 0) {
+                            clockwise = true;
+                        } else {
+                            clockwise = false;
+                        }
+                        
+                        
+                        path.add(new Phaser.Curves.Ellipse(
+                            scene.snake.head.getCenter().x, 
+                            scene.snake.head.getCenter().y, 
+                            r,
+                            r,
+                            0,
+                            360,
+                            clockwise,
+                            _degrees  
+                        ));
+
+                        var follower = { t: 0, vec: new Phaser.Math.Vector2(segment.x, segment.y),  };
+
+                        
+                        // path.draw(graphics); // Draws the circle paths
+
+                        
+
+                        var pathTween = scene.tweens.add({
+                            targets: follower,
+                            t: 1,
+                            ease: 'Linear',
+                            duration: Phaser.Math.Between(2000,3000),
+                            delay: delayHold,
+                            repeat: -1,
+                            onUpdate: (tween, targets) => {
+                                path.getPoint(targets.t, targets.vec);
+                                segment.x = targets.vec.x;
+                                segment.y = targets.vec.y;
+
+                            }
+                        });
+
+                        scene.pathTweens.add(pathTween);
+
+                        var _radius = Phaser.Math.Between(22,27);
+                        scene.tweens.add({
+                            targets: path.curves,
+                            ease: 'Back.easeIn',
+                            delay: delayHold,
+                            duration: timeToScoreScreen,
+                            xRadius: _radius,
+                            yRadius: _radius,
+                        })
+                    });
+
+                    
+
+                    // #endregion
                 }
                 
             }

@@ -31,9 +31,6 @@ var Portal = new Phaser.Class({
             this.portalHighlight = scene.add.sprite(from[0], from[1]).setDepth(46).setOrigin(.3125,.3125);
             // this.portalHighlight.setTint(color.color);
             // this.portalHighlight.chain(['portalHighlights']);
-            
-
-
         } else {
             this.setOrigin(0,0);
             scene.wallPortals.push(this);
@@ -57,7 +54,6 @@ var Portal = new Phaser.Class({
         this.snakePortalingSprite = scene.add.sprite(from[0], from[1], 'snakeDefault', 1
         ).setDepth(52).setOrigin(0,0).setPipeline('Light2D');
         this.snakePortalingSprite.setAlpha(0.66);
-        scene.snakePortalingSprites.push(this.snakePortalingSprite);
 
 
         
@@ -118,7 +114,7 @@ var Portal = new Phaser.Class({
         scene.time.delayedCall(750, () => { 
             this.portalTimerRunning = false;
             //this.target.portalTimerRunning = false;    
-        });
+        }, [], this);
 
         /*scene.tweens.add({
                 targets: this,

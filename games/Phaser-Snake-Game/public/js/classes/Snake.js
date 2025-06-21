@@ -21,6 +21,8 @@ var Snake = new Phaser.Class({
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
 
+        this.head.name = "head";
+
         this.newHead = {};
 
         this.previous = [];
@@ -116,6 +118,7 @@ var Snake = new Phaser.Class({
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.sprite(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(47).setPipeline('Light2D');
+        newPart.name = `BodyPart ${scene.length}`;
         //newPart.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
         
@@ -282,7 +285,10 @@ var Snake = new Phaser.Class({
 
     
 
-        if (GState.PLAY === scene.gState && this.body.length > 2) { 
+        if (GState.PLAY === scene.gState && this.body.length > 2 && 
+            !Number.isNaN(this.body[this.body.length -2].x) && 
+            !Number.isNaN(this.body[this.body.length -2].y)) 
+            { 
             
             var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
             var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
@@ -319,43 +325,15 @@ var Snake = new Phaser.Class({
 
 
         
-        // Check for Blackholes
-        if (scene.winned) {
-            debugger
-            
-            /**
-             * Okay to not be part of the interact layer because there is only ever 8?
-             */
-            
-            for (let index = 0; index < scene.nextStagePortals.length; index++) {
-
-                
-                if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
-                    
-                    console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
-                    scene.portals.forEach(portal => {
-                        portal.portalHighlight.visible = false;
-                    });
-
-                    //portal.snakePortalingSprite.visible = false;
-                    //portal.targetObject.snakePortalingSprite.visible = false;
-                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                    updatePlayerStats()
-                    scene.warpToNext(index);
-                }
-
-                
+        // Check for ExtractHole
+        if (scene.extractHole) { //check that there is an extract hole
+            if (scene.extractHole.x === this.head.x && scene.extractHole.y === this.head.y) {
+                console.log('WOO')
+                //scene.finalScore();
+                scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                // TODO Extract Prompt needs to handle Gauntlet Mode.
+                scene.extractPrompt(); // Maybe higher function that determines which to call.
             }
-            if (scene.extractHole) { //check that there is an extract hole
-                if (scene.extractHole.x === this.head.x && scene.extractHole.y === this.head.y) {
-                    console.log('WOO')
-                    //scene.finalScore();
-                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                    debugger // TODO Extract Prompt needs to handle Gauntlet Mode.
-                    scene.extractPrompt(); // Maybe higher function that determines which to call.
-                }
-            }
-
         }
 
         // Update closest portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
@@ -514,7 +492,6 @@ var Snake = new Phaser.Class({
             scene.scene.get("InputScene").moveHistory.push(["BONK"]);
 
             //reset portal visuals on bonk
-            debugger
             scene.portals.forEach(portal => {
                 portal.portalHighlight.alpha = 0;
                 console.log(portal.portalHighlight.alpha);
