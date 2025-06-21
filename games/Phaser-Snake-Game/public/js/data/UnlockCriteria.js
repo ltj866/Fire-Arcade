@@ -102,12 +102,12 @@ export const STAGES = new Map([
     ["8-3", "World_8-3_Adv_Portaling"],
     ["8-4", "World_8-4_Adv_Portaling"],
     ["8-5", "World_8-5_Adv_Portaling"],
+    ["9-1", "World_9-1_Final_Exams"],
     ["9-2", "World_9-2_Final_Exams"],
     ["9-3", "World_9-3_Final_Exams"],
-    ["9-4", "World_9-4_Final_Exams"],
+    ["10-1", "World_10-1"],
     ["10-2", "World_10-2"],
     ["10-3", "World_10-3"],
-    ["10-4", "World_10-4"],
 
     ["G1-1", "Gauntlet_1-1"],
     ["G1-2", "Gauntlet_1-2"],
@@ -128,8 +128,8 @@ export const EXTRACT_CODES = [
     "0-1|8-1|8-2|8-4",
     "0-1|8-1|8-3|8-4",
     "0-1|8-1|8-2|8-5",
-    "0-1|1-1|9-2|9-3|9-4",
-    "0-1|2-1|10-2|10-3|10-4",   
+    "0-1|1-1|9-1|9-2|9-3",
+    "0-1|2-1|10-1|10-2|10-3",   
 ];
 
 export const COMPASS_ORDER = [
