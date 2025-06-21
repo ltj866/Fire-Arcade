@@ -361,7 +361,7 @@
         {
          "name":"next",
          "type":"string",
-         "value":"1-2, 9-2"
+         "value":""
         }, 
         {
          "name":"slug",

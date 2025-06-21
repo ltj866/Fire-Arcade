@@ -247,7 +247,7 @@ export const STAGE_UNLOCKS = new Map([
     ['two-wide-corridors', function () {
         return checkRank.call(this,STAGES.get("8-4"), RANKS.WOOD);}],
     ['double-back-portals', function () {
-        return checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("10-3"), RANKS.WOOD);
     }],
     ['easy-wrap', function () {
         return PLAYER_STATS.wraps > 128;
@@ -274,7 +274,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank.call(this,STAGES.get("8-2"), RANKS.WOOD);
     }],
     ['hardest----for-now', function () {
-        return checkRank.call(this,STAGES.get("10-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("10-2"), RANKS.WOOD);
     }],
     ['swirl-swirl', function () {
         return checkRank.call(this,STAGES.get("4-4"), RANKS.WOOD);
@@ -283,7 +283,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank.call(this,STAGES.get("4-2"), RANKS.WOOD);
     }],
     ['plus-plus', function () {
-        return checkRank.call(this,STAGES.get("10-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("10-1"), RANKS.WOOD);
     }],
     ['col', function () {
         return checkRank.call(this,STAGES.get("4-2"), RANKS.WOOD);
@@ -295,10 +295,10 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank.call(this,STAGES.get("8-4"), RANKS.WOOD);
     }],
     ['horizontal-uturns', function () {
-        return checkRank.call(this,STAGES.get("9-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("9-2"), RANKS.WOOD);
     }],
     ['horizontal-gaps', function () {
-        return checkRank.call(this,STAGES.get("9-2"), RANKS.WOOD); 
+        return checkRank.call(this,STAGES.get("9-1"), RANKS.WOOD); 
     }],
     ['first-medium', function () {
         return true;

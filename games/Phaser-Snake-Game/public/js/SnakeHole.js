@@ -830,11 +830,14 @@ export const GState = Object.freeze({
     TRANSITION: 6
 }); 
 
+// Starts with a nearly full grown snake.
+const GROW_26 = true; // false
 
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
+
 
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
@@ -8562,12 +8565,12 @@ class GameScene extends Phaser.Scene {
                                                                     blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                                 }
                                                                 break;
-                                                            case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
-                                                                if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
+                                                            case !checkRank.call(this, STAGES.get("9-3"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-3"), RANKS.WOOD):
+                                                                if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-3"), RANKS.WOOD)) {
                                                                     blackholeImage.postFX.addShine(1, .5, 5);
                                                                     blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                                 }
-                                                                if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
+                                                                if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-3"), RANKS.WOOD)) {
                                                                     blackholeImage.postFX.addShine(1, .5, 5);
                                                                     blackholeImage.setTint(COLOR_FOCUS_HEX);
                                                                 }     
@@ -8629,6 +8632,7 @@ class GameScene extends Phaser.Scene {
                                             /**
                                              * Make it compatible with Interactlayer.
                                              */
+                                            debugger
 
                                             var _head = scene.snake.head;
                                             
@@ -9251,7 +9255,7 @@ class GameScene extends Phaser.Scene {
             var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
         }
         
-        /* // Grow 26;
+        if (GROW_26) {
         this.snake.grow(this);
         this.snake.grow(this);
         this.snake.grow(this);
@@ -9277,7 +9281,8 @@ class GameScene extends Phaser.Scene {
         this.snake.grow(this);
         this.snake.grow(this);
         this.snake.grow(this);
-        this.snake.grow(this);*/
+        this.snake.grow(this);
+        }
         
 
 
@@ -10947,7 +10952,7 @@ class GameScene extends Phaser.Scene {
             //y: {from: this.snake.head.y + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.y},
             yoyo: false,
             duration: 600,
-            ease: 'Sine.in',
+            ease: 'Back.easeIn', //'Sine.in'
             repeat: 0,
             delay: this.tweens.stagger(60),
             alpha: {from: 5, to: 0},
@@ -10993,6 +10998,7 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.In',
                     delay: 500,
                     onComplete: () =>{
+                        debugger
                         switch (true) {
                             case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.HARDCORE || this.mode === MODES.TUTORIAL:
                                 if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
@@ -14924,8 +14930,8 @@ function loadSpriteSheetsAndAnims(scene) {
 var checkExpertUnlocked = function () {
 
     return (
-        checkRankGlobal(STAGES.get("9-4"), RANKS.WOOD)
-        && checkRankGlobal(STAGES.get("10-4"), RANKS.WOOD)
+        checkRankGlobal(STAGES.get("9-3"), RANKS.WOOD)
+        && checkRankGlobal(STAGES.get("10-3"), RANKS.WOOD)
     );
 }
 

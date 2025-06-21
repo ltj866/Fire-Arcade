@@ -133,7 +133,7 @@
         {
          "name":"next",
          "type":"string",
-         "value":"10-3"
+         "value":""
         }, 
         {
          "name":"slug",
