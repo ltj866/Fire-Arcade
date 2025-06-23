@@ -1,5 +1,5 @@
 
-import { BEST_OF_ALL, BEST_OF_EXPERT, PLAYER_STATS, RANKS, MODES } from "../SnakeHole.js";
+import { BEST_OF_ALL, BEST_OF_EXPERT, PLAYER_STATS, RANKS, MODES, GRID } from "../SnakeHole.js";
 
 //import { BEST_OF_ALL} from "../SnakeHole.js"
 
@@ -76,6 +76,17 @@ export var checkCanExtract = function(stageID) {
 
 }
 
+/**
+ * INSTRUCTIONS for adding a stage.
+ *  0. Tiled - Stage name, new UUID, Slug. (Also correct Layers)
+ *      - Next only matters if not in EXTRACT CODES (Tutorials and Bonus levels)
+ *      - End stage has "end" as convention. Not techinally needed.
+ *  1. STAGES - Add ID and Name.
+ *  2. EXTRACT_CODES - put in the right place.
+ *  3. MAP_CORDS - Add Stage ID and x,y location relative to 0,0 as map center.
+ *  4. STAGE_UNLOCKS - Add how stage is unlocked using the stage `slug`.
+ */
+
 export const STAGES = new Map([
     ["0-1", "World_0-1"],
     ["1-1", "World_1-1"],
@@ -132,6 +143,68 @@ export const EXTRACT_CODES = [
     "0-1|2-1|10-1|10-2|10-3",   
 ];
 
+const mGrid = 12;
+
+export const MAP_CORDS = new Map([
+    // Relative to 0,0 as center
+    ["0-1", { x:0, y:0 }],
+    ["1-1", { x:mGrid * 1, y:0 }],
+    ["1-2", { x:mGrid * 2, y:0 }],
+    ["1-3", { x:mGrid * 3, y:0 }],
+    ["2-1", { x:mGrid * -1, y:0 }],
+    ["2-2", { x:mGrid * -2, y:0 }],
+    ["2-3", { x:mGrid * -3, y:0 }],
+    ["2-4", { x:mGrid * -3, y:mGrid * -1 }],
+    ["3-1", { x:mGrid * -2, y:mGrid * -2 }],
+    ["3-2", { x:mGrid * -2, y:mGrid * -3 }],
+    ["3-3", { x:mGrid * -2, y:mGrid * -4 }],
+    ["4-1", { x:mGrid * 0, y:mGrid * -2 }],
+    ["4-2", { x:mGrid * 0, y:mGrid * -3 }],
+    ["4-3", { x:mGrid * 0, y:mGrid * -4 }],
+    ["4-4", { x:mGrid * 1, y:mGrid * -3 }],
+    ["4-5", { x:mGrid * 1, y:mGrid * -4 }],
+    ["5-1", { x:mGrid * 2, y:mGrid * -2 }],
+    ["5-2", { x:mGrid * 3, y:mGrid * -3 }],
+    ["5-3", { x:mGrid * 4, y:mGrid * -4 }],
+    ["5-4", { x:mGrid * 4, y:mGrid * -2 }],
+    ["8-1", { x:mGrid * 0, y:mGrid * 2 }],
+    ["8-2", { x:mGrid * 0, y:mGrid * 3 }],
+    ["8-5", { x:mGrid * 1, y:mGrid * 3 }],
+    ["8-3", { x:mGrid * -1, y:mGrid * 3 }],
+    ["8-4", { x:mGrid * 0, y:mGrid * 4 }],
+    ["9-1", { x:mGrid * 2, y:mGrid * 1 }],
+    ["9-2", { x:mGrid * 3, y:mGrid * 1 }],
+    ["9-3", { x:mGrid * 4, y:mGrid * 1 }],
+    ["10-1", { x:mGrid * -2, y:mGrid * 1 }],
+    ["10-2", { x:mGrid * -3, y:mGrid * 1 }],
+    ["10-3", { x:mGrid * -4, y:mGrid * 1 }],
+]);
+
+var checkMapCords = function () {
+    /*
+    * Used to verify each node has a location on the map.
+    * Otherwise it the Tracker Map errors with no helpful information.
+    * */
+
+    var ids = new Set();
+    
+    EXTRACT_CODES.forEach( code => {
+
+        var split = code.split("|");
+        split.forEach( id => {
+            ids.add(id);
+        })
+    });
+
+    ids.forEach( id => {
+        if (!MAP_CORDS.has(id)) {
+            throw new Error(`MAP_CORDS does not contain ID "${id}"`);    
+        }
+    });
+}
+checkMapCords();
+
+
 export const COMPASS_ORDER = [
     ["1-3", new Map([["0-1", "E"],["1-1", "E"],["1-2", "E"]])],
     ["2-3", new Map([["0-1", "W"]])],
@@ -158,7 +231,7 @@ export const GAUNTLET_CODES = new Map([
             var checkLevels = [
                 STAGES.get("1-1"), STAGES.get("2-1"), STAGES.get("3-1"),
                 STAGES.get("4-1"), STAGES.get("5-1"), STAGES.get("8-1"),
-                STAGES.get("9-2"), STAGES.get("10-2"),
+                STAGES.get("9-1"), STAGES.get("10-1"),
             ];
             var pass = checkLevels.every(stage => {
                 return checkRankGlobal(stage, RANKS.WOOD);
@@ -166,10 +239,10 @@ export const GAUNTLET_CODES = new Map([
             return pass;
             //return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
         },
-        stages: "1-1|2-1|3-1|4-1|5-1|8-1|9-2|10-2",
+        stages: "1-1|2-1|3-1|4-1|5-1|8-1|9-1|10-1",
         startingCoins: 1,
     }],
-    ["Tutorial Is Over -- Marathon", {
+    ["Marathon -- Tutorial Is Over", {
         checkUnlock: function () {
             return true;
             //return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
@@ -188,7 +261,7 @@ export const GAUNTLET_CODES = new Map([
         checkUnlock: function () {
             return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
         },
-        stages: "4-5|9-4|10-4",
+        stages: "4-5|9-3|10-3",
         startingCoins: 0,
     }],*/
 ]);

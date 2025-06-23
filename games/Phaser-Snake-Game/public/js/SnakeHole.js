@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
-import { STAGE_UNLOCKS, COMPASS_ORDER, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, COMPASS_ORDER, MAP_CORDS,  STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { ITEMS } from './data/items.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
@@ -3757,7 +3757,7 @@ class ExtractTracker extends Phaser.Scene {
     create(codexArgs) {
         var _index = 0;
         var topLeft = X_OFFSET + GRID * 8;
-        var rowY = Y_OFFSET + GRID * 1.5;
+        var rowY = Y_OFFSET + GRID * 13;
         var extractNumber = 0;
         var nextRow = 68;
         var letterOffset = 30;
@@ -3770,13 +3770,68 @@ class ExtractTracker extends Phaser.Scene {
         this.maskContainerMenu = this.make.container(0, 0);
 
 
+        this.mapContainer = this.make.container(0,0);
+        this.mapContainer.name = "Map Container";
+        this.mapContainer.x = SCREEN_WIDTH /2;
+        this.mapContainer.y = SCREEN_HEIGHT /2 + GRID * 1;
+        this.mapContainer.setDepth(50);
+
+        var connectionKeys = new Set();
+        
+        EXTRACT_CODES.forEach( path => {
+            var split = path.split("|");
+            
+            for (let index = 0; index < split.length - 1; index++) {
+                var pair = `${split[index]}|${split[index + 1]}`
+                connectionKeys.add(pair);
+            }
+        });
+
+        // Lines First
+        var mapLines = new Map();
+
+        connectionKeys.forEach( key => {
+
+            var pair = key.split("|");
+            var pointA = MAP_CORDS.get(pair[0]);
+            var pointB = MAP_CORDS.get(pair[1]);
+
+            var line = this.add.line(0,0, pointA.x, pointA.y, pointB.x, pointB.y, 0xababab, 1).setOrigin(0,0);
+            line.setLineWidth(2);
+            line.name = key;
+
+            mapLines.set(key, line);
+
+            this.mapContainer.add(line);
+        });
+
+        var mapNodes = new Map();
+
+        MAP_CORDS.forEach( (val, key) => {
+            key;
+            val;
+            var node = this.add.circle(val.x, val.y, 3, 0xababab);
+            node.name = key;
+
+            mapNodes.set(key, node);
+
+            this.mapContainer.add(node);
+        });
+
         var letterCounter = [0,0,0,0,0,0];
+
+        var mapPanel = this.add.nineslice(260, 130, 
+            'uiPanelL', 'Glass', 
+            GRID * 10, GRID * 10, 
+            8, 8, 8, 8);
+        mapPanel.setDepth(10).setOrigin(0,0).setScrollFactor(0);
+        mapPanel.name = "Map Panel";
 
         
         if (localStorage.getItem("extractRanks")) {
             var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")));
 
-            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY + GRID, 
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, Y_OFFSET + GRID * 2.5, 
                 'uiPanelL', 'Glass', 
                 GRID * 27.5, GRID * 4, 
                 8, 8, 8, 8);
@@ -3977,6 +4032,49 @@ class ExtractTracker extends Phaser.Scene {
             
 
             var selected = this.yMap.get([...this.yMap.keys()][0]);
+            var selectedOnMap = new Set();
+
+            var mapSelect = function (extractCode, selectedSet) {
+
+                // Deselect
+                if (selectedSet.size > 0) {
+
+                    selectedSet.forEach(item => {
+                        debugger
+                        switch (item.type) {
+                        case "Arc":
+                            item.setFillStyle(0xbdbdbd, 1)
+                            break;
+                        case "Line":
+                            item.setStrokeStyle(2, 0xbdbdbd, 1);
+                            break;
+                        default:
+                            throw new Error(`Map Tracker Type Not Supported Here. "${item.type}"`);
+                            break;
+                        }
+                        selectedSet.delete(item);
+                    });
+                }
+
+                var split = extractCode.split("|");
+                for (let index = 0; index < split.length; index++) {
+                    var _node = mapNodes.get(split[index]);
+                    _node.setFillStyle(COLOR_FOCUS_HEX, 1);
+                    selectedSet.add(_node);
+
+                    if (index < split.length - 1 ) {
+                        var _key = `${split[index]}|${split[index + 1]}`;
+ 
+                        var _line = mapLines.get(_key);
+                        _line.setStrokeStyle(2, COLOR_FOCUS_HEX, 1);
+                        selectedSet.add(_line)
+                    }
+                }
+            }
+
+            
+
+            mapSelect(selected.extractCode, selectedOnMap);
            
             this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
 
@@ -4032,6 +4130,8 @@ class ExtractTracker extends Phaser.Scene {
                 var safeIndex = Math.max(selected.index - 1, 0);
                 
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                mapSelect(nextSelect, selectedOnMap);
+
                 selected = this.yMap.get(nextSelect);
                 
                 this.containerToY = selected.conY * -1 + nextRow;
@@ -4061,6 +4161,8 @@ class ExtractTracker extends Phaser.Scene {
                 var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
                 
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                mapSelect(nextSelect, selectedOnMap);
+
                 selected = this.yMap.get(nextSelect);
                 
                 this.containerToY = selected.conY * -1 + nextRow;
