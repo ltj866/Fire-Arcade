@@ -1607,10 +1607,15 @@ class SpaceBoyScene extends Phaser.Scene {
         }
 
         var stageID = currentStage.split("_")[1];
+
+        if (stageID === undefined) {
+            stageID = currentStage.toUpperCase();
+        }
         var stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125) + offset * index,
          'mainFont', 
             `${stageID}`, 
         8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+
 
         
         var stageOutLine = this.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125) + offset * index, stageID.length * 5 + 3, 10,  
