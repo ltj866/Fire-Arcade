@@ -3186,6 +3186,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('atomicPickupComet', 'assets/sprites/atomicPickupComet.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
+        this.load.spritesheet('spaceBall', 'assets/sprites/spaceBall.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('shiftLight', 'assets/sprites/spaceBoyShiftLight.png', { frameWidth: 23, frameHeight: 3 });
@@ -8836,11 +8837,11 @@ class GameScene extends Phaser.Scene {
 
                 
 
-                var _delay = 360;
+                var _delay = 180;
                 var _index = 0;
 
                 // This Timing is independent from the rest of the sequence.
-                this.time.delayedCall(_delay * 2, event => {
+                this.time.delayedCall(_delay * 4, event => {
                     this.gState = GState.START_WAIT;
                     this.events.emit("spawnArrows", this.snake.head);
                 }, [], this);
@@ -8851,19 +8852,19 @@ class GameScene extends Phaser.Scene {
                     if (bH) {
                         _index++;
                         
-                        var spaceBall = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y, 'inventoryIcons', 42
-                        ).setOrigin(0.2,0.2).setDepth(20);
-                        spaceBall.setTintFill(0xf0f0f0);
+                        var spaceBall = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y, 'spaceBall'
+                        ).setOrigin(0.2,0.2).setDepth(50);
+                        spaceBall.play('spaceBallSpawn');
+                        spaceBall.chain(['spaceBallIdle']);
                         spaceBall.name = "spaceBall";
-                        //spaceBall.play('atom01idle');
 
-                        spaceBall.electrons = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y).setOrigin(.22,.175).setDepth(48);
-                        spaceBall.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
-                        spaceBall.electrons.anims.msPerFrame = 66;
-                        spaceBall.electrons.setTintFill(0xf0f0f0);
+                        //spaceBall.electrons = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y).setOrigin(.22,.175).setDepth(48);
+                        //spaceBall.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
+                        //spaceBall.electrons.anims.msPerFrame = 66;
+                        //spaceBall.electrons.setTintFill(0xf0f0f0);
 
                         this.tweens.add( {
-                            targets: [spaceBall,spaceBall.electrons ],
+                            targets: [spaceBall],//,spaceBall.electrons ],
                             x: {from: this.snake.body[0].x, to: bH.x },
                             y: {from: this.snake.body[0].y, to: bH.y },
                             duration: 600,
@@ -8871,7 +8872,7 @@ class GameScene extends Phaser.Scene {
                             delay: _delay * _index,
                             onComplete: (tween) => {
                                 spaceBall.destroy();
-                                spaceBall.electrons.destroy();
+                                //spaceBall.electrons.destroy();
                                 bH.play('blackholeForm');
                                 bH.alpha = 1;
                                 if (bH.anims.getName() === 'blackholeForm') {
@@ -14515,7 +14516,6 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 12,
         repeat: -1
     });
-    //herehere
     
     /*scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frameWidth: 32, frameHeight: 32,
         frame: 'portalAnim.png'
@@ -14813,7 +14813,22 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('coinPickup01Anim',{ frames: [ 0,1,2,3,4,5,6,7]}),
         frameRate: 8,
         repeat: -1
-      })
+    })
+
+    scene.anims.create({
+        key: 'spaceBallSpawn',
+        frames: scene.anims.generateFrameNumbers('spaceBall',{ frames: [ 0,1,2]}),
+        frameRate: 12,
+        repeat: 0
+    })
+    scene.anims.create({
+        key: 'spaceBallIdle',
+        frames: scene.anims.generateFrameNumbers('spaceBall',{ frames: [3,4,5,6,7,8]}),
+        frameRate: 10,
+        repeat: -1
+    })
+
+    
   
     scene.textures.addSpriteSheetFromAtlas('electronCloudAnim', { atlas: 'megaAtlas', frameWidth: 22 ,frameHeight: 18,
         frame: 'electronCloudAnim.png'

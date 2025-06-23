@@ -208,7 +208,7 @@ var Food = new Phaser.Class({
                                     scene.slowMoTween = scene.tweens.add({
                                         targets: { value: 1 },
                                         value: 0.2,
-                                        duration: 500,
+                                        duration: 300,
                                         delay:500,
                                         yoyo: true,
                                         ease: 'Sine.easeInOut',
