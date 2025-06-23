@@ -9232,7 +9232,6 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        this.portalLights = [];
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -9297,18 +9296,18 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        function adjustLightIntensityAndRadius(portalLights) {
+        function adjustLightIntensityAndRadius(lightArray) {
             const maxIntensity = 1.5; // Maximum intensity for lights
             const baselineIntensity = 0.75; // Baseline intensity to ensure visibility
             const maxRadius = 128; // Maximum radius for lights
             const minRadius = 32; // Minimum radius to ensure visibility
             const thresholdDistance = 128; // Distance threshold for adjustment
         
-            portalLights.forEach(light1 => {
+            lightArray.forEach(light1 => {
                 let additionalIntensity = 0;
                 let newRadius = maxRadius; // Start with the maximum radius
         
-                portalLights.forEach(light2 => {
+                lightArray.forEach(light2 => {
                     if (light1 !== light2) {
                         let distance = Phaser.Math.Distance.Between(light1.x, light1.y, light2.x, light2.y);
                         if (distance < thresholdDistance) {
@@ -9330,7 +9329,14 @@ class GameScene extends Phaser.Scene {
 
         
         // Adjust intensities and radii
-        adjustLightIntensityAndRadius(this.portalLights);
+
+        var portalLights = [];
+
+        this.portals.forEach( portal => {
+            portalLights.push(portal.portalLight)
+        });
+
+        adjustLightIntensityAndRadius(portalLights);
         
         
         
