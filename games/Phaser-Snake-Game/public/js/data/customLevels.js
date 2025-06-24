@@ -1217,3 +1217,65 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
         },
     }
 });
+
+// #region Gauntlet Levels
+
+STAGE_OVERRIDES.set("Gauntlet_1-1", {
+    1_3: null,
+    methods: {
+        preFix: function (scene) {
+            scene.lengthGoal = 28 * 1;
+        },
+        postFix: function (scene) {
+            scene.growN(28 * 0);
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("Gauntlet_1-2", {
+    1_3: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = 28 * 2;
+        },
+        postFix: function (scene) {
+            scene.growN(28 * 1);
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("Gauntlet_1-3", {
+    1_3: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = 28 * 3;
+        },
+        postFix: function (scene) {
+            scene.growN(28 * 2);
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("Gauntlet_1-4", {
+    1_3: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = 28 * 4;
+        },
+        postFix: function (scene) {
+            scene.growN(28 * 3);
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("Gauntlet_1-5", {
+    1_3: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = 28 * 5;
+        },
+        postFix: function (scene) {
+            scene.growN(28 * 4);
+        },
+    }
+});

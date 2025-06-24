@@ -831,7 +831,7 @@ export const GState = Object.freeze({
 }); 
 
 // Starts with a nearly full grown snake.
-const GROW_26 = true; // false
+const GROW_26 = false; // false
 
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
@@ -8768,9 +8768,7 @@ class GameScene extends Phaser.Scene {
                                                     scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
                                                     updatePlayerStats()
                                                     scene.warpToNext(index);
-                                                }
-
-                                                
+                                                }  
                                             }
                                         }  
                                     }
@@ -8798,17 +8796,48 @@ class GameScene extends Phaser.Scene {
                         });
                         var nextTile = Phaser.Utils.Array.RemoveRandomElement(spawnPoints)
                     }
+                    debugger
                     
-                    var extractImage = this.add.sprite(nextTile.pixelX + X_OFFSET, nextTile.pixelY + Y_OFFSET, 'extractHole.png' 
+                    var image = this.add.sprite(nextTile.pixelX + X_OFFSET, nextTile.pixelY + Y_OFFSET, 'extractHole.png' 
                     ).setDepth(10).setOrigin(0.4125,0.4125)
+
+                    image.onOver = function (scene) {
+                        /**
+                         * Make it compatible with Interactlayer.
+                         */
+                        debugger
+
+                        var _head = scene.snake.head;
+                        
+                        for (let index = 0; index < scene.nextStagePortals.length; index++) {
+
+                            
+                            if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === _head.x && scene.nextStagePortals[index].y === _head.y)) {
+                                
+                                console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
+                                scene.portals.forEach(portal => {
+                                    portal.portalHighlight.visible = false;
+                                });
+
+                                //portal.snakePortalingSprite.visible = false;
+                                //portal.targetObject.snakePortalingSprite.visible = false;
+                                scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                                updatePlayerStats()
+                                scene.warpToNext(index);
+                            }  
+                        }
+                    } 
+
+
+
                     if (ourPersist.gauntlet.length === 0) {
-                        extractImage.play('extractHoleIdle');
-                        this.extractHole = extractImage;
+                        image.play('extractHoleIdle');
+                        this.extractHole = image;
                         
                     } else {
-                        extractImage.play('blackholeForm');
-                        extractImage.playAfterRepeat('blackholeIdle');
-                        this.nextStagePortals.push(extractImage);
+                        image.play('blackholeForm');
+                        image.playAfterRepeat('blackholeIdle');
+                        this.nextStagePortals.push(image);
                     }
 
                     break;
@@ -8890,6 +8919,7 @@ class GameScene extends Phaser.Scene {
 
                                 // Delay this line further to make blackholes uninteractable for a longer period.
                                 // This positition means they are interactable as soon as spawning starts.
+                                debugger
                                 this.interactLayer[(bH.x - X_OFFSET) / GRID][(bH.y - Y_OFFSET) / GRID] = bH;
                     
                             }

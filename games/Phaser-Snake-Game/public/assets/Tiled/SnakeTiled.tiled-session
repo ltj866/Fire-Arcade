@@ -420,8 +420,8 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 210.66666666666666,
-                "y": 172.16666666666663
+                "x": 174,
+                "y": 161.83333333333334
             }
         },
         "World_0-1.json#tileSheetx12": {
@@ -432,7 +432,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 306,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -454,7 +454,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 172.5,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -487,7 +487,7 @@
             "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 306,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -520,8 +520,8 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 144.66666666666666,
-                "y": 170.33333333333334
+                "x": 174,
+                "y": 161.66666666666669
             }
         },
         "World_2-1.json#tileSheetx12": {
@@ -708,7 +708,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 172.99999999999997,
+                "x": 174,
                 "y": 161.66666666666669
             }
         },
@@ -741,7 +741,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.33333333333331,
+                "x": 174,
                 "y": 161.66666666666669
             }
         },
@@ -752,7 +752,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.33333333333331,
+                "x": 174,
                 "y": 161.66666666666669
             }
         },
@@ -774,7 +774,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -807,7 +807,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 172.5,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -818,8 +818,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 499,
-                "y": 196
+                "x": 372,
+                "y": 34
             }
         },
         "Wrap_Stage-03b.json#tileSheetx24": {
@@ -829,8 +829,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 172.5,
-                "y": 286.5
+                "x": 174,
+                "y": 161.5
             }
         },
         "Wrap_Stage-03c.json#tileSheetx12": {
@@ -840,8 +840,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 172.5,
-                "y": 286.5
+                "x": 174,
+                "y": 161.5
             }
         },
         "Wrap_Stage-04.json#tileSheetx12": {
@@ -1743,8 +1743,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 533,
-                "y": 370
+                "x": 372,
+                "y": 372
             }
         },
         "zoolander-01.json#tileSheetx24": {
