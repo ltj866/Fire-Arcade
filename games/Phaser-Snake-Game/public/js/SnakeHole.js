@@ -9542,7 +9542,6 @@ class GameScene extends Phaser.Scene {
         const ourGame = this.scene.get("GameScene");
 
         if (INVENTORY_ITEMS.get("boostItem")) {
-            debugger;
             this.boostBarTween = this.tweens.add( {
                 targets: this.boostMask,
                 scaleX: this.boostEnergy/1000,
@@ -11636,22 +11635,6 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
-
-            // could we move this into snake.move()
-            this.snakeMask.x = this.snake.head.x;
-            this.snakeMask.y = this.snake.head.y;
-
-            this.snakeMaskN.x = this.snake.head.x
-            this.snakeMaskN.y = this.snake.head.y + SCREEN_HEIGHT
-
-            this.snakeMaskE.x = this.snake.head.x + SCREEN_WIDTH
-            this.snakeMaskE.y = this.snake.head.y
-
-            this.snakeMaskS.x = this.snake.head.x;
-            this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT;
-
-            this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH;
-            this.snakeMaskW.y = this.snake.head.y;
 
             /*if (this.starEmitterFinal) {
                 this.starEmitterFinal.x = this.snake.head.x

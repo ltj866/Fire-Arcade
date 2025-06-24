@@ -21,6 +21,9 @@ var Snake = new Phaser.Class({
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
 
+        this.xN = this.head.x;
+        this.yN = this.head.y;
+
         this.head.name = "head";
 
         this.newHead = {};
@@ -69,7 +72,7 @@ var Snake = new Phaser.Class({
             this.lightDiameter = 192
         }
         else{
-            this.lightIntensity = .75
+            this.lightIntensity = .75 //.75
             this.lightDiameter = 92
         }
 
@@ -133,31 +136,45 @@ var Snake = new Phaser.Class({
 
 
     },
+    nextPos: function () {
+        let xN;
+        let yN;
+
+        switch (this.direction) {
+            case DIRS.LEFT:
+                yN = this.head.y;
+                xN = Phaser.Math.Wrap(this.head.x  - GRID * 2, X_OFFSET, X_OFFSET + 29 * GRID);
+                break;
+
+            case DIRS.RIGHT:
+                yN = this.head.y;
+                xN = Phaser.Math.Wrap(this.head.x + GRID * 2, X_OFFSET, X_OFFSET + 29 * GRID);
+                break;
+
+            case DIRS.UP:
+                xN = this.head.x;
+                yN = Phaser.Math.Wrap(this.head.y - GRID * 2, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                break;
+
+            case DIRS.DOWN:
+                xN = this.head.x;
+                yN = Phaser.Math.Wrap(this.head.y + GRID * 2, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                break;
+                
+            default:
+                //debugger; // UNCOMMENT THIS OUT BEFORE PUSH
+                break;
+        }
+
+        return {x: xN, y: yN} 
+    },
+    
     
     // #region Move
     move: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
         this.previous = [this.head.x,this.head.y];
-    
-        // Alias x and y to the current head position
-        let x = this.head.x;
-        let y = this.head.y;
 
-        // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
-        this.snakeLight.x = x + GRID/2;
-        this.snakeLight.y = y + GRID/2;
-
-        this.snakeLightN.x = x;
-        this.snakeLightN.y = y + GRID * 27;
-
-        this.snakeLightE.x = x + GRID * 29;
-        this.snakeLightE.y = y;
-
-        this.snakeLightS.x = x;
-        this.snakeLightS.y = y - GRID * 27;
-
-        this.snakeLightW.x = x - GRID * 29;
-        this.snakeLightW.y = y;
 
         // wrapping tiles
         scene.map.setLayer(scene.wallVarient);
@@ -283,6 +300,47 @@ var Snake = new Phaser.Class({
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP && scene.gState != GState.TRANSITION) {
                  Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);      
         }
+
+                // Alias x and y to the current head position
+        debugger
+        var next = this.nextPos();
+        let x = next.x;
+        let y = next.y;
+        debugger
+
+        // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
+        this.snakeLight.x = x + GRID/2;
+        this.snakeLight.y = y + GRID/2;
+
+        this.snakeLightN.x = x;
+        this.snakeLightN.y = y + GRID * 27;
+
+        this.snakeLightE.x = x + GRID * 29;
+        this.snakeLightE.y = y;
+
+        this.snakeLightS.x = x;
+        this.snakeLightS.y = y - GRID * 27;
+
+        this.snakeLightW.x = x - GRID * 29;
+        this.snakeLightW.y = y;
+
+
+
+        // could we move this into snake.move()
+        scene.snakeMask.x = x + GRID/2;
+        scene.snakeMask.y = y + GRID/2;
+
+        scene.snakeMaskN.x = x;
+        scene.snakeMaskN.y = y + GRID * 27;
+
+        scene.snakeMaskE.x = x + GRID * 29;
+        scene.snakeMaskE.y = y;
+
+        scene.snakeMaskS.x = x;
+        scene.snakeMaskS.y = y - GRID * 27;
+
+        scene.snakeMaskW.x = x - GRID * 29;
+        scene.snakeMaskW.y = y;
 
     
 
