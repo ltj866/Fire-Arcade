@@ -7663,9 +7663,11 @@ class GameScene extends Phaser.Scene {
         //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
         // #region Next Layer
-        this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
-        this.nextStagePortalLayer.visible = false;
-
+        if (this.map.getLayer('Next')) {
+            this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
+            this.nextStagePortalLayer.visible = false;
+        }
+        
         this.tiledProperties = new Map();
 
         this.map.properties.forEach(prop => {
@@ -7677,10 +7679,14 @@ class GameScene extends Phaser.Scene {
 
         
 
+        this.nextStages = undefined;
+
         var splitID = this.stage.split("_");
         if (splitID[0] != "World") {
-            // The first split and join santizes any spaces.
-            this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");   
+            if (this.map.getLayer('Next')) {
+                // This means the stage isn't in the ExtractCodes and so the next property is required.
+                this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
+            }   
         } else {
             this.stageID = splitID[1];
 
@@ -7809,6 +7815,7 @@ class GameScene extends Phaser.Scene {
 
 
         if (this.map.getLayer('Ghost-1')) {
+            
             var ghostTiles = [
                 545, 546, 547, 548,
                 577, 578, 579, 580,
@@ -7816,10 +7823,12 @@ class GameScene extends Phaser.Scene {
             ];
 
             var passed = ghostTiles.some( tileIndex => {
-                return this.map.findByIndex(tileIndex, false, false, 'Ghost-1');
+                console.log("has tile", tileIndex, this.map.findByIndex(tileIndex, false, false, 'Ghost-1') );
+                return this.map.findByIndex(tileIndex, 0, false, 'Ghost-1');
             });
 
             if (passed) {
+                
                 this.hasGhostTiles = true;
                 this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
                 this.ghostWallLayer.setDepth(26);
@@ -9370,32 +9379,7 @@ class GameScene extends Phaser.Scene {
         }
         
         if (GROW_26) {
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
-        this.snake.grow(this);
+            this.growN(26);
         }
         
 
@@ -10092,6 +10076,12 @@ class GameScene extends Phaser.Scene {
         }
         
     }
+    growN (times) {
+        while (times > 0) {
+            this.snake.grow(this);    
+            times--;
+        }
+    }
     playAtomSound() {
         if (this.moveInterval === SPEED_WALK) {
             // Play atom sound
@@ -10257,7 +10247,6 @@ class GameScene extends Phaser.Scene {
         
         
         if (this.ghostWallLayer) {
-            debugger
             this.ghostWallLayer.forEachTile(wall => {
                 if (wall.index > 0) {
                     validPoints.delete(`${wall.x},${wall.y}`);

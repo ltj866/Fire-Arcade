@@ -231,7 +231,7 @@ var Snake = new Phaser.Class({
 
 
         // #region Bonk Ghost Walls
-        if (this.ghostWallLayer) {
+        if (scene.hasGhostTiles) {
             scene.map.setLayer("Ghost-1"); // When there are multiple version. Get the current one here.
             if (scene.map.getTileAtWorldXY( xN, yN )) {
             
@@ -241,6 +241,7 @@ var Snake = new Phaser.Class({
                     this.bonk(scene);   
                 }
             }
+            scene.map.setLayer(scene.wallVarient);
         }
 
         // #region Intersect Self

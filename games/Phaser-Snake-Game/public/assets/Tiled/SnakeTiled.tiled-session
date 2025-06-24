@@ -417,21 +417,22 @@
             "scaleInDock": 1
         },
         "World_0-1.json": {
-            "scale": 1,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 146.5,
-                "y": 274.5
+                "x": 210.66666666666666,
+                "y": 172.16666666666663
             }
         },
         "World_0-1.json#tileSheetx12": {
+            "dynamicWrapping": false,
             "scaleInDock": 1
         },
         "World_1-1.json": {
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173,
+                "x": 306,
                 "y": 161.5
             }
         },
@@ -486,7 +487,7 @@
             "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173,
+                "x": 306,
                 "y": 161.5
             }
         },
@@ -707,7 +708,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 172.99999999999997,
                 "y": 161.66666666666669
             }
         },
@@ -1446,7 +1447,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 455.5,
+                "x": 395.5,
                 "y": 372
             }
         },
@@ -1457,7 +1458,7 @@
             "scale": 0.33,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 886.3636363636365,
+                "x": 704.5454545454545,
                 "y": 603.030303030303
             }
         },
@@ -1479,7 +1480,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 147,
+                "x": 106.99999999999999,
                 "y": 256.33333333333326
             }
         },
@@ -1487,7 +1488,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 268.5,
+                "x": 208.5,
                 "y": 185.5
             }
         },
@@ -1495,7 +1496,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 357.5,
+                "x": 297.5,
                 "y": 372
             }
         },
@@ -1506,7 +1507,7 @@
             "scale": 1.5297043010752687,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 362.488357789298,
+                "x": 323.2650909410421,
                 "y": 262.14216676917675
             }
         },
@@ -1514,21 +1515,27 @@
             "scaleInDock": 1
         },
         "testing11.json": {
-            "scale": 1,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 357.5,
-                "y": 372
+                "x": 170.5,
+                "y": 174.75
             }
         },
+        "testing11.json#tileSheetx12": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "testing11.json#tileSheetx24": {
+            "dynamicWrapping": false,
             "scaleInDock": 1
         },
         "testing12-2.json": {
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 226.5,
+                "x": 166.5,
                 "y": 252.5
             }
         },
@@ -1564,7 +1571,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 272.5,
+                "x": 322,
                 "y": 108.5
             }
         },
@@ -1575,7 +1582,7 @@
             "scale": 0.8286962365591397,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.2715108263726,
+                "x": 432.0038926283351,
                 "y": 483.8926283350904
             }
         },
@@ -1796,6 +1803,7 @@
         "Wrap_Stage-xx.json"
     ],
     "project": "SnakeTiled.tiled-project",
+    "property.type": "bool",
     "recentFiles": [
         "World_0-1.json",
         "World_10-2.json",
