@@ -478,7 +478,7 @@ var tempSumOfBest = function(scene, stageData) {
 export var INVENTORY_ITEMS = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory-items") ?? "{}"))); {
     
     var inventoryDefaults = new Map([
-        ["boostItem", INVENTORY_ITEMS.get("boostItem") ?? false],
+        ["boostItem", INVENTORY_ITEMS.get("boostItem") ?? true],
         ["piggybank", INVENTORY_ITEMS.get("piggybank") ?? false],
         ["gearbox", INVENTORY_ITEMS.get("gearbox") ?? false],
         ["comboTrainer", INVENTORY_ITEMS.get("comboTrainer") ?? true],
@@ -9535,6 +9535,7 @@ class GameScene extends Phaser.Scene {
         const ourGame = this.scene.get("GameScene");
 
         if (INVENTORY_ITEMS.get("boostItem")) {
+            debugger;
             this.boostBarTween = this.tweens.add( {
                 targets: this.boostMask,
                 scaleX: this.boostEnergy/1000,
@@ -9729,6 +9730,7 @@ class GameScene extends Phaser.Scene {
             PLAYER_STATS.globalScore += timeLeft;
             
             if (timeLeft > BOOST_ADD_FLOOR) {
+                debugger;
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
 
                 var electronToCapacitor = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
@@ -11940,8 +11942,7 @@ a
                 //console.log("spacebar not down");
                 this.moveInterval = this.gameSettings.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
-                
-                this.boostEnergy = Math.min(this.boostEnergy + this.boostAdd, 1000); // Recharge Boost Slowly
+                this.boostEnergy = Math.min(this.boostEnergy + this.gameSettings.boostAdd, 1000); // Recharge Boost Slowly
             }
            
             this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
