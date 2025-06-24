@@ -489,7 +489,6 @@ export var INVENTORY_ITEMS = new Map(Object.entries(JSON.parse(localStorage.getI
         ["slowPortals", INVENTORY_ITEMS.get("slowPortals") ?? false],
     ])
     INVENTORY_ITEMS = inventoryDefaults;
-
     localStorage.setItem("inventory-items", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
 }
 
@@ -834,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'testing11'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -5556,6 +5555,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', function() {
 
 
+
             // Check for starting tutorial
             if (localStorage["version"] === undefined) {
                 this.hasPlayedBefore = false;
@@ -7522,7 +7522,8 @@ class GameScene extends Phaser.Scene {
             //    ourPersist.fx.hue(330);
             //}
             default:
-                debugger
+                console.log("WARNING: No World Style for this level.")
+                //debugger
                 break;
         }
 
@@ -7697,9 +7698,6 @@ class GameScene extends Phaser.Scene {
             }
             
         }
-
-        
-        
         
 
         // Loads tiled properties if not on the main path of levels. May not need the next part that loads all of the next ones, but needs testing before removing.
@@ -7789,7 +7787,11 @@ class GameScene extends Phaser.Scene {
         }
         
 
-        this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
+        
+        this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET);
+        //this.wallLayer = new Phaser.Tilemaps.TilemapLayer(this, this.map, 1, [this.tileset], X_OFFSET, Y_OFFSET)
+        
+        //this.map.getLayer(this.wallVarient); // This needs to be here. Why? I don't know.
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
         this.wallLayer.forEachTile(tile => {
@@ -8086,8 +8088,9 @@ class GameScene extends Phaser.Scene {
 
         
         
-        this.map.getLayer(this.wallVarient);
+        //this.map.getLayer(this.wallVarient);
         this.map.forEachTile( tile => {
+
 
             // Make Portal Walls
 
@@ -8107,6 +8110,10 @@ class GameScene extends Phaser.Scene {
 
 
             // Make Portal Spawning List based on the wall layer
+            if (tile.index > PORTAL_TILE_START && tile.index != 577 && tile.index != 609) {
+                
+            }
+            
             if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
                 (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
             ) {
@@ -8191,7 +8198,7 @@ class GameScene extends Phaser.Scene {
                 default:
                     break;
             }
-        });
+        }, this, 0, 0, 30, 30, {}, this.wallVarient);
 
         
 
