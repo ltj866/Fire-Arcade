@@ -410,10 +410,10 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['two-spaces', function () {
-        return checkRank.call(this,STAGES.get("2-2"), RANKS.WOOD);
+        return true;
     }],
     ['maze', function () {
-        return checkRank.call(this,STAGES.get("2-4"), RANKS.WOOD);
+        return true;
     }],
     ['medium-wrap', function () {
         return checkRank.call(this,STAGES.get("3-1"), RANKS.WOOD)
