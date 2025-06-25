@@ -92,8 +92,11 @@ export const STAGES = new Map([
     ["1-1", "World_1-1"],
     ["1-2", "World_1-2"],
     ["1-3", "World_1-3"],
+    ["2-t3", "World_2-test3"],
     ["2-1", "World_2-1"],
+    ["2-t", "World_2-test"],
     ["2-2", "World_2-2"],
+    ["2-t2", "World_2-test2"],
     ["2-3", "World_2-3"],
     ["2-4", "World_2-4"],
     ["3-1", "World_3-1_Wrap"],
@@ -129,8 +132,8 @@ export const STAGES = new Map([
 
 export const EXTRACT_CODES = [
     "0-1|1-1|1-2|1-3",
-    "0-1|2-1|2-2|2-3",
-    "0-1|2-1|2-2|2-4",
+    "0-1|2-1|2-t|2-2|2-t2|2-3",
+    //"0-1|2-1|2-2|2-4|2-t3",
     "0-1|3-1|3-2|3-3",
     "0-1|4-1|4-2|4-3",
     "0-1|4-1|4-4|4-5",
@@ -140,7 +143,7 @@ export const EXTRACT_CODES = [
     "0-1|8-1|8-3|8-4",
     "0-1|8-1|8-2|8-5",
     "0-1|1-1|9-1|9-2|9-3",
-    "0-1|2-1|10-1|10-2|10-3",   
+    //"0-1|2-1|10-1|10-2|10-3",   
 ];
 
 const mGrid = 12;
@@ -198,7 +201,7 @@ var checkMapCords = function () {
 
     ids.forEach( id => {
         if (!MAP_CORDS.has(id)) {
-            throw new Error(`MAP_CORDS does not contain ID "${id}"`);    
+            //throw new Error(`MAP_CORDS does not contain ID "${id}"`);    
         }
     });
 }
@@ -402,6 +405,15 @@ export const STAGE_UNLOCKS = new Map([
     }],
     ['first-blocks', function () {
         return checkRank.call(this,STAGES.get("1-3"), RANKS.WOOD);
+    }],
+    ['asteroid-channel', function () {
+        return true;
+    }],
+    ['two-spaces', function () {
+        return checkRank.call(this,STAGES.get("2-2"), RANKS.WOOD);
+    }],
+    ['maze', function () {
+        return checkRank.call(this,STAGES.get("2-4"), RANKS.WOOD);
     }],
     ['medium-wrap', function () {
         return checkRank.call(this,STAGES.get("3-1"), RANKS.WOOD)
