@@ -301,12 +301,9 @@ var Snake = new Phaser.Class({
                  Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);      
         }
 
-                // Alias x and y to the current head position
-        debugger
         var next = this.nextPos();
         let x = next.x;
         let y = next.y;
-        debugger
 
         // TODO: should be moved to after the movment? Also should follow the Head when Bonked.
         this.snakeLight.x = x + GRID/2;
