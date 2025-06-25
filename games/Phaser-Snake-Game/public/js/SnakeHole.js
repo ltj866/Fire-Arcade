@@ -8084,12 +8084,14 @@ class GameScene extends Phaser.Scene {
 
         
         
+        
+
+         // #region Base Portals
+
         var basePortalSpawnPools = {};
         var wallPortalData = {};
-
         
-        
-        //this.map.getLayer(this.wallVarient);
+       
         this.map.forEachTile( tile => {
 
 
@@ -8108,12 +8110,6 @@ class GameScene extends Phaser.Scene {
                 tile.index = -1;
             }
 
-
-
-            // Make Portal Spawning List based on the wall layer
-            if (tile.index > PORTAL_TILE_START && tile.index != 577 && tile.index != 609) {
-                
-            }
             
             if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
                 (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
@@ -8134,6 +8130,10 @@ class GameScene extends Phaser.Scene {
             
 
             // Draw Dream walls from Tiled Layer
+            /**
+             * Could still use this as a specific portal wall like mechanic. Limited visually and allows more levels.
+             * It works like screen wrap (no portaling across).
+             */
             switch (tile.index) {
                 // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
                 case 550:
@@ -8205,16 +8205,12 @@ class GameScene extends Phaser.Scene {
 
         this.lightMasksContainer = this.make.container(0, 0);
          
-            this.lights.enable();
-            if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
-                this.lights.setAmbientColor(0xc9c9c9);
-            }
-
-        
-        
+        this.lights.enable();
+        if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            this.lights.setAmbientColor(0xc9c9c9);
+        }
 
 
-        
 
 
         // Starting Game State
@@ -9093,6 +9089,133 @@ class GameScene extends Phaser.Scene {
             //p2.setFrame(randomStart)
         }
 
+        var pLayerIndex = 1;
+        var pChoiceVarients = [];
+
+        while (this.map.getLayer(`Portal_Choice_A-${pLayerIndex}`)) {
+            pChoiceVarients.push(`Portal_Choice_A-${pLayerIndex}`);
+            pLayerIndex++;
+        }
+
+        var portalChoiceLayer = Phaser.Math.RND.pick(pChoiceVarients);
+
+        debugger
+        // #region Portal Choice
+
+        var portalChoiceSpawnPools = {};
+        var portalChoicePortalData = {};
+        
+       
+        this.map.forEachTile( tile => {
+            // Make Portal Walls
+
+            if ((tile.index > PORTAL_WALL_START && tile.index < PORTAL_WALL_START + 9) ||
+                (tile.index > PORTAL_WALL_START + ROW_DELTA && tile.index < PORTAL_WALL_START + ROW_DELTA + 9)
+            ) {
+                if (portalChoicePortalData[tile.index]) {
+                    
+                    portalChoicePortalData[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                }
+                else {
+                    portalChoicePortalData[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                }
+                tile.index = -1;
+            }
+
+            
+            if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
+                (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
+            ) {
+                debugger
+
+                if (portalChoiceSpawnPools[tile.index]) {
+                    
+                    portalChoiceSpawnPools[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                }
+                else {
+                    portalChoiceSpawnPools[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                }
+                tile.index = -1;
+                
+            }
+            
+
+            
+
+            // Draw Dream walls from Tiled Layer
+            /**
+             * Could still use this as a specific portal wall like mechanic. Limited visually and allows more levels.
+             * It works like screen wrap (no portaling across).
+             */
+            switch (tile.index) {
+                // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
+                case 550:
+                    var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                    wallShimmerTop.play('wrapBlock02');
+                    this.dreamWalls.push(wallShimmerTop);
+                    tile.index = -1;
+                    break;
+
+                case 614:
+                    var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                    wallShimmerBottom.play('wrapBlock07');
+                    this.dreamWalls.push(wallShimmerBottom);
+                    tile.index = -1;
+                    break;
+
+                case 581:
+                    var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                    wallShimmerLeft.play('wrapBlock04');
+                    this.dreamWalls.push(wallShimmerLeft);
+                    tile.index = -1;
+                    break;
+
+                case 583:
+                    var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                    wallShimmerRight.play('wrapBlock05');
+                    this.dreamWalls.push(wallShimmerRight);
+                    tile.index = -1;
+                    break;
+
+                case 549:
+                    var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                    ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock01);
+                    tile.index = -1;
+                    break;
+
+                case 551:
+                    var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                    ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock03);
+                    tile.index = -1;
+                    break;
+                
+                case 613:
+                    var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                    ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock06);
+                    tile.index = -1;
+                    break;
+
+                case 615:
+                    var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                    ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
+
+                    this.dreamWalls.push(wrapBlock08);
+                    tile.index = -1;
+                    break;
+            
+                default:
+                    break;
+            }
+        }, this, 0, 0, 30, 30, {}, portalChoiceLayer);
+
+        
+
 
 
 
@@ -9168,7 +9291,21 @@ class GameScene extends Phaser.Scene {
 
         for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
 
-            // basePortalSpawnPools X doesn't have to do with coordinates and is confusingly named.
+            if (portalChoiceSpawnPools[index]) {
+                var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
+                // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                
+                let _from = Phaser.Math.RND.pick(portalChoiceSpawnPools[index]);
+                let _to = Phaser.Math.RND.pick(portalChoiceSpawnPools[index + ROW_DELTA]);
+                //console.log("Portal Base Logic: FROM TO",_from, _to, index);
+                makePair(this, "portalForm", _to, _from, colorHex, true, portalSpawnDelay);
+
+                portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
+            }
+        }
+        
+        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
+
             if (basePortalSpawnPools[index]) {
                 var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
                 // consider throwing an error if a portal doesn't have a correctly defined _to or _from
@@ -9542,7 +9679,6 @@ class GameScene extends Phaser.Scene {
         const ourGame = this.scene.get("GameScene");
 
         if (INVENTORY_ITEMS.get("boostItem")) {
-            debugger;
             this.boostBarTween = this.tweens.add( {
                 targets: this.boostMask,
                 scaleX: this.boostEnergy/1000,
@@ -9737,7 +9873,6 @@ class GameScene extends Phaser.Scene {
             PLAYER_STATS.globalScore += timeLeft;
             
             if (timeLeft > BOOST_ADD_FLOOR) {
-                debugger;
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
 
                 var electronToCapacitor = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
@@ -11636,22 +11771,6 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
-
-            // could we move this into snake.move()
-            this.snakeMask.x = this.snake.head.x;
-            this.snakeMask.y = this.snake.head.y;
-
-            this.snakeMaskN.x = this.snake.head.x
-            this.snakeMaskN.y = this.snake.head.y + SCREEN_HEIGHT
-
-            this.snakeMaskE.x = this.snake.head.x + SCREEN_WIDTH
-            this.snakeMaskE.y = this.snake.head.y
-
-            this.snakeMaskS.x = this.snake.head.x;
-            this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT;
-
-            this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH;
-            this.snakeMaskW.y = this.snake.head.y;
 
             /*if (this.starEmitterFinal) {
                 this.starEmitterFinal.x = this.snake.head.x
