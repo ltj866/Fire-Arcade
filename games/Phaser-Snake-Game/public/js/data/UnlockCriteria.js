@@ -92,13 +92,15 @@ export const STAGES = new Map([
     ["1-1", "World_1-1"],
     ["1-2", "World_1-2"],
     ["1-3", "World_1-3"],
-    ["2-t3", "World_2-test3"],
     ["2-1", "World_2-1"],
-    ["2-t", "World_2-test"],
+    ["2-6", "World_2-6"],
     ["2-2", "World_2-2"],
-    ["2-t2", "World_2-test2"],
+    ["2-7", "World_2-7"],
     ["2-3", "World_2-3"],
     ["2-4", "World_2-4"],
+    ["2-8", "World_2-8"],
+    ["2-10", "World_2-10"],
+    ["2-9", "World_2-9"],
     ["3-1", "World_3-1_Wrap"],
     ["3-2", "World_3-2_Wrap"],
     ["3-3", "World_3-3_Wrap"],
@@ -132,8 +134,8 @@ export const STAGES = new Map([
 
 export const EXTRACT_CODES = [
     "0-1|1-1|1-2|1-3",
-    "0-1|2-1|2-t|2-2|2-t2|2-3",
-    //"0-1|2-1|2-2|2-4|2-t3",
+    "0-1|2-1|2-6|2-2|2-7|2-3",
+    "0-1|2-1|2-4|2-8|2-10|2-9",
     "0-1|3-1|3-2|3-3",
     "0-1|4-1|4-2|4-3",
     "0-1|4-1|4-4|4-5",
@@ -143,7 +145,7 @@ export const EXTRACT_CODES = [
     "0-1|8-1|8-3|8-4",
     "0-1|8-1|8-2|8-5",
     "0-1|1-1|9-1|9-2|9-3",
-    //"0-1|2-1|10-1|10-2|10-3",   
+    "0-1|2-1|10-1|10-2|10-3",   
 ];
 
 const mGrid = 12;
@@ -413,6 +415,12 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['maze', function () {
+        return true;
+    }],
+    ['fine-separation', function () {
+        return true;
+    }],
+    ['boxed-in', function () {
         return true;
     }],
     ['medium-wrap', function () {

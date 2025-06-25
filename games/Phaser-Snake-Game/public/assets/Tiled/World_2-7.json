@@ -169,11 +169,6 @@
          "value":100
         }, 
         {
-         "name":"next",
-         "type":"string",
-         "value":""
-        }, 
-        {
          "name":"slug",
          "type":"string",
          "value":"two-spaces"

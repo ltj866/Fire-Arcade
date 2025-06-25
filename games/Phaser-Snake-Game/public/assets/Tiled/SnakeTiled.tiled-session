@@ -281,11 +281,14 @@
         },
         "Stage-09.json": {
             "scale": 1,
-            "selectedLayer": 0,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 235.5,
+                "x": 301.5,
                 "y": 145.5
             }
+        },
+        "Stage-09.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "Stage-10.json": {
             "scale": 1,
@@ -428,6 +431,17 @@
             "dynamicWrapping": false,
             "scaleInDock": 1
         },
+        "World_0-9.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 235.5,
+                "y": 145.5
+            }
+        },
+        "World_0-9.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "World_1-1.json": {
             "scale": 1,
             "selectedLayer": 0,
@@ -520,19 +534,30 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.99999999999997,
-                "y": 161.66666666666663
+                "x": 152.66666666666669,
+                "y": 220.99999999999997
             }
         },
         "World_2-1.json#tileSheetx12": {
             "scaleInDock": 1
         },
-        "World_2-2.json": {
-            "scale": 1,
-            "selectedLayer": 0,
+        "World_2-10.json": {
+            "scale": 1.5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
-                "y": 161.5
+                "x": 156,
+                "y": 199.66666666666663
+            }
+        },
+        "World_2-10.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-2.json": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 175.33333333333331,
+                "y": 176.99999999999997
             }
         },
         "World_2-2.json#tileSheetx12": {
@@ -542,7 +567,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 97,
                 "y": 161.5
             }
         },
@@ -553,7 +578,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 97.5,
+                "x": 97,
                 "y": 161.5
             }
         },
@@ -573,15 +598,59 @@
         },
         "World_2-4.json": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 173.99999999999997,
+                "x": 138.66666666666669,
                 "y": 161.66666666666663
             }
         },
         "World_2-4.json#tileSheetx12": {
             "dynamicWrapping": false,
             "scaleInDock": 1
+        },
+        "World_2-6.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 79.33333333333331,
+                "y": 193.66666666666663
+            }
+        },
+        "World_2-6.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-7.json": {
+            "scale": 1.5314655172413791,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 189.36110329299186,
+                "y": 162.26287644244303
+            }
+        },
+        "World_2-7.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-8.json": {
+            "scale": 1.5314655172413791,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 180.87250211089224,
+                "y": 170.09850830284267
+            }
+        },
+        "World_2-8.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_2-9.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 177.99999999999997,
+                "y": 114.33333333333331
+            }
+        },
+        "World_2-9.json#tileSheetx12": {
+            "scaleInDock": 2
         },
         "World_2-test.json": {
             "scale": 1.5,
@@ -1848,7 +1917,7 @@
         "Wrap_Stage-xx.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "World_2-3b.json",
         "World_2-test3.json",
