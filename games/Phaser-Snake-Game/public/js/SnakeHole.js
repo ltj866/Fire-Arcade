@@ -830,10 +830,10 @@ export const GState = Object.freeze({
 }); 
 
 // Starts with a nearly full grown snake.
-const GROW_26 = true; // false
+const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Dark_Stage-02'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7683,13 +7683,23 @@ class GameScene extends Phaser.Scene {
 
         this.nextStages = undefined;
 
-        var splitID = this.stage.split("_");
-        if (splitID[0] != "World") {
-            if (this.map.getLayer('Next')) {
+        
+
+        var stageNames = STAGES.values();
+
+        var inSTAGES = stageNames.some( name => {
+            return name === this.stage
+        });
+
+        
+        if (!inSTAGES) {
+            if (this.map.getLayer('Next') && this.tiledProperties.has("next")) {
+                debugger
                 // This means the stage isn't in the ExtractCodes and so the next property is required.
                 this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
             }   
         } else {
+            var splitID = this.stage.split("_");
             this.stageID = splitID[1];
 
             if (this.mode === MODES.HARDCORE) {
