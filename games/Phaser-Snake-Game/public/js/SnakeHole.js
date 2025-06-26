@@ -7695,7 +7695,7 @@ class GameScene extends Phaser.Scene {
         if (!inSTAGES) {
             if (this.map.getLayer('Next') && this.tiledProperties.has("next")) {
                 debugger
-                // This means the stage isn't in the ExtractCodes and so the next property is required.
+                // This means the stage isn't STAGES and so not in EXTRACT_CODES either so requires the next property.
                 this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
             }   
         } else {
