@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'Dark_Stage-02'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_8-T4'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7683,8 +7683,6 @@ class GameScene extends Phaser.Scene {
 
         this.nextStages = undefined;
 
-        
-
         var stageNames = STAGES.values();
 
         var inSTAGES = stageNames.some( name => {
@@ -8589,7 +8587,6 @@ class GameScene extends Phaser.Scene {
                                                     spawnOn = true;
                                                 }
             
-                                                debugger;
                                                 
                                                 if ((STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) || this.mode === MODES.HARDCORE) {
                                                     
@@ -8932,7 +8929,6 @@ class GameScene extends Phaser.Scene {
 
                                 // Delay this line further to make blackholes uninteractable for a longer period.
                                 // This positition means they are interactable as soon as spawning starts.
-                                debugger
                                 this.interactLayer[(bH.x - X_OFFSET) / GRID][(bH.y - Y_OFFSET) / GRID] = bH;
                     
                             }
@@ -9108,8 +9104,6 @@ class GameScene extends Phaser.Scene {
         }
 
         var portalChoiceLayer = Phaser.Math.RND.pick(pChoiceVarients);
-
-        debugger
         // #region Portal Choice
 
         var portalChoiceSpawnPools = {};
