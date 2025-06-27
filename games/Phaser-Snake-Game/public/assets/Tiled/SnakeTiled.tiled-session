@@ -62,12 +62,15 @@
             "scaleInDock": 1
         },
         "Dark_Stage-02.json": {
-            "scale": 1,
-            "selectedLayer": 0,
+            "scale": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 414.5,
-                "y": 227.5
+                "x": 79.49999999999997,
+                "y": 228.5
             }
+        },
+        "Dark_Stage-02.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "Dark_Stage-02.json#tileSheetx24": {
             "dynamicWrapping": false,
@@ -617,6 +620,18 @@
         "World_2-4g.json#tileSheetx12": {
             "scaleInDock": 1
         },
+        "World_2-7.json": {
+            "scale": 3.964197530864197,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.93179694799133,
+                "y": 162.07567735907818
+            }
+        },
+        "World_2-7.json#tileSheetx12": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
         "World_3-1_Wrap.json": {
             "scale": 1,
             "selectedLayer": 0,
@@ -654,7 +669,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 317.5,
                 "y": 161.5
             }
         },
@@ -665,7 +680,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 317.5,
                 "y": 161.5
             }
         },
@@ -705,12 +720,23 @@
         "World_4-5.json#tileSheetx12": {
             "scaleInDock": 1
         },
+        "World_4-6.json": {
+            "scale": 3.964197530864197,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 173.93179694799133,
+                "y": 162.07567735907818
+            }
+        },
+        "World_4-6.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "World_5-1_Racing.json": {
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 165.83333333333331,
-                "y": 171.5
+                "x": 213.83333333333331,
+                "y": 104.66666666666666
             }
         },
         "World_5-1_Racing.json#tileSheetx12": {
@@ -720,8 +746,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 178.75,
-                "y": 182.25
+                "x": 250.75,
+                "y": 82
             }
         },
         "World_5-2_Racing.json#tileSheetx12": {
@@ -755,7 +781,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 172.99999999999994,
                 "y": 161.66666666666669
             }
         },
@@ -766,7 +792,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -777,7 +803,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.66666666666669,
                 "y": 161.66666666666669
             }
         },
@@ -788,7 +814,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
+                "x": 172.99999999999994,
                 "y": 161.66666666666669
             }
         },
@@ -804,6 +830,18 @@
             }
         },
         "World_8-5_Adv_Portaling.json#tileSheetx12": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "World_8-T4.json": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 167.16666666666666,
+                "y": 168.5
+            }
+        },
+        "World_8-T4.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "World_9-1_Final_Exams.json": {

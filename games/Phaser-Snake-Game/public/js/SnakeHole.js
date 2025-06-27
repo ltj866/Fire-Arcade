@@ -9100,128 +9100,135 @@ class GameScene extends Phaser.Scene {
             //p2.setFrame(randomStart)
         }
 
-        var pLayerIndex = 1;
-        var pChoiceVarients = [];
+        if (this.map.getLayer(`Portal_Choice_A-1`)) {
+            var pLayerIndex = 1;
+            var pChoiceVarients = [];
 
-        while (this.map.getLayer(`Portal_Choice_A-${pLayerIndex}`)) {
-            pChoiceVarients.push(`Portal_Choice_A-${pLayerIndex}`);
-            pLayerIndex++;
+            while (this.map.getLayer(`Portal_Choice_A-${pLayerIndex}`)) {
+                pChoiceVarients.push(`Portal_Choice_A-${pLayerIndex}`);
+                pLayerIndex++;
+            }
+
+            var portalChoiceLayer = Phaser.Math.RND.pick(pChoiceVarients);
+            // #region Portal Choice
+
+            var portalChoiceSpawnPools = {};
+            var portalChoicePortalData = {};
+            
+        
+            this.map.forEachTile( tile => {
+                // Make Portal Walls
+
+                if ((tile.index > PORTAL_WALL_START && tile.index < PORTAL_WALL_START + 9) ||
+                    (tile.index > PORTAL_WALL_START + ROW_DELTA && tile.index < PORTAL_WALL_START + ROW_DELTA + 9)
+                ) {
+                    if (portalChoicePortalData[tile.index]) {
+                        
+                        portalChoicePortalData[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                    }
+                    else {
+                        portalChoicePortalData[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                    }
+                    tile.index = -1;
+                }
+
+                
+                if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
+                    (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
+                ) {
+                    debugger
+
+                    if (portalChoiceSpawnPools[tile.index]) {
+                        
+                        portalChoiceSpawnPools[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                    }
+                    else {
+                        portalChoiceSpawnPools[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                    }
+                    tile.index = -1;
+                    
+                }
+                
+
+                
+
+                // Draw Dream walls from Tiled Layer
+                /**
+                 * Could still use this as a specific portal wall like mechanic. Limited visually and allows more levels.
+                 * It works like screen wrap (no portaling across).
+                 */
+                switch (tile.index) {
+                    // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
+                    case 550:
+                        var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                        wallShimmerTop.play('wrapBlock02');
+                        this.dreamWalls.push(wallShimmerTop);
+                        tile.index = -1;
+                        break;
+
+                    case 614:
+                        var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                        wallShimmerBottom.play('wrapBlock07');
+                        this.dreamWalls.push(wallShimmerBottom);
+                        tile.index = -1;
+                        break;
+
+                    case 581:
+                        var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                        wallShimmerLeft.play('wrapBlock04');
+                        this.dreamWalls.push(wallShimmerLeft);
+                        tile.index = -1;
+                        break;
+
+                    case 583:
+                        var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
+                        wallShimmerRight.play('wrapBlock05');
+                        this.dreamWalls.push(wallShimmerRight);
+                        tile.index = -1;
+                        break;
+
+                    case 549:
+                        var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                        ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
+
+                        this.dreamWalls.push(wrapBlock01);
+                        tile.index = -1;
+                        break;
+
+                    case 551:
+                        var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                        ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
+
+                        this.dreamWalls.push(wrapBlock03);
+                        tile.index = -1;
+                        break;
+                    
+                    case 613:
+                        var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                        ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
+
+                        this.dreamWalls.push(wrapBlock06);
+                        tile.index = -1;
+                        break;
+
+                    case 615:
+                        var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
+                        ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
+
+                        this.dreamWalls.push(wrapBlock08);
+                        tile.index = -1;
+                        break;
+                
+                    default:
+                        break;
+                }
+            }, this, 0, 0, 30, 30, {}, portalChoiceLayer);
+            
         }
 
-        var portalChoiceLayer = Phaser.Math.RND.pick(pChoiceVarients);
-        // #region Portal Choice
+        debugger
 
-        var portalChoiceSpawnPools = {};
-        var portalChoicePortalData = {};
         
-       
-        this.map.forEachTile( tile => {
-            // Make Portal Walls
-
-            if ((tile.index > PORTAL_WALL_START && tile.index < PORTAL_WALL_START + 9) ||
-                (tile.index > PORTAL_WALL_START + ROW_DELTA && tile.index < PORTAL_WALL_START + ROW_DELTA + 9)
-            ) {
-                if (portalChoicePortalData[tile.index]) {
-                    
-                    portalChoicePortalData[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
-                }
-                else {
-                    portalChoicePortalData[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
-                }
-                tile.index = -1;
-            }
-
-            
-            if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
-                (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
-            ) {
-                debugger
-
-                if (portalChoiceSpawnPools[tile.index]) {
-                    
-                    portalChoiceSpawnPools[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
-                }
-                else {
-                    portalChoiceSpawnPools[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
-                }
-                tile.index = -1;
-                
-            }
-            
-
-            
-
-            // Draw Dream walls from Tiled Layer
-            /**
-             * Could still use this as a specific portal wall like mechanic. Limited visually and allows more levels.
-             * It works like screen wrap (no portaling across).
-             */
-            switch (tile.index) {
-                // Remember all of these are +1 then in Tiled because in phaser tiles are 1 index and in Tiled tiles are 0 index.
-                case 550:
-                    var wallShimmerTop = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
-                    wallShimmerTop.play('wrapBlock02');
-                    this.dreamWalls.push(wallShimmerTop);
-                    tile.index = -1;
-                    break;
-
-                case 614:
-                    var wallShimmerBottom = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
-                    wallShimmerBottom.play('wrapBlock07');
-                    this.dreamWalls.push(wallShimmerBottom);
-                    tile.index = -1;
-                    break;
-
-                case 581:
-                    var wallShimmerLeft = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
-                    wallShimmerLeft.play('wrapBlock04');
-                    this.dreamWalls.push(wallShimmerLeft);
-                    tile.index = -1;
-                    break;
-
-                case 583:
-                    var wallShimmerRight = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET).setDepth(50).setOrigin(0,0);
-                    wallShimmerRight.play('wrapBlock05');
-                    this.dreamWalls.push(wallShimmerRight);
-                    tile.index = -1;
-                    break;
-
-                case 549:
-                    var wrapBlock01 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
-                    ).play("wrapBlock01").setOrigin(0,0).setDepth(-10);
-
-                    this.dreamWalls.push(wrapBlock01);
-                    tile.index = -1;
-                    break;
-
-                case 551:
-                    var wrapBlock03 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
-                    ).play("wrapBlock03").setOrigin(0,0).setDepth(-10);
-
-                    this.dreamWalls.push(wrapBlock03);
-                    tile.index = -1;
-                    break;
-                
-                case 613:
-                    var wrapBlock06 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
-                    ).play("wrapBlock06").setOrigin(0,0).setDepth(-10);
-
-                    this.dreamWalls.push(wrapBlock06);
-                    tile.index = -1;
-                    break;
-
-                case 615:
-                    var wrapBlock08 = this.add.sprite(tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET
-                    ).play("wrapBlock08").setOrigin(0,0).setDepth(-10);
-
-                    this.dreamWalls.push(wrapBlock08);
-                    tile.index = -1;
-                    break;
-            
-                default:
-                    break;
-            }
-        }, this, 0, 0, 30, 30, {}, portalChoiceLayer);
 
         
 
@@ -9298,18 +9305,21 @@ class GameScene extends Phaser.Scene {
             portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
         }
 
-        for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
+        if (this.map.getLayer(`Portal_Choice_A-1`)) {
 
-            if (portalChoiceSpawnPools[index]) {
-                var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
-                // consider throwing an error if a portal doesn't have a correctly defined _to or _from
-                
-                let _from = Phaser.Math.RND.pick(portalChoiceSpawnPools[index]);
-                let _to = Phaser.Math.RND.pick(portalChoiceSpawnPools[index + ROW_DELTA]);
-                //console.log("Portal Base Logic: FROM TO",_from, _to, index);
-                makePair(this, "portalForm", _to, _from, colorHex, true, portalSpawnDelay);
+            for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
 
-                portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
+                if (portalChoiceSpawnPools[index]) {
+                    var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
+                    // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                    
+                    let _from = Phaser.Math.RND.pick(portalChoiceSpawnPools[index]);
+                    let _to = Phaser.Math.RND.pick(portalChoiceSpawnPools[index + ROW_DELTA]);
+                    //console.log("Portal Base Logic: FROM TO",_from, _to, index);
+                    makePair(this, "portalForm", _to, _from, colorHex, true, portalSpawnDelay);
+
+                    portalSpawnDelay += PORTAL_SPAWN_DELAY * 2;
+                }
             }
         }
         
@@ -10643,6 +10653,8 @@ class GameScene extends Phaser.Scene {
         var finalWindowTop = Y_OFFSET + GRID * 8.5;
         var windowCenterX = SCREEN_WIDTH/2;
         var extractHistory = [];
+
+        debugger
 
         for (let index = 0; index < persist.stageHistory.length; index++) {
             var id = persist.stageHistory[index].getID();
