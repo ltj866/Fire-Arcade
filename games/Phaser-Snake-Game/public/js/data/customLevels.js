@@ -129,6 +129,11 @@ STAGE_OVERRIDES.set("World_2-4", {
     }
 });
 
+/**
+ * Bonus Levels
+ */
+
+// Summon Walls
 STAGE_OVERRIDES.set("Bonus_X-1", {
     X_1: null,
     methods: {
@@ -214,6 +219,7 @@ STAGE_OVERRIDES.set("Bonus_X-1", {
     }
 });
 
+// Big Boost Balls
 STAGE_OVERRIDES.set("Bonus_X-2", {
     X_2: null,
     methods: {
@@ -287,6 +293,7 @@ STAGE_OVERRIDES.set("Bonus_X-2", {
     }
 });
 
+// Million Apples
 STAGE_OVERRIDES.set("Bonus_X-3", {
     X_3: null,
     methods: {
@@ -307,78 +314,7 @@ STAGE_OVERRIDES.set("Bonus_X-3", {
     }
 });
 
-STAGE_OVERRIDES.set("Bonus_X-4", {
-    X_4: null,
-    methods: {
-        preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-        },
-        postFix: function (scene) {
-            scene.checkWinCon = this.checkWinCon;
-
-            scene.atoms.forEach( atom => {
-                atom.setTint(0xFFD700);
-            })
-        },
-        afterEat: function (scene, food) {
-            scene.snake.grow(scene);
-            scene.events.emit('addScore', food); 
-        },
-        checkWinCon: function () {
-            if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR) {
-                this.events.emit('win');
-            }
-        
-        },
-    }
-});
-
-STAGE_OVERRIDES.set("Bonus_X-5", {
-    X_5: null,
-    methods: {
-        preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.highScore = INVENTORY_DATA.get("comboTrainerXPB");
-            scene.gameSettings.firstFood = false;
-        },
-        postFix: function (scene) {
-            scene.checkWinCon = this.checkWinCon;
-        },
-        afterMove: function (scene) {
-            if (scene.snake.comboCounter > scene.gameSettings.highScore) {
-                scene.gameSettings.highScore = scene.snake.comboCounter;
-                scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.gameSettings.highScore);
-
-                INVENTORY_DATA.set("comboTrainerXPB", scene.snake.comboCounter);
-                localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
-            }
-
-            if (scene.snake.comboCounter === 0 && scene.gameSettings.firstFood) {
-                scene.snake.bonk(scene);
-                scene.gameSettings.firstFood = false;
-            }
-        },
-        afterBonk: function (scene) {
-            var toRemove = scene.snake.body.splice(1, scene.snake.body.length -1);
-            toRemove.forEach( bodyPart => {
-                bodyPart.destroy();
-            });
-        },
-        afterEat: function(scene) {
-            if (scene.snake.comboCounter > 0) {
-                // Something is off with the combo counter. It doesn't start after the first combo.
-                // This if statment shouldn't need be.
-                scene.gameSettings.firstFood = true;
-            }
-        },
-        checkWinCon: function () {
-            return false;
-            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
-        
-        },   
-    }
-});
-
+// Disarm the Bomb Stage
 STAGE_OVERRIDES.set("Bonus_X-6", {
     X_6: null,
     methods: {
@@ -430,87 +366,7 @@ STAGE_OVERRIDES.set("Bonus_X-6", {
     }
 });
 
-STAGE_OVERRIDES.set("Bonus_X-7", {
-    X_7: null,
-    methods: {
-        preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-        },
-        postFix: function (scene) {
-
-            var times = 28;
-            while (times > 0) {
-                scene.snake.grow(scene);
-                times--;
-            }
-            
-            scene.checkWinCon = this.checkWinCon;
-
-            scene.oldGrow = this.snake.grow;
-            scene.snake.grow = this.grow;
-            scene.snake.grow = this.oldGrow;
-    
-        },
-        checkWinCon: function () {
-            if (this.length < 1) {
-                this.events.emit('win');
-            }
-            return ;
-            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
-        
-        },
-        grow: function (scene)
-        {
-            const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
-            scene.length -= 1;
-            scene.globalFruitCount += 1; // Run Wide Counter
-    
-            var length = `${scene.length}`;
-            
-            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
-            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
-    
-    
-            /*
-            if (scene.boostOutlinesBody.length > 1) {
-                //newPart.setTint(0xFF00FF);
-                // Make the new one
-                var boostOutline = scene.add.sprite(
-                    this.body[this.body.length - 2].x, 
-                    this.body[this.body.length - 2].y
-                ).setOrigin(.083333,.083333).setDepth(15);
-                 
-                boostOutline.play("snakeOutlineAnim");
-                scene.boostOutlinesBody.unshift(boostOutline);
-            }
-            */
-            
-            if (this.body.length > 1) {
-                this.tail = this.body.slice(-1);
-                Math.random()
-
-                var oldPart = this.body.splice(1,1);
-
-                oldPart[0].destroy();
-                
-            } else {
-                scene.snake.grow = this.oldGrow;
-                scene.winned = true;
-            }
-    
-    
-            if (this.body.length > 1){
-                this.body[this.body.length -1].setTexture('snakeDefault',[4])
-                
-            }
-            //this.body.push(newPart);
-            scene.applyMask();
-    
-    
-        },
-    }
-});
-
+// Tail Eating the Snake
 STAGE_OVERRIDES.set("Bonus_X-8", {
     X_8: null,
     methods: {
@@ -590,6 +446,7 @@ STAGE_OVERRIDES.set("Bonus_X-8", {
     }
 });
 
+// Timer Tail Stage (Timed Bonus)
 STAGE_OVERRIDES.set("Bonus_X-9", {
     X_9: null,
     methods: {
@@ -689,6 +546,225 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
     }
 });
 
+// Reverse Snake (Lackluste but could be item?)
+STAGE_OVERRIDES.set("Bonus_X-7", {
+    X_7: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = Infinity;
+        },
+        postFix: function (scene) {
+
+            var times = 28;
+            while (times > 0) {
+                scene.snake.grow(scene);
+                times--;
+            }
+            
+            scene.checkWinCon = this.checkWinCon;
+
+            scene.oldGrow = this.snake.grow;
+            scene.snake.grow = this.grow;
+            scene.snake.grow = this.oldGrow;
+    
+        },
+        checkWinCon: function () {
+            if (this.length < 1) {
+                this.events.emit('win');
+            }
+            return ;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
+        
+        },
+        grow: function (scene)
+        {
+            const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
+            scene.length -= 1;
+            scene.globalFruitCount += 1; // Run Wide Counter
+    
+            var length = `${scene.length}`;
+            
+            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+    
+    
+            /*
+            if (scene.boostOutlinesBody.length > 1) {
+                //newPart.setTint(0xFF00FF);
+                // Make the new one
+                var boostOutline = scene.add.sprite(
+                    this.body[this.body.length - 2].x, 
+                    this.body[this.body.length - 2].y
+                ).setOrigin(.083333,.083333).setDepth(15);
+                 
+                boostOutline.play("snakeOutlineAnim");
+                scene.boostOutlinesBody.unshift(boostOutline);
+            }
+            */
+            
+            if (this.body.length > 1) {
+                this.tail = this.body.slice(-1);
+                Math.random()
+
+                var oldPart = this.body.splice(1,1);
+
+                oldPart[0].destroy();
+                
+            } else {
+                scene.snake.grow = this.oldGrow;
+                scene.winned = true;
+            }
+    
+    
+            if (this.body.length > 1){
+                this.body[this.body.length -1].setTexture('snakeDefault',[4])
+                
+            }
+            //this.body.push(newPart);
+            scene.applyMask();
+    
+    
+        },
+    }
+});
+
+/**
+ * Training Levels - 2
+ */
+
+// Combo Trainer
+STAGE_OVERRIDES.set("Bonus_X-13", {
+    X_13: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = Infinity;
+            scene.gameSettings.stopOnBonk = true;
+            scene.gameSettings.highScore = INVENTORY_DATA.get("comboTrainerPB");
+        },
+        postFix: function (scene) {
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+
+            scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
+                scene.snake.comboCounter, 
+                8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
+
+        },
+        afterMove: function (scene) {
+            if (scene.snake.comboCounter === 0) {
+                if (scene.snake.body.length > 3) {
+                    scene.snake.tail = scene.snake.body.slice(-1);
+                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 1,1);
+
+                    oldPart[0].destroy();  
+
+                    scene.snake.body[scene.snake.body.length - 1].setFrame(8);
+                }
+            }
+
+
+            if (scene.snake.comboCounter > scene.gameSettings.highScore) {
+                debugger
+                scene.gameSettings.highScore = scene.snake.comboCounter;
+                scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.gameSettings.highScore);
+
+                INVENTORY_DATA.set("comboTrainerPB", scene.snake.comboCounter);
+                localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
+            }
+            //debugger
+
+            var head = scene.snake.body[1].getCenter();
+
+            scene.comboText.x = head.x;
+            scene.comboText.y = head.y;
+            scene.comboText.setText(scene.snake.comboCounter);
+
+        },
+    }
+});
+
+// Trainer Level 2
+STAGE_OVERRIDES.set("Bonus_X-5", {
+    X_5: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = Infinity;
+            scene.gameSettings.highScore = INVENTORY_DATA.get("comboTrainerXPB");
+            scene.gameSettings.firstFood = false;
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
+        },
+        afterMove: function (scene) {
+            if (scene.snake.comboCounter > scene.gameSettings.highScore) {
+                scene.gameSettings.highScore = scene.snake.comboCounter;
+                scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.gameSettings.highScore);
+
+                INVENTORY_DATA.set("comboTrainerXPB", scene.snake.comboCounter);
+                localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
+            }
+
+            if (scene.snake.comboCounter === 0 && scene.gameSettings.firstFood) {
+                scene.snake.bonk(scene);
+                scene.gameSettings.firstFood = false;
+            }
+        },
+        afterBonk: function (scene) {
+            var toRemove = scene.snake.body.splice(1, scene.snake.body.length -1);
+            toRemove.forEach( bodyPart => {
+                bodyPart.destroy();
+            });
+        },
+        afterEat: function(scene) {
+            if (scene.snake.comboCounter > 0) {
+                // Something is off with the combo counter. It doesn't start after the first combo.
+                // This if statment shouldn't need be.
+                scene.gameSettings.firstFood = true;
+            }
+        },
+        checkWinCon: function () {
+            return false;
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
+        
+        },   
+    }
+});
+
+
+/**
+ * Atom Types - 2 (Future Content)
+ */
+
+// Double Apple
+STAGE_OVERRIDES.set("Bonus_X-4", {
+    X_4: null,
+    methods: {
+        preFix: function (scene) {
+            scene.gameSettings.lengthGoal = Infinity;
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0xFFD700);
+            })
+        },
+        afterEat: function (scene, food) {
+            // These are done for a second time.
+            scene.snake.grow(scene);
+            scene.events.emit('addScore', food); 
+        },
+        checkWinCon: function () {
+            if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR) {
+                this.events.emit('win');
+            }
+        
+        },
+    }
+});
+
+// Ghost Atom Stage
 STAGE_OVERRIDES.set("Bonus_X-10", {
     X_10: null,
     methods: {
@@ -708,6 +784,14 @@ STAGE_OVERRIDES.set("Bonus_X-10", {
     }
 });
 
+
+
+/**
+ * Possible New World Types - 2 New
+ * Currently - Ghost Walls and Dark Levels
+ */
+
+// Mirror Snake
 STAGE_OVERRIDES.set("Bonus_X-11", {
     X_11: null,
     methods: {
@@ -775,6 +859,7 @@ STAGE_OVERRIDES.set("Bonus_X-11", {
     }
 });
 
+// Laser Wall
 STAGE_OVERRIDES.set("Bonus_X-12", {
     X_12: null,
     methods: {
@@ -1188,57 +1273,6 @@ STAGE_OVERRIDES.set("World_1-3", {
         preFix: function (scene) {
         },
         postFix: function (scene) {
-        },
-    }
-});
-
-STAGE_OVERRIDES.set("Bonus_X-13", {
-    X_13: null,
-    methods: {
-        preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.stopOnBonk = true;
-            scene.gameSettings.highScore = INVENTORY_DATA.get("comboTrainerPB");
-        },
-        postFix: function (scene) {
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-
-            scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
-                scene.snake.comboCounter, 
-                8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
-
-        },
-        afterMove: function (scene) {
-            if (scene.snake.comboCounter === 0) {
-                if (scene.snake.body.length > 3) {
-                    scene.snake.tail = scene.snake.body.slice(-1);
-                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 1,1);
-
-                    oldPart[0].destroy();  
-
-                    scene.snake.body[scene.snake.body.length - 1].setFrame(8);
-                }
-            }
-
-
-            if (scene.snake.comboCounter > scene.gameSettings.highScore) {
-                debugger
-                scene.gameSettings.highScore = scene.snake.comboCounter;
-                scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.gameSettings.highScore);
-
-                INVENTORY_DATA.set("comboTrainerPB", scene.snake.comboCounter);
-                localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
-            }
-            //debugger
-
-            var head = scene.snake.body[1].getCenter();
-
-            scene.comboText.x = head.x;
-            scene.comboText.y = head.y;
-            scene.comboText.setText(scene.snake.comboCounter);
-
         },
     }
 });
