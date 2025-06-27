@@ -874,7 +874,7 @@ STAGE_OVERRIDES.set("Tutorial_T-1", {
                 this.gState = GState.TRANSITION;
                 this.snake.direction = DIRS.STOP;
 
-                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
 
                 vTween.on("complete", () => {
                     this.time.delayedCall(200, () => {
@@ -921,7 +921,7 @@ STAGE_OVERRIDES.set("Tutorial_T-2", {
                 this.gState = GState.TRANSITION;
                 this.snake.direction = DIRS.STOP;
 
-                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
 
                 vTween.on("complete", () => {
                     this.time.delayedCall(200, () => {
@@ -967,7 +967,7 @@ STAGE_OVERRIDES.set("Tutorial_T-3", {
                 this.gState = GState.TRANSITION;
                 this.snake.direction = DIRS.STOP;
 
-                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
 
                 vTween.on("complete", () => {
                     this.time.delayedCall(200, () => {
@@ -1011,7 +1011,7 @@ STAGE_OVERRIDES.set("Tutorial_T-4", {
                 this.gState = GState.TRANSITION;
                 this.snake.direction = DIRS.STOP;
 
-                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
 
                 vTween.on("complete", () => {
                     this.time.delayedCall(200, () => {
@@ -1086,6 +1086,38 @@ STAGE_OVERRIDES.set("World_4-1", {
 
         },
         postFix: function (scene) {
+            scene.events.once('secret', function (tile){
+                scene.secretPortal = scene.add.sprite(tile.pixelX + X_OFFSET + GRID * 3.5, tile.pixelY + Y_OFFSET + GRID * 0.5);
+                scene.secretPortal.play('blackholeForm');
+
+                scene.tweens.addCounter({
+                    from: 0,
+                    to: 360,
+                    duration: 3000,
+                    loop: -1,
+                    onUpdate: (tween) => {
+                        let hueValue = tween.getValue();
+                        
+                        // Add an offset to the hue for each segment
+                        let partHueValue = (hueValue * 12.41) % 360;
+            
+                        // Reduce saturation and increase lightness
+                        let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+            
+                        if (color) {// only update color when it's not null
+                            scene.secretPortal.setTint(color.color);
+                        }
+                        
+                    }
+                });
+
+    
+                console.log("SPAWNING SECRET BLACKHOLE");
+                //scene.nextStagePortals.pop(scene.secretPortal);
+                //scene.interactLayer[tile.x][tile.y] = scene.secretPortal
+            }, scene)
+
+
         },
         afterMove: function (scene) {
             var currentEWraps = PLAYER_STATS.eWraps - scene.startEWraps;
@@ -1101,15 +1133,8 @@ STAGE_OVERRIDES.set("World_4-1", {
                 var tile = scene.wallLayer.getTileAt(16, 12);
 
 
-                if (scene.gameSettings.delta > 4 && scene.secretPortal === undefined) {
-                    scene.secretPortal = scene.add.sprite(tile.pixelX + X_OFFSET + GRID * 3.5, tile.pixelY + Y_OFFSET + GRID * 0.5);
-                    scene.secretPortal.play('blackholeForm');
-                    console.log("SPAWNING SECRET BLACKHOLE", scene.delta);
-
-                    scene.secretPortal.onOver = function() {
-                        console.log("Something Secret!");
-                    } 
-                    scene.interactLayer[tile.x + 3][tile.y] = scene.secretPortal;
+                if (scene.gameSettings.delta > 1) {
+                    scene.events.emit("secret", tile);
                 }
                 // add in code here to tint based on the delta size.
                 tile.tint = 0xFF0000;

@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_8-T4'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -2792,6 +2792,10 @@ class TutorialScene extends Phaser.Scene {
 
         for (let index = 0; index < tutorialPanels.length; index++) {
 
+            if (!TUTORIAL_PANELS.has(tutorialPanels[index])) {
+                throw new Error(`HOW TO PANEL NOT FOUND: Expected Tutorial Panel String ID = "${tutorialPanels[index]}"`);
+            }
+
             var _map = TUTORIAL_PANELS.get(tutorialPanels[index]).call(this, index);
 
             // make different sections addressible later.
@@ -4523,7 +4527,7 @@ class StageCodex extends Phaser.Scene {
 
                 _index += 1;
                 stageNumber += 1;
-            })
+            });
 
 
             this.selected = this.yMap.get(stageDisplay);
@@ -7317,7 +7321,7 @@ class GameScene extends Phaser.Scene {
             spawnCoins : true,
             skipScoreScreen : false, //
             lengthGoal: LENGTH_GOAL,
-            maxScore: MAX_SCORE
+            maxScore: MAX_SCORE,
         };
 
         
@@ -7326,6 +7330,7 @@ class GameScene extends Phaser.Scene {
         this.pressedSpaceDuringWait = false; 
 
         this.extractMenuOn = false; // set to true to enable extract menu functionality. // GOTTOGO
+        this.secretPortal = undefined;
         
         this.lightMasks = [];
         this.hasGhostTiles = false;

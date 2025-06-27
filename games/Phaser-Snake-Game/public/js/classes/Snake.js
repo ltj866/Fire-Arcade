@@ -392,6 +392,39 @@ var Snake = new Phaser.Class({
             }
         }
 
+        if (scene.secretPortal) {
+            if (scene.secretPortal.x - 6 === this.head.x && scene.secretPortal.y - 6 === this.head.y) {
+                console.log('WOO');
+
+                scene.gState = GState.TRANSITION;
+                scene.snake.direction = DIRS.STOP;
+
+                var secretStage = scene.tiledProperties.get("secret");
+
+                if (!secretStage) {
+                    throw new Error("Secret Expected. Tiled is missing `secret` property, or is formatted incorrectly.");
+                }
+
+                var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y, 500);
+                
+
+                vTween.on("complete", (event) => {
+                    scene.time.delayedCall(200, () => {
+                        scene.gameSceneFullCleanup();
+
+                        scene.scene.start('TutorialScene', {
+                            cards: [secretStage], // Put Correct Howto Card Here @TODO
+                            toStage: secretStage,
+                        });
+                    }, scene);
+                });
+                
+                //scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                
+            }
+        }
+
+
         // Update closest portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]

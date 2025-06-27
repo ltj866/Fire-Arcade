@@ -212,6 +212,11 @@
          "value":"4-2,  4-4"
         }, 
         {
+         "name":"secret",
+         "type":"string",
+         "value":"Bonus_X-1"
+        }, 
+        {
          "name":"slug",
          "type":"string",
          "value":"medium-happy"
