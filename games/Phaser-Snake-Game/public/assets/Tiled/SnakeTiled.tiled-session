@@ -660,8 +660,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
-                "y": 161.75
+                "x": 182,
+                "y": 202.25
             }
         },
         "World_2-7.json#tileSheetx12": {
@@ -836,8 +836,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 118.66666666666666,
+                "y": 188.33333333333337
             }
         },
         "World_4-8.json#tileSheetx12": {
