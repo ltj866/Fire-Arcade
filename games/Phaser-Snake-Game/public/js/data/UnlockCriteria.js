@@ -106,6 +106,9 @@ export const STAGES = new Map([
     ["3-3", "World_3-3_Wrap"],
     ["4-1", "World_4-1"],
     ["4-2", "World_4-2"],
+    ["4-6", "World_4-6"],
+    ["4-7", "World_4-7"],
+    ["4-8", "World_4-8"],
     ["4-3", "World_4-3"],
     ["4-4", "World_4-4"],
     ["4-5", "World_4-5"],
@@ -135,10 +138,11 @@ export const STAGES = new Map([
 export const EXTRACT_CODES = [
     "0-1|1-1|1-2|1-3",
     "0-1|2-1|2-6|2-2|2-7|2-3",
-    "0-1|2-1|2-4|2-8|2-10|2-9",
+    "0-1|2-1|2-8|2-9|2-10|2-4",
     "0-1|3-1|3-2|3-3",
-    "0-1|4-1|4-2|4-3",
-    "0-1|4-1|4-4|4-5",
+    "0-1|4-2|4-6|4-7|4-8|4-3",
+    //"0-1|4-1|4-2|4-3",
+    //"0-1|4-1|4-4|4-5",
     "0-1|5-1|5-2|5-3",
     "0-1|5-1|5-2|5-4",
     "0-1|8-1|8-2|8-4",
@@ -318,7 +322,8 @@ export const STAGE_UNLOCKS = new Map([
         var pass = checkLevels.every(stage => {
             return checkRank.call(this,stage, RANKS.GOLD);
         });
-        return pass}],
+        return true // return pass
+    }],
         //return checkRank.call(this,["World_2-4", RANKS.GOLD)}],
     ['railgun', function () { 
         return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
@@ -421,6 +426,15 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['boxed-in', function () {
+        return true;
+    }],
+    ['pandora', function () {
+        return true;
+    }],
+    ['interlock', function () {
+        return true;
+    }],
+    ['fillet', function () {
         return true;
     }],
     ['medium-wrap', function () {

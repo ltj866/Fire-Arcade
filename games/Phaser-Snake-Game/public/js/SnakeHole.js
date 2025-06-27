@@ -34,7 +34,7 @@ export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
-const GHOST_WALLS = true;
+const GHOST_WALLS = false;
 // #region DEBUG OPTIONS
 
 export const DEBUG = false;
@@ -9657,7 +9657,6 @@ class GameScene extends Phaser.Scene {
         }
         if (this.hasGhostTiles) {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
-
         }
         
         // #endregion
