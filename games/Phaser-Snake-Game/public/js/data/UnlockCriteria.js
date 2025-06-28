@@ -110,6 +110,7 @@ export const STAGES = new Map([
     ["4-7", "World_4-7"],
     ["4-8", "World_4-8"],
     ["4-9", "World_4-9"],
+    ["4-10", "World_4-10"],
     ["4-3", "World_4-3"],
     ["4-4", "World_4-4"],
     ["4-5", "World_4-5"],
@@ -141,7 +142,7 @@ export const EXTRACT_CODES = [
     "0-1|2-1|2-6|2-2|2-7|2-3",
     "0-1|2-1|2-8|2-9|2-10|2-4",
     "0-1|3-1|3-2|3-3",
-    "0-1|4-2|4-6|4-7|4-8|4-3",
+    "0-1|4-2|4-6|4-8|4-7|4-9|4-10|4-1",
     //"0-1|4-1|4-2|4-3",
     //"0-1|4-1|4-4|4-5",
     "0-1|5-1|5-2|5-3",
@@ -439,6 +440,9 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['xylem', function () {
+        return true;
+    }],
+    ['squid', function () {
         return true;
     }],
     ['medium-wrap', function () {
