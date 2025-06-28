@@ -212,6 +212,11 @@
          "value":100
         }, 
         {
+         "name":"laserWallX",
+         "type":"int",
+         "value":4
+        }, 
+        {
          "name":"next",
          "type":"string",
          "value":"4-3"

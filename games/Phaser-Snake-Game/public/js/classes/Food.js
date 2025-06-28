@@ -84,7 +84,7 @@ var Food = new Phaser.Class({
 
 
             // #region Last Atom
-            if (scene.length != scene.gameSettings.lengthGoal -1) { 
+            if (scene.length != scene.stageConfig.lengthGoal -1) { 
                 // Normal Case 
                 if (!scene.winned) {
                     scene.events.emit('addScore', this, timeSinceFruit); 
@@ -193,8 +193,8 @@ var Food = new Phaser.Class({
                                     scene.events.emit('win');
                                 
                                     // Store speed values
-                                    let _walkSpeed = scene.gameSettings.speedWalk;
-                                    let _sprintSpeed = scene.gameSettings.speedSprint;
+                                    let _walkSpeed = scene.stageConfig.speedWalk;
+                                    let _sprintSpeed = scene.stageConfig.speedSprint;
                             
                                     // Store initial camera position
                                     let initialCameraX = scene.cameras.main.scrollX;
@@ -220,8 +220,8 @@ var Food = new Phaser.Class({
                                             // Apply the interpolated slowMoValue to all the timeScales
                                             scene.tweens.timeScale = slowMoValue;
                                             scene.anims.globalTimeScale = slowMoValue;
-                                            scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
-                                            scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
+                                            scene.stageConfig.speedWalk = _walkSpeed  / slowMoValue;
+                                            scene.stageConfig.speedSprint = _sprintSpeed / slowMoValue;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = slowMoValue;
                                             }
@@ -230,8 +230,8 @@ var Food = new Phaser.Class({
                                             console.log('Slow motion effect completed');
                                             scene.tweens.timeScale = 1;
                                             scene.anims.globalTimeScale = 1;
-                                            scene.gameSettings.speedWalk = _walkSpeed;
-                                            scene.gameSettings.speedSprint = _sprintSpeed;
+                                            scene.stageConfig.speedWalk = _walkSpeed;
+                                            scene.stageConfig.speedSprint = _sprintSpeed;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = 1;
                                             }
@@ -261,8 +261,8 @@ var Food = new Phaser.Class({
                                                 // Apply the interpolated slowMoValue to all the timeScales
                                                 scene.tweens.timeScale = slowMoValue;
                                                 scene.anims.globalTimeScale = slowMoValue;
-                                                scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
-                                                scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
+                                                scene.stageConfig.speedWalk = _walkSpeed  / slowMoValue;
+                                                scene.stageConfig.speedSprint = _sprintSpeed / slowMoValue;
                                                 if (scene.starEmitterFinal) {
                                                     scene.starEmitterFinal.timeScale = slowMoValue;
                                                 }
@@ -314,8 +314,8 @@ var Food = new Phaser.Class({
                                                 
                                                 scene.tweens.timeScale = 1;
                                                 scene.anims.globalTimeScale = 1;
-                                                scene.gameSettings.speedWalk = _walkSpeed;
-                                                scene.gameSettings.speedSprint = _sprintSpeed;
+                                                scene.stageConfig.speedWalk = _walkSpeed;
+                                                scene.stageConfig.speedSprint = _sprintSpeed;
                                                 if (scene.starEmitterFinal) {
                                                     scene.starEmitterFinal.timeScale = 1;
                                                 }

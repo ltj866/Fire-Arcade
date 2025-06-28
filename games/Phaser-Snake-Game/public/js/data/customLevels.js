@@ -138,9 +138,9 @@ STAGE_OVERRIDES.set("Bonus_X-1", {
     X_1: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.stopOnBonk = true;
-            scene.gameSettings.tickCounter = 0;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.stopOnBonk = true;
+            scene.stageConfig.tickCounter = 0;
         },
         postFix: function (scene) {
             // Override
@@ -186,7 +186,7 @@ STAGE_OVERRIDES.set("Bonus_X-1", {
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
             );
 
-            this.gameSettings.maxScore = Math.max(this.gameSettings.maxScore - 10, 1);
+            this.stageConfig.maxScore = Math.max(this.stageConfig.maxScore - 10, 1);
 
             debugger;
 
@@ -224,14 +224,14 @@ STAGE_OVERRIDES.set("Bonus_X-2", {
     X_2: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.stopOnBonk = true;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.stopOnBonk = true;
         
-            scene.gameSettings.boostCost = 8;
-            scene.gameSettings.boostAdd = 0;
+            scene.stageConfig.boostCost = 8;
+            scene.stageConfig.boostAdd = 0;
             
-            scene.gameSettings.speedSprint = 99;
-            scene.gameSettings.speedWalk = 33;
+            scene.stageConfig.speedSprint = 99;
+            scene.stageConfig.speedWalk = 33;
         },
         postFix: function (scene) {
 
@@ -298,7 +298,7 @@ STAGE_OVERRIDES.set("Bonus_X-3", {
     X_3: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = 221;
+            scene.stageConfig.lengthGoal = 221;
         },
         postFix: function (scene) {
             scene.atoms.forEach( atom => {
@@ -319,8 +319,8 @@ STAGE_OVERRIDES.set("Bonus_X-6", {
     X_6: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.bombTime = 40;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.bombTime = 40;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
@@ -349,7 +349,7 @@ STAGE_OVERRIDES.set("Bonus_X-6", {
             scene.bombAtom.timerText.y = pos.y;
         },
         afterTick: function (scene) {
-            var diff = scene.gameSettings.maxScore - scene.gameSettings.bombTime;
+            var diff = scene.stageConfig.maxScore - scene.stageConfig.bombTime;
             var time = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10 ;
 
             scene.bombAtom.timerText.setText(
@@ -358,7 +358,7 @@ STAGE_OVERRIDES.set("Bonus_X-6", {
             );
         },
         checkWinCon: function () {
-            if (this.currentScoreTimer() < this.gameSettings.maxScore - this.gameSettings.bombTime) {
+            if (this.currentScoreTimer() < this.stageConfig.maxScore - this.stageConfig.bombTime) {
                 this.events.emit('win');  
             }
             return ;
@@ -371,10 +371,10 @@ STAGE_OVERRIDES.set("Bonus_X-8", {
     X_8: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.attackTimer = 12;
-            scene.gameSettings.tickCounter = 0;
-            scene.gameSettings.countDownTicker = scene.gameSettings.attackTimer * 10;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.attackTimer = 12;
+            scene.stageConfig.tickCounter = 0;
+            scene.stageConfig.countDownTicker = scene.stageConfig.attackTimer * 10;
             scene.length = -12;
         },
         postFix: function (scene) {
@@ -388,7 +388,7 @@ STAGE_OVERRIDES.set("Bonus_X-8", {
             //scene.length = scene.length - 12;
 
             scene.attackerText = scene.add.bitmapText(0, 0, 'mainFont', 
-                scene.gameSettings.attackTimer, 
+                scene.stageConfig.attackTimer, 
                 8).setOrigin(1,1).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
 
             scene.snake.body[scene.snake.body.length -1].setTint(0xCC0000);
@@ -406,15 +406,15 @@ STAGE_OVERRIDES.set("Bonus_X-8", {
         },
         afterTick: function (scene) {
             
-            scene.gameSettings.tickCounter++;
-            scene.gameSettings.countDownTicker--;
+            scene.stageConfig.tickCounter++;
+            scene.stageConfig.countDownTicker--;
 
-            if (scene.gameSettings.countDownTicker < 1) {
-                scene.gameSettings.attackTimer--;
-                scene.gameSettings.countDownTicker = scene.gameSettings.attackTimer * 10;
+            if (scene.stageConfig.countDownTicker < 1) {
+                scene.stageConfig.attackTimer--;
+                scene.stageConfig.countDownTicker = scene.stageConfig.attackTimer * 10;
                 
             }
-            if (scene.gameSettings.tickCounter >= scene.gameSettings.attackTimer){
+            if (scene.stageConfig.tickCounter >= scene.stageConfig.attackTimer){
 
                 if (scene.snake.body.length > 1) {
                     scene.snake.tail = scene.snake.body.slice(-1);
@@ -424,9 +424,9 @@ STAGE_OVERRIDES.set("Bonus_X-8", {
                     oldPart[0].destroy();  
                 }
 
-                scene.attackerText.setText(scene.gameSettings.attackTimer);
+                scene.attackerText.setText(scene.stageConfig.attackTimer);
 
-                scene.gameSettings.tickCounter = 0;
+                scene.stageConfig.tickCounter = 0;
             }    
         },
         afterEat: function (scene) {
@@ -451,9 +451,9 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
     X_9: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.deathTimer = 10;
-            scene.gameSettings.tickCounter = 0;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.deathTimer = 10;
+            scene.stageConfig.tickCounter = 0;
             scene.length = -50;
         },
         postFix: function (scene) {
@@ -471,7 +471,7 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
                 scene.startCoords.x + GRID - 1, 
                 scene.startCoords.y + GRID - 1, 
                 'mainFont', 
-                scene.gameSettings.deathTimer, 
+                scene.stageConfig.deathTimer, 
                 8
             ).setOrigin(1,1).setDepth(50).setAlpha(1).setTintFill(0xFFFFFF);
 
@@ -490,8 +490,8 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
         },
         afterTick: function (scene) {
             
-            scene.gameSettings.tickCounter++;
-            if (scene.gameSettings.tickCounter >= scene.gameSettings.deathTimer){
+            scene.stageConfig.tickCounter++;
+            if (scene.stageConfig.tickCounter >= scene.stageConfig.deathTimer){
 
                 if (scene.snake.body.length > 1) {
                     scene.snake.tail = scene.snake.body.slice(-1);
@@ -500,9 +500,9 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
 
                     oldPart[0].destroy();  
                 }
-                scene.gameSettings.tickCounter = 0;
+                scene.stageConfig.tickCounter = 0;
             }
-            scene.attackerText.setText(scene.gameSettings.deathTimer - scene.gameSettings.tickCounter);    
+            scene.attackerText.setText(scene.stageConfig.deathTimer - scene.stageConfig.tickCounter);    
         },
         afterEat: function (scene) {
             if (scene.snake.body.length > 1){
@@ -546,12 +546,12 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
     }
 });
 
-// Reverse Snake (Lackluste but could be item?)
+// Reverse Snake (Lackluster but could be item?)
 STAGE_OVERRIDES.set("Bonus_X-7", {
     X_7: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
+            scene.stageConfig.lengthGoal = Infinity;
         },
         postFix: function (scene) {
 
@@ -637,9 +637,9 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
     X_13: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.stopOnBonk = true;
-            scene.gameSettings.highScore = INVENTORY_DATA.get("comboTrainerPB");
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.stopOnBonk = true;
+            scene.stageConfig.highScore = INVENTORY_DATA.get("comboTrainerPB");
         },
         postFix: function (scene) {
             scene.snake.grow(scene);
@@ -664,10 +664,10 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
             }
 
 
-            if (scene.snake.comboCounter > scene.gameSettings.highScore) {
+            if (scene.snake.comboCounter > scene.stageConfig.highScore) {
                 debugger
-                scene.gameSettings.highScore = scene.snake.comboCounter;
-                scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.gameSettings.highScore);
+                scene.stageConfig.highScore = scene.snake.comboCounter;
+                scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.stageConfig.highScore);
 
                 INVENTORY_DATA.set("comboTrainerPB", scene.snake.comboCounter);
                 localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
@@ -689,25 +689,25 @@ STAGE_OVERRIDES.set("Bonus_X-5", {
     X_5: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.highScore = INVENTORY_DATA.get("comboTrainerXPB");
-            scene.gameSettings.firstFood = false;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.highScore = INVENTORY_DATA.get("comboTrainerXPB");
+            scene.stageConfig.firstFood = false;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
         },
         afterMove: function (scene) {
-            if (scene.snake.comboCounter > scene.gameSettings.highScore) {
-                scene.gameSettings.highScore = scene.snake.comboCounter;
-                scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.gameSettings.highScore);
+            if (scene.snake.comboCounter > scene.stageConfig.highScore) {
+                scene.stageConfig.highScore = scene.snake.comboCounter;
+                scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.stageConfig.highScore);
 
                 INVENTORY_DATA.set("comboTrainerXPB", scene.snake.comboCounter);
                 localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
             }
 
-            if (scene.snake.comboCounter === 0 && scene.gameSettings.firstFood) {
+            if (scene.snake.comboCounter === 0 && scene.stageConfig.firstFood) {
                 scene.snake.bonk(scene);
-                scene.gameSettings.firstFood = false;
+                scene.stageConfig.firstFood = false;
             }
         },
         afterBonk: function (scene) {
@@ -720,7 +720,7 @@ STAGE_OVERRIDES.set("Bonus_X-5", {
             if (scene.snake.comboCounter > 0) {
                 // Something is off with the combo counter. It doesn't start after the first combo.
                 // This if statment shouldn't need be.
-                scene.gameSettings.firstFood = true;
+                scene.stageConfig.firstFood = true;
             }
         },
         checkWinCon: function () {
@@ -733,7 +733,7 @@ STAGE_OVERRIDES.set("Bonus_X-5", {
 
 
 /**
- * Atom Types - 2 (Future Content)
+ * Atom Types - 2 (Future Content, trainer ball levels?);
  */
 
 // Double Apple
@@ -741,7 +741,7 @@ STAGE_OVERRIDES.set("Bonus_X-4", {
     X_4: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
+            scene.stageConfig.lengthGoal = Infinity;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
@@ -769,8 +769,8 @@ STAGE_OVERRIDES.set("Bonus_X-10", {
     X_10: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.collideSelf = false;
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.collideSelf = false;
             return true
         },
         postFix: function (scene) {
@@ -796,7 +796,7 @@ STAGE_OVERRIDES.set("Bonus_X-11", {
     X_11: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
+            scene.stageConfig.lengthGoal = Infinity;
         },
         postFix: function (scene) {
 
@@ -864,41 +864,38 @@ STAGE_OVERRIDES.set("Bonus_X-12", {
     X_12: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = Infinity;
-            scene.gameSettings.laserWallX = -1;
-            scene.gameSettings.tickCount = 1;
-            scene.gameSettings.wallMovedCount = 0;
-            scene.gameSettings.wallSpeed = 1;
-            scene.gameSettings.deathWalls = [];
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.laserWallX = -1;
+            scene.stageConfig.laserWalls = [];
+            scene.stageConfig.laserSpeed = 12;
+            scene.stageConfig.laserLastTime = 1;
+
+            //scene.stageConfig.tickCount = 1;
+            
+            
         },
         postFix: function (scene) {
-            scene.snake.grow(scene);
+            //scene.snake.grow(scene);
         
             scene.moveWall = this.moveWall;
         },
         afterTick: function (scene) {
-            scene.gameSettings.tickCount++;
+            scene.stageConfig.laserTickCount++;
 
-            if (scene.gameSettings.tickCount > scene.gameSettings.wallSpeed) {
+            if (scene.timeTickCount - scene.stageConfig.laserLastTime > scene.stageConfig.laserSpeed) {
+                scene.stageConfig.laserLastTime = scene.timeTickCount;
+                console.log("moved", scene.timeTickCount);
+
                 scene.moveWall();
 
-                scene.gameSettings.wallMovedCount++;
-                console.log("Wall will move every", scene.gameSettings.wallSpeed,"Wall move count = ",  scene.gameSettings.wallMovedCount);
-                scene.gameSettings.tickCount = 0;
+                console.log("Wall will move every", scene.stageConfig.wallSpeed,"Wall move count = ",  scene.stageConfig.wallMovedCount);
             }
 
-            if (scene.gameSettings.wallMovedCount > 10) {
-                scene.gameSettings.wallSpeed = Math.min(scene.gameSettings.wallSpeed - 1, 1);
-            }
         },
         afterMove: function(scene) {
-            scene.gameSettings.deathWalls.forEach( wall => {
-                if (wall.pixelX + X_OFFSET === scene.snake.head.x && wall.pixelY + Y_OFFSET === scene.snake.head.y) {
-                    //var middle = Math.ceil(scene.snake.body.length / 2);
-                    debugger
-                    
-                }
-            });
+            if (scene.stageConfig.laserWallX * GRID + X_OFFSET === scene.snake.head.x) {
+                scene.snake.bonk(scene);
+            }
             
         },
         checkWinCon: function () {
@@ -910,25 +907,22 @@ STAGE_OVERRIDES.set("Bonus_X-12", {
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },
-        moveWall: function () {
+        moveLaser: function () {
 
-            this.gameSettings.laserWallX = Phaser.Math.Wrap(this.gameSettings.laserWallX + 1, 0, 28);
+            this.stageConfig.laserWallX = Phaser.Math.Wrap(this.stageConfig.laserWallX + 1, 0, 28);
             var y = 0;
-            this.gameSettings.deathWalls = [];
+            this.stageConfig.deathWalls = [];
 
             while (y < 27) {
 
-                var prevTile = this.wallLayer.getTileAt(Phaser.Math.Wrap(this.gameSettings.laserWallX - 1, 0, 28), y, true, this.wallVarient);
+                var prevTile = this.wallLayer.getTileAt(Phaser.Math.Wrap(this.stageConfig.laserWallX - 1, 0, 28), y, true, this.wallVarient);
                 
                 prevTile.index = -1;
                 prevTile.properties.hasCollision = false;
                 
-                var tile = this.wallLayer.getTileAt(this.gameSettings.laserWallX, y, true, this.wallVarient);
                 
-                tile.index = 577;
-                tile.properties.hasCollision = false;
 
-                this.gameSettings.deathWalls.push(tile);
+                this.stageConfig.deathWalls.push(tile);
             
                 y++ ;
             }
@@ -943,7 +937,7 @@ STAGE_OVERRIDES.set("Tutorial_T-1", {
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
-            scene.gameSettings.spawnCoins = false;
+            scene.stageConfig.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99
 
         },
@@ -985,7 +979,7 @@ STAGE_OVERRIDES.set("Tutorial_T-2", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
-            scene.gameSettings.spawnCoins = false;
+            scene.stageConfig.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
 
         },
@@ -1031,7 +1025,7 @@ STAGE_OVERRIDES.set("Tutorial_T-3", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
-            scene.gameSettings.spawnCoins = false;
+            scene.stageConfig.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
 
         },
@@ -1164,8 +1158,8 @@ STAGE_OVERRIDES.set("World_4-1", {
         preFix: function (scene) {
             scene.startEWraps = PLAYER_STATS.eWraps;
             scene.startWWraps = PLAYER_STATS.wWraps;
-            scene.gameSettings.delta = 0;
-            scene.gameSettings.deltaCache = 0;
+            scene.stageConfig.delta = 0;
+            scene.stageConfig.deltaCache = 0;
 
             scene.secretPortal = undefined;
 
@@ -1208,22 +1202,22 @@ STAGE_OVERRIDES.set("World_4-1", {
             var currentEWraps = PLAYER_STATS.eWraps - scene.startEWraps;
             var currentWWraps = PLAYER_STATS.wWraps - scene.startWWraps;
 
-            scene.gameSettings.delta = currentWWraps - currentEWraps;
-            if (scene.gameSettings.delta < 1) {
-                scene.gameSettings.delta = 0;
+            scene.stageConfig.delta = currentWWraps - currentEWraps;
+            if (scene.stageConfig.delta < 1) {
+                scene.stageConfig.delta = 0;
             } 
 
-            if (scene.wallVarient === "Wall_2" && scene.gameSettings.delta != scene.gameSettings.deltaCache) {
+            if (scene.wallVarient === "Wall_2" && scene.stageConfig.delta != scene.stageConfig.deltaCache) {
 
                 var tile = scene.wallLayer.getTileAt(16, 12);
 
 
-                if (scene.gameSettings.delta > 1) {
+                if (scene.stageConfig.delta > 1) {
                     scene.events.emit("secret", tile);
                 }
                 // add in code here to tint based on the delta size.
                 tile.tint = 0xFF0000;
-                scene.gameSettings.deltaCache = scene.gameSettings.delta;
+                scene.stageConfig.deltaCache = scene.stageConfig.delta;
             }
   
         }
@@ -1295,7 +1289,7 @@ STAGE_OVERRIDES.set("Gauntlet_1-2", {
     1_3: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = 28 * 2;
+            scene.stageConfig.lengthGoal = 28 * 2;
         },
         postFix: function (scene) {
             scene.growN(28 * 1);
@@ -1307,7 +1301,7 @@ STAGE_OVERRIDES.set("Gauntlet_1-3", {
     1_3: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = 28 * 3;
+            scene.stageConfig.lengthGoal = 28 * 3;
         },
         postFix: function (scene) {
             scene.growN(28 * 2);
@@ -1319,7 +1313,7 @@ STAGE_OVERRIDES.set("Gauntlet_1-4", {
     1_3: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = 28 * 4;
+            scene.stageConfig.lengthGoal = 28 * 4;
         },
         postFix: function (scene) {
             scene.growN(28 * 3);
@@ -1331,7 +1325,7 @@ STAGE_OVERRIDES.set("Gauntlet_1-5", {
     1_3: null,
     methods: {
         preFix: function (scene) {
-            scene.gameSettings.lengthGoal = 28 * 5;
+            scene.stageConfig.lengthGoal = 28 * 5;
         },
         postFix: function (scene) {
             scene.growN(28 * 4);

@@ -713,7 +713,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 201.5,
                 "y": 161
             }
         },
@@ -779,7 +779,7 @@
             "scale": 2.5797413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.0484544695071,
+                "x": 184.70843776106935,
                 "y": 162.03174603174602
             }
         },
@@ -1922,8 +1922,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 162.25
+                "x": 173.75,
+                "y": 162
             }
         },
         "zoolander-01.json#tileSheetx12": {
@@ -1938,8 +1938,11 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 223.75,
-                "y": 224.25
+                "y": 224
             }
+        },
+        "zoolander-03.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "zoolander-03.json#tileSheetx24": {
             "dynamicWrapping": false,
@@ -1987,7 +1990,7 @@
         "World_2-X_25_06_28.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "string",
+    "property.type": "bool",
     "recentFiles": [
         "World_2-4.json",
         "World_3-1_Wrap.json",

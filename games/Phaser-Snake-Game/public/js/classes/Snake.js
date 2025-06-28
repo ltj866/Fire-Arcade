@@ -232,6 +232,13 @@ var Snake = new Phaser.Class({
                 break;
         }
 
+        if (xN != this.head.x && 
+            xN > this.head.x && 
+            scene.tiledProperties.get("zoolander")
+        ) {
+            scene.moveLasers();
+        }
+
         
         // #region Bonk Walls
         scene.map.setLayer(scene.wallVarient);
@@ -241,10 +248,25 @@ var Snake = new Phaser.Class({
         if (nextTile != null && nextTile.properties.hasCollision && !scene.winned) {
             
             this.direction = DIRS.STOP;
-            if (scene.gameSettings.bonkable) {
+            if (scene.stageConfig.bonkable) {
                 this.bonk(scene);  
             }
         }
+
+        // Check Laser Wall
+        if (scene.stageConfig.laserSpeed != 0) {
+
+            scene.map.setLayer("laserWalls")
+            if (scene.map.getTileAtWorldXY( xN, yN )) {
+
+                this.direction = DIRS.STOP;
+                if (scene.stageConfig.bonkable) {
+                    this.bonk(scene);   
+                }    
+            }
+            scene.map.setLayer(scene.wallVarient);   
+        }
+        
 
 
         // #region Bonk Ghost Walls
@@ -254,7 +276,7 @@ var Snake = new Phaser.Class({
             
         
                 this.direction = DIRS.STOP;
-                if (scene.gameSettings.bonkable) {
+                if (scene.stageConfig.bonkable) {
                     this.bonk(scene);   
                 }
             }
@@ -262,7 +284,7 @@ var Snake = new Phaser.Class({
         }
 
         // #region Intersect Self
-        if (GState.PLAY === scene.gState && scene.gameSettings.collideSelf) { //GState.PLAY
+        if (GState.PLAY === scene.gState && scene.stageConfig.collideSelf) { //GState.PLAY
             /***
              * Don't check the Tail because the Tail will always move out of the way
              * when the head moves forward.
@@ -279,7 +301,7 @@ var Snake = new Phaser.Class({
                     if(scene.interactLayer[nextHeadGridX][nextHeadGridY] instanceof Portal){
                         portalSafe = true; // Mark on portal
                     }
-                    if (!portalSafe && scene.gameSettings.bonkable) {
+                    if (!portalSafe && scene.stageConfig.bonkable) {
                         this.bonk(scene);    
                     }
                     

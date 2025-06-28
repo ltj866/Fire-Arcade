@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7283,6 +7283,7 @@ class GameScene extends Phaser.Scene {
 
         this.moveInterval = SPEED_WALK;
         this.lastMoveTime = 0; // The last time we called move()
+        this.timeTickCount = 0 // Counts up every time the Score timer decrements.
         this.nextScore = 0; // Calculated and stored after score screen finishes.
 
 
@@ -7307,22 +7308,32 @@ class GameScene extends Phaser.Scene {
         const { stage = START_STAGE } = props 
         this.stage = stage;
 
-        // Special flags - Typically Read Only Settings.
+        // Stage Config
         // Wrapped in an object to make sure they are reset.
         // Particularly ones added during bonus stages.
-        this.gameSettings = {
-            boostCost: 6,
-            boostAdd: 1,
-            speedWalk: SPEED_WALK,
-            speedSprint: SPEED_SPRINT,
-            bonkable : true, // No longer bonks when you hit yourself or a wall
-            collideSelf : true,
-            stepMode : false, // Stops auto moving, only pressing moves.
-            spawnCoins : true,
-            skipScoreScreen : false, //
-            lengthGoal: LENGTH_GOAL,
-            maxScore: MAX_SCORE,
-        };
+        this.stageConfig = {};
+
+        this.stageConfig.boostCost = 6,
+        this.stageConfig.boostAdd = 1,
+        this.stageConfig.speedWalk = SPEED_WALK,
+        this.stageConfig.speedSprint = SPEED_SPRINT,
+        this.stageConfig.bonkable = true, // No longer bonks when you hit yourself or a wall
+        this.stageConfig.collideSelf = true,
+        this.stageConfig.stepMode = false, // Stops auto moving, only pressing moves.
+        this.stageConfig.spawnCoins = true,
+        this.stageConfig.skipScoreScreen = false, //
+        this.stageConfig.lengthGoal = LENGTH_GOAL,
+        this.stageConfig.maxScore = MAX_SCORE,
+        
+
+        // Laser Wall Settings
+
+        this.laserWallXIndex = 0;
+        this.laserWalls = [];
+        this.laserLastMove = 1;
+
+        this.stageConfig.laserSpeed = 0;
+        
 
         
 
@@ -7680,6 +7691,10 @@ class GameScene extends Phaser.Scene {
         this.map.properties.forEach(prop => {
             this.tiledProperties.set(prop.name, prop.value);
         });
+
+        if (this.tiledProperties.has("laserWallX")) {
+            this.stageConfig.laserSpeed = this.tiledProperties.get("laserWallX");
+        }
 
 
         // Loading all Next Stage name to slug to grab from the cache later.
@@ -8214,6 +8229,22 @@ class GameScene extends Phaser.Scene {
             }
         }, this, 0, 0, 30, 30, {}, this.wallVarient);
 
+        // #region Stage Flags
+        if (this.tiledProperties.has("laserWallX")) {
+            
+            var laserWalls = this.map.createBlankLayer("laserWalls", [this.tileset], X_OFFSET, Y_OFFSET); 
+            laserWalls.setTint(0xff00ff);
+
+            for (let index = 0; index < this.map.layer.height; index++) {
+    
+                var tile = this.map.getTileAt(0, index, true, "laserWalls");
+
+                tile.index = 577;
+                tile.properties.hasCollision = true;
+            }
+
+        }
+
         
 
         this.lightMasksContainer = this.make.container(0, 0);
@@ -8281,7 +8312,7 @@ class GameScene extends Phaser.Scene {
 
                     
     
-                    if (this.currentScoreTimer() === this.gameSettings.maxScore) {
+                    if (this.currentScoreTimer() === this.stageConfig.maxScore) {
                         /**
                          * This code is duplicated here to make sure that the electron 
                          * animation is played as soon as you move from the start and wait state.
@@ -9226,15 +9257,6 @@ class GameScene extends Phaser.Scene {
             
         }
 
-        debugger
-
-        
-
-        
-
-
-
-
         var portalVarient = ""
         if (this.varientIndex) { // False if 0
             portalVarient = `Portal_${this.varientIndex}`
@@ -9752,9 +9774,9 @@ class GameScene extends Phaser.Scene {
         var length = 0;
         var length = `${ourGame.length}`;
 
-        if (this.gameSettings.lengthGoal != 0) {
+        if (this.stageConfig.lengthGoal != 0) {
             ourSpaceBoy.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${this.gameSettings.lengthGoal.toString().padStart(2, "0")}`
+                `${length.padStart(2, "0")}\n${this.stageConfig.lengthGoal.toString().padStart(2, "0")}`
             ).setOrigin(0,0);
             ourSpaceBoy.lengthGoalUI.setLineSpacing(6)
             //ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
@@ -9773,7 +9795,7 @@ class GameScene extends Phaser.Scene {
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
         this.scoreTimer = this.time.addEvent({
-            delay: this.gameSettings.maxScore * 100,
+            delay: this.stageConfig.maxScore * 100,
             paused: true
          }, this);
 
@@ -10009,21 +10031,21 @@ class GameScene extends Phaser.Scene {
             }
 
              // Restart Score Timer
-            if (this.length < this.gameSettings.lengthGoal) {
+            if (this.length < this.stageConfig.lengthGoal) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: this.gameSettings.maxScore * 100,
+                    delay: this.stageConfig.maxScore * 100,
                     paused: false
                  }, this);   
             }
 
             switch (this.length) {
-                case this.gameSettings.lengthGoal - 4:
+                case this.stageConfig.lengthGoal - 4:
                     ourSpaceBoy.shiftLight1.setAlpha(1);
                     ourSpaceBoy.shiftLight1.setFrame(0);
                     ourSpaceBoy.shiftLight5.setAlpha(1);
                     ourSpaceBoy.shiftLight5.setFrame(0);
                     break;
-                case this.gameSettings.lengthGoal - 3:
+                case this.stageConfig.lengthGoal - 3:
                     ourSpaceBoy.shiftLight2.setAlpha(1);
                     ourSpaceBoy.shiftLight1.setFrame(1);
                     ourSpaceBoy.shiftLight2.setFrame(1);
@@ -10031,7 +10053,7 @@ class GameScene extends Phaser.Scene {
                     ourSpaceBoy.shiftLight4.setFrame(1);
                     ourSpaceBoy.shiftLight5.setFrame(1);
                     break;
-                case this.gameSettings.lengthGoal - 2:
+                case this.stageConfig.lengthGoal - 2:
                     ourSpaceBoy.shiftLight3.setAlpha(2);
                     ourSpaceBoy.shiftLight1.setFrame(2);
                     ourSpaceBoy.shiftLight2.setFrame(2);
@@ -10268,6 +10290,28 @@ class GameScene extends Phaser.Scene {
         }
         
     }
+    moveLasers () {
+
+        if (this.stageConfig.laserWallX != 0) {
+
+            this.laserWallXIndex = Phaser.Math.Wrap(this.laserWallXIndex + 1, 0, 28);
+            var y = 0;
+
+            while (y < 27) {
+
+                var _prevTile = this.map.getTileAt(Phaser.Math.Wrap(this.laserWallXIndex - 1, 0, 28), y, true, "laserWalls");
+                
+                _prevTile.index = -1;
+                _prevTile.properties.hasCollision = false;
+                
+                var _tile = this.map.getTileAt(this.laserWallXIndex, y, true, "laserWalls");
+                
+                _tile.index = 577;
+                _tile.properties.hasCollision = true;
+                y++ ;
+            }
+        }  
+    }
     growN (times) {
         while (times > 0) {
             this.snake.grow(this);    
@@ -10303,10 +10347,10 @@ class GameScene extends Phaser.Scene {
 
     // #region .screenShake(
     screenShake(){
-        if (this.moveInterval === this.gameSettings.speedSprint) {
+        if (this.moveInterval === this.stageConfig.speedSprint) {
             this.cameras.main.shake(400, .01);
         }
-        else if (this.moveInterval === this.gameSettings.speedWalk){
+        else if (this.moveInterval === this.stageConfig.speedWalk){
             this.cameras.main.shake(300, .00625)
         }    
     }
@@ -11545,7 +11589,7 @@ class GameScene extends Phaser.Scene {
 
     checkLoseCon() {
         /*
-        if (this.gameSettings.lengthGoal > 0) { // Placeholder check for bonus level.
+        if (this.stageConfig.lengthGoal > 0) { // Placeholder check for bonus level.
             const ourPersist = this.scene.get("PersistScene");
             return ourPersist.coins < 0;
         } else {
@@ -11933,6 +11977,8 @@ class GameScene extends Phaser.Scene {
             this.checkWinCon();
 
             if(!this.scoreTimer.paused) {
+                this.timeTickCount++; 
+
                 if (!this.winned) {
                     this.coinSpawnCounter -= 1;
 
@@ -11942,7 +11988,6 @@ class GameScene extends Phaser.Scene {
                         this.scoreTimer.paused = true;
                         countDown = Math.max(1, countDown); // max 1 Saves this from being zero after portalling
                     }
-
                     this.countDownTimer.setText(countDown.toString().padStart(3,"0"));
                 }
 
@@ -11962,7 +12007,7 @@ class GameScene extends Phaser.Scene {
                 
 
                 if (this.coinSpawnCounter < 1) {
-                    if (this.gameSettings.spawnCoins) {
+                    if (this.stageConfig.spawnCoins) {
                         switch (this.mode) {
                             case MODES.CLASSIC:
                                 console.log("COIN TIME YAY. SPAWN a new coin");
@@ -11990,6 +12035,21 @@ class GameScene extends Phaser.Scene {
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
 
+                // #region LaserWall move
+
+                //debugger
+                console.log(this.timeTickCount - this.laserLastMove);
+
+                if (this.stageConfig.laserSpeed != 0 
+                    && this.timeTickCount - this.laserLastMove > this.stageConfig.laserSpeed - 1
+                    && !this.tiledProperties.get("zoolander")
+                ) {
+                    this.laserLastMove = this.timeTickCount;
+                
+                    this.moveLasers();
+
+                }
+
                 if (STAGE_OVERRIDES.has(this.stage) && "afterTick" in STAGE_OVERRIDES.get(this.stage).methods) {
                     STAGE_OVERRIDES.get(this.stage).methods.afterTick(this);
                 }
@@ -11998,7 +12058,7 @@ class GameScene extends Phaser.Scene {
             // Update Atom Animation.
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
-                    case this.gameSettings.maxScore:  // 120 {}
+                    case this.stageConfig.maxScore:  // 120 {}
                     this.atoms.forEach(atom => {
                         if (atom.anims.currentAnim.key !== 'atom01idle'||atom.anims.currentAnim.key !== 'atom05spawn') {
                             atom.play("atom01idle");
@@ -12068,27 +12128,27 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = this.gameSettings.speedSprint;
+                    this.moveInterval = this.stageConfig.speedSprint;
 a                    
                     if (!this.winned) {
                         // Boost Stats
                         ourInputScene.boostTime += 6;
                         //this.boostMask.setScale(this.boostEnergy/1000,1);
 
-                        this.boostEnergy = Math.max(this.boostEnergy - this.gameSettings.boostCost, 0);
+                        this.boostEnergy = Math.max(this.boostEnergy - this.stageConfig.boostCost, 0);
                     } 
                 } else{
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
                     this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
-                    this.moveInterval = this.gameSettings.speedWalk;
+                    this.moveInterval = this.stageConfig.speedWalk;
                 }
         
             } else {
                 //console.log("spacebar not down");
-                this.moveInterval = this.gameSettings.speedWalk; // Less is Faster
+                this.moveInterval = this.stageConfig.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
-                this.boostEnergy = Math.min(this.boostEnergy + this.gameSettings.boostAdd, 1000); // Recharge Boost Slowly
+                this.boostEnergy = Math.min(this.boostEnergy + this.stageConfig.boostAdd, 1000); // Recharge Boost Slowly
             }
            
             this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
@@ -14091,7 +14151,7 @@ class ScoreScene extends Phaser.Scene {
             } 
         }
 
-        if (ourGame.gameSettings.skipScoreScreen) {
+        if (ourGame.stageConfig.skipScoreScreen) {
             onContinue(ourGame);
         }
 
@@ -14353,7 +14413,7 @@ class InputScene extends Phaser.Scene {
     moveUp(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode) || !gameScene.gameSettings.collideSelf) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stageConfig.stepMode) || !gameScene.stageConfig.collideSelf) { 
 
             //console.log("I'm Moving Up");
             
@@ -14392,7 +14452,7 @@ class InputScene extends Phaser.Scene {
     moveDown(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode ) || !gameScene.gameSettings.collideSelf) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stageConfig.stepMode ) || !gameScene.stageConfig.collideSelf) { 
            
 
             this.setPLAY(gameScene);
@@ -14426,7 +14486,7 @@ class InputScene extends Phaser.Scene {
     moveLeft(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode)  || !gameScene.gameSettings.collideSelf) {
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stageConfig.stepMode)  || !gameScene.stageConfig.collideSelf) {
             
             this.setPLAY(gameScene);
 
@@ -14459,7 +14519,7 @@ class InputScene extends Phaser.Scene {
     moveRight(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.gameSettings.stepMode) || !gameScene.gameSettings.collideSelf) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stageConfig.stepMode) || !gameScene.stageConfig.collideSelf) { 
             
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);
