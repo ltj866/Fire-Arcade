@@ -437,7 +437,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.16666666666669,
                 "y": 161.83333333333331
             }
         },
@@ -460,7 +460,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -471,7 +471,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -482,7 +482,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -515,7 +515,7 @@
             "scale": 1.476867816091954,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174.01692771670398,
+                "x": 173.67837338262478,
                 "y": 162.1675260239323
             }
         },
@@ -527,7 +527,7 @@
             "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -538,7 +538,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -560,7 +560,7 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -571,7 +571,7 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -582,7 +582,7 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -604,7 +604,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -637,7 +637,7 @@
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -649,7 +649,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -660,8 +660,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 182,
-                "y": 202.25
+                "x": 174.25,
+                "y": 161.75
             }
         },
         "World_2-7.json#tileSheetx12": {
@@ -671,7 +671,7 @@
             "scale": 1.5314655172413791,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.68983957219254,
+                "x": 174.0163242330425,
                 "y": 162.26287644244303
             }
         },
@@ -682,7 +682,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -726,7 +726,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -737,7 +737,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -748,7 +748,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -759,7 +759,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -770,8 +770,8 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 100.33333333333333,
-                "y": 142.99999999999997
+                "x": 174.33333333333331,
+                "y": 161.66666666666663
             }
         },
         "World_4-10.json#tileSheetx12": {
@@ -781,7 +781,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -792,7 +792,7 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -803,7 +803,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -814,7 +814,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -825,7 +825,7 @@
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -836,7 +836,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -847,8 +847,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 118.66666666666666,
-                "y": 188.33333333333337
+                "x": 189,
+                "y": 208.99999999999997
             }
         },
         "World_4-8.json#tileSheetx12": {
@@ -858,8 +858,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 142.66666666666669,
-                "y": 164.99999999999997
+                "x": 174.33333333333331,
+                "y": 161.66666666666663
             }
         },
         "World_4-9.json#tileSheetx12": {
@@ -869,7 +869,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.16666666666669,
                 "y": 162.16666666666669
             }
         },
@@ -880,7 +880,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -892,7 +892,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -904,7 +904,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.16666666666669,
                 "y": 162.16666666666669
             }
         },
@@ -915,7 +915,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -926,7 +926,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -937,7 +937,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -948,7 +948,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -959,7 +959,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -993,7 +993,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -1004,7 +1004,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -1026,7 +1026,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -1037,7 +1037,7 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372,
+                "x": 371,
                 "y": 87
             }
         },
@@ -1048,7 +1048,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -1059,7 +1059,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -1070,7 +1070,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -1644,7 +1644,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 173.5,
                 "y": 161.5
             }
         },
@@ -1707,7 +1707,7 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -1955,7 +1955,7 @@
         },
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1,
+            "scaleInDock": 3,
             "scaleInEditor": 1
         },
         "tileSheetx24.tsx": {
@@ -1966,7 +1966,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 161.75
             }
         },
@@ -1978,7 +1978,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 174.25,
                 "y": 162.25
             }
         },
@@ -2045,14 +2045,15 @@
         "World_4-7.json",
         "World_4-6.json",
         "World_4-8.json",
-        "World_4-9.json",
+        "World_4-10.json",
         "World_2-8.json",
         "World_10-1g.json",
         "World_2-7.json",
         "World_2-10.json",
         "World_2-9.json",
         "World_2-6.json",
-        "testing07.json"
+        "testing07.json",
+        "World_4-9.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
