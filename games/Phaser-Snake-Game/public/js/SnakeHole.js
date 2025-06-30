@@ -7866,7 +7866,6 @@ class GameScene extends Phaser.Scene {
             }
   
         }
-       
 
         if (this.map.getLayer('Food')) {
             this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET, Y_OFFSET);
@@ -9129,6 +9128,8 @@ class GameScene extends Phaser.Scene {
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
+
+            return [p1, p2]
         }
 
         if (this.map.getLayer(`Portal_Choice_A-1`)) {
@@ -9457,6 +9458,9 @@ class GameScene extends Phaser.Scene {
         
         // #endregion
 
+
+
+        // Do this in the portal class when intialized and tie the light to the portal.
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
             switch (portal.tintTopLeft) { // checks each portal color and changes its light color
@@ -9561,12 +9565,62 @@ class GameScene extends Phaser.Scene {
         });
 
         adjustLightIntensityAndRadius(portalLights);
-        
-        
+
+        // Secrets
+        if (this.map.getLayer('Secret')) {
+
+            var secretSpawnPools = {};
+
+            this.map.forEachTile( tile => {
+                
+                if ((tile.index > PORTAL_TILE_START && tile.index < PORTAL_TILE_START + 9) ||
+                    (tile.index > PORTAL_TILE_START + ROW_DELTA && tile.index < PORTAL_TILE_START + ROW_DELTA + 9)
+                ) {
+
+                    if (secretSpawnPools[tile.index]) {
+                        
+                        secretSpawnPools[tile.index].push([tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]);
+                    }
+                    else {
+                        secretSpawnPools[tile.index] = [[tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET]];
+                    }
+                    tile.index = -1;  
+                }
+
+                if (
+                    tile.index === 11 // Apple Tile
+
+                ) {
+                    debugger
+
+                    var _coin = new Coin(this, this.coinsArray, tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET);
+                    _coin.alpha = 0;
+
+                    this.interactLayer[tile.x][tile.y] = _coin;
+
+                }
+            }, this, 0, 0, 30, 30, {}, 'Secret');
+
+            for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
+
+                if (secretSpawnPools[index]) {
+
+                    let _from = Phaser.Math.RND.pick(secretSpawnPools[index]);
+                    let _to = Phaser.Math.RND.pick(secretSpawnPools[index + ROW_DELTA]);
+                    //console.log("Portal Base Logic: FROM TO",_from, _to, index);
+                    var pair = makePair(this, "portalForm", _to, _from, colorHex, true, 0);
+                    pair[0].alpha = 0;
+                    pair[1].alpha = 0;
+                }
+            }   
+        }
         
 
         // #region Portals Play
         this.showPortals();
+
+
+    
 
         //stagger portal spawns
         //this.time.delayedCall(600, event => {
