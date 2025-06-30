@@ -289,9 +289,12 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.99999999999994,
-                "y": 127
+                "x": 175,
+                "y": 126.99999999999997
             }
+        },
+        "Stage-08.json#tileSheetx12": {
+            "scaleInDock": 1
         },
         "Stage-09.json": {
             "scale": 1,
@@ -710,11 +713,11 @@
             "scaleInDock": 1
         },
         "World_4-10.json": {
-            "scale": 2.5797413793103448,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.0484544695071,
-                "y": 162.03174603174602
+                "x": 162.25,
+                "y": 204.25
             }
         },
         "World_4-10.json#tileSheetx12": {
@@ -798,11 +801,11 @@
             "scaleInDock": 1
         },
         "World_4-9.json": {
-            "scale": 2.5797413793103448,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.0484544695071,
-                "y": 162.03174603174602
+                "x": 200.33333333333331,
+                "y": 192.99999999999997
             }
         },
         "World_4-9.json#tileSheetx12": {
@@ -858,8 +861,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.66666666666663,
-                "y": 161.66666666666663
+                "x": 166,
+                "y": 174.99999999999997
             }
         },
         "World_8-1_Adv_Portaling.json#tileSheetx12": {
@@ -1081,8 +1084,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 194.75,
-                "y": 248.25
+                "x": 180.5,
+                "y": 237.75
             }
         },
         "r-07-10-5.json#tileSheetx24": {
@@ -1090,11 +1093,11 @@
             "scaleInDock": 1
         },
         "r-07-10-6.json": {
-            "scale": 1,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 314.5,
-                "y": 330.5
+                "x": 190.66666666666663,
+                "y": 245.66666666666663
             }
         },
         "r-07-10-6.json#tileSheetx12": {
