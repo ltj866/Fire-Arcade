@@ -437,7 +437,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.16666666666663,
+                "x": 174.16666666666666,
                 "y": 161.83333333333331
             }
         },
@@ -549,7 +549,7 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.66666666666663,
+                "x": 174.33333333333334,
                 "y": 161.66666666666663
             }
         },
@@ -571,7 +571,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -615,7 +615,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.66666666666663,
+                "x": 173.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -636,9 +636,9 @@
         },
         "World_2-6.json": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 149.33333333333334,
+                "x": 149.33333333333331,
                 "y": 179.66666666666663
             }
         },
@@ -646,11 +646,11 @@
             "scaleInDock": 1
         },
         "World_2-7.json": {
-            "scale": 3.964197530864197,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.93179694799133,
-                "y": 162.07567735907818
+                "x": 194,
+                "y": 200.99999999999997
             }
         },
         "World_2-7.json#tileSheetx12": {
@@ -672,7 +672,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -683,7 +683,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -694,7 +694,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -705,7 +705,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -727,7 +727,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -738,7 +738,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -749,7 +749,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -760,7 +760,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -815,7 +815,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.16666666666663,
+                "x": 174,
                 "y": 162.16666666666669
             }
         },
@@ -826,7 +826,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.25,
+                "x": 174.5,
                 "y": 161.75
             }
         },
@@ -838,7 +838,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.25,
+                "x": 174.5,
                 "y": 161.75
             }
         },
@@ -850,7 +850,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.16666666666663,
+                "x": 174,
                 "y": 162.16666666666669
             }
         },
@@ -872,7 +872,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -883,7 +883,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.66666666666663,
+                "x": 173.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -894,7 +894,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.66666666666663,
+                "x": 206.66666666666669,
                 "y": 161.66666666666663
             }
         },
@@ -905,13 +905,46 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 92.66666666666667,
-                "y": 161.66666666666663
+                "x": 164,
+                "y": 139.66666666666663
             }
         },
         "World_8-5_Adv_Portaling.json#tileSheetx12": {
             "dynamicWrapping": false,
             "scaleInDock": 1
+        },
+        "World_8-6_Adv_Portaling.json": {
+            "scale": 1.2639367816091953,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 219.94770944640214,
+                "y": 258.31988177787883
+            }
+        },
+        "World_8-6_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-7.json": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 175,
+                "y": 190.75
+            }
+        },
+        "World_8-7.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_8-7_Adv_Portaling.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 162,
+                "y": 178.33333333333337
+            }
+        },
+        "World_8-7_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 2
         },
         "World_8-T4.json": {
             "scale": 2,
@@ -951,7 +984,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -962,7 +995,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -984,7 +1017,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -995,7 +1028,7 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371,
+                "x": 370,
                 "y": 87
             }
         },
@@ -1006,7 +1039,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.25,
+                "x": 174.5,
                 "y": 161.75
             }
         },
@@ -1017,7 +1050,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173,
                 "y": 161.5
             }
         },
@@ -1028,7 +1061,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 260.5,
+                "x": 381,
                 "y": 181.5
             }
         },
@@ -1936,7 +1969,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.25,
+                "x": 174.5,
                 "y": 162.25
             }
         },
