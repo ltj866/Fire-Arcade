@@ -857,6 +857,17 @@
         "World_5-4_Racing.json#tileSheetx12": {
             "scaleInDock": 1
         },
+        "World_8-10_Adv_Portaling.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 114.66666666666666,
+                "y": 168.99999999999997
+            }
+        },
+        "World_8-10_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1.5
+        },
         "World_8-1_Adv_Portaling.json": {
             "scale": 1.5,
             "selectedLayer": 0,
@@ -950,7 +961,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 149,
+                "x": 98.66666666666664,
                 "y": 173.66666666666663
             }
         },
@@ -961,8 +972,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 210.99999999999997,
-                "y": 168.33333333333337
+                "x": 136,
+                "y": 177.66666666666663
             }
         },
         "World_8-9_Adv_Portaling.json#tileSheetx12": {
