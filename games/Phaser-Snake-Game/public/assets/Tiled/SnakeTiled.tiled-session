@@ -861,19 +861,30 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 114.66666666666666,
+                "x": 82,
                 "y": 168.99999999999997
             }
         },
         "World_8-10_Adv_Portaling.json#tileSheetx12": {
             "scaleInDock": 1.5
         },
+        "World_8-11_Adv_Portaling.json": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 146,
+                "y": 214.33333333333337
+            }
+        },
+        "World_8-11_Adv_Portaling.json#tileSheetx12": {
+            "scaleInDock": 1.5
+        },
         "World_8-1_Adv_Portaling.json": {
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.66666666666663,
-                "y": 161.66666666666663
+                "x": 165.66666666666669,
+                "y": 174.99999999999997
             }
         },
         "World_8-1_Adv_Portaling.json#tileSheetx12": {
@@ -961,7 +972,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 98.66666666666664,
+                "x": 135,
                 "y": 173.66666666666663
             }
         },
@@ -972,7 +983,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 136,
+                "x": 205.66666666666669,
                 "y": 177.66666666666663
             }
         },
