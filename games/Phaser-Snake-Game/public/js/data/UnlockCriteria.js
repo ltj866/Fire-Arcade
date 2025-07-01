@@ -123,6 +123,12 @@ export const STAGES = new Map([
     ["8-3", "World_8-3_Adv_Portaling"],
     ["8-4", "World_8-4_Adv_Portaling"],
     ["8-5", "World_8-5_Adv_Portaling"],
+    ["8-6", "World_8-6_Adv_Portaling"],
+    ["8-7", "World_8-7_Adv_Portaling"],
+    ["8-8", "World_8-8_Adv_Portaling"],
+    ["8-9", "World_8-9_Adv_Portaling"],
+    ["8-10", "World_8-10_Adv_Portaling"],
+    ["8-11", "World_8-11_Adv_Portaling"],
     ["9-1", "World_9-1_Final_Exams"],
     ["9-2", "World_9-2_Final_Exams"],
     ["9-3", "World_9-3_Final_Exams"],
@@ -147,9 +153,12 @@ export const EXTRACT_CODES = [
     //"0-1|4-1|4-4|4-5",
     "0-1|5-1|5-2|5-3",
     "0-1|5-1|5-2|5-4",
-    "0-1|8-1|8-2|8-4",
-    "0-1|8-1|8-3|8-4",
-    "0-1|8-1|8-2|8-5",
+    "0-1|8-1|8-2|8-3",
+    //"0-1|8-1|8-2|8-4",
+    "0-1|8-1|8-8|8-7|8-11|8-4",
+    //"0-1|8-1|8-3|8-4",
+    "0-1|8-1|8-9|8-10|8-11|8-4",
+    //"0-1|8-1|8-2|8-5",
     "0-1|1-1|9-1|9-2|9-3",
     "0-1|2-1|10-1|10-2|10-3",   
 ];
@@ -443,6 +452,21 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['squid', function () {
+        return true;
+    }],
+    ['spin-doctor', function () {
+        return true;
+    }],
+    ['obstructed-passage', function () {
+        return true;
+    }],
+    ['snare-hold', function () {
+        return true;
+    }],
+    ['precarious-sanctum', function () {
+        return true;
+    }],
+    ['iron-reverb', function () {
         return true;
     }],
     ['medium-wrap', function () {

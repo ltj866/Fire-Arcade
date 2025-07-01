@@ -226,7 +226,7 @@
          "name":"Next",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":29,
          "x":0,
          "y":0
@@ -248,7 +248,7 @@
         {
          "name":"slug",
          "type":"string",
-         "value":""
+         "value":"obstructed-passage"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
