@@ -799,7 +799,8 @@ const EVIL_TRANSFORM = Object.freeze({
     COUNTER_CLOCKWISE: 3, 
 }); 
 
-var evilSnake = function (scene, upInv, downInv, leftInv, rightInv, vect2d) {
+var evilSnake = function (scene, upInv, downInv, leftInv, rightInv, vect2d, color) {
+
 
 
     if (!vect2d) {
@@ -815,11 +816,20 @@ var evilSnake = function (scene, upInv, downInv, leftInv, rightInv, vect2d) {
 
     var evilSnake = new Snake(scene, evilStartCoords.x, evilStartCoords.y);
 
+    if (!color) {
+        evilSnake.bodyColor = 0x66666;
+        
+    } else {
+        evilSnake.bodyColor = color;
+    }
+
+    
+
     evilSnake.startCoords = evilStartCoords;
 
 
     scene.evil = true;
-    evilSnake.head.setTint(0x66666);
+    evilSnake.head.setTint(evilSnake.bodyColor);
     evilSnake.head.setDepth(50);
     evilSnake.head.alpha = 1;
 
@@ -1619,6 +1629,123 @@ STAGE_OVERRIDES.set("World_14-CR3", {
     }
 });
 
+STAGE_OVERRIDES.set("World_14-CR4", {
+    w14_CL1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.evilAtoms = false;
+            scene.stageConfig.evilCollision = true;
+        },
+        postFix: function (scene) {
+
+            //var tiles = [];
+
+            //var spawnTile = scene.map.findByIndex(10, 0, false, scene.wallVarient); // Evil Snake Head Index
+            //tiles.push(spawnTile);
+            scene.evilSnakes = [];
+
+            var evilTiles = scene.map.filterTiles( tile => {
+                if (tile.index === 10)  {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+
+            evilTiles.forEach( spawnTile => {
+                var evilStartCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+
+                spawnTile.index = -1;
+
+                scene.evilSnakes.push(
+                    evilSnake(scene, 
+                    EVIL_TRANSFORM.CLOCKWISE, // UP
+                    EVIL_TRANSFORM.CLOCKWISE, // DOWN
+                    EVIL_TRANSFORM.CLOCKWISE, // LEFT
+                    EVIL_TRANSFORM.CLOCKWISE,  // RIGHT
+                    evilStartCoords, 0xe71010
+                ));
+            });
+
+
+
+            scene.atoms.forEach( atom => {
+                //atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+
+            scene.evilSnakes.forEach( snake => {
+                snake.grow(scene);
+                snake.body[snake.body.length - 1].setTint(snake.bodyColor);
+            });
+            
+        },
+        afterMove: function(scene) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                var nextVec = evilSnake.changeDir(scene);
+                
+                if (scene.stageConfig.evilAtoms) {
+                    evilSnake.checkFood(scene); 
+                }
+
+                if (scene.stageConfig.evilCollision) {
+                    var hitCheck = evilSnake.body.some( part => {
+                        if (scene.snake.head.x === part.x && scene.snake.head.y === part.y) {
+                            
+                            return true
+                        }
+                    });
+
+                    if (hitCheck) {
+                        scene.snake.bonk(scene);
+                        
+                    } else {
+                        Phaser.Actions.ShiftPosition(evilSnake.body, nextVec.x, nextVec.y, evilSnake.tail);
+                    }
+
+
+                } else {
+                    Phaser.Actions.ShiftPosition(evilSnake.body, nextVec.x, nextVec.y, evilSnake.tail);
+                }
+
+                evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+
+            });
+
+            
+
+            
+
+            
+
+            
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                evilSnake.inversePortal(scene, portal, portalTime);
+            });
+        },
+        beforeBonk: function(scene) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                var evilRespawn = scene.vortexIn(
+                evilSnake.body, 
+                evilSnake.startCoords.x, 
+                evilSnake.startCoords.y, 
+                500
+                );
+            });
+        },
+    }
+});
+
 STAGE_OVERRIDES.set("World_14-CL1", {
     w14_CL1: null,
     methods: {
@@ -1895,7 +2022,7 @@ STAGE_OVERRIDES.set("World_14-3", {
                     EVIL_TRANSFORM.NORMAL, // DOWN
                     EVIL_TRANSFORM.INVERSE, // LEFT
                     EVIL_TRANSFORM.INVERSE,  // RIGHT
-                    evilStartCoords
+                    evilStartCoords, 0xe71010
                 ));
             });
 
@@ -1911,7 +2038,7 @@ STAGE_OVERRIDES.set("World_14-3", {
 
             scene.evilSnakes.forEach( snake => {
                 snake.grow(scene);
-                snake.body[snake.body.length - 1].setTint(0x66666);
+                snake.body[snake.body.length - 1].setTint(snake.bodyColor);
             });
             
         },
