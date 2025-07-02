@@ -3,7 +3,8 @@ import { X_OFFSET, Y_OFFSET,
     GState, DIRS, commaInt, PLAYER_STATS, 
     INVENTORY_ITEMS,INVENTORY_DATA,
     BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, 
-    SPACE_BOY, PERSISTS } from "../SnakeHole.js";
+    SPACE_BOY, PERSISTS,
+    COLOR_FOCUS_HEX } from "../SnakeHole.js";
 import { Food } from "../classes/Food.js";
 import { Snake } from "../classes/Snake.js";
 import { PORTAL_COLORS} from '../const.js';
@@ -791,19 +792,324 @@ STAGE_OVERRIDES.set("Bonus_X-10", {
  * Currently - Ghost Walls and Dark Levels
  */
 
+const EVIL_TRANSFORM = Object.freeze({ 
+    CLOCKWISE: 0,
+    NORMAL: 1, 
+    INVERSE: 2, 
+    COUNTER_CLOCKWISE: 3, 
+}); 
+
+var evilSnake = function (scene, upInv, downInv, leftInv, rightInv, vect2d) {
+
+
+    if (!vect2d) {
+        var spawnTile = scene.map.findByIndex(10, 0, false, scene.wallVarient); // Evil Snake Head Index
+        var evilStartCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+
+        spawnTile.index = -1;
+        
+    } else {
+        var evilStartCoords = vect2d;
+    }
+    
+
+    var evilSnake = new Snake(scene, evilStartCoords.x, evilStartCoords.y);
+
+    evilSnake.startCoords = evilStartCoords;
+
+
+    scene.evil = true;
+    evilSnake.head.setTint(0x66666);
+    evilSnake.head.setDepth(50);
+    evilSnake.head.alpha = 1;
+
+    evilSnake.chevrons = new Map();
+
+    var up = scene.add.sprite(evilSnake.head.getCenter().x, evilSnake.head.getCenter().y, 'evilSnakeChevron' , upInv
+    ).setDepth(70);
+
+    var down = scene.add.sprite(evilSnake.head.getCenter().x, evilSnake.head.getCenter().y, 'evilSnakeChevron' , downInv
+    ).setDepth(70).toggleFlipY();
+
+    var left = scene.add.sprite(evilSnake.head.getCenter().x, evilSnake.head.getCenter().y, 'evilSnakeChevron' , leftInv
+    ).setDepth(70).toggleFlipY();
+    left.angle = 90;
+
+    var right = scene.add.sprite(evilSnake.head.getCenter().x, evilSnake.head.getCenter().y, 'evilSnakeChevron' , rightInv
+    ).setDepth(70);
+    right.angle = 90;
+
+    evilSnake.updateChevrons = function (scene, toX, toY) {
+        this.chevrons.forEach( (val,key) => {
+
+                val.x = toX + GRID / 2;
+                val.y = toY + GRID / 2;
+
+                if (key === scene.snake.direction) {
+                    val.setTint(COLOR_FOCUS_HEX);
+                } else {
+                    val.clearTint();
+                }
+            });
+    }
+
+    evilSnake.changeDir = function(scene) {
+        let xN;
+        let yN;
+
+        switch (scene.snake.direction) {
+            case DIRS.RIGHT:
+                switch (this.chevrons.get(DIRS.RIGHT).frame.name) {
+                    case EVIL_TRANSFORM.CLOCKWISE: // Clockwise Right
+                        yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID)
+                        xN = this.head.x;
+                        break;
+                    case EVIL_TRANSFORM.NORMAL: // Normal
+                        yN = this.head.y;
+                        xN = Phaser.Math.Wrap(this.head.x  + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.INVERSE: // Inverted
+                        yN = this.head.y;
+                        xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.COUNTER_CLOCKWISE: // Counter-clockwise Left
+                        yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID)
+                        xN = this.head.x;   
+
+                        break;
+                
+                    default:
+                        break;
+                }
+                
+
+                break;
+
+            case DIRS.LEFT:
+                switch (this.chevrons.get(DIRS.LEFT).frame.name) {
+                    case EVIL_TRANSFORM.CLOCKWISE: // Clockwise Right
+                        yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID)
+                        xN = this.head.x;
+                        break;
+                    case EVIL_TRANSFORM.NORMAL: // Normal
+                        yN = this.head.y;
+                        xN = Phaser.Math.Wrap(this.head.x - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.INVERSE: // Inverted
+                        yN = this.head.y;
+                        xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.COUNTER_CLOCKWISE: // Counter-clockwise Left
+                        yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID)
+                        xN = this.head.x;
+                        break;
+                
+                    default:
+                        break;
+                }
+                
+
+                break;
+
+            case DIRS.DOWN:
+                switch (this.chevrons.get(DIRS.DOWN).frame.name) {
+                    case EVIL_TRANSFORM.CLOCKWISE: // Clockwise Right
+                        xN = Phaser.Math.Wrap(this.head.x - GRID, X_OFFSET, X_OFFSET + 29 * GRID)
+                        yN = this.head.y;
+                        break;
+                    case EVIL_TRANSFORM.NORMAL: // Normal
+                        xN = this.head.x;
+                        yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.INVERSE: // Inverted
+                        xN = this.head.x;
+                        yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.COUNTER_CLOCKWISE: // Counter-clockwise Left
+                        xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID)
+                        yN = this.head.y;
+
+                        break;
+                
+                    default:
+                        break;
+                }
+                
+
+                break;
+
+            case DIRS.UP:
+                switch (this.chevrons.get(DIRS.UP).frame.name) {
+                    case EVIL_TRANSFORM.CLOCKWISE: // Clockwise Right
+                        xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                        yN = this.head.y
+                        break;
+                    case EVIL_TRANSFORM.NORMAL: // Normal
+                        xN = this.head.x;
+                        yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.INVERSE: // Inverted
+                        xN = this.head.x;
+                        yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                       
+                        break;
+                    case EVIL_TRANSFORM.COUNTER_CLOCKWISE: // Counter-clockwise Left
+                        xN = Phaser.Math.Wrap(this.head.x - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                        yN = this.head.y
+
+                        break;
+                
+                    default:
+                        break;
+                }
+                break;
+                
+            default:
+                debugger;
+                break;
+        }
+
+        return { x: xN, y: yN }
+    }
+
+    evilSnake.checkFood = function(scene) {
+        if (scene.interactLayer[(this.head.x - X_OFFSET) / GRID][ (this.head.y - Y_OFFSET) / GRID
+            ].constructor.name === "Food") {
+                var _food = scene.interactLayer[
+                    (this.head.x - X_OFFSET) / GRID]
+                    [(this.head.y - Y_OFFSET) / GRID
+                ].onOver(scene);
+            } else {
+            }
+
+    }
+
+    evilSnake.inversePortal = function(scene, portal, portalTime) {
+
+        let toX;
+        let toY;
+
+        var dX = portal.x - portal.target.x;
+        var dy = portal.y - portal.target.y;
+
+        var xOffset = 0;
+        var yOffset = 0;
+
+        //**
+        // *
+        // * No idea why this makes the math work, but it makes it work.
+        // * Otherwise the evil snake is off by one when portaling.
+        //  */
+
+
+        switch (scene.snake.direction) {
+            case DIRS.LEFT:
+                xOffset = GRID;
+                
+                break;
+            case DIRS.RIGHT:
+                xOffset = GRID * -1;
+                break;
+
+            case DIRS.UP:
+                yOffset = GRID;
+                break;
+
+            case DIRS.DOWN:
+                yOffset = GRID * -1;
+                break;
+
+            default:
+                debugger
+                break;
+        }
+
+
+        if (this.chevrons.get(DIRS.UP).frame.name === EVIL_TRANSFORM.CLOCKWISE) {
+            toX = this.head.x - dy;
+            toY = this.head.y - dX;
+            
+            xOffset = xOffset * 0;
+            yOffset = yOffset * 0;
+            
+        } else if (this.chevrons.get(DIRS.UP).frame.name === EVIL_TRANSFORM.COUNTER_CLOCKWISE) {
+            toX = this.head.x + dy;
+            toY = this.head.y + dX;
+
+            xOffset = xOffset * 0;
+            yOffset = yOffset * 0;
+
+        } else {
+            if (this.chevrons.get(DIRS.RIGHT).frame.name === EVIL_TRANSFORM.INVERSE) {
+                toX = this.head.x + dX;
+            } else { 
+                toX = this.head.x - dX;
+                xOffset = xOffset * -1;
+            }
+
+            if (this.chevrons.get(DIRS.UP).frame.name === EVIL_TRANSFORM.INVERSE) {
+                toY = this.head.y + dy;
+            } else {
+                toY = this.head.y - dy;
+                yOffset = yOffset * -1;
+            }
+
+        }
+
+        
+
+        
+
+        Phaser.Math.Wrap(toY + yOffset, Y_OFFSET, Y_OFFSET + 27 * GRID)
+        Phaser.Math.Wrap(toX + xOffset, X_OFFSET, X_OFFSET + 29 * GRID)
+    
+        var _tween = scene.tweens.add({
+            targets: this.body[0], 
+            x: toX + xOffset,
+            y: toY + yOffset,
+            yoyo: false,
+            duration: portalTime,
+            ease: 'Linear',
+            repeat: 0,
+            //delay: 500
+            onStart: function () {       
+            }
+        });
+    }
+
+    //var right = scene.add.sprite(scene.evilSnake.head.x, scene.evilSnake.head.y, 'evilSnakeChevron' , 2
+    //).setDepth(70).setOrigin(0,0).toggleFlipY();
+
+    evilSnake.chevrons.set(DIRS.UP, up);
+    evilSnake.chevrons.set(DIRS.DOWN, down);
+    evilSnake.chevrons.set(DIRS.LEFT, left);
+    evilSnake.chevrons.set(DIRS.RIGHT, right);
+
+    return evilSnake;
+
+}
+
 // Mirror Snake
-STAGE_OVERRIDES.set("Bonus_X-11", {
-    X_11: null,
+STAGE_OVERRIDES.set("World_14-XY1", {
+    14_1: null,
     methods: {
         preFix: function (scene) {
-            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.lengthGoal = 28 * 2;
         },
         postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 2, 2, 2, 2);
 
-            scene.evilSnake = new Snake(scene, scene.startCoords.x, scene.startCoords.y - GRID);
-            scene.evilSnake.head.setTint(0x66666);
-            scene.evilSnake.head.alpha = 1;
-            scene.checkWinCon = this.checkWinCon;
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
     
         },
         afterEat: function (scene) {
@@ -813,53 +1119,866 @@ STAGE_OVERRIDES.set("Bonus_X-11", {
         },
         afterMove: function(scene) {
 
-            let xN;
-            let yN;
+            var nextVec = scene.evilSnake.changeDir(scene);
 
-            
-            switch (scene.snake.direction) {
-                case DIRS.RIGHT:
-                    yN = scene.evilSnake.head.y;
-                    xN = Phaser.Math.Wrap(scene.evilSnake.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+            scene.evilSnake.checkFood(scene); 
 
-                    break;
-    
-                case DIRS.LEFT:
-                    yN = scene.evilSnake.head.y;
-                    xN = Phaser.Math.Wrap(scene.evilSnake.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
 
-                    break;
-    
-                case DIRS.DOWN:
-                    xN = scene.evilSnake.head.x;
-                    yN = Phaser.Math.Wrap(scene.evilSnake.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
-
-                    break;
-    
-                case DIRS.UP:
-                    xN = scene.evilSnake.head.x;
-                    yN = Phaser.Math.Wrap(scene.evilSnake.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
-                    break;
-                    
-                default:
-                    debugger;
-                    break;
-            }
-            //scene.evilSnake.head.x = xN;
-            //scene.evilSnake.head.y = yN;
-
-            Phaser.Actions.ShiftPosition(scene.evilSnake.body, xN, yN, scene.evilSnake.tail);
-            
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
         },
-        checkWinCon: function () {
-            return false;
-            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
-        
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
         },
     }
 });
 
-// Laser Wall
+STAGE_OVERRIDES.set("World_14-XY2", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 2, 2, 2, 2);
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+
+STAGE_OVERRIDES.set("World_14-NY1", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.NORMAL, // UP
+                EVIL_TRANSFORM.NORMAL, // DOWN
+                EVIL_TRANSFORM.INVERSE, // LEFT
+                EVIL_TRANSFORM.INVERSE  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-NY2", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.NORMAL, // UP
+                EVIL_TRANSFORM.NORMAL, // DOWN
+                EVIL_TRANSFORM.INVERSE, // LEFT
+                EVIL_TRANSFORM.INVERSE  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-NX1", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.INVERSE, // UP
+                EVIL_TRANSFORM.INVERSE, // DOWN
+                EVIL_TRANSFORM.NORMAL, // LEFT
+                EVIL_TRANSFORM.NORMAL  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-NX2", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.INVERSE, // UP
+                EVIL_TRANSFORM.INVERSE, // DOWN
+                EVIL_TRANSFORM.NORMAL, // LEFT
+                EVIL_TRANSFORM.NORMAL  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-CR1", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.CLOCKWISE, // UP
+                EVIL_TRANSFORM.CLOCKWISE, // DOWN
+                EVIL_TRANSFORM.CLOCKWISE, // LEFT
+                EVIL_TRANSFORM.CLOCKWISE  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-CR2", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.CLOCKWISE, // UP
+                EVIL_TRANSFORM.CLOCKWISE, // DOWN
+                EVIL_TRANSFORM.CLOCKWISE, // LEFT
+                EVIL_TRANSFORM.CLOCKWISE  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-CR3", {
+    w14_CL1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.evilAtoms = false;
+            scene.stageConfig.evilCollision = true;
+        },
+        postFix: function (scene) {
+
+            //var tiles = [];
+
+            //var spawnTile = scene.map.findByIndex(10, 0, false, scene.wallVarient); // Evil Snake Head Index
+            //tiles.push(spawnTile);
+            scene.evilSnakes = [];
+
+            var evilTiles = scene.map.filterTiles( tile => {
+                if (tile.index === 10)  {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+
+            evilTiles.forEach( spawnTile => {
+                var evilStartCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+
+                spawnTile.index = -1;
+
+                scene.evilSnakes.push(
+                    evilSnake(scene, 
+                    EVIL_TRANSFORM.CLOCKWISE, // UP
+                    EVIL_TRANSFORM.CLOCKWISE, // DOWN
+                    EVIL_TRANSFORM.CLOCKWISE, // LEFT
+                    EVIL_TRANSFORM.CLOCKWISE,  // RIGHT
+                    evilStartCoords
+                ));
+            });
+
+
+
+            scene.atoms.forEach( atom => {
+                //atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+
+            scene.evilSnakes.forEach( snake => {
+                snake.grow(scene);
+                snake.body[snake.body.length - 1].setTint(0x66666);
+            });
+            
+        },
+        afterMove: function(scene) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                var nextVec = evilSnake.changeDir(scene);
+                
+                if (scene.stageConfig.evilAtoms) {
+                    evilSnake.checkFood(scene); 
+                }
+
+                if (scene.stageConfig.evilCollision) {
+                    var hitCheck = evilSnake.body.some( part => {
+                        if (scene.snake.head.x === part.x && scene.snake.head.y === part.y) {
+                            
+                            return true
+                        }
+                    });
+
+                    if (hitCheck) {
+                        scene.snake.bonk(scene);
+                        
+                    } else {
+                        Phaser.Actions.ShiftPosition(evilSnake.body, nextVec.x, nextVec.y, evilSnake.tail);
+                    }
+
+
+                } else {
+                    Phaser.Actions.ShiftPosition(evilSnake.body, nextVec.x, nextVec.y, evilSnake.tail);
+                }
+
+                evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+
+            });
+
+            
+
+            
+
+            
+
+            
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                evilSnake.inversePortal(scene, portal, portalTime);
+            });
+        },
+        beforeBonk: function(scene) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                var evilRespawn = scene.vortexIn(
+                evilSnake.body, 
+                evilSnake.startCoords.x, 
+                evilSnake.startCoords.y, 
+                500
+                );
+            });
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-CL1", {
+    w14_CL1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE, // UP
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE, // DOWN
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE, // LEFT
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-CL2", {
+    w14_CL1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = false;
+            scene.stageConfig.evilCollision = true;
+        },
+        postFix: function (scene) {
+
+            var spawnTile = scene.map.findByIndex(10, 0, false, scene.wallVarient); // Evil Snake Head Index
+            var evilStartCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+
+            spawnTile.index = -1;
+
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE, // UP
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE, // DOWN
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE, // LEFT
+                EVIL_TRANSFORM.COUNTER_CLOCKWISE,  // RIGHT
+                evilStartCoords
+            );
+
+            scene.atoms.forEach( atom => {
+                //atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            if (scene.stageConfig.evilAtoms) {
+                scene.evilSnake.checkFood(scene); 
+            }
+
+            if (scene.stageConfig.evilCollision) {
+                var hitCheck = scene.evilSnake.body.some( part => {
+                    if (scene.snake.head.x === part.x && scene.snake.head.y === part.y) {
+                        
+                        return true
+                    }
+                });
+
+                if (hitCheck) {
+                    scene.snake.bonk(scene);
+                    
+                } else {
+                    Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+                }
+
+
+            } else {
+                Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+            }
+
+            
+
+            
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-1", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.NORMAL, // UP
+                EVIL_TRANSFORM.NORMAL, // DOWN
+                EVIL_TRANSFORM.NORMAL, // LEFT
+                EVIL_TRANSFORM.NORMAL  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-2", {
+    14_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = 28 * 2;
+            scene.stageConfig.evilAtoms = true;
+        },
+        postFix: function (scene) {
+            scene.evilSnake = evilSnake(scene, 
+                EVIL_TRANSFORM.NORMAL, // UP
+                EVIL_TRANSFORM.NORMAL, // DOWN
+                EVIL_TRANSFORM.NORMAL, // LEFT
+                EVIL_TRANSFORM.NORMAL  // RIGHT
+            );
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+
+            var nextVec = scene.evilSnake.changeDir(scene);
+
+            scene.evilSnake.checkFood(scene); 
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, nextVec.x, nextVec.y, scene.evilSnake.tail);
+
+            scene.evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnake.inversePortal(scene, portal, portalTime);
+        },
+        beforeBonk: function(scene) {
+
+            var evilRespawn = scene.vortexIn(
+                scene.evilSnake.body, 
+                scene.evilSnake.startCoords.x, 
+                scene.evilSnake.startCoords.y, 
+                500
+            );
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_14-3", {
+    w14_CL1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.stageConfig.lengthGoal = Infinity;
+            scene.stageConfig.evilAtoms = false;
+            scene.stageConfig.evilCollision = true;
+        },
+        postFix: function (scene) {
+
+            //var tiles = [];
+
+            //var spawnTile = scene.map.findByIndex(10, 0, false, scene.wallVarient); // Evil Snake Head Index
+            //tiles.push(spawnTile);
+            scene.evilSnakes = [];
+
+            var evilTiles = scene.map.filterTiles( tile => {
+                if (tile.index === 10)  {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+
+            evilTiles.forEach( spawnTile => {
+                var evilStartCoords = { x: spawnTile.pixelX + X_OFFSET, y: spawnTile.pixelY + Y_OFFSET};
+
+                spawnTile.index = -1;
+
+                scene.evilSnakes.push(
+                    evilSnake(scene, 
+                    EVIL_TRANSFORM.NORMAL, // UP
+                    EVIL_TRANSFORM.NORMAL, // DOWN
+                    EVIL_TRANSFORM.INVERSE, // LEFT
+                    EVIL_TRANSFORM.INVERSE,  // RIGHT
+                    evilStartCoords
+                ));
+            });
+
+
+
+            scene.atoms.forEach( atom => {
+                //atom.setTint(0x66666);
+
+            });
+    
+        },
+        afterEat: function (scene) {
+
+            scene.evilSnakes.forEach( snake => {
+                snake.grow(scene);
+                snake.body[snake.body.length - 1].setTint(0x66666);
+            });
+            
+        },
+        afterMove: function(scene) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                var nextVec = evilSnake.changeDir(scene);
+                
+                if (scene.stageConfig.evilAtoms) {
+                    evilSnake.checkFood(scene); 
+                }
+
+                if (scene.stageConfig.evilCollision) {
+                    var hitCheck = evilSnake.body.some( part => {
+                        if (scene.snake.head.x === part.x && scene.snake.head.y === part.y) {
+                            
+                            return true
+                        }
+                    });
+
+                    if (hitCheck) {
+                        scene.snake.bonk(scene);
+                        
+                    } else {
+                        Phaser.Actions.ShiftPosition(evilSnake.body, nextVec.x, nextVec.y, evilSnake.tail);
+                    }
+
+
+                } else {
+                    Phaser.Actions.ShiftPosition(evilSnake.body, nextVec.x, nextVec.y, evilSnake.tail);
+                }
+
+                evilSnake.updateChevrons(scene, nextVec.x, nextVec.y); 
+
+            });
+
+            
+
+            
+
+            
+
+            
+        },
+        onPortal: function (scene, portal, portalTime) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                evilSnake.inversePortal(scene, portal, portalTime);
+            });
+        },
+        beforeBonk: function(scene) {
+
+            scene.evilSnakes.forEach( evilSnake => {
+                var evilRespawn = scene.vortexIn(
+                evilSnake.body, 
+                evilSnake.startCoords.x, 
+                evilSnake.startCoords.y, 
+                500
+                );
+            });
+        },
+    }
+});
+
+
+
+// Laser Wall  Don't need this anymore.
 STAGE_OVERRIDES.set("Bonus_X-12", {
     X_12: null,
     methods: {
@@ -907,27 +2026,6 @@ STAGE_OVERRIDES.set("Bonus_X-12", {
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },
-        moveLaser: function () {
-
-            this.stageConfig.laserWallX = Phaser.Math.Wrap(this.stageConfig.laserWallX + 1, 0, 28);
-            var y = 0;
-            this.stageConfig.deathWalls = [];
-
-            while (y < 27) {
-
-                var prevTile = this.wallLayer.getTileAt(Phaser.Math.Wrap(this.stageConfig.laserWallX - 1, 0, 28), y, true, this.wallVarient);
-                
-                prevTile.index = -1;
-                prevTile.properties.hasCollision = false;
-                
-                
-
-                this.stageConfig.deathWalls.push(tile);
-            
-                y++ ;
-            }
-
-        } 
     }
 });
 

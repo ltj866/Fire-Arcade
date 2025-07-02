@@ -772,7 +772,7 @@ const UISTYLE = {
 
 const COLOR_SCORE = "yellow";
 const COLOR_FOCUS = "fuchsia";
-const COLOR_FOCUS_HEX = 0xFF00FF;
+export const COLOR_FOCUS_HEX = 0xFF00FF;
 const COLOR_BONUS = "limegreen";
 const COLOR_BONUS_HEX = 0x32CD32;
 const COLOR_TERTIARY = "goldenrod";
@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_14-3'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -846,7 +846,7 @@ const TUTORIAL_UUIDS = [
     "4c577a41-07a0-4aea-923e-d33c36893027"
 ];
 
-const START_COINS = 4;
+const START_COINS = 25;
 
 
 class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
@@ -3168,6 +3168,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
         //this.load.spritesheet('ranksSpriteSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('ranksSpriteSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 24, frameHeight: 36 });
+        this.load.spritesheet('evilSnakeChevron', 'assets/sprites/evilSnakeChevron.png', { frameWidth: 12, frameHeight: 12 });
+
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -7329,10 +7331,11 @@ class GameScene extends Phaser.Scene {
         // Laser Wall Settings
 
         this.laserWallXIndex = 0;
-        this.laserWalls = [];
         this.laserLastMove = 1;
 
         this.stageConfig.laserSpeed = 0;
+
+
         
 
         
@@ -12091,8 +12094,6 @@ class GameScene extends Phaser.Scene {
 
                 // #region LaserWall move
 
-                //debugger
-                console.log(this.timeTickCount - this.laserLastMove);
 
                 if (this.stageConfig.laserSpeed != 0 
                     && this.timeTickCount - this.laserLastMove > this.stageConfig.laserSpeed - 1

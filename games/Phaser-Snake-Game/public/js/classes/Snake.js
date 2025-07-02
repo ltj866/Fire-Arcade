@@ -61,6 +61,8 @@ var Snake = new Phaser.Class({
         this.lastPlayedCombo = 0;
         this.lastPortal = undefined; // Set
         this.closestPortal = undefined; // TYPE Portal.
+
+        this.evil = false;
         
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
@@ -124,8 +126,6 @@ var Snake = new Phaser.Class({
         newPart.name = `BodyPart ${scene.length}`;
         //newPart.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
-        
-        
 
         if (this.body.length > 1){
             this.body[this.body.length -1].setTexture('snakeDefault',[1])
@@ -398,7 +398,15 @@ var Snake = new Phaser.Class({
 
         if (scene.gState === GState.PLAY && typeof scene.interactLayer[onGridX][onGridY].onOver === 'function') {
             // Only call if whatever is there has an onOver
-            scene.interactLayer[onGridX][onGridY].onOver(scene);
+            if (scene.interactLayer[onGridX][onGridY].constructor.name != "Food") {
+                scene.interactLayer[onGridX][onGridY].onOver(scene);
+            } else {
+                if (scene.stageConfig.evilAtoms) {
+                    /// pass
+                } else {
+                    scene.interactLayer[onGridX][onGridY].onOver(scene);
+                }
+            }
         }
 
 
@@ -598,6 +606,12 @@ var Snake = new Phaser.Class({
         }
 
         if (!scene.stopOnBonk) {
+
+            if (STAGE_OVERRIDES.has(scene.stage) 
+                && "beforeBonk" in STAGE_OVERRIDES.get(scene.stage).methods
+                && scene.gState != GState.BONK) {
+                        STAGE_OVERRIDES.get(scene.stage).methods.beforeBonk(scene);
+            }
 
             scene.gState = GState.BONK;
             scene.scene.get("InputScene").moveHistory.push(["BONK"]);

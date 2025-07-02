@@ -1,5 +1,5 @@
 import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG, PLAYER_STATS, X_OFFSET, Y_OFFSET, SPACE_BOY } from "../SnakeHole.js";
-
+import { STAGE_OVERRIDES } from '../data/customLevels.js';
 
 var Portal = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
@@ -144,6 +144,10 @@ var Portal = new Phaser.Class({
         var portalSound = scene.portalSounds[0];
         portalSound.play();
 
+        if (STAGE_OVERRIDES.has(scene.stage) && "onPortal" in STAGE_OVERRIDES.get(scene.stage).methods) {
+            STAGE_OVERRIDES.get(scene.stage).methods.onPortal(scene, this, portalTime);
+        }
+
         var _tween = scene.tweens.add({
             targets: scene.snake.body[0], 
             x: _x,
@@ -156,6 +160,7 @@ var Portal = new Phaser.Class({
             onStart: function () {       
             }
         });
+
         
         _tween.on('complete',()=>{
             scene.gState = GState.PLAY;
