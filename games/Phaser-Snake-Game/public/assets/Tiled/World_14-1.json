@@ -1227,10 +1227,6 @@
                         }]
                 }],
          "tilewidth":12
-        }, 
-        {
-         "firstgid":1025,
-         "source":"tileSheetx12.tsx"
         }],
  "tilewidth":12,
  "type":"map",
