@@ -1,5 +1,5 @@
 {
-    "activeFile": "World_10-2.json",
+    "activeFile": "World_2-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -9,7 +9,7 @@
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
-            "scaleInDock": 1
+            "scaleInDock": 1.5
         },
         ":/automap-tiles.tsx": {
             "scaleInDock": 1
@@ -459,7 +459,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161
+                "y": 162
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -503,7 +503,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.016927716704,
-                "y": 162.50608035801145
+                "y": 161.82897168985306
             }
         },
         "World_10-1.json#tileSheetx12": {
@@ -513,7 +513,7 @@
             "scale": 1.476867816091954,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.33981904854562,
+                "x": 174.016927716704,
                 "y": 161.82897168985306
             }
         },
@@ -526,7 +526,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 174,
-                "y": 161
+                "y": 162
             }
         },
         "World_10-2.json#tileSheetx12": {
@@ -537,7 +537,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161
+                "y": 162
             }
         },
         "World_10-3.json#tileSheetx12": {
@@ -786,11 +786,11 @@
             "scaleInDock": 1
         },
         "World_2-1.json": {
-            "scale": 1.5,
-            "selectedLayer": 0,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
-                "y": 162
+                "x": 172,
+                "y": 173
             }
         },
         "World_2-1.json#tileSheetx12": {
@@ -801,8 +801,8 @@
             "scale": 2.729885057471264,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.81684210526316,
-                "y": 162.0947368421053
+                "x": 173.63368421052635,
+                "y": 162.27789473684214
             }
         },
         "World_2-10.json#tileSheetx12": {
@@ -823,8 +823,8 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 244.25,
-                "y": 160.25
+                "x": 244.5,
+                "y": 160
             }
         },
         "World_2-2g.json#tileSheetx12": {
@@ -1167,7 +1167,7 @@
         },
         "World_8-1_Adv_Portaling.json": {
             "scale": 2,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 174,
                 "y": 162
@@ -2223,6 +2223,10 @@
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
+            "scaleInEditor": 4
+        },
+        "tileSheetx12_25-04-04.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "tileSheetx24.tsx": {
@@ -2281,23 +2285,27 @@
         "World_10-2.json",
         "World_10-3.json",
         "World_1-1.json",
-        "World_1-2.json"
+        "World_1-2.json",
+        "World_8-1_Adv_Portaling.json",
+        "World_2-1.json",
+        "World_2-10.json",
+        "World_2-2g.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "tileSheetx12_25-04-04.tsx",
         "World_0-1.json",
         "World_10-1.json",
         "World_10-1g.json",
-        "World_1-2.json",
-        "World_1-1.json",
-        "World_10-3.json",
         "World_10-2.json",
-        "World_1-3.json",
-        "World_5-1_Racing.json",
-        "World_5-2_Racing.json",
-        "World_5-3_Racing.json",
-        "World_4-9.json"
+        "World_10-3.json",
+        "World_1-1.json",
+        "World_1-2.json",
+        "World_8-1_Adv_Portaling.json",
+        "World_2-2g.json",
+        "World_2-10.json",
+        "World_2-1.json"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
 }

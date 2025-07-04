@@ -9992,7 +9992,7 @@ class GameScene extends Phaser.Scene {
 
             var coverTiles = this.map.filterTiles( tile => {
                 if (tile.index != -1) {
-                    if (tile.index === 482) { // Secret Cover Tile
+                    if (tile.properties.secretCoverAll) { // Secret Cover Tile
                     return true
                     
                     } else {
@@ -10003,6 +10003,7 @@ class GameScene extends Phaser.Scene {
             }, this, 0, 0, 29, 27, {}, 'Secrets');
 
             this.secretTileCount = coverTiles.length;
+            debugger
 
             
             // Secret Portals

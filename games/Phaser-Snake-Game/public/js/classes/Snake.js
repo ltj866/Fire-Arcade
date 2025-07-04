@@ -409,28 +409,28 @@ var Snake = new Phaser.Class({
             }
         }
 
-        if (nextTile && nextTile.index === 513) {
+        if (nextTile && nextTile.properties.switch) {
 
             scene.map.forEachTile( tile => {
 
                 switch (tile.index) {
-                    case 514:
-                        tile.index = 517;
+                    case 483:
+                        tile.index = 515;
+                        tile.properties.hasCollision = true;
+                        
+                        break;
+                    case 484:
+                        tile.index = 516;
                         tile.properties.hasCollision = false;
                         
                         break;
                     case 515:
-                        tile.index = 516;
-                        tile.properties.hasCollision = true;
-                        
-                        break;
-                    case 516:
-                        tile.index = 515;
+                        tile.index = 483;
                         tile.properties.hasCollision = false;
                         
                         break;
-                    case 517:
-                        tile.index = 514;
+                    case 516:
+                        tile.index = 484;
                         tile.properties.hasCollision = true;
                         
                         break;

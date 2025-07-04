@@ -898,20 +898,25 @@
  </tile>
  <tile id="481">
   <properties>
-   <property name="secretCoverAll" type="bool" value="true"/>
+   <property name="expertNoSpawn" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="512">
-  <properties>
-   <property name="switch" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="513">
+ <tile id="483">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="515">
+ <tile id="512">
+  <properties>
+   <property name="secretCoverAll" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="513">
+  <properties>
+   <property name="switch" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="514">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
