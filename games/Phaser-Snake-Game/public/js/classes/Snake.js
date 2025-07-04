@@ -245,11 +245,15 @@ var Snake = new Phaser.Class({
         var nextTile = scene.map.getTileAtWorldXY( xN, yN);
         //debugger
         
-        if (nextTile != null && nextTile.properties.hasCollision && !scene.winned) {
-            
-            this.direction = DIRS.STOP;
-            if (scene.stageConfig.bonkable) {
-                this.bonk(scene);  
+        if (nextTile != null && !scene.winned) {
+
+            if (nextTile.properties.hasCollision 
+                || this.direction === nextTile.properties.stopDIRS 
+            ) {
+                this.direction = DIRS.STOP;
+                if (scene.stageConfig.bonkable) {
+                    this.bonk(scene);  
+                }
             }
         }
 

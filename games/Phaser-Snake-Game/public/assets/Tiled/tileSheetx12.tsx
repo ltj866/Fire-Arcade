@@ -906,6 +906,16 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="484">
+  <properties>
+   <property name="stopDIRS" type="int" value="2"/>
+  </properties>
+ </tile>
+ <tile id="487">
+  <properties>
+   <property name="stopDIRS" type="int" value="3"/>
+  </properties>
+ </tile>
  <tile id="512">
   <properties>
    <property name="secretCoverAll" type="bool" value="true"/>
@@ -919,6 +929,16 @@
  <tile id="514">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="517">
+  <properties>
+   <property name="stopDIRS" type="int" value="1"/>
+  </properties>
+ </tile>
+ <tile id="518">
+  <properties>
+   <property name="stopDIRS" type="int" value="4"/>
   </properties>
  </tile>
  <tile id="640">

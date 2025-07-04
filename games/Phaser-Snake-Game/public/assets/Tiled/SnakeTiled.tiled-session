@@ -452,7 +452,8 @@
         },
         "World_0-1.json#tileSheetx12": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 2
         },
         "World_1-1.json": {
             "scale": 1,
@@ -2292,8 +2293,9 @@
         "World_2-2g.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "int",
     "recentFiles": [
+        "tileSheetx12.tsx",
         "World_1-2.json",
         "World_1-1.json",
         "World_10-3.json",
@@ -2304,8 +2306,7 @@
         "World_1-3.json",
         "World_14-1.json",
         "World_14-2.json",
-        "World_14-3.json",
-        "World_14-CL1.json"
+        "World_14-3.json"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
 }
