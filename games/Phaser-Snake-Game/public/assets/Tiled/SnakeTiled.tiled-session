@@ -898,6 +898,17 @@
             "dynamicWrapping": false,
             "scaleInDock": 1
         },
+        "World_2-9.json": {
+            "scale": 2.0064655172413794,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.937701396348,
+                "y": 161.97636949516647
+            }
+        },
+        "World_2-9.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "World_2-X_06_28.json": {
             "scale": 2.729885057471264,
             "selectedLayer": 0,
@@ -936,7 +947,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161.5
+                "y": 161
             }
         },
         "World_3-1_Wrap.json#tileSheetx12": {
@@ -947,7 +958,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161.5
+                "y": 161
             }
         },
         "World_3-2_Wrap.json#tileSheetx12": {
@@ -1045,8 +1056,8 @@
             "scale": 3.964197530864197,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.93179694799133,
-                "y": 162.07567735907818
+                "x": 174.05792587978823,
+                "y": 162.20180629087514
             }
         },
         "World_4-6.json#tileSheetx12": {
@@ -1109,7 +1120,7 @@
         },
         "World_5-1_Racing.json": {
             "scale": 2,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 179.5,
                 "y": 171

@@ -58,6 +58,15 @@ export var checkRank = function(stageName, targetRank) {
     }
 }
 
+var checkLiveRank = function(stageData, targetRank) {
+    if (stageData.stageRank() >= targetRank) {
+        return true
+    } else {
+        return false
+    }
+
+}
+
 export var checkCanExtract = function(stageID) {
     var checkEnds = [];
     EXTRACT_CODES.forEach(path => {
@@ -401,7 +410,8 @@ export const STAGE_UNLOCKS = new Map([
         return false;
     }],
     ['easy-racer', function () {
-        return checkRank.call(this,STAGES.get("0-1"), RANKS.PLATINUM);
+        return checkLiveRank.call(this, this.scene.get("ScoreScene").stageData, RANKS.PLATINUM);
+        //return checkRank.call(this,STAGES.get("0-1"), RANKS.PLATINUM);
     }],
     ['hello-ghosts', function () {
         return false;
