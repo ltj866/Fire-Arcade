@@ -916,6 +916,9 @@ class SpaceBoyScene extends Phaser.Scene {
         this.zedSegments = [];
         //this.zedBar = this.add.graphics();
     }
+    preload() {
+
+    }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
 
@@ -1741,6 +1744,375 @@ class SpaceBoyScene extends Phaser.Scene {
     }
 }
 
+class MediaPlayer {
+    constructor(scene) {
+        this.startedOnce = false;
+        this.musicOpacity = 0;
+
+        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        this.startTrack = this.shuffledTracks.pop();
+
+        this.music = scene.sound.add(`track_${this.startTrack}`,{
+            volume: 0.33
+        });
+
+        // used to check if player intentionally pressed button,
+        // not if the feature state is on or off
+        this.playerPaused = false;
+        this.playerLooped = false;
+
+
+        // CREATE
+
+        const ourGame = scene.scene.get("GameScene");
+
+        this.soundManager = scene.sound;
+
+        // Start volume at 50%
+        this.soundManager.volume = 0.5;
+
+        // Create an invisible interactive zone for volume dial and the music player zone
+        this.volumeControlZone = scene.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
+             24, 36).setInteractive().setOrigin(0,0).setDepth(1);
+        this.musicPlayerZone = scene.add.zone(X_OFFSET + GRID * 34, GRID * 0.5,
+            64, 104).setInteractive().setOrigin(0,0).setDepth(0);;
+        // debugging bounding box
+        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.musicPlayerZone);
+
+        // speaker icon above slider
+        this.volumeIcon = scene.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 7.5 + 8, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
+        // volume slider icon
+        this.volumeSlider = scene.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 4.5  + 8, 'uiVolumeSlider').setDepth(100).setAlpha(0);
+        // mask sprite
+        this.volumeSliderWidgetMask = scene.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 4.5  + 8, 'uiVolumeSliderWidget').setDepth(101);
+        // rendered sprite
+        this.volumeSliderWidgetReal = scene.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 4.5  + 8, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
+
+        const volumeMask = new Phaser.Display.Masks.BitmapMask(scene, this.volumeSliderWidgetMask);
+        this.volumeSlider.setMask(volumeMask)
+        this.volumeSliderWidgetMask.visible = false;
+        this.volumeSlider.mask.invertAlpha = true;
+
+        // is mouse hovering over volume wheel OR the entire music player area?
+        this.isVolumeControlActive = false;
+
+        this.volumeControlZone.on('pointerover', () => {
+            scene.input.setDefaultCursor('pointer');
+            if (SPACE_BOY.spaceBoyReady) {
+                this.isVolumeControlActive = true;
+                this.musicOpacity = 1;
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
+            }
+            
+        });
+        this.volumeControlZone.on('pointerout', () => {
+            scene.input.setDefaultCursor('default');
+            this.isVolumeControlActive = false
+        }); 
+
+        this.musicPlayerZone.on('pointerover', () => {
+            if (SPACE_BOY.spaceBoyReady) {
+                this.musicOpacity = 1;
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
+            }
+            
+        });
+        this.musicPlayerZone.on('pointerout', () => {
+            var show = false;
+            ourGame.musicPlayerDisplay(show);
+            if (this.isVolumeControlActive === false) {
+                this.musicOpacity = 0;
+            }
+        });
+
+        // Listen for mouse wheel events
+        scene.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+            if (SPACE_BOY.spaceBoyReady) {
+                if (this.isVolumeControlActive){
+                    let volumeChange;
+                    //checks for mouse scroll up or down
+                    if (deltaY > 0) {
+                        volumeChange = -0.125; 
+                    } 
+                    else {
+                        volumeChange = 0.125; 
+                    }
+                    // clamp volume from 0-1
+                    this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
+                    this.updatedVolume = this.soundManager.volume + volumeChange
+                    
+                    // y values for adjusting the volumeSliderWidget and Mask
+                    const minY = this.volumeSlider.y - this.volumeSlider.height/2;
+                    const maxY = this.volumeSlider.y + this.volumeSlider.height/2;
+                    const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
+                    
+                    // this console log is one event call behind hence this.updatedVolume
+                    //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
+
+                    // set volume icon based on volume level
+                    if (newY >= minY && newY <= maxY) {
+                        this.volumeSliderWidgetMask.y = newY;
+                        this.volumeSliderWidgetReal.y = newY;
+
+                        if (this.updatedVolume === 0) {
+                            this.volumeIcon.setFrame(3);
+                        }
+                        else if (this.updatedVolume > 0 && this.updatedVolume <= 0.33) {
+                            this.volumeIcon.setFrame(2);
+                        }
+                        else if (this.updatedVolume > 0.33 && this.updatedVolume <= 0.66) {
+                            this.volumeIcon.setFrame(1);
+                        }
+                        else if (this.updatedVolume > 0.66)
+                            this.volumeIcon.setFrame(0);
+                        }
+                    }
+                }      
+        });
+        
+        // Buttons
+        var columnX = X_OFFSET + GRID * 36 + 1;
+
+        this.trackIDLabel = scene.add.bitmapText(columnX - GRID * 4 -5, GRID * 7.75 + 1, 'mainFont', `TRACK`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
+        this.trackID = scene.add.bitmapText(columnX - GRID * 3, GRID * 7.75 + 1, 'mainFont', `000`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
+        this.trackID.setDepth(80);
+        this.trackID.setText(this.startTrack);
+
+        // Loop Button
+        this.loopButton = scene.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        
+        
+        this.loopButton.on('pointerdown', () => {
+            if (SPACE_BOY.spaceBoyReady) {
+                if (!this.playerLooped) {
+                    this.playerLooped = true;
+                    this.loopButton.setFrame(5);
+                }
+                else{
+                    this.playerLooped = false;
+                    this.loopButton.setFrame(4);
+                }
+            }
+        }, this);
+        
+    
+        // Pause Button
+        this.pauseButton = scene.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        
+
+        this.pauseButton.on('pointerdown', () => {
+            if (SPACE_BOY.spaceBoyReady) {
+                // is music playing?
+                if (this.music.isPlaying) {
+                    this.pauseButton.setFrame(1);
+                    this.music.pause();
+                    this.playerPaused = true;
+                }  
+                // does music exist? and if so is it paused?
+                else if (this.music.isPaused) {
+                    this.pauseButton.setFrame(0);
+                    this.playerPaused = false;
+                    this.music.resume();
+                } 
+                // this will unpause the player and queue a new song if
+                // entered game scene in a paused state
+                else {
+                    this.pauseButton.setFrame(0);
+                    this.playerPaused = false;
+                    this.nextSong(scene);
+                }   
+            }
+        }, this);
+
+        // Next Button
+        this.nextButton = scene.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+
+        this.nextButton.on('pointerdown', () => {
+            if (SPACE_BOY.spaceBoyReady) {
+                // if looping enabled, disable
+                if (this.playerLooped) {
+                    this.playerLooped = false;
+                    this.loopButton.setFrame(4);
+                }
+                this.nextButton.setFrame(3);
+                this.music.stop();
+                this.nextSong(scene);
+                if (this.pauseButton.frame.name === 1) {
+                    console.log('working')
+                    this.pauseButton.setFrame(0)
+                }
+            } 
+        }, this);
+        
+
+        // on mouse click up, only nextButton resets to unpressed state
+        scene.input.on('pointerup', function(pointer){
+            this.nextButton.setFrame(2);
+        }, this);
+
+        // when music pauses, button updates accordingly
+        this.music.on('pause', () => {
+            this.pauseButton.setFrame(1);
+        }, this);
+
+        // checks whether cursor is over any button and then changes cursor to hand
+        function setupButtonCursor(button, scene) {
+            button.on('pointerover', () => {
+                scene.input.setDefaultCursor('pointer');
+                scene.musicOpacity = 1;
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
+            });
+            button.on('pointerout', () => {
+                scene.input.setDefaultCursor('default');
+                scene.musicOpacity = 0;
+                var show = false;
+                ourGame.musicPlayerDisplay(show);
+            });
+        }
+        setupButtonCursor(this.loopButton, scene);
+        setupButtonCursor(this.nextButton, scene);
+        setupButtonCursor(this.pauseButton, scene);
+         
+        //pauses and resumes sound so queued sfx don't play all at once upon resuming
+        window.addEventListener('focus', () => {
+            if (SPACE_BOY.spaceBoyReady) {
+                this.sound.pauseAll(); // ensures all sounds do NOT play when clicking back into game (prevents unwanted noises)
+                this.music.resume(); //resumes all music instances so old tracks need to be stopped properly
+                if (this.playerPaused) {
+                    this.music.pause(); //keeps music paused if player clicked pause button
+                }
+                else{
+                    this.pauseButton.setFrame(0);
+                }
+            }
+        });
+        
+        window.addEventListener('blur', (scene) => {
+            if (SPACE_BOY.spaceBoyReady) {
+                this.pauseButton.setFrame(1);
+                scene.sound.pauseAll(); // this prevents sound from being able to resume
+            }
+        });
+    }
+    // This needs to be manually called as this is no longer a scene.
+    update (scene) {
+        if (SPACE_BOY.spaceBoyReady) {
+            let targetOpacity = Phaser.Math.Interpolation.Linear(
+                [this.volumeSlider.alpha, this.musicOpacity], 0.25);
+            this.volumeSlider.alpha = targetOpacity;
+            this.volumeSliderWidgetReal.alpha = targetOpacity;
+        }
+    }
+    showTrackID(scene){
+        scene.tweens.add({
+            targets: [this.trackIDLabel,this.trackID, this.volumeIcon],
+            alpha: 1,
+            ease: 'Sine.InOut',
+            duration: 750,
+            repeat: 0,
+            yoyo: false,
+        });
+   }
+    stopMusic(scene) {
+        scene.sound.sounds.forEach((sound) => {
+            sound.stop();
+        });
+    }
+
+    startMusic(scene) {
+        //if (!START_RANDOM) { //commenting out until functionality can return
+                // check that a song isn't already playing so we don't add more than 1
+            // when looping back to the main menu
+            if (!this.music.isPlaying && !this.playerPaused) {
+                this.startedOnce = true; // Place holder until I fix track 86
+                if (!this.startedOnce) {
+                    console.log('music playing from startMusic()')
+                    this.music = scene.sound.add(`track_86`,{
+                        volume: 0.2
+                    });
+                    this.music.play(scene);
+                    
+                } else {
+                    this.nextSong(scene);
+                }
+                
+            }
+        //}
+    }
+
+    nextSong (scene, songID) {
+        // we call stop here before calling next song to delete old instances of music
+        // prevents songs from double playing
+        this.stopMusic(scene);
+        switch (songID) {
+            case `track_149`: // Game Over Song
+                this.music.stop(scene);
+                this.music = scene.sound.add(`track_149`,{
+                    volume: 0.33
+                });
+
+                this.music.play(scene);
+                this.trackID.setText(149);
+                
+                break;
+
+            case `track_175`: // Red Alert Song
+                this.music.stop(scene);
+                this.music = scene.sound.add(`track_175`,{
+                    volume: 0.33
+                });
+
+                this.music.play(scene);
+                this.trackID.setText(175);
+
+                this.music.play(scene);
+                this.music.on('complete', () => {
+                    this.nextSong(scene);
+                }, this);
+                
+                break;
+
+            default: // Everything else
+                if (this.playerLooped) {
+                    this.music.play(scene);
+                }
+                else {
+                    if (this.shuffledTracks.length != 0) {
+                    } else {
+                        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+                    }
+
+                    var track = this.shuffledTracks.pop();
+
+                    this.music = scene.sound.add(`track_${track}`,{
+                        volume: 0.33
+                    });
+
+                    this.music.play(scene);
+                    this.music.on('complete', () => {
+                        this.nextSong(scene);
+                    }, this); 
+                    
+                    this.trackID.setText(track);
+                }
+
+                break;
+        }
+    }
+}
+
 class MusicPlayerScene extends Phaser.Scene {
     constructor () {
         super({key: 'MusicPlayerScene', active: false});
@@ -1761,14 +2133,14 @@ class MusicPlayerScene extends Phaser.Scene {
         this.playerPaused = false;
         this.playerLooped = false;
     }
-    preload() {
+    /*preload() {
         this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
         this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
         this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
         this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
         this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
 
-    }
+    }*/
     create() {
         const ourGame = this.scene.get("GameScene");
 
@@ -2774,7 +3146,7 @@ class TutorialScene extends Phaser.Scene {
         var tutorialPanels = args.cards;
         var toStage = args.toStage;
 
-        this.scene.bringToTop('MusicPlayerScene');
+        //this.scene.bringToTop('MusicPlayerScene');
 
         // AUDIO
         this.pop02 = this.sound.add('pop02');
@@ -2984,10 +3356,10 @@ class TutorialScene extends Phaser.Scene {
                 scene.scene.get("PersistScene").coins = START_COINS;
 
                 //double check that player hasn't paused music so it isn't played again
-                if (!scene.scene.get("MusicPlayerScene").playerPaused) {
+                if (!SPACE_BOY.mediaPlayer.playerPaused) {
                     console.log('music playing from TutorialScene onContinue')
-                    scene.scene.get("MusicPlayerScene").music.pause();
-                    scene.scene.get("MusicPlayerScene").nextSong();
+                    SPACE_BOY.mediaPlayer.music.pause();
+                    SPACE_BOY.mediaPlayer.nextSong(SPACE_BOY);
                 }
 
                 var startStage;
@@ -3211,6 +3583,15 @@ class StartScene extends Phaser.Scene {
         this.load.image('tutWallSprite2', 'assets/HowToCards/tutorial_walls_wall2.png');
         this.load.spritesheet('tutBlackHole', 'assets/HowToCards/tutorial_snake_blackHole_Sheet.png', { frameWidth: 232, frameHeight: 46 });
 
+
+        // Nedia Player
+        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
+        
+        
         SPACE_BOY = this.scene.get("SpaceBoyScene");
         PERSISTS = this.scene.get("PersistScene");
         INPUT = this.scene.get("InputScene");
@@ -3362,10 +3743,13 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('SpaceBoyScene');
         this.scene.launch('PlinkoMachineScene');
         this.scene.launch('PinballDisplayScene');
-        this.scene.launch('MusicPlayerScene');
+
+        SPACE_BOY.mediaPlayer = new MediaPlayer(SPACE_BOY);
+        
+        //this.scene.launch('MusicPlayerScene');
         //this.scene.launch('GalaxyMapScene');
         this.scene.bringToTop('SpaceBoyScene');
-        this.scene.bringToTop('MusicPlayerScene');
+        //this.scene.bringToTop('MusicPlayerScene');
         
 
 
@@ -4817,7 +5201,6 @@ class MainMenuScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
 
 
-
         let newContent = PERSISTS.checkNewContent();
 
         if (newContent != "none") {
@@ -5584,8 +5967,8 @@ class MainMenuScene extends Phaser.Scene {
                 this.scene.get("SpaceBoyScene").mapProgressPanelText.setAlpha(1);
                 if (!mainMenuScene.pressedSpace) {
 
-                    if (!this.scene.get("MusicPlayerScene").hasStarted) {
-                        this.scene.get("MusicPlayerScene").startMusic();
+                    if (!SPACE_BOY.hasStarted) { // Why is this flag here? It is not referenced anywhere else.
+                        SPACE_BOY.mediaPlayer.startMusic(SPACE_BOY);
                     } 
     
                     mainMenuScene.UI_PressStartTween.stop();
@@ -5599,7 +5982,7 @@ class MainMenuScene extends Phaser.Scene {
                         titleTween.resume();
                         menuFadeTween.resume();
                     }
-                    this.scene.get("MusicPlayerScene").showTrackID();   
+                    SPACE_BOY.mediaPlayer.showTrackID(SPACE_BOY);   
                 }
                 else{
                     // call the main menu option
@@ -10657,7 +11040,7 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const sPersist = this.scene.get("PersistScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
-        this.scene.get('MusicPlayerScene').nextSong(`track_149`);
+        SPACE_BOY.mediaPlayer.nextSong(SPACE_BOY, `track_149`);
         var ourGame = this.scene.get("GameScene");
 
         if (this.mode === MODES.HARDCORE) {
@@ -10721,7 +11104,7 @@ class GameScene extends Phaser.Scene {
 
             const onContinue = function () {
                 //set to next song so it doesn't repeat gameOver song
-                ourGameScene.scene.get("MusicPlayerScene").nextSong();
+                SPACE_BOY.mediaPlayer.nextSong(SPACE_BOY);
                 ourGameScene.gameSceneFullCleanup();
                 ourGameScene.scene.start('MainMenuScene');
             }
@@ -11221,13 +11604,13 @@ class GameScene extends Phaser.Scene {
         this.scene.get("PersistScene").prevRank = 0;
 
         // reset music player
-        if (!this.scene.get("MusicPlayerScene").playerPaused) {
-            this.scene.get("MusicPlayerScene").pauseButton.setFrame(0);
+        if (!SPACE_BOY.mediaPlayer.playerPaused) {
+            SPACE_BOY.mediaPlayer.pauseButton.setFrame(0);
         }
-        if (!this.scene.get("MusicPlayerScene").playerLooped) {
-            this.scene.get("MusicPlayerScene").loopButton.setFrame(4);
+        if (!SPACE_BOY.mediaPlayer.playerLooped) {
+            SPACE_BOY.mediaPlayer.loopButton.setFrame(4);
         }
-        this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
+        SPACE_BOY.mediaPlayer.nextButton.setFrame(2);
 
         this.scene.get("PinballDisplayScene").resetPinballFull();
 
@@ -15467,7 +15850,7 @@ var config = {
         PersistScene, TutorialScene,
         GameScene, InputScene, ScoreScene, 
         StageCodex, ExtractTracker,
-        SpaceBoyScene, PinballDisplayScene,  MusicPlayerScene]
+        SpaceBoyScene, PinballDisplayScene,]  //MusicPlayerScene]
 };
 
 // #region Screen Settings
