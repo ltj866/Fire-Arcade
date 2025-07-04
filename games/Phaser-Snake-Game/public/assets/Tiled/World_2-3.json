@@ -15,9 +15,9 @@
             59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 95,
             94, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 93,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 257, 257, 257, 257, 257, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 257, 257, 257, 257, 257, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 257, 257, 257, 257, 257, 0,
+            0, 0, 0, 0, 0, 0, 802, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 773, 257, 257, 257, 257, 257, 0,
+            0, 0, 0, 0, 0, 0, 802, 770, 770, 770, 770, 770, 770, 770, 9, 770, 770, 770, 770, 770, 770, 770, 773, 257, 257, 257, 257, 257, 0,
+            0, 0, 0, 0, 0, 0, 802, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 770, 773, 257, 257, 257, 257, 257, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             62, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 118, 61,
             59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63,
@@ -147,6 +147,12 @@
          "imagewidth":384,
          "margin":0,
          "name":"tileSheetx12",
+         "properties":[
+                {
+                 "name":"switch",
+                 "type":"bool",
+                 "value":true
+                }],
          "spacing":0,
          "tilecount":1024,
          "tileheight":12,
@@ -1664,6 +1670,245 @@
                  "properties":[
                         {
                          "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":737,
+                 "properties":[
+                        {
+                         "name":"switch",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":739,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":33
+                        }]
+                }, 
+                {
+                 "id":740,
+                 "properties":[
+                        {
+                         "name":"switch",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":741,
+                 "properties":[
+                        {
+                         "name":"stopDIRS",
+                         "type":"int",
+                         "value":2
+                        }]
+                }, 
+                {
+                 "id":768,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":769,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":33
+                        }]
+                },
+            
+                {
+                 "id":770,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":99
+                        }]
+                }, 
+                {
+                 "id":771,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":99
+                        }]
+                }, 
+                {
+                 "id":774,
+                 "properties":[
+                        {
+                         "name":"stopDIRS",
+                         "type":"int",
+                         "value":1
+                        }]
+                }, 
+                {
+                 "id":802,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":99
+                        }]
+                }, 
+                {
+                 "id":803,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":99
+                        }]
+                }, 
+                {
+                 "id":804,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":33
+                        }]
+                }, 
+                {
+                 "id":805,
+                 "properties":[
+                        {
+                         "name":"stopDIRS",
+                         "type":"int",
+                         "value":4
+                        }]
+                }, 
+                {
+                 "id":832,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":833,
+                 "properties":[
+                        {
+                         "name":"coverAllSwitch",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":834,
+                 "properties":[
+                        {
+                         "name":"conveyDIRS",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"int",
+                         "value":33
+                        }]
+                }, 
+                {
+                 "id":838,
+                 "properties":[
+                        {
+                         "name":"stopDIRS",
+                         "type":"int",
+                         "value":3
+                        }]
+                }, 
+                {
+                 "id":864,
+                 "properties":[
+                        {
+                         "name":"instaDeath",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":865,
+                 "properties":[
+                        {
+                         "name":"instaDeath",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":866,
+                 "properties":[
+                        {
+                         "name":"instaDeath",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":897,
+                 "properties":[
+                        {
+                         "name":"instaDeath",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":898,
+                 "properties":[
+                        {
+                         "name":"instaDeath",
                          "type":"bool",
                          "value":true
                         }]

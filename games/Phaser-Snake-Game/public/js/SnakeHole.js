@@ -9992,7 +9992,7 @@ class GameScene extends Phaser.Scene {
 
             var coverTiles = this.map.filterTiles( tile => {
                 if (tile.index != -1) {
-                    if (tile.properties.secretCoverAll) { // Secret Cover Tile
+                    if (tile.properties.coverAllSwitch) { // Secret Cover Tile
                     return true
                     
                     } else {

@@ -3,6 +3,7 @@ import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState, updatePlayerStats,
     LENGTH_GOAL, PLAYER_STATS, SPEED_SPRINT, COMBO_ADD_FLOOR,
     X_OFFSET,
     Y_OFFSET,
+    SPEED_WALK,
 } from "../SnakeHole.js";
 import { STAGE_OVERRIDES } from '../data/customLevels.js';
 import { Food } from "./Food.js";
@@ -63,6 +64,7 @@ var Snake = new Phaser.Class({
         this.closestPortal = undefined; // TYPE Portal.
 
         this.evil = false;
+        this.onConvey = false;
         
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
@@ -171,7 +173,7 @@ var Snake = new Phaser.Class({
     
     
     // #region Move
-    move: function (scene) {
+    move: function (scene, dirOverride) {
         const ourPersistScene = scene.scene.get('PersistScene');
         this.previous = [this.head.x,this.head.y];
 
@@ -179,14 +181,21 @@ var Snake = new Phaser.Class({
         // wrapping tiles
         scene.map.setLayer(scene.wallVarient);
         
-
         // Look ahead for bonks
     
         let xN;
         let yN;
 
+        let dir;
+
+        if (dirOverride) {
+            dir = dirOverride;
+        } else {
+            dir = this.direction;
+        }
+
         
-        switch (this.direction) {
+        switch (dir) {
             case DIRS.LEFT:
                 yN = this.head.y;
                 xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
@@ -320,11 +329,34 @@ var Snake = new Phaser.Class({
         /**
          * Interface requirement that all objects in the interative layer 
          * need an onOver method to work properly or be "empty".
-         */ 
+         */
+        
+        
+
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP && scene.gState != GState.TRANSITION) {
                  Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);      
+        }
+
+        let conveyDir = function (scene, dir) {
+            var _tile = scene.map.getTileAtWorldXY( this.head.x, this.head.y );
+
+            if (_tile === null || !_tile.properties.conveyDIRS) {
+                this.onConvey = false;
+                return
+            }
+
+            this.move(scene, dir);
+
+            scene.time.delayedCall(nextTile.properties.speed, () => {
+                conveyDir.call(this, scene, nextTile.properties.conveyDIRS);
+            }, [scene], this);
+        }
+
+        if (nextTile != null && nextTile.properties.conveyDIRS && this.onConvey === false) {
+            this.onConvey = true;
+            conveyDir.call(this, scene, nextTile.properties.conveyDIRS);
         }
 
         var next = this.nextPos();
@@ -413,30 +445,60 @@ var Snake = new Phaser.Class({
             }
         }
 
+        if (nextTile && nextTile.properties.instantDeath) {
+            scene.canContinue = false;
+            scene.gState = GState.TRANSITION;
+            this.direction = DIRS.STOP;
+            scene.gameSceneCleanup();
+            scene.gameOver();
+
+        }
+
         if (nextTile && nextTile.properties.switch) {
 
             scene.map.forEachTile( tile => {
 
                 switch (tile.index) {
-                    case 483:
-                        tile.index = 515;
+                    case 737: // ON OFF TILES
+                        tile.index = 833;
                         tile.properties.hasCollision = true;
                         
                         break;
-                    case 484:
-                        tile.index = 516;
+                    case 769:
+                        tile.index = 801;
                         tile.properties.hasCollision = false;
                         
                         break;
-                    case 515:
-                        tile.index = 483;
-                        tile.properties.hasCollision = false;
-                        
-                        break;
-                    case 516:
-                        tile.index = 484;
+                    case 801:
+                        tile.index = 769;
                         tile.properties.hasCollision = true;
                         
+                        break;
+                    case 833:
+                        tile.index = 737;
+                        tile.properties.hasCollision = false;
+                        
+                        break;
+                        
+                    /// Conveyor Tiles Flip
+                    case 771:
+                        tile.properties.conveyDIRS += 1;
+                        tile.index = 804; 
+                        break;
+
+                    case 772:
+                        tile.properties.conveyDIRS += -1;
+                        tile.index = 803;     
+                        break;
+
+                    case 803:
+                        tile.properties.conveyDIRS += 1;
+                        tile.index = 772;
+                        break;
+
+                    case 804:
+                        tile.properties.conveyDIRS += -1;
+                        tile.index = 771;
                         break;
                 
                     default:

@@ -447,7 +447,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 162
+                "y": 161.83333333333331
             }
         },
         "World_0-1.json#tileSheetx12": {
@@ -503,8 +503,8 @@
             "scale": 1.476867816091954,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.016927716704,
-                "y": 161.82897168985306
+                "x": 174.01692771670395,
+                "y": 161.4904173557739
             }
         },
         "World_10-1.json#tileSheetx12": {
@@ -514,8 +514,8 @@
             "scale": 1.476867816091954,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174.016927716704,
-                "y": 161.82897168985306
+                "x": 174.01692771670395,
+                "y": 161.4904173557739
             }
         },
         "World_10-1g.json#tileSheetx12": {
@@ -788,10 +788,10 @@
         },
         "World_2-1.json": {
             "scale": 2,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 172,
-                "y": 173
+                "y": 172.75
             }
         },
         "World_2-1.json#tileSheetx12": {
@@ -802,23 +802,24 @@
             "scale": 2.729885057471264,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.63368421052635,
-                "y": 162.27789473684214
+                "x": 173.63368421052633,
+                "y": 162.46105263157898
             }
         },
         "World_2-10.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "World_2-2.json": {
-            "scale": 1,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161.5
+                "y": 137.25
             }
         },
         "World_2-2.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
         },
         "World_2-2g.json": {
             "scale": 2,
@@ -832,15 +833,16 @@
             "scaleInDock": 1
         },
         "World_2-3.json": {
-            "scale": 1,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.5
+                "x": 155,
+                "y": 238.25
             }
         },
         "World_2-3.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 2,
+            "scaleInEditor": 1
         },
         "World_2-3_OLD.json": {
             "scale": 1,
@@ -858,7 +860,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161.66666666666669
+                "y": 161.66666666666666
             }
         },
         "World_2-4.json#tileSheetx12": {
@@ -869,7 +871,7 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 168.25,
+                "x": 168,
                 "y": 171.25
             }
         },
@@ -880,7 +882,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 217.75,
+                "x": 217.5,
                 "y": 134.25
             }
         },
@@ -1167,11 +1169,11 @@
             "scaleInDock": 1
         },
         "World_8-1_Adv_Portaling.json": {
-            "scale": 2,
+            "scale": 5.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
-                "y": 162
+                "x": 174.36363636363637,
+                "y": 172.09090909090912
             }
         },
         "World_8-1_Adv_Portaling.json#tileSheetx12": {
@@ -1672,7 +1674,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 314.5,
+                "x": 314,
                 "y": 161.5
             }
         },
@@ -1694,7 +1696,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 314.5,
+                "x": 314,
                 "y": 161.5
             }
         },
@@ -1705,7 +1707,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 314.5,
+                "x": 314,
                 "y": 330.5
             }
         },
@@ -1716,7 +1718,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 314.5,
+                "x": 314,
                 "y": 161.5
             }
         },
@@ -2223,8 +2225,8 @@
         },
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1,
-            "scaleInEditor": 4
+            "scaleInDock": 3,
+            "scaleInEditor": 16
         },
         "tileSheetx12_25-04-04.tsx": {
             "scaleInDock": 1,
@@ -2295,18 +2297,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "World_2-3.json",
         "tileSheetx12.tsx",
-        "World_1-1.json",
-        "World_14-1.json",
-        "World_1-2.json",
+        "World_2-1.json",
+        "World_2-2.json",
+        "World_2-10.json",
         "World_0-1.json",
-        "World_10-3.json",
-        "World_10-2.json",
-        "World_10-1g.json",
         "World_10-1.json",
-        "World_1-3.json",
-        "World_14-2.json",
-        "World_14-3.json"
+        "World_10-1g.json",
+        "World_2-4.json",
+        "World_2-4g.json",
+        "World_8-1_Adv_Portaling.json",
+        "r_11-30-2.json"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
 }
