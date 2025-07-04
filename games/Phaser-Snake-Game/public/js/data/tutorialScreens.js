@@ -272,6 +272,27 @@ export var TUTORIAL_PANELS = new Map([
         return _map
 
     }],
+    ["Bonus_X-3", function (panelNumber) {
+        var _map = structuredClone(defaultMap);
+
+        const panel3 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
+        panel3.setDepth(80);
+        panel3.setScale(0);
+        
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+            'Rules Hint?',
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
+
+        
+
+        _map.get("text").push(tutText);
+        //_map.get("images").push(tutPortal1, tutPortal2, tutSnake2, tutSnake3);
+        _map.get("panels").push(panel3);
+        _map.set("growPanelTo", {w:240, h:160});
+
+        return _map
+
+    }],
     ["boost", function (panelNumber) {
         var _map = structuredClone(defaultMap);
 

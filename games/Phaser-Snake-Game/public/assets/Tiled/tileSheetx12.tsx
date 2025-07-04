@@ -516,26 +516,6 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="155">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="156">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="157">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="158">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
  <tile id="160">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
@@ -651,26 +631,6 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="187">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="188">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="189">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
- <tile id="190">
-  <properties>
-   <property name="hasCollision" type="bool" value="true"/>
-  </properties>
- </tile>
  <tile id="192">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
@@ -749,6 +709,21 @@
  <tile id="207">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="208">
+  <properties>
+   <property name="checkpoint" type="int" value="0"/>
+  </properties>
+ </tile>
+ <tile id="209">
+  <properties>
+   <property name="checkpoint" type="int" value="0"/>
+  </properties>
+ </tile>
+ <tile id="210">
+  <properties>
+   <property name="checkpoint" type="int" value="0"/>
   </properties>
  </tile>
  <tile id="212">
@@ -866,6 +841,16 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="240">
+  <properties>
+   <property name="checkpoint" type="int" value="0"/>
+  </properties>
+ </tile>
+ <tile id="242">
+  <properties>
+   <property name="checkpoint" type="int" value="0"/>
+  </properties>
+ </tile>
  <tile id="244">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
@@ -909,6 +894,66 @@
  <tile id="281">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="481">
+  <properties>
+   <property name="secretCoverAll" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="512">
+  <properties>
+   <property name="switch" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="513">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="515">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="640">
+  <properties>
+   <property name="checkpoint" type="int" value="1"/>
+  </properties>
+ </tile>
+ <tile id="641">
+  <properties>
+   <property name="checkpoint" type="int" value="2"/>
+  </properties>
+ </tile>
+ <tile id="642">
+  <properties>
+   <property name="checkpoint" type="int" value="3"/>
+  </properties>
+ </tile>
+ <tile id="643">
+  <properties>
+   <property name="checkpoint" type="int" value="4"/>
+  </properties>
+ </tile>
+ <tile id="644">
+  <properties>
+   <property name="checkpoint" type="int" value="5"/>
+  </properties>
+ </tile>
+ <tile id="645">
+  <properties>
+   <property name="checkpoint" type="int" value="6"/>
+  </properties>
+ </tile>
+ <tile id="646">
+  <properties>
+   <property name="checkpoint" type="int" value="7"/>
+  </properties>
+ </tile>
+ <tile id="647">
+  <properties>
+   <property name="checkpoint" type="int" value="8"/>
   </properties>
  </tile>
 </tileset>

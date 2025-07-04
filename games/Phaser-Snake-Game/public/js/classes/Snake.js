@@ -409,6 +409,93 @@ var Snake = new Phaser.Class({
             }
         }
 
+        if (nextTile && nextTile.index === 513) {
+
+            scene.map.forEachTile( tile => {
+
+                switch (tile.index) {
+                    case 514:
+                        tile.index = 517;
+                        tile.properties.hasCollision = false;
+                        
+                        break;
+                    case 515:
+                        tile.index = 516;
+                        tile.properties.hasCollision = true;
+                        
+                        break;
+                    case 516:
+                        tile.index = 515;
+                        tile.properties.hasCollision = false;
+                        
+                        break;
+                    case 517:
+                        tile.index = 514;
+                        tile.properties.hasCollision = true;
+                        
+                        break;
+                
+                    default:
+                        break;
+                }
+
+            }, this, 0, 0, 30, 30, {}, scene.wallVarient);
+            
+            
+        }
+
+
+        // Check Secret Layer For Hover Tiles
+
+        if (scene.secretTileCount) {
+            var _tile = scene.map.getTileAt(onGridX, onGridY, false, "Secrets");
+
+            if (_tile && _tile.properties.secretCoverAll) {
+
+                scene.secretTilePool.add(`${_tile.x},${_tile.y}`);
+
+                if (scene.secretTilePool.size === scene.secretTileCount) {
+                    
+                    console.log("YOU DID THE THING! (Secret)");
+                    scene.events.emit("secret", _tile);
+                }
+                
+            } else {
+                scene.secretTilePool.clear();
+            }
+        }
+
+        // Checkpoint Logic
+
+        if (scene.finalCheckpoint) {
+            var _tile = scene.map.getTileAt(onGridX, onGridY, false, "Checkpoints");
+
+            if (_tile && _tile.properties.checkpoint) {
+                
+                if (scene.checkpoints.has(_tile.properties.checkpoint - 1)) {
+                    scene.checkpoints.add(_tile.properties.checkpoint);
+                }
+
+                if (_tile.properties.checkpoint === 1) {
+                    if (scene.checkpoints.size === scene.finalCheckpoint) {
+                        console.log("ONE LAP!");
+                        if (scene.tem.racingTimer) {
+                            scene.tem.racingTimer = scene.tem.racingTimerStart;  
+                        }
+                        scene.checkpoints.clear();
+                    } else {
+                        console.log("CLEARING CHECKPOINTS");
+                        scene.checkpoints.clear();
+                        scene.checkpoints.add(1);
+                    }
+                    
+                }
+                
+            }
+        }
+
+
+
 
         
         // Check for ExtractHole

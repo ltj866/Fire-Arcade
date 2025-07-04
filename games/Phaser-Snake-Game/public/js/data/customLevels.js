@@ -1,5 +1,5 @@
 import { X_OFFSET, Y_OFFSET, 
-    GRID, MODES, 
+    GRID, MODES, STYLE_DEFAULT, 
     GState, DIRS, commaInt, PLAYER_STATS, 
     INVENTORY_ITEMS,INVENTORY_DATA,
     BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, 
@@ -2446,6 +2446,106 @@ STAGE_OVERRIDES.set("World_4-1", {
             }
   
         }
+    }
+});
+STAGE_OVERRIDES.set("World_5-1_Racing", {
+    8_1: null,
+    methods: {
+        preFix: function (scene) {
+            scene.tem = {};
+            scene.tem.racingTimerStart = 90;
+            scene.tem.racingTimer = scene.tem.racingTimerStart;
+
+            
+        },
+        postFix: function (scene) {
+
+        scene.tem.countText = scene.add.dom(390, 243, 'div', Object.assign({}, STYLE_DEFAULT, {
+            'color': '#FF2222',
+            'text-shadow': '0 0 4px #FF9405, 0 0 8px #FF2222',
+            'font-size': '22px',
+            'font-weight': '400',
+            'font-family': 'Oxanium',
+            'padding': '2px 7px 0px 0px',
+            })).setHTML(
+                scene.tem.racingTimer.toString().padStart(3,"0")
+        ).setOrigin(1,0).setScale(.5);
+        scene.tem.countText.setScrollFactor(0);
+        scene.tem.countText.name = "racingTimer";
+            
+        },
+        afterTick: function (scene) {
+            scene.tem.racingTimer--;
+            scene.tem.countText.setHTML(scene.tem.racingTimer.toString().padStart(3,"0"));
+
+            if (scene.tem.racingTimer < 1) {
+
+                var cutOff = scene.snake.body.splice(Math.floor(scene.snake.body.length / 2), scene.snake.body.length + 1);
+                
+                scene.scoreHistory.splice(cutOff.length, scene.scoreHistory.length + 1);
+
+                SPACE_BOY.lengthGoalUI.setText(scene.scoreHistory.length);
+
+                scene.snake.bonk(scene);
+                scene.tem.racingTimer = scene.tem.racingTimerStart;
+
+                scene.tweens.add({
+                    targets: cutOff,
+                    alpha: 0,
+                    duration: 5000,
+                    ease: 'Sine.Out',
+                    onComplete: (tween, targets) => {
+                        targets.forEach( part => {
+                            part.destroy();
+                        })
+                    }
+                });
+            }
+            
+        },
+    }
+});
+
+STAGE_OVERRIDES.set("World_8-1_Adv_Portaling", {
+    8_1: null,
+    methods: {
+        preFix: function (scene) {
+            // Secret Portal Reset in Init
+        },
+        postFix: function (scene) {
+            scene.events.once('secret', function (tile){
+                scene.secretPortal = scene.add.sprite(tile.pixelX + X_OFFSET + GRID * 3.5, tile.pixelY + Y_OFFSET + GRID * 0.5);
+                scene.secretPortal.play('blackholeForm');
+
+                scene.tweens.addCounter({
+                    from: 0,
+                    to: 360,
+                    duration: 3000,
+                    loop: -1,
+                    onUpdate: (tween) => {
+                        let hueValue = tween.getValue();
+                        
+                        // Add an offset to the hue for each segment
+                        let partHueValue = (hueValue * 12.41) % 360;
+            
+                        // Reduce saturation and increase lightness
+                        let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+            
+                        if (color) {// only update color when it's not null
+                            scene.secretPortal.setTint(color.color);
+                        }
+                        
+                    }
+                });
+
+    
+                console.log("SPAWNING SECRET BLACKHOLE");
+                //scene.nextStagePortals.pop(scene.secretPortal);
+                //scene.interactLayer[tile.x][tile.y] = scene.secretPortal
+            }, scene)
+
+
+        },
     }
 });
 

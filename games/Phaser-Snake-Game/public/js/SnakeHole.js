@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_14-CR4'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_2-1'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7327,6 +7327,7 @@ class GameScene extends Phaser.Scene {
         this.stageConfig.lengthGoal = LENGTH_GOAL,
         this.stageConfig.maxScore = MAX_SCORE,
         
+        this.tem = {};
 
         // Laser Wall Settings
 
@@ -7345,6 +7346,13 @@ class GameScene extends Phaser.Scene {
 
         this.extractMenuOn = false; // set to true to enable extract menu functionality. // GOTTOGO
         this.secretPortal = undefined;
+        this.secretTileCount = undefined;
+        this.secretTilePool = new Set();
+
+        // Check Point Code
+
+        this.checkpoints = new Set();
+        this.finalCheckpoint = undefined;
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -9570,8 +9578,26 @@ class GameScene extends Phaser.Scene {
         adjustLightIntensityAndRadius(portalLights);
 
         // Secrets
-        if (this.map.getLayer('Secret')) {
+        if (this.map.getLayer('Secrets')) {
 
+            // Secret Hover Tiles
+
+            var coverTiles = this.map.filterTiles( tile => {
+                if (tile.index != -1) {
+                    if (tile.index === 482) { // Secret Cover Tile
+                    return true
+                    
+                    } else {
+                        return false
+                    }  
+                }
+                
+            }, this, 0, 0, 29, 27, {}, 'Secrets');
+
+            this.secretTileCount = coverTiles.length;
+
+            
+            // Secret Portals
             var secretSpawnPools = {};
 
             this.map.forEachTile( tile => {
@@ -9594,7 +9620,6 @@ class GameScene extends Phaser.Scene {
                     tile.index === 11 // Apple Tile
 
                 ) {
-                    debugger
 
                     var _coin = new Coin(this, this.coinsArray, tile.pixelX + X_OFFSET , tile.pixelY + Y_OFFSET);
                     _coin.alpha = 0;
@@ -9602,7 +9627,7 @@ class GameScene extends Phaser.Scene {
                     this.interactLayer[tile.x][tile.y] = _coin;
 
                 }
-            }, this, 0, 0, 30, 30, {}, 'Secret');
+            }, this, 0, 0, 30, 30, {}, 'Secrets');
 
             for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
 
@@ -9616,6 +9641,22 @@ class GameScene extends Phaser.Scene {
                     pair[1].alpha = 0;
                 }
             }   
+        }
+
+        if (this.map.getLayer('Checkpoints')) {
+            if (this.map.findByIndex(641, 0, false, "Checkpoints")) {
+
+                this.checkpoints.add(1); // Start with the first 1.
+
+                var highestCheckpoint = 8; // Hightest Checkpoint Value.
+                var count = 0;
+
+                do {
+                    count++;
+                } while (this.map.findByIndex(641 + count, 0, false, "Checkpoints"));
+
+            }
+            this.finalCheckpoint = count;
         }
         
 
