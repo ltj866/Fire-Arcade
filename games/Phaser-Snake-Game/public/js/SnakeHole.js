@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_2-1'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-2'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -1999,7 +1999,7 @@ class MediaPlayer {
             }
         });
         
-        window.addEventListener('blur', (scene) => {
+        window.addEventListener('blur', scene => {
             if (SPACE_BOY.spaceBoyReady) {
                 this.pauseButton.setFrame(1);
                 scene.sound.pauseAll(); // this prevents sound from being able to resume
@@ -8222,6 +8222,31 @@ class GameScene extends Phaser.Scene {
                 tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
             }
         });
+
+        if (PERSISTS.mode === MODES.EXPERT) {
+            if (this.map.getLayer('Expert')) {
+
+                this.map.forEachTile(tile => {
+
+                    if (tile.index != -1) {
+
+                        var toWallTile = this.map.getTileAt(tile.x, tile.y, true, this.wallVarient);
+
+                        toWallTile.index = tile.index;
+                        debugger
+                        toWallTile.tint = 0xDD0000;
+                        toWallTile.properties.hasCollision = true;
+
+                        debugger
+                        
+                    }
+                    
+                }, this, 0, 0, 30, 30, {}, 'Expert');
+                
+            }
+            debugger
+            
+        }
         
         //var renderIndex = 9  @holden still need this?
         //this.noRenderTiles = [8,9,10,11];
