@@ -454,7 +454,7 @@ var Snake = new Phaser.Class({
         if (scene.secretTileCount) {
             var _tile = scene.map.getTileAt(onGridX, onGridY, false, "Secrets");
 
-            if (_tile && _tile.properties.secretCoverAll) {
+            if (_tile && _tile.properties.coverAllSwitch) {
 
                 scene.secretTilePool.add(`${_tile.x},${_tile.y}`);
 

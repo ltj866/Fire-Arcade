@@ -2293,18 +2293,18 @@
         "World_2-2g.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "int",
+    "property.type": "bool",
     "recentFiles": [
         "tileSheetx12.tsx",
-        "World_1-2.json",
         "World_1-1.json",
+        "World_14-1.json",
+        "World_1-2.json",
+        "World_0-1.json",
         "World_10-3.json",
         "World_10-2.json",
         "World_10-1g.json",
         "World_10-1.json",
-        "World_0-1.json",
         "World_1-3.json",
-        "World_14-1.json",
         "World_14-2.json",
         "World_14-3.json"
     ],
