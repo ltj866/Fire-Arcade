@@ -1,5 +1,5 @@
 {
-    "activeFile": "",
+    "activeFile": "World_10-2.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -459,7 +459,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161.5
+                "y": 161
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -502,8 +502,8 @@
             "scale": 1.476867816091954,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.01692771670398,
-                "y": 162.16752602393234
+                "x": 174.016927716704,
+                "y": 162.50608035801145
             }
         },
         "World_10-1.json#tileSheetx12": {
@@ -513,8 +513,8 @@
             "scale": 1.476867816091954,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.67837338262478,
-                "y": 162.16752602393228
+                "x": 173.33981904854562,
+                "y": 161.82897168985306
             }
         },
         "World_10-1g.json#tileSheetx12": {
@@ -526,7 +526,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 174,
-                "y": 161.5
+                "y": 161
             }
         },
         "World_10-2.json#tileSheetx12": {
@@ -537,7 +537,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174,
-                "y": 161.5
+                "y": 161
             }
         },
         "World_10-3.json#tileSheetx12": {
@@ -2275,22 +2275,29 @@
     "last.externalTilesetPath": "C:/Users/jlhan/OneDrive/Documents/GitHub/Fire-Arcade2/games/Phaser-Snake-Game/public/assets/Tiled",
     "map.lastUsedFormat": "json",
     "openFiles": [
+        "World_0-1.json",
+        "World_10-1.json",
+        "World_10-1g.json",
+        "World_10-2.json",
+        "World_10-3.json",
+        "World_1-1.json",
+        "World_1-2.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "tileSheetx12.tsx",
-        "World_2-1.json",
-        "World_5-1_Racing.json",
-        "Wrap_Stage-xx.json",
         "World_0-1.json",
-        "World_10-2.json",
-        "World_10-3.json",
-        "World_1-1.json",
+        "World_10-1.json",
+        "World_10-1g.json",
         "World_1-2.json",
+        "World_1-1.json",
+        "World_10-3.json",
+        "World_10-2.json",
         "World_1-3.json",
-        "World_2-2.json",
-        "World_2-3.json"
+        "World_5-1_Racing.json",
+        "World_5-2_Racing.json",
+        "World_5-3_Racing.json",
+        "World_4-9.json"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)"
 }
