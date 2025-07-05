@@ -833,7 +833,7 @@ export const GState = Object.freeze({
 const GROW_26 = false; // false
 
 // #region START STAGE
-export const START_STAGE = 'World_5-1_Racing'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_4-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -12274,10 +12274,12 @@ class GameScene extends Phaser.Scene {
     // #region Game Update
     update(time, delta) {
 
-        if (STAGE_OVERRIDES.has(this.stage)) {
-            //console.log("Running preFix Update on", this.stage);
-            STAGE_OVERRIDES.get(this.stage).methods.preUpdate(this, time, delta);
+        if (STAGE_OVERRIDES.has(this.stage )) {
+            if (STAGE_OVERRIDES.get(this.stage).methods.hasOwnProperty("preUpdate")) {
+                STAGE_OVERRIDES.get(this.stage).methods.preUpdate(this, time, delta);
+            }
         }
+
 
 
 
