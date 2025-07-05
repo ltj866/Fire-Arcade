@@ -2548,7 +2548,7 @@ STAGE_OVERRIDES.set("World_5-1_Racing", {
 
                 //scene.snake.bonk(scene);
                 scene.tem.racingTimer = scene.tem.racingTimerStart;
-                var toCut = Math.floor(scene.snake.body.length / 2)
+                var toCut = Math.floor(scene.snake.body.length * 0.75)
 
                 this.destroyTail(scene, toCut);
 
