@@ -2516,15 +2516,27 @@ STAGE_OVERRIDES.set("World_5-1_Racing", {
                 // Sound is placeholder.
                 scene.coinSound.play();
 
+                var placeholder = scene.add.line(
+                    0,0,
+                    part.x, part.y, 
+                    scene.tem.cannon.x , scene.tem.cannon.y,
+                    0xff0000,
+                )
+
                 scene.tweens.add({
-                    targets: part,
+                    targets: [part, placeholder],
                     alpha: 0,
-                    duration: 1500,
+                    duration: 1000,
                     ease: 'Sine.Out',
                     onComplete: (tween, targets) => {
-                        targets[0].destroy();
+                        targets.forEach(item =>{
+                            item.destroy();
+                        });
                     }
                 });
+
+                
+
 
 
                 scene.time.delayedCall(200, () => {
