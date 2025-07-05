@@ -2472,7 +2472,67 @@ STAGE_OVERRIDES.set("World_5-1_Racing", {
         ).setOrigin(1,0).setScale(.5);
         scene.tem.countText.setScrollFactor(0);
         scene.tem.countText.name = "racingTimer";
+
+        var turret = scene.map.findByIndex(152, 0, false, scene.wallVarient);
+
+        var h = 18;
+        var w = 70;
+
+        scene.tem.cannon = scene.add.rectangle(turret.pixelX + X_OFFSET + h, turret.pixelY + Y_OFFSET + h - 3, w, h, 0x00f000, .5);
+        scene.tem.cannon.setOrigin(0.95,0.5);
+        scene.tem.cannon.angle = 45;
             
+        },
+        preUpdate: function(scene, time, delta) {
+
+            var last = scene.snake.body[scene.snake.body.length - 1];
+            
+
+            var angle = Phaser.Math.Angle.Between(
+                    last.x, 
+                    last.y,
+                    scene.tem.cannon.x, 
+                    scene.tem.cannon.y,
+            );
+            //const move = 100 * (delta/1000);
+            //const diff = (angle - scene.tem.cannon.angle) * move;
+
+            scene.tem.cannon.rotation = angle;
+
+
+        },
+        destroyTail: function (scene, n) {
+
+            if (n < 1) {
+                // Last One
+                return
+            } else {
+
+                scene.scoreHistory.pop();
+                scene.length = scene.scoreHistory.length;
+                var part = scene.snake.body.pop();
+                SPACE_BOY.lengthGoalUI.setText(scene.scoreHistory.length);
+
+                // Sound is placeholder.
+                scene.coinSound.play();
+
+                scene.tweens.add({
+                    targets: part,
+                    alpha: 0,
+                    duration: 1500,
+                    ease: 'Sine.Out',
+                    onComplete: (tween, targets) => {
+                        targets[0].destroy();
+                    }
+                });
+
+
+                scene.time.delayedCall(200, () => {
+                
+                    this.destroyTail(scene, n-1);
+                }, [], this);
+            }
+
         },
         afterTick: function (scene) {
             scene.tem.racingTimer--;
@@ -2480,15 +2540,19 @@ STAGE_OVERRIDES.set("World_5-1_Racing", {
 
             if (scene.tem.racingTimer < 1) {
 
-                var cutOff = scene.snake.body.splice(Math.floor(scene.snake.body.length / 2), scene.snake.body.length + 1);
+                //var cutOff = scene.snake.body.splice(Math.floor(scene.snake.body.length / 2), scene.snake.body.length + 1);
                 
-                scene.scoreHistory.splice(cutOff.length, scene.scoreHistory.length + 1);
+                //scene.scoreHistory.splice(cutOff.length, scene.scoreHistory.length + 1);
 
-                SPACE_BOY.lengthGoalUI.setText(scene.scoreHistory.length);
+                //SPACE_BOY.lengthGoalUI.setText(scene.scoreHistory.length);
 
-                scene.snake.bonk(scene);
+                //scene.snake.bonk(scene);
                 scene.tem.racingTimer = scene.tem.racingTimerStart;
+                var toCut = Math.floor(scene.snake.body.length / 2)
 
+                this.destroyTail(scene, toCut);
+
+                /*
                 scene.tweens.add({
                     targets: cutOff,
                     alpha: 0,
@@ -2499,7 +2563,7 @@ STAGE_OVERRIDES.set("World_5-1_Racing", {
                             part.destroy();
                         })
                     }
-                });
+                });*/
             }
             
         },
